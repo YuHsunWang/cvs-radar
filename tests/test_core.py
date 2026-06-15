@@ -256,6 +256,35 @@ class TimeAndServiceTest(unittest.TestCase):
         self.assertEqual(result.filters["end_date"], "2026-06-15T12:00:00")
 
 
+class AppHelperTest(unittest.TestCase):
+    def test_app_helpers_use_service_query_shape(self) -> None:
+        from datetime import datetime
+        from cvs_radar.app_helpers import ALL_BRANDS, brand_options, build_product_query, product_rows
+        from cvs_radar.sample_data import load_sample
+        from cvs_radar.service import query_products
+
+        now = datetime(2026, 6, 15, 12, 0)
+        posts = load_sample()
+
+        options = brand_options(posts, recent_days=30, now=now)
+        query = build_product_query(
+            brand=ALL_BRANDS,
+            recent_days=30,
+            min_posts=1,
+            min_comments=0,
+            limit=5,
+        )
+        result = query_products(posts, query, now=now)
+        rows = product_rows(result)
+
+        self.assertEqual(options[0], ALL_BRANDS)
+        self.assertIsNone(query.brand)
+        self.assertTrue(rows)
+        self.assertLessEqual(len(rows), 5)
+        self.assertIn("fair_score", rows[0])
+        self.assertIn("代表性推", rows[0])
+
+
 class CrawlerTest(unittest.TestCase):
     def test_seen_cache_creates_parent_directory(self) -> None:
         from tempfile import TemporaryDirectory

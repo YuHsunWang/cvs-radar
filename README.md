@@ -110,3 +110,48 @@ payload = result.to_dict()
 ```
 
 時間篩選會同時約束貼文與留言；若舊貼文下有落在區間內的新留言，系統會保留商品脈絡與該留言，但不使用舊貼文作者評分。
+
+## Streamlit 互動式 App
+
+安裝依賴：
+
+```bash
+pip install -r requirements.txt
+```
+
+啟動互動介面：
+
+```bash
+streamlit run app.py
+# 若 streamlit 指令不在 PATH，可改用：
+python -m streamlit run app.py
+```
+
+預設資料來源是 `demo 離線樣本`，不會連網。側邊欄可操作：
+
+- `資料來源`：使用 demo，或手動切換到 `crawl PTT CVS`。
+- `時間選擇`：使用 `近 N 天`，或切換為 `起訖日期`。
+- `品牌`：由 `cvs_radar.service.list_brands` 依目前時間範圍動態產生，並含 `全部`。
+- `進階篩選`：最低分 `min_score`、最低有效樣本 `min_n_eff`、最少貼文、最少留言、筆數上限。
+
+主畫面會顯示商品排名與細節，包含 `fair_score`、`consensus`、`confidence`、`n_eff`、貼文/留言數，以及代表性推/噓評論。UI 只負責輸入與呈現，查詢與排名透過 `cvs_radar.service.query_products` 執行。
+
+## FastAPI JSON 端點
+
+啟動 API：
+
+```bash
+uvicorn cvs_radar.api:app --reload
+# 若 uvicorn 指令不在 PATH，可改用：
+python -m uvicorn cvs_radar.api:app --reload
+```
+
+常用端點：
+
+```bash
+curl "http://127.0.0.1:8000/health"
+curl "http://127.0.0.1:8000/brands?source=demo&recent_days=30"
+curl "http://127.0.0.1:8000/products?source=demo&brand=7-11&min_score=50&limit=10"
+```
+
+API 預設使用 demo 離線資料；只有明確傳入 `source=crawl` 時才會嘗試連線抓取。
