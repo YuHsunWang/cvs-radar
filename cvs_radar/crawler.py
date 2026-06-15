@@ -5,12 +5,14 @@ from __future__ import annotations
 import json
 import logging
 import time
+from datetime import date, datetime
 from pathlib import Path
 from typing import Iterable
 
 import requests
 
 from .config import CRAWL
+from .filters import build_time_window, filter_post_by_time
 from .models import Post
 from .parser import parse_ptt_article, parse_ptt_list, parse_push_count
 
@@ -36,9 +38,24 @@ class PttCrawler:
         self.session.cookies.set("over18", "1", domain="www.ptt.cc")
         self.seen_urls = self._load_seen()
 
-    def crawl(self, max_pages: int | None = None, board: str | None = None) -> list[Post]:
+    def crawl(
+        self,
+        max_pages: int | None = None,
+        board: str | None = None,
+        *,
+        start_date: str | date | datetime | None = None,
+        end_date: str | date | datetime | None = None,
+        recent_days: int | None = None,
+        now: datetime | None = None,
+    ) -> list[Post]:
         board = board or str(CRAWL["board"])
         max_pages = int(max_pages if max_pages is not None else CRAWL["max_pages"])
+        window = build_time_window(
+            start_date=start_date,
+            end_date=end_date,
+            recent_days=recent_days,
+            now=now,
+        )
         url = f"{self.base_url}/bbs/{board}/index.html"
         posts: list[Post] = []
 
@@ -55,11 +72,14 @@ class PttCrawler:
                 except Exception as exc:  # keep batch running when one article fails
                     logger.warning("failed to parse %s: %s", article_url, exc)
                     continue
-                self.seen_urls.add(article_url)
                 if post is None:
+                    self.seen_urls.add(article_url)
                     continue
                 post.push_count = parse_push_count(item.get("push_count"))
-                posts.append(post)
+                filtered_post = filter_post_by_time(post, window)
+                self.seen_urls.add(article_url)
+                if filtered_post is not None:
+                    posts.append(filtered_post)
             if not prev_url:
                 break
             url = prev_url
@@ -94,6 +114,7 @@ class PttCrawler:
             return set()
 
     def _save_seen(self) -> None:
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
         self.cache_path.write_text(
             json.dumps(sorted(self.seen_urls), ensure_ascii=False, indent=2),
             encoding="utf-8",

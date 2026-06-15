@@ -73,3 +73,40 @@ python -m compileall .
 
 ## 後續(v1)
 接 Dcard(`Source` 介面已預留)、情感換 LLM、簡易查詢介面 / Web dashboard。
+# CVS Radar 新增核心功能使用方式
+
+## CLI
+
+```bash
+# 列出目前資料中的品牌
+python run.py --demo --list-brands
+
+# 指定日期區間，只用該區間內的貼文/留言重新評分
+python run.py --demo --start-date 2026-06-01 --end-date 2026-06-07
+
+# 近 N 天篩選
+python run.py --demo --recent-days 14
+
+# 指定品牌後輸出該品牌商品排名，並套用最低分與樣本條件
+python run.py --demo --brand 7-11 --min-score 50 --min-n-eff 1 --min-comments 1 --limit 10
+
+# 爬 PTT 後套用同樣條件
+python run.py --crawl --pages 5 --recent-days 30 --brand 7-11
+```
+
+## 服務層 API
+
+前端或 HTTP handler 可直接呼叫 `cvs_radar.service`：
+
+```python
+from cvs_radar.sample_data import load_sample
+from cvs_radar.service import ProductQuery, list_brands, query_products, select_reviews
+
+posts = load_sample()
+selected = select_reviews(posts, start_date="2026-06-01", end_date="2026-06-07")
+brands = list_brands(posts)
+result = query_products(posts, ProductQuery(brand="7-11", min_score=50, recent_days=30))
+payload = result.to_dict()
+```
+
+時間篩選會同時約束貼文與留言；若舊貼文下有落在區間內的新留言，系統會保留商品脈絡與該留言，但不使用舊貼文作者評分。

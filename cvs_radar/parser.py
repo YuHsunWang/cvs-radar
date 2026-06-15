@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Iterable
 
 from bs4 import BeautifulSoup
@@ -76,7 +76,8 @@ def parse_ptt_article(html: str, url: str = "", board: str = "CVS") -> Post | No
     if not is_product_title(title):
         return None
 
-    comments = _parse_comments(soup)
+    posted_at = parse_ptt_datetime(metadata.get("date"))
+    comments = _parse_comments(soup, posted_at)
     body_text = _body_text_without_pushes(soup)
     fields = _parse_fields(body_text)
     product_name = _first_field(fields, "商品名稱", "商品", default=_title_product_name(title))
@@ -97,7 +98,7 @@ def parse_ptt_article(html: str, url: str = "", board: str = "CVS") -> Post | No
         author=metadata.get("author", ""),
         author_score=parse_score(_first_field(fields, "評分", "分數")),
         review_text=review_text,
-        posted_at=parse_ptt_datetime(metadata.get("date")),
+        posted_at=posted_at,
         is_reply=title.lower().startswith("re:"),
         push_count=None,
         comments=comments,
@@ -146,7 +147,7 @@ def _parse_metadata(soup: BeautifulSoup) -> dict[str, str]:
     }
 
 
-def _parse_comments(soup: BeautifulSoup) -> list[Comment]:
+def _parse_comments(soup: BeautifulSoup, reference: datetime | None = None) -> list[Comment]:
     comments: list[Comment] = []
     for push in soup.select("div.push"):
         tag = _text(push.select_one(".push-tag"))
@@ -157,7 +158,7 @@ def _parse_comments(soup: BeautifulSoup) -> list[Comment]:
                 tag=tag,
                 user=user,
                 text=content,
-                posted_at=parse_push_datetime(_text(push.select_one(".push-ipdatetime"))),
+                posted_at=parse_push_datetime(_text(push.select_one(".push-ipdatetime")), reference=reference),
             )
         )
     return comments
@@ -235,16 +236,38 @@ def parse_ptt_datetime(raw: str | None) -> datetime | None:
     return None
 
 
-def parse_push_datetime(raw: str | None) -> datetime | None:
+def parse_push_datetime(raw: str | None, reference: datetime | None = None) -> datetime | None:
     if not raw:
         return None
     text = raw.strip()
-    for fmt in ("%m/%d %H:%M", "%Y-%m-%d %H:%M:%S"):
+    try:
+        return datetime.strptime(text, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        pass
+
+    match = re.fullmatch(r"(?P<month>\d{1,2})/(?P<day>\d{1,2})\s+(?P<hour>\d{1,2}):(?P<minute>\d{2})", text)
+    if match:
+        year = reference.year if reference is not None else datetime.now().year
         try:
-            parsed = datetime.strptime(text, fmt)
-            if parsed.year == 1900:
-                parsed = parsed.replace(year=datetime.now().year)
-            return parsed
+            parsed = datetime(
+                year,
+                int(match.group("month")),
+                int(match.group("day")),
+                int(match.group("hour")),
+                int(match.group("minute")),
+            )
         except ValueError:
-            pass
+            return None
+        if reference is not None and parsed < reference - timedelta(days=180):
+            parsed = _replace_year(parsed, year + 1)
+        elif reference is not None and parsed > reference + timedelta(days=180):
+            parsed = _replace_year(parsed, year - 1)
+        return parsed
     return None
+
+
+def _replace_year(value: datetime, year: int) -> datetime | None:
+    try:
+        return value.replace(year=year)
+    except ValueError:
+        return None

@@ -42,8 +42,12 @@ def render_text(reports: list[ProductReport], internal: bool = False) -> str:
 
 
 def render_json(reports: list[ProductReport], internal: bool = False) -> str:
-    payload = [_report_to_dict(report, internal=internal) for report in reports]
+    payload = [report_to_dict(report, internal=internal) for report in reports]
     return json.dumps(payload, ensure_ascii=False, indent=2)
+
+
+def report_to_dict(report: ProductReport, internal: bool = False) -> dict[str, Any]:
+    return _report_to_dict(report, internal=internal)
 
 
 def render_suspicion(profiles: dict[str, AccountProfile]) -> str:
