@@ -40,6 +40,52 @@ SCORING = {
     "exclude_self_push": True,
 }
 
+PRODUCT_NORMALIZATION = {
+    "similarity_threshold": 0.86,
+    "jaccard_threshold": 0.72,
+}
+
+PRODUCT_ALIASES: dict[str, dict[str, str]] = {
+    "7-11": {
+        "阜杭饅頭豬排蛋": "阜杭豆漿饅頭夾豬排蛋",
+    },
+}
+
+BRAND_COMPARISON = {
+    "comparison_terms": [
+        "比較",
+        "比",
+        "還是",
+        "輸",
+        "贏",
+        "勝過",
+        "不如",
+        "屌打",
+        "CP值",
+        "cp值",
+        "沒有",
+        "沒",
+    ],
+    "positive_nearby_terms": [
+        "好",
+        "好吃",
+        "更好",
+        "較好",
+        "比較好",
+        "比較好吃",
+        "讚",
+        "優",
+        "香",
+        "划算",
+        "便宜",
+        "高",
+        "強",
+        "勝",
+        "贏",
+        "屌打",
+    ],
+}
+
 SUSPICION = {
     "min_activity": 5,
     "weight_floor": 0.1,

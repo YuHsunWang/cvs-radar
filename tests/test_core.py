@@ -6,7 +6,7 @@ import unittest
 from cvs_radar.models import Comment, Post
 from cvs_radar.parser import parse_ptt_article, parse_push_datetime, parse_score
 from cvs_radar.pipeline import run_pipeline
-from cvs_radar.reporting import render_json
+from cvs_radar.reporting import render_json, render_text
 from cvs_radar.scoring import normalize_product
 from cvs_radar.sentiment import score_comment
 
@@ -87,6 +87,181 @@ class ScoringTest(unittest.TestCase):
         reports, _ = run_pipeline([post])
         payload = json.loads(render_json(reports, internal=False))
         self.assertNotIn("contributors", payload[0])
+
+    def test_product_grouping_merges_noisy_same_product_titles(self) -> None:
+        posts = [
+            Post(id="p1", brand="7-11", product_name="阜杭豆漿饅頭夾豬排蛋", author="a1", author_score=80),
+            Post(id="p2", brand="7-11", product_name="阜杭豆漿饅頭夾豬排蛋(回購)", author="a2", author_score=82),
+            Post(id="p3", brand="7-11", product_name="7-11阜杭豆漿饅頭夾豬排蛋 心得", author="a3", author_score=84),
+            Post(id="p4", brand="7-11", product_name="阜杭饅頭豬排蛋", author="a4", author_score=86),
+            Post(id="p5", brand="7-11", product_name="小7 阜杭豆漿饅頭夾豬排蛋 分享", author="a5", author_score=88),
+        ]
+
+        reports, _ = run_pipeline(posts)
+
+        self.assertEqual(len(reports), 1)
+        self.assertEqual(reports[0].product_name, "阜杭豆漿饅頭夾豬排蛋")
+        self.assertEqual(reports[0].product_key, "7-11:阜杭豆漿饅頭夾豬排蛋")
+
+    def test_product_grouping_keeps_different_flavors_and_items_separate(self) -> None:
+        posts = [
+            Post(id="p1", brand="7-11", product_name="阜杭豆漿饅頭夾豬排蛋", author="a1", author_score=80),
+            Post(id="p2", brand="7-11", product_name="阜杭豆漿饅頭夾豬排蛋辣味", author="a2", author_score=81),
+            Post(id="p3", brand="7-11", product_name="阜杭豆漿飯糰豬排蛋", author="a3", author_score=82),
+        ]
+
+        reports, _ = run_pipeline(posts)
+
+        self.assertEqual(
+            {report.product_name for report in reports},
+            {"阜杭豆漿饅頭夾豬排蛋", "阜杭豆漿饅頭夾豬排蛋辣味", "阜杭豆漿飯糰豬排蛋"},
+        )
+
+    def test_representative_comments_are_deduped_and_cleaned(self) -> None:
+        post = Post(
+            id="p1",
+            brand="7-11",
+            product_name="測試飯糰",
+            author="author",
+            comments=[
+                Comment("推", "u1", "7-11 這款超好吃推薦"),
+                Comment("推", "u2", "  超好吃  "),
+                Comment("推", "u3", "超好吃"),
+                Comment("噓", "u4", "7-11 這個很難吃"),
+                Comment("噓", "u5", "很難吃"),
+            ],
+        )
+
+        reports, _ = run_pipeline([post])
+
+        self.assertEqual(reports[0].rep_positive, ["超好吃"])
+        self.assertEqual(reports[0].rep_negative, ["很難吃"])
+
+    def test_public_reports_hide_internal_fields_unless_internal_mode(self) -> None:
+        post = Post(id="p1", brand="7-11", product_name="測試", author="u", author_score=80)
+        reports, _ = run_pipeline([post])
+
+        public_payload = json.loads(render_json(reports, internal=False))
+        internal_payload = json.loads(render_json(reports, internal=True))
+        public_text = render_text(reports, internal=False)
+        internal_text = render_text(reports, internal=True)
+
+        self.assertNotIn("product_key", public_payload[0])
+        self.assertNotIn("n_eff", public_payload[0])
+        self.assertNotIn("score_std", public_payload[0])
+        self.assertIn("evidence_note", public_payload[0])
+        self.assertIn("product_key", internal_payload[0])
+        self.assertIn("n_eff", internal_payload[0])
+        self.assertNotIn("key=", public_text)
+        self.assertNotIn("n_eff=", public_text)
+        self.assertNotIn("std=", public_text)
+        self.assertIn("key=", internal_text)
+
+    def test_low_confidence_products_are_ranked_after_better_supported_items(self) -> None:
+        posts = [
+            Post(id="low", brand="7-11", product_name="高分但資料少", author="a1", author_score=100),
+            Post(
+                id="supported",
+                brand="7-11",
+                product_name="分數較穩",
+                author="a2",
+                author_score=80,
+                comments=[
+                    Comment("推", "u1", "好吃"),
+                    Comment("推", "u2", "好吃"),
+                    Comment("推", "u3", "好吃"),
+                ],
+            ),
+        ]
+
+        reports, _ = run_pipeline(posts)
+        payload = json.loads(render_json(reports, internal=False))
+
+        self.assertEqual([report.product_name for report in reports], ["分數較穩", "高分但資料少"])
+        self.assertEqual(payload[1]["confidence"], "低")
+        self.assertIn("降權", payload[1]["evidence_note"])
+
+    def test_cross_brand_decision_1_keeps_own_brand_or_no_competitor_comments(self) -> None:
+        post = Post(
+            id="own",
+            brand="全家",
+            product_name="測試飯糰",
+            comments=[
+                Comment("推", "u1", "全家這款好吃"),
+                Comment("推", "u2", "好吃會回購"),
+            ],
+        )
+
+        reports, _ = run_pipeline([post])
+        report = reports[0]
+
+        self.assertIsNotNone(report.fair_score)
+        self.assertEqual({c.user for c in report.contributors}, {"u1", "u2"})
+        self.assertEqual(report.competitor_mention_count, 0)
+        self.assertEqual(report.competitor_preference_count, 0)
+
+    def test_cross_brand_decision_2_keeps_comment_when_own_brand_wins_comparison(self) -> None:
+        post = Post(
+            id="own-wins",
+            brand="全家",
+            product_name="測試甜點",
+            comments=[
+                Comment("→", "u1", "比小7好吃"),
+                Comment("→", "u2", "吃過小7，還是全家的好吃"),
+            ],
+        )
+
+        reports, _ = run_pipeline([post])
+        report = reports[0]
+        payload = json.loads(render_json(reports, internal=False))[0]
+
+        self.assertIsNotNone(report.fair_score)
+        self.assertEqual({c.user for c in report.contributors}, {"u1", "u2"})
+        self.assertTrue(all(c.score > 0.5 for c in report.contributors))
+        self.assertEqual(report.competitor_mention_count, 2)
+        self.assertEqual(report.competitor_preference_count, 0)
+        self.assertEqual(report.competitor_brands, ["7-11"])
+        self.assertEqual(payload["competitor_mentions"]["preferred_other"], 0)
+
+    def test_cross_brand_decision_3_excludes_comment_when_competitor_wins_comparison(self) -> None:
+        post = Post(
+            id="other-wins",
+            brand="全家",
+            product_name="測試甜點",
+            comments=[
+                Comment("推", "u1", "小7的比較好吃"),
+                Comment("推", "u2", "還是小7好"),
+            ],
+        )
+
+        reports, _ = run_pipeline([post])
+        report = reports[0]
+
+        self.assertIsNone(report.fair_score)
+        self.assertEqual(report.contributors, [])
+        self.assertEqual(report.rep_positive, [])
+        self.assertEqual(report.competitor_mention_count, 2)
+        self.assertEqual(report.competitor_preference_count, 2)
+        self.assertEqual(report.competitor_brands, ["7-11"])
+
+    def test_cross_brand_decision_4_excludes_non_comparison_competitor_mentions(self) -> None:
+        post = Post(
+            id="other-mentioned",
+            brand="全家",
+            product_name="測試甜點",
+            comments=[
+                Comment("推", "u1", "小7也有賣"),
+            ],
+        )
+
+        reports, _ = run_pipeline([post])
+        report = reports[0]
+
+        self.assertIsNone(report.fair_score)
+        self.assertEqual(report.contributors, [])
+        self.assertEqual(report.competitor_mention_count, 1)
+        self.assertEqual(report.competitor_preference_count, 0)
+        self.assertEqual(report.competitor_brands, ["7-11"])
 
 
 class SentimentTest(unittest.TestCase):

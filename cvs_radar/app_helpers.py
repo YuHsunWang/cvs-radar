@@ -104,20 +104,32 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     """Convert service output into rows suitable for Streamlit tables."""
 
     rows: list[dict[str, Any]] = []
-    for rank, report in enumerate(result.to_dict()["reports"], 1):
+    for rank, report in enumerate(result.reports, 1):
         rows.append(
             {
                 "排名": rank,
-                "品牌": report["brand"],
-                "商品": report["product_name"],
-                "fair_score": report["fair_score"],
-                "consensus": report["consensus"],
-                "confidence": report["confidence"],
-                "n_eff": report["n_eff"],
-                "n_posts": report["n_posts"],
-                "n_comments": report["n_comments"],
-                "代表性推": " / ".join(report["rep_positive"]),
-                "代表性噓": " / ".join(report["rep_negative"]),
+                "品牌": report.brand,
+                "商品": report.product_name,
+                "fair_score": report.fair_score,
+                "consensus": report.consensus,
+                "confidence": report.confidence,
+                "資料狀態": _evidence_note(report.confidence, report.consensus),
+                "有效樣本": report.n_eff,
+                "n_posts": report.n_posts,
+                "n_comments": report.n_comments,
+                "競品提及": report.competitor_mention_count,
+                "偏好他牌": report.competitor_preference_count,
+                "提及競品": " / ".join(report.competitor_brands),
+                "代表性推": " / ".join(report.rep_positive),
+                "代表性噓": " / ".join(report.rep_negative),
             }
         )
     return rows
+
+
+def _evidence_note(confidence: str, consensus: str) -> str:
+    if confidence == "低" or consensus == "資料不足":
+        return "資料仍少，排名已降權"
+    if confidence == "中":
+        return "樣本量中等"
+    return "樣本量較充足"

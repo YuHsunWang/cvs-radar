@@ -60,3 +60,6 @@ class ProductReport:
     rep_negative: list[str] = field(default_factory=list)
     product_key: str = ""
     score_mean: float = 0.0
+    competitor_mention_count: int = 0
+    competitor_preference_count: int = 0
+    competitor_brands: list[str] = field(default_factory=list)

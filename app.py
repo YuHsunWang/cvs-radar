@@ -100,7 +100,7 @@ def _render_sidebar() -> dict[str, object]:
         use_min_n_eff = st.checkbox("啟用最低有效樣本", value=False)
         min_n_eff = None
         if use_min_n_eff:
-            min_n_eff = float(st.number_input("min_n_eff", min_value=0.0, value=1.0, step=0.5))
+            min_n_eff = float(st.number_input("最低有效樣本值", min_value=0.0, value=1.0, step=0.5))
 
         min_posts = int(st.number_input("最少貼文", min_value=0, value=0, step=1))
         min_comments = int(st.number_input("最少留言", min_value=0, value=0, step=1))
@@ -148,9 +148,12 @@ def _render_rankings(result) -> None:
         use_container_width=True,
         column_config={
             "fair_score": st.column_config.NumberColumn("fair_score", format="%.1f"),
-            "n_eff": st.column_config.NumberColumn("n_eff", format="%.2f"),
+            "有效樣本": st.column_config.NumberColumn("有效樣本", format="%.2f"),
             "n_posts": st.column_config.NumberColumn("貼文數"),
             "n_comments": st.column_config.NumberColumn("留言數"),
+            "競品提及": st.column_config.NumberColumn("競品提及"),
+            "偏好他牌": st.column_config.NumberColumn("偏好他牌"),
+            "提及競品": st.column_config.TextColumn(width="small"),
             "代表性推": st.column_config.TextColumn(width="medium"),
             "代表性噓": st.column_config.TextColumn(width="medium"),
         },
@@ -164,8 +167,13 @@ def _render_rankings(result) -> None:
             c1, c2, c3, c4 = st.columns(4)
             c1.metric("consensus", row["consensus"])
             c2.metric("confidence", row["confidence"])
-            c3.metric("n_eff", f'{row["n_eff"]:.2f}')
+            c3.metric("資料狀態", row["資料狀態"])
             c4.metric("貼文/留言", f'{row["n_posts"]}/{row["n_comments"]}')
+            st.write(
+                "競品提及：",
+                f'{row["競品提及"]} 則，其中 {row["偏好他牌"]} 則偏好他牌',
+                f'（{row["提及競品"] or "無"}）',
+            )
             st.write("代表性推：", row["代表性推"] or "無")
             st.write("代表性噓：", row["代表性噓"] or "無")
 
