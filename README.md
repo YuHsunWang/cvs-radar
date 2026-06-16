@@ -155,3 +155,50 @@ curl "http://127.0.0.1:8000/products?source=demo&brand=7-11&min_score=50&limit=1
 ```
 
 API 預設使用 demo 離線資料；只有明確傳入 `source=crawl` 時才會嘗試連線抓取。
+
+## 人工標註與離線評測
+
+這套流程用來建立 gold labels，之後比較現有規則與 LLM/fine-tune 模型。預設只使用 `cvs_radar.sample_data`，不需要網路或 API key。
+
+### 1. 產生待標 CSV
+
+```bash
+python -m cvs_radar.labeling --source demo --output data/labels/to_label.csv --limit 50
+```
+
+欄位包含留言文字、貼文品牌、商品、tag、context，以及空白標註欄：
+`sentiment`, `target_brand`, `is_comparative`, `favored_brand`, `notes`。
+
+若未來要改用 crawl 來源：
+
+```bash
+python -m cvs_radar.labeling --source crawl --pages 5 --output data/labels/to_label.csv
+```
+
+### 2. 人工標註
+
+請依照 `docs/labeling_guideline.md` 填寫：
+
+- `sentiment`: `正` / `負` / `中性`
+- `target_brand`: `本牌` / `他牌:<品牌>` / `無`
+- `is_comparative`: `是` / `否`
+- `favored_brand`: `本牌` / `他牌` / `平手` / `不明`
+
+### 3. 跑規則 baseline 評測
+
+repo 內建 smoke gold：
+
+```bash
+python -m cvs_radar.evaluation --gold data/labels/gold_smoke.csv
+python -m cvs_radar.evaluation --gold data/labels/gold_smoke.csv --json data/labels/rules_report.json
+```
+
+評測會輸出：
+
+- `sentiment_polarity`: 情感三分類 accuracy / macro precision / macro recall / macro F1
+- `comparative_detection`: 是否比較句的 binary accuracy / precision / recall / F1
+- `competitor_preference_detection`: 是否判為他牌勝出的 binary metrics
+- `favored_direction`: 僅在 gold 比較句上評估 `本牌` / `他牌` / `平手` / `不明`
+- `target_brand`: `本牌` / `他牌` / `無` 的輔助評估
+
+`cvs_radar.evaluation.Predictor` 是預留介面；目前可用 `RuleBasedPredictor`，之後可接 LLM predictor，但規則 baseline 不依賴網路。

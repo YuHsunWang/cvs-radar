@@ -1,0 +1,69 @@
+from __future__ import annotations
+
+import json
+import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from cvs_radar.evaluation import RuleBasedPredictor, evaluate, read_gold_csv, render_text_report, write_json_report
+from cvs_radar.labeling import build_labeling_rows, read_labeling_csv, write_labeling_csv
+from cvs_radar.sample_data import load_sample
+
+
+class LabelingTest(unittest.TestCase):
+    def test_build_labeling_rows_from_demo_keeps_blank_label_fields(self) -> None:
+        rows = build_labeling_rows(load_sample(), limit=2)
+
+        self.assertEqual([row.comment_id for row in rows], ["sample-711-fuhang#000", "sample-711-fuhang#001"])
+        self.assertEqual(rows[0].post_brand, "7-11")
+        self.assertIn("貼文品牌=7-11", rows[0].context)
+        self.assertEqual(rows[0].sentiment, "")
+        self.assertEqual(rows[0].favored_brand, "")
+
+    def test_write_and_read_labeling_csv(self) -> None:
+        rows = build_labeling_rows(load_sample(), limit=1)
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "nested" / "to_label.csv"
+
+            write_labeling_csv(rows, path)
+            loaded = read_labeling_csv(path)
+
+        self.assertEqual(len(loaded), 1)
+        self.assertEqual(loaded[0]["comment_id"], "sample-711-fuhang#000")
+        self.assertEqual(loaded[0]["sentiment"], "")
+
+
+class EvaluationHarnessTest(unittest.TestCase):
+    def test_rule_harness_runs_on_gold_smoke_and_computes_metrics(self) -> None:
+        rows = read_gold_csv("data/labels/gold_smoke.csv")
+
+        report = evaluate(rows, RuleBasedPredictor())
+
+        self.assertEqual(report["predictor"], "rules")
+        self.assertEqual(report["n_rows"], 8)
+        tasks = report["tasks"]
+        self.assertIn("sentiment_polarity", tasks)
+        self.assertIn("competitor_preference_detection", tasks)
+        self.assertIn("favored_direction", tasks)
+        self.assertGreaterEqual(tasks["sentiment_polarity"]["accuracy"], 0)
+        self.assertLessEqual(tasks["sentiment_polarity"]["accuracy"], 1)
+        self.assertEqual(tasks["favored_direction"]["support"], 3)
+
+    def test_render_and_write_reports(self) -> None:
+        report = evaluate(read_gold_csv("data/labels/gold_smoke.csv"))
+        text = render_text_report(report)
+
+        self.assertIn("CVS Radar 評測報告", text)
+        self.assertIn("sentiment_polarity", text)
+
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "report.json"
+            write_json_report(report, path)
+            payload = json.loads(path.read_text(encoding="utf-8"))
+
+        self.assertEqual(payload["predictor"], "rules")
+        self.assertIn("rows", payload)
+
+
+if __name__ == "__main__":
+    unittest.main()
