@@ -4,3 +4,8 @@ __pycache__/
 .venv/
 .pytest_cache/
 *.zip
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
