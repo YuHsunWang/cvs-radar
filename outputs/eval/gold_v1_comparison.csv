@@ -1,0 +1,3 @@
+dataset,backend,n_rows,sentiment_polarity_accuracy,meets_80pct_target,note
+gold_v1.csv,lexicon,17,0.9412,True,user-labeled 0-10 mapped to 正/負/中(>=7/5-6/<=4); N=17 small
+gold_v1.csv,snownlp,17,0.8824,True,user-labeled 0-10 mapped to 正/負/中(>=7/5-6/<=4); N=17 small
