@@ -5,7 +5,15 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from cvs_radar.evaluation import RuleBasedPredictor, evaluate, read_gold_csv, render_text_report, write_json_report
+from cvs_radar.evaluation import (
+    RuleBasedPredictor,
+    SentimentBackendPredictor,
+    compare_sentiment_backends,
+    evaluate,
+    read_gold_csv,
+    render_text_report,
+    write_json_report,
+)
 from cvs_radar.labeling import build_labeling_rows, read_labeling_csv, write_labeling_csv
 from cvs_radar.sample_data import load_sample
 
@@ -32,6 +40,16 @@ class LabelingTest(unittest.TestCase):
         self.assertEqual(loaded[0]["comment_id"], "sample-711-fuhang#000")
         self.assertEqual(loaded[0]["sentiment"], "")
 
+    def test_demo_labeling_csv_does_not_fabricate_labels(self) -> None:
+        rows = build_labeling_rows(load_sample())
+
+        self.assertGreater(len(rows), 8)
+        for row in rows:
+            self.assertEqual(row.sentiment, "")
+            self.assertEqual(row.target_brand, "")
+            self.assertEqual(row.is_comparative, "")
+            self.assertEqual(row.favored_brand, "")
+
 
 class EvaluationHarnessTest(unittest.TestCase):
     def test_rule_harness_runs_on_gold_smoke_and_computes_metrics(self) -> None:
@@ -48,6 +66,30 @@ class EvaluationHarnessTest(unittest.TestCase):
         self.assertGreaterEqual(tasks["sentiment_polarity"]["accuracy"], 0)
         self.assertLessEqual(tasks["sentiment_polarity"]["accuracy"], 1)
         self.assertEqual(tasks["favored_direction"]["support"], 3)
+
+    def test_backend_predictor_runs_snownlp_on_gold_smoke(self) -> None:
+        rows = read_gold_csv("data/labels/gold_smoke.csv")
+
+        report = evaluate(rows, SentimentBackendPredictor("snownlp"))
+
+        self.assertEqual(report["predictor"], "snownlp")
+        self.assertEqual(report["n_rows"], 8)
+        self.assertIn("accuracy", report["tasks"]["sentiment_polarity"])
+
+    def test_backend_comparison_csv_runs_and_marks_small_sample(self) -> None:
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "backend_comparison.csv"
+
+            rows = compare_sentiment_backends(
+                ["data/labels/gold_smoke.csv"],
+                path,
+                backends=["lexicon", "snownlp"],
+            )
+
+            loaded = path.read_text(encoding="utf-8")
+
+        self.assertEqual([row["backend"] for row in rows], ["lexicon", "snownlp"])
+        self.assertIn("statistically insufficient", loaded)
 
     def test_render_and_write_reports(self) -> None:
         report = evaluate(read_gold_csv("data/labels/gold_smoke.csv"))

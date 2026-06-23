@@ -29,6 +29,14 @@ CRAWL = {
 SENTIMENT = {
     "backend": "lexicon",
     "tag_prior_weight": 0.6,
+    "llm": {
+        "enabled": False,
+        "provider": "",
+        "model": "",
+        "api_key": "",
+        "api_key_env": "CVS_RADAR_LLM_API_KEY",
+        "fallback_backend": "snownlp",
+    },
 }
 
 SCORING = {

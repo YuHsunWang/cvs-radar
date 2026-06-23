@@ -11,7 +11,7 @@ from typing import Protocol
 
 from .models import Comment
 from .scoring import _comment_attribution
-from .sentiment import score_comment
+from .sentiment import llm_has_key, score_comment
 
 
 SENTIMENT_LABELS = ("positive", "negative", "neutral")
@@ -38,12 +38,13 @@ class RuleBasedPredictor:
     """Baseline using the current lexicon sentiment and comment attribution rules."""
 
     name = "rules"
+    backend = "lexicon"
 
     def predict_row(self, row: dict[str, str]) -> Prediction:
         text = row.get("comment_text", "")
         tag = row.get("comment_tag", "")
         post_brand = row.get("post_brand", "")
-        sentiment_score = score_comment(tag, text)
+        sentiment_score = score_comment(tag, text, backend=self.backend)
         comment = Comment(tag=tag, user=row.get("comment_user", ""), text=text, sentiment=sentiment_score)
         attribution = _comment_attribution(post_brand, comment)
 
@@ -65,6 +66,14 @@ class RuleBasedPredictor:
                 "effective_sentiment": attribution.effective_sentiment,
             },
         )
+
+
+class SentimentBackendPredictor(RuleBasedPredictor):
+    """Rule predictor with selectable comment-text sentiment backend."""
+
+    def __init__(self, backend: str) -> None:
+        self.backend = backend
+        self.name = backend
 
 
 class StubPredictor:
@@ -232,6 +241,63 @@ def write_json_report(report: dict[str, object], path: str | Path) -> None:
     output_path.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
 
 
+def compare_sentiment_backends(
+    gold_paths: list[str | Path],
+    output_path: str | Path,
+    *,
+    backends: list[str] | None = None,
+) -> list[dict[str, object]]:
+    selected_backends = backends or available_comparison_backends()
+    rows: list[dict[str, object]] = []
+
+    for gold_path in gold_paths:
+        gold_rows = read_gold_csv(gold_path)
+        dataset = Path(gold_path).name
+        for backend in selected_backends:
+            report = evaluate(gold_rows, SentimentBackendPredictor(backend))
+            metrics = report["tasks"]["sentiment_polarity"]
+            assert isinstance(metrics, dict)
+            support = int(metrics["support"])
+            accuracy = float(metrics["accuracy"])
+            rows.append(
+                {
+                    "dataset": dataset,
+                    "backend": backend,
+                    "n_rows": support,
+                    "sentiment_polarity_accuracy": accuracy,
+                    "meets_80pct_target": str(accuracy >= 0.8).lower(),
+                    "sample_caveat": _sample_caveat(support),
+                }
+            )
+
+    write_backend_comparison_csv(rows, output_path)
+    return rows
+
+
+def available_comparison_backends() -> list[str]:
+    backends = ["lexicon", "snownlp"]
+    if llm_has_key():
+        backends.append("llm")
+    return backends
+
+
+def write_backend_comparison_csv(rows: list[dict[str, object]], path: str | Path) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = [
+        "dataset",
+        "backend",
+        "n_rows",
+        "sentiment_polarity_accuracy",
+        "meets_80pct_target",
+        "sample_caveat",
+    ]
+    with output_path.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def normalize_sentiment(value: str) -> str:
     token = (value or "").strip().casefold()
     aliases = {
@@ -338,15 +404,22 @@ def _safe_div(numerator: float, denominator: float) -> float:
     return numerator / denominator if denominator else 0.0
 
 
+def _sample_caveat(support: int) -> str:
+    if support <= 8:
+        return "gold_smoke has only 8 rows; statistically insufficient for representative validation"
+    return ""
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Evaluate CVS Radar comment-label predictions")
     parser.add_argument("--gold", required=True, help="Gold CSV path")
     parser.add_argument("--json", dest="json_path", help="Write JSON report to this path")
     parser.add_argument("--text", dest="text_path", help="Write text report to this path")
-    parser.add_argument("--predictor", choices=["rules"], default="rules")
+    parser.add_argument("--predictor", choices=["rules", "lexicon", "snownlp", "llm"], default="rules")
+    parser.add_argument("--backend-comparison-csv", help="Write lexicon/snownlp/(llm with key) comparison CSV")
     args = parser.parse_args(argv)
 
-    predictor: Predictor = RuleBasedPredictor()
+    predictor: Predictor = RuleBasedPredictor() if args.predictor == "rules" else SentimentBackendPredictor(args.predictor)
     report = evaluate(read_gold_csv(args.gold), predictor)
     text = render_text_report(report)
     print(text)
@@ -356,6 +429,8 @@ def main(argv: list[str] | None = None) -> None:
         output_path = Path(args.text_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(text + "\n", encoding="utf-8")
+    if args.backend_comparison_csv:
+        compare_sentiment_backends([args.gold], args.backend_comparison_csv)
 
 
 if __name__ == "__main__":

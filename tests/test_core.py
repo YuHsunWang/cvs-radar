@@ -8,7 +8,7 @@ from cvs_radar.parser import parse_ptt_article, parse_push_datetime, parse_score
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import render_json, render_text
 from cvs_radar.scoring import normalize_product
-from cvs_radar.sentiment import score_comment
+from cvs_radar.sentiment import LlmBackend, score_comment
 
 
 class ParserTest(unittest.TestCase):
@@ -269,6 +269,25 @@ class SentimentTest(unittest.TestCase):
         self.assertGreater(score_comment("推", "好吃會回購"), 0)
         self.assertLess(score_comment("噓", "難吃踩雷"), 0)
         self.assertEqual(score_comment("→", ""), 0)
+
+    def test_backend_switch_accepts_lexicon_and_snownlp(self) -> None:
+        lexicon_score = score_comment("→", "好吃會回購", backend="lexicon")
+        snownlp_score = score_comment("→", "好吃會回購", backend="snownlp")
+
+        self.assertGreater(lexicon_score, 0)
+        self.assertGreaterEqual(snownlp_score, -1)
+        self.assertLessEqual(snownlp_score, 1)
+
+    def test_tag_prior_remains_primary_over_text_backend(self) -> None:
+        self.assertGreater(score_comment("推", "難吃踩雷", backend="snownlp"), 0)
+        self.assertLess(score_comment("噓", "好吃會回購", backend="snownlp"), 0)
+
+    def test_llm_backend_without_key_falls_back_without_network_client(self) -> None:
+        backend = LlmBackend(client=None)
+
+        score = score_comment("推", "好吃會回購", backend=backend)
+
+        self.assertGreater(score, 0)
 
 
 class TimeAndServiceTest(unittest.TestCase):
