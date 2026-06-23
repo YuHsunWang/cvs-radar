@@ -38,6 +38,84 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(post.author_score, 80)
         self.assertEqual(len(post.comments), 1)
 
+    def test_parse_comments_merges_adjacent_same_user_three_line_run(self) -> None:
+        html = """
+        <div id="main-content">
+          <div class="article-metaline"><span class="article-meta-tag">作者</span><span class="article-meta-value">tester (測試)</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">標題</span><span class="article-meta-value">[商品] 711 測試飯糰</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">時間</span><span class="article-meta-value">Mon Jun  1 12:00:00 2026</span></div>
+          【商品名稱】測試飯糰
+          <div class="push"><span class="push-tag">推 </span><span class="push-userid">alice</span><span class="push-content">: 第一段</span><span class="push-ipdatetime">06/01 12:01</span></div>
+          <div class="push"><span class="push-tag">→ </span><span class="push-userid">alice</span><span class="push-content">: 第二段</span><span class="push-ipdatetime">06/01 12:02</span></div>
+          <div class="push"><span class="push-tag">→ </span><span class="push-userid">alice</span><span class="push-content">: 第三段</span><span class="push-ipdatetime">06/01 12:03</span></div>
+        </div>
+        """
+
+        post = parse_ptt_article(html, "https://www.ptt.cc/bbs/CVS/M.merge.html")
+
+        assert post is not None
+        self.assertEqual(len(post.comments), 1)
+        comment = post.comments[0]
+        self.assertEqual(comment.user, "alice")
+        self.assertEqual(comment.tag, "推")
+        self.assertEqual(comment.text, "第一段第二段第三段")
+        self.assertEqual(comment.posted_at.isoformat(), "2026-06-01T12:01:00")
+
+    def test_parse_comments_keeps_non_adjacent_same_user_separate(self) -> None:
+        html = """
+        <div id="main-content">
+          <div class="article-metaline"><span class="article-meta-tag">作者</span><span class="article-meta-value">tester (測試)</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">標題</span><span class="article-meta-value">[商品] 711 測試飯糰</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">時間</span><span class="article-meta-value">Mon Jun  1 12:00:00 2026</span></div>
+          【商品名稱】測試飯糰
+          <div class="push"><span class="push-tag">推 </span><span class="push-userid">alice</span><span class="push-content">: A1</span><span class="push-ipdatetime">06/01 12:01</span></div>
+          <div class="push"><span class="push-tag">推 </span><span class="push-userid">bob</span><span class="push-content">: B</span><span class="push-ipdatetime">06/01 12:02</span></div>
+          <div class="push"><span class="push-tag">推 </span><span class="push-userid">alice</span><span class="push-content">: A2</span><span class="push-ipdatetime">06/01 12:03</span></div>
+        </div>
+        """
+
+        post = parse_ptt_article(html, "https://www.ptt.cc/bbs/CVS/M.nonadjacent.html")
+
+        assert post is not None
+        self.assertEqual([comment.user for comment in post.comments], ["alice", "bob", "alice"])
+        self.assertEqual([comment.text for comment in post.comments], ["A1", "B", "A2"])
+
+    def test_parse_comments_keeps_adjacent_different_users_separate(self) -> None:
+        html = """
+        <div id="main-content">
+          <div class="article-metaline"><span class="article-meta-tag">作者</span><span class="article-meta-value">tester (測試)</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">標題</span><span class="article-meta-value">[商品] 711 測試飯糰</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">時間</span><span class="article-meta-value">Mon Jun  1 12:00:00 2026</span></div>
+          【商品名稱】測試飯糰
+          <div class="push"><span class="push-tag">推 </span><span class="push-userid">alice</span><span class="push-content">: 好吃</span><span class="push-ipdatetime">06/01 12:01</span></div>
+          <div class="push"><span class="push-tag">噓 </span><span class="push-userid">bob</span><span class="push-content">: 難吃</span><span class="push-ipdatetime">06/01 12:02</span></div>
+        </div>
+        """
+
+        post = parse_ptt_article(html, "https://www.ptt.cc/bbs/CVS/M.diffusers.html")
+
+        assert post is not None
+        self.assertEqual([(comment.user, comment.text) for comment in post.comments], [("alice", "好吃"), ("bob", "難吃")])
+
+    def test_parse_comments_cross_line_sentence_scores_negative_after_merge(self) -> None:
+        html = """
+        <div id="main-content">
+          <div class="article-metaline"><span class="article-meta-tag">作者</span><span class="article-meta-value">tester (測試)</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">標題</span><span class="article-meta-value">[商品] 711 測試飯糰</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">時間</span><span class="article-meta-value">Mon Jun  1 12:00:00 2026</span></div>
+          【商品名稱】測試飯糰
+          <div class="push"><span class="push-tag">→ </span><span class="push-userid">alice</span><span class="push-content">: 這個</span><span class="push-ipdatetime">06/01 12:01</span></div>
+          <div class="push"><span class="push-tag">→ </span><span class="push-userid">alice</span><span class="push-content">: 真的很難吃</span><span class="push-ipdatetime">06/01 12:02</span></div>
+        </div>
+        """
+
+        post = parse_ptt_article(html, "https://www.ptt.cc/bbs/CVS/M.negative.html")
+
+        assert post is not None
+        self.assertEqual(len(post.comments), 1)
+        self.assertEqual(post.comments[0].text, "這個真的很難吃")
+        self.assertLess(score_comment(post.comments[0].tag, post.comments[0].text, backend="lexicon"), -0.2)
+
     def test_parse_push_datetime_uses_article_year_and_rollover(self) -> None:
         from datetime import datetime
 

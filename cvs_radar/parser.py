@@ -149,18 +149,37 @@ def _parse_metadata(soup: BeautifulSoup) -> dict[str, str]:
 
 def _parse_comments(soup: BeautifulSoup, reference: datetime | None = None) -> list[Comment]:
     comments: list[Comment] = []
+    current_run: list[Comment] = []
+
+    def flush_run() -> None:
+        if not current_run:
+            return
+        first = current_run[0]
+        tag = next((comment.tag for comment in current_run if comment.tag.strip() != "→"), first.tag)
+        comments.append(
+            Comment(
+                tag=tag,
+                user=first.user,
+                text="".join(comment.text for comment in current_run),
+                posted_at=first.posted_at,
+            )
+        )
+        current_run.clear()
+
     for push in soup.select("div.push"):
         tag = _text(push.select_one(".push-tag"))
         user = _text(push.select_one(".push-userid"))
         content = _text(push.select_one(".push-content")).lstrip(":：").strip()
-        comments.append(
-            Comment(
-                tag=tag,
-                user=user,
-                text=content,
-                posted_at=parse_push_datetime(_text(push.select_one(".push-ipdatetime")), reference=reference),
-            )
+        comment = Comment(
+            tag=tag,
+            user=user,
+            text=content,
+            posted_at=parse_push_datetime(_text(push.select_one(".push-ipdatetime")), reference=reference),
         )
+        if current_run and current_run[-1].user != user:
+            flush_run()
+        current_run.append(comment)
+    flush_run()
     return comments
 
 
