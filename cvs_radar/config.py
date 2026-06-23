@@ -32,7 +32,8 @@ SENTIMENT = {
 }
 
 SCORING = {
-    "role_weight": {"author": 1.5, "commenter": 1.0},
+    # §19 Q4 決策(2026-06-23): 留言群體分權重 >= 作者自評分(群體推噓較客觀;作者自評偏樂觀且單一樣本)
+    "role_weight": {"author": 1.0, "commenter": 1.0},
     "prior_mean": 0.5,
     "prior_strength": 3.0,
     "time_decay_lambda": 0.0,
