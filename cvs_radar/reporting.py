@@ -5,11 +5,12 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import asdict
+from datetime import datetime
 from typing import Any
 
 from .config import PRIVACY
-from .models import Contributor, ProductReport
-from .preference import AccountProfile
+from .models import Comment, Contributor, Post, ProductReport
+from .preference import AccountProfile, _burst_indices, _template_like_indices
 
 
 def render_text(reports: list[ProductReport], internal: bool = False) -> str:
@@ -69,6 +70,48 @@ def render_suspicion(profiles: dict[str, AccountProfile]) -> str:
     return "\n".join(lines)
 
 
+def render_suspicion_detail(profile: AccountProfile, posts: list[Post]) -> str:
+    user_comments = _profile_comments(profile.user, posts)
+    template_flagged = _template_flagged_comments(user_comments)
+    burst_flagged = _burst_flagged_comments(user_comments)
+
+    lines = [
+        f"帳號可疑明細: {profile.user}",
+        (
+            f"總留言數: {profile.total_comments}; 信度: {profile.credibility:.2f}; "
+            f"可疑分: {profile.suspicion_score:.2f}; 傾向品牌: {profile.lean_brand or '-'}"
+        ),
+        "",
+        "品牌互動",
+    ]
+    if profile.brand_stats:
+        for brand, stat in sorted(profile.brand_stats.items(), key=lambda item: (-item[1].count, item[0])):
+            lines.append(f"- {brand}: 留言數={stat.count}, 平均情感={stat.avg_sentiment:.2f}")
+    else:
+        lines.append("- 無")
+
+    lines.extend(["", "特徵明細"])
+    explanations = {
+        "one_sided": "偏向單一品牌正面、競品負面的程度",
+        "single_brand": "留言集中在單一品牌的程度",
+        "extreme": "極端情感留言比例",
+        "template_like": "完全重複或近似樣板留言比例",
+        "burst": "同品牌短時間爆發留言比例",
+    }
+    if profile.suspicion_features:
+        for name, explanation in explanations.items():
+            value = profile.suspicion_features.get(name, 0.0)
+            lines.append(f"- {name}: {value:.2f} ({explanation})")
+    else:
+        lines.append("- 未達活動量門檻，未計算特徵")
+
+    lines.extend(["", "template_like 標記留言"])
+    lines.extend(_format_flagged_comments(template_flagged[:10]))
+    lines.extend(["", "burst 標記留言"])
+    lines.extend(_format_flagged_comments(burst_flagged[:10]))
+    return "\n".join(lines)
+
+
 def _report_to_dict(report: ProductReport, internal: bool) -> dict[str, Any]:
     data = {
         "brand": report.brand,
@@ -96,6 +139,45 @@ def _report_to_dict(report: ProductReport, internal: bool) -> dict[str, Any]:
     elif PRIVACY["public_include_contributors"]:
         data["contributors"] = [_public_contributor(c) for c in report.contributors]
     return data
+
+
+def _profile_comments(user: str, posts: list[Post]) -> list[tuple[str, Comment]]:
+    comments: list[tuple[str, Comment]] = []
+    for post in posts:
+        for comment in post.comments:
+            if comment.user == user:
+                comments.append((post.brand, comment))
+    return comments
+
+
+def _template_flagged_comments(user_comments: list[tuple[str, Comment]]) -> list[tuple[str, Comment]]:
+    texts = [comment.text for _, comment in user_comments]
+    flagged = _template_like_indices(texts)
+    return [user_comments[index] for index in sorted(flagged)]
+
+
+def _burst_flagged_comments(user_comments: list[tuple[str, Comment]]) -> list[tuple[str, Comment]]:
+    by_brand: dict[str, list[tuple[int, datetime]]] = {}
+    for index, (brand, comment) in enumerate(user_comments):
+        if comment.posted_at is None:
+            continue
+        by_brand.setdefault(brand, []).append((index, comment.posted_at))
+
+    flagged: set[int] = set()
+    for values in by_brand.values():
+        local_flagged = _burst_indices([timestamp for _, timestamp in values])
+        flagged.update(values[index][0] for index in local_flagged)
+    return [user_comments[index] for index in sorted(flagged)]
+
+
+def _format_flagged_comments(flagged: list[tuple[str, Comment]]) -> list[str]:
+    if not flagged:
+        return ["- 無"]
+    lines: list[str] = []
+    for brand, comment in flagged:
+        posted_at = comment.posted_at.isoformat(sep=" ", timespec="minutes") if comment.posted_at else "時間未知"
+        lines.append(f"- [{brand}] {posted_at} {comment.text}")
+    return lines
 
 
 def _evidence_note(report: ProductReport) -> str:

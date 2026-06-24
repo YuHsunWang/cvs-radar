@@ -99,11 +99,14 @@ SUSPICION = {
     "min_activity": 5,
     "weight_floor": 0.1,
     "feature_weights": {
-        "one_sided": 0.4,
-        "single_brand": 0.25,
-        "extreme": 0.25,
-        "repeated_text": 0.10,
+        "one_sided": 0.35,
+        "single_brand": 0.20,
+        "extreme": 0.20,
+        "template_like": 0.10,
+        "burst": 0.15,
     },
+    "burst_window_hours": 24,
+    "burst_min_count": 3,
 }
 
 CONSENSUS = {
