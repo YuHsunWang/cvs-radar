@@ -21,6 +21,7 @@ def main() -> None:
     source = parser.add_mutually_exclusive_group()
     source.add_argument("--demo", action="store_true", help="Use bundled sample data")
     source.add_argument("--crawl", action="store_true", help="Crawl PTT CVS")
+    source.add_argument("--stored", action="store_true", help="Use stored crawl data from JSONL")
 
     parser.add_argument("--pages", type=_non_negative_int, default=5, help="PTT list pages to crawl")
     parser.add_argument("--start-date", help="Filter posts/comments from this date or datetime, e.g. 2026-06-01")
@@ -97,6 +98,13 @@ def main() -> None:
 
 
 def _load_posts(args: argparse.Namespace, *, now: datetime | None = None):
+    if args.stored:
+        from cvs_radar.store import load_posts as load_stored
+
+        posts = load_stored()
+        print(f"Loaded {len(posts)} posts from store")
+        return posts
+
     if args.crawl:
         from cvs_radar.crawler import PttCrawler
 

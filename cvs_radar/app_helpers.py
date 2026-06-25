@@ -13,7 +13,7 @@ from .models import Post
 from .service import ProductQuery, ProductQueryResult, list_brands
 
 ALL_BRANDS = "全部"
-SourceName = Literal["demo", "crawl"]
+SourceName = Literal["demo", "crawl", "stored"]
 
 
 def load_posts(
@@ -36,6 +36,11 @@ def load_posts(
         from .sample_data import load_sample
 
         return load_sample()
+
+    if source == "stored":
+        from .store import load_posts as load_stored
+
+        return load_stored()
 
     if source == "crawl":
         from .crawler import PttCrawler

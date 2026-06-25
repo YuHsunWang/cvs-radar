@@ -80,9 +80,22 @@ def _render_sidebar() -> dict[str, object]:
     with st.sidebar:
         st.header("篩選")
 
-        source_label = st.radio("資料來源", ["demo 離線樣本", "crawl PTT CVS"], index=0)
-        source = "demo" if source_label.startswith("demo") else "crawl"
+        source_label = st.radio(
+            "資料來源",
+            ["demo 離線樣本", "stored 已爬取資料", "crawl PTT CVS"],
+            index=0,
+        )
+        source = (
+            "demo"
+            if source_label.startswith("demo")
+            else ("stored" if source_label.startswith("stored") else "crawl")
+        )
         crawl_pages = 5
+        if source == "stored":
+            from cvs_radar.store import store_stats
+
+            stats = store_stats()
+            st.info(f"已載入 {stats['post_count']} 篇文 / {stats['comment_count']} 則留言")
         if source == "crawl":
             st.warning("crawl 會連線到 PTT；demo 不會連網。")
             crawl_pages = int(st.number_input("PTT 頁數", min_value=1, max_value=50, value=5, step=1))

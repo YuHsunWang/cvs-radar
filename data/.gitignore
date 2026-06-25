@@ -1,0 +1,3 @@
+# 爬蟲資料不進 git（太大且含帳號資料）
+*.jsonl
+!.gitignore
