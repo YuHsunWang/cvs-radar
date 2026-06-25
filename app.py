@@ -13,6 +13,8 @@ from cvs_radar.app_helpers import (
     load_posts,
     product_rows,
 )
+from cvs_radar.pipeline import run_pipeline
+from cvs_radar.reporting import render_suspicion_detail
 from cvs_radar.service import query_products
 
 
@@ -44,28 +46,34 @@ def main() -> None:
         st.error(f"資料載入失敗：{exc}")
         return
 
-    selected_brand = st.sidebar.selectbox("品牌", options, index=0)
-    query = build_product_query(
-        brand=selected_brand,
-        start_date=controls["start_date"],
-        end_date=controls["end_date"],
-        recent_days=controls["recent_days"],
-        min_score=controls["min_score"],
-        min_n_eff=controls["min_n_eff"],
-        min_posts=controls["min_posts"],
-        min_comments=controls["min_comments"],
-        limit=controls["limit"],
-        internal=False,
-    )
+    tab1, tab2 = st.tabs(["商品排名", "帳號信度維運"])
 
-    try:
-        result = query_products(posts, query)
-    except ValueError as exc:
-        st.error(str(exc))
-        return
+    with tab1:
+        selected_brand = st.selectbox("品牌", options, index=0)
+        query = build_product_query(
+            brand=selected_brand,
+            start_date=controls["start_date"],
+            end_date=controls["end_date"],
+            recent_days=controls["recent_days"],
+            min_score=controls["min_score"],
+            min_n_eff=controls["min_n_eff"],
+            min_posts=controls["min_posts"],
+            min_comments=controls["min_comments"],
+            limit=controls["limit"],
+            internal=False,
+        )
 
-    _render_summary(result.to_dict(), selected_brand)
-    _render_rankings(result)
+        try:
+            result = query_products(posts, query)
+        except ValueError as exc:
+            st.error(str(exc))
+            return
+
+        _render_summary(result.to_dict(), selected_brand)
+        _render_rankings(result)
+
+    with tab2:
+        _render_account_maintenance(posts, controls)
 
 
 def _render_sidebar() -> dict[str, object]:
@@ -176,6 +184,116 @@ def _render_rankings(result) -> None:
             )
             st.write("代表性推：", row["代表性推"] or "無")
             st.write("代表性噓：", row["代表性噓"] or "無")
+
+
+def _render_account_maintenance(posts, controls: dict[str, object]) -> None:
+    try:
+        _, profiles = run_pipeline(
+            posts,
+            start_date=controls["start_date"],
+            end_date=controls["end_date"],
+            recent_days=controls["recent_days"],
+        )
+    except ValueError as exc:
+        st.error(str(exc))
+        return
+
+    active_profiles = [
+        profile
+        for profile in sorted(profiles.values(), key=lambda item: -item.suspicion_score)
+        if profile.suspicion_features
+    ]
+
+    st.subheader("帳號概覽")
+    min_suspicion = st.slider("最低可疑分", 0.0, 1.0, 0.0, 0.01)
+    filtered_profiles = [
+        profile for profile in active_profiles if profile.suspicion_score >= min_suspicion
+    ]
+
+    overview_rows = [
+        {
+            "帳號": profile.user,
+            "留言數": profile.total_comments,
+            "傾向品牌": profile.lean_brand or "-",
+            "可疑分": profile.suspicion_score,
+            "信度": profile.credibility,
+        }
+        for profile in filtered_profiles
+    ]
+    st.dataframe(
+        overview_rows,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "留言數": st.column_config.NumberColumn("留言數"),
+            "可疑分": st.column_config.NumberColumn("可疑分", format="%.2f"),
+            "信度": st.column_config.NumberColumn("信度", format="%.2f"),
+        },
+    )
+
+    if not filtered_profiles:
+        st.info("目前條件下沒有達活動量門檻且符合最低可疑分的帳號。")
+        return
+
+    st.subheader("帳號明細")
+    selected_user = st.selectbox("選擇帳號", [profile.user for profile in filtered_profiles])
+    selected_profile = next(
+        profile for profile in filtered_profiles if profile.user == selected_user
+    )
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("留言數", selected_profile.total_comments)
+    col2.metric("信度", f"{selected_profile.credibility:.2f}")
+    col3.metric("可疑分", f"{selected_profile.suspicion_score:.2f}")
+    col4.metric("傾向品牌", selected_profile.lean_brand or "-")
+
+    st.markdown("#### 品牌互動")
+    brand_rows = [
+        {
+            "品牌": brand,
+            "留言數": stat.count,
+            "平均情感": stat.avg_sentiment,
+        }
+        for brand, stat in sorted(
+            selected_profile.brand_stats.items(),
+            key=lambda item: (-item[1].count, item[0]),
+        )
+    ]
+    st.dataframe(
+        brand_rows,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "留言數": st.column_config.NumberColumn("留言數"),
+            "平均情感": st.column_config.NumberColumn("平均情感", format="%.2f"),
+        },
+    )
+
+    st.markdown("#### 特徵明細")
+    explanations = {
+        "one_sided": "偏向單一品牌正面、競品負面的程度",
+        "single_brand": "留言集中在單一品牌的程度",
+        "extreme": "極端情感留言比例",
+        "template_like": "完全重複或近似樣板留言比例",
+        "burst": "同品牌短時間爆發留言比例",
+    }
+    feature_rows = [
+        {
+            "特徵": name,
+            "值": selected_profile.suspicion_features.get(name, 0.0),
+            "說明": explanation,
+        }
+        for name, explanation in explanations.items()
+    ]
+    st.dataframe(
+        feature_rows,
+        hide_index=True,
+        use_container_width=True,
+        column_config={"值": st.column_config.NumberColumn("值", format="%.2f")},
+    )
+
+    st.markdown("#### 被標記留言")
+    st.code(render_suspicion_detail(selected_profile, posts), language="text")
 
 
 if __name__ == "__main__":
