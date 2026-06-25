@@ -28,19 +28,30 @@ from .sentiment import POSITIVE_WORDS
 _BRACKET_RE = re.compile(r"[\[\(（【].*?[\]\)）】]")
 _TITLE_PREFIX_RE = re.compile(r"^\s*(商品|心得|情報|問題|請益|討論|問卦)\s*")
 _NOISE_RE = re.compile(
-    r"(心得|開箱|踩雷|地雷|評價|回購|好吃嗎|好不好吃|分享|請益|請問|詢問|"
-    r"推薦|推不推|反推|實測|試吃|食記|簡評|小心得)"
+    r"(無限回購|期間限定|季節限定|超好吃|好不好吃|好吃嗎|小心得|新口味|"
+    r"心得|開箱|踩雷|地雷|評價|回購|分享|請益|請問|詢問|推薦|推不推|"
+    r"反推|實測|試吃|食記|簡評|必買|不推|超商|好吃|難吃|最新|聯名|"
+    r"大推|激推|微雷|不雷|二訪|回味|雷)"
 )
 _OPTIONAL_RE = re.compile(
     r"(\d+(\.\d+)?\s*(入|包|個|顆|片|枚|杯|瓶|罐|盒|組|ml|毫升|g|公克|克)|"
     r"(口味|數量|容量|規格|加量|限定|新品|新上市))"
 )
 _COMMENT_NOISE_RE = re.compile(r"(這款|這個|這品|這次|個人覺得|我覺得|覺得|補充[:：]?|推薦|推推|再推一次)")
+_SYNONYM_MAP = {
+    "蕃薯": "地瓜",
+    "番薯": "地瓜",
+    "起士": "起司",
+    "芝士": "起司",
+    "優格": "優酪",
+    "吐司": "土司",
+}
 _DISTINCTIVE_TERMS = {
     "原味",
     "辣",
     "麻辣",
     "起司",
+    "地瓜",
     "乳酪",
     "巧克力",
     "可可",
@@ -99,6 +110,8 @@ def _clean_product_name(brand: str, name: str) -> str:
     s = _OPTIONAL_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
     s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
+    for old, new in _SYNONYM_MAP.items():
+        s = s.replace(old, new)
     return s or "unknown"
 
 
@@ -126,6 +139,8 @@ def _clean_product_name_without_alias(brand: str, name: str) -> str:
     s = _OPTIONAL_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
     s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
+    for old, new in _SYNONYM_MAP.items():
+        s = s.replace(old, new)
     return s or "unknown"
 
 

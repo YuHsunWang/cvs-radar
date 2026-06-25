@@ -139,6 +139,42 @@ class ScoringTest(unittest.TestCase):
     def test_product_normalization_removes_brand(self) -> None:
         self.assertEqual(normalize_product("7-11", "711  測試飯糰"), "測試飯糰")
 
+    def test_product_normalization_strips_noise_and_units(self) -> None:
+        self.assertEqual(
+            normalize_product("7-11", "鮪魚飯糰2入"),
+            normalize_product("7-11", "鮪魚飯糰"),
+        )
+        self.assertEqual(
+            normalize_product("全家", "新品 XX蛋糕 心得開箱"),
+            normalize_product("全家", "XX蛋糕"),
+        )
+
+    def test_product_synonym_normalization(self) -> None:
+        self.assertEqual(
+            normalize_product("7-11", "起士蛋糕"),
+            normalize_product("7-11", "起司蛋糕"),
+        )
+        self.assertEqual(
+            normalize_product("全家", "蕃薯球"),
+            normalize_product("全家", "地瓜球"),
+        )
+
+    def test_product_grouping_merges_name_with_parenthetical(self) -> None:
+        posts = [
+            Post(id="p1", brand="7-11", product_name="阜杭豆漿饅頭夾豬排蛋", author="a1", author_score=80),
+            Post(id="p2", brand="7-11", product_name="阜杭豆漿饅頭夾豬排蛋(新包裝)", author="a2", author_score=82),
+        ]
+        reports, _ = run_pipeline(posts)
+        self.assertEqual(len(reports), 1)
+
+    def test_product_grouping_keeps_different_flavors_separate_with_synonyms(self) -> None:
+        posts = [
+            Post(id="p1", brand="7-11", product_name="起司蛋糕", author="a1", author_score=80),
+            Post(id="p2", brand="7-11", product_name="草莓蛋糕", author="a2", author_score=82),
+        ]
+        reports, _ = run_pipeline(posts)
+        self.assertEqual(len(reports), 2)
+
     def test_pipeline_caps_same_user_comments_and_excludes_self_push(self) -> None:
         post = Post(
             id="p1",
