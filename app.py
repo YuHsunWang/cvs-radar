@@ -10,12 +10,13 @@ from cvs_radar.app_helpers import (
     ALL_BRANDS,
     brand_options,
     build_product_query,
+    load_results_or_none,
     load_posts,
     product_rows,
 )
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import render_suspicion_detail
-from cvs_radar.service import query_products
+from cvs_radar.service import BrandSummary, ProductQueryResult, filter_reports, query_products
 
 
 def main() -> None:
@@ -25,26 +26,38 @@ def main() -> None:
 
     controls = _render_sidebar()
 
-    try:
-        posts = load_posts(
-            controls["source"],
-            crawl_pages=controls["crawl_pages"],
-            start_date=controls["start_date"],
-            end_date=controls["end_date"],
-            recent_days=controls["recent_days"],
-        )
-        options = brand_options(
-            posts,
-            start_date=controls["start_date"],
-            end_date=controls["end_date"],
-            recent_days=controls["recent_days"],
-        )
-    except ValueError as exc:
-        st.error(str(exc))
-        return
-    except Exception as exc:  # pragma: no cover - UI safety net
-        st.error(f"資料載入失敗：{exc}")
-        return
+    posts = None
+    reports = None
+    profiles = None
+    if controls["source"] == "results":
+        loaded = load_results_or_none()
+        if loaded is None:
+            st.warning("尚無預算結果。請先執行 `python crawl_job.py` 爬取資料。")
+            st.stop()
+        reports, profiles = loaded
+        brand_set = sorted(set(r.brand for r in reports))
+        options = [ALL_BRANDS, *brand_set]
+    else:
+        try:
+            posts = load_posts(
+                controls["source"],
+                crawl_pages=controls["crawl_pages"],
+                start_date=controls["start_date"],
+                end_date=controls["end_date"],
+                recent_days=controls["recent_days"],
+            )
+            options = brand_options(
+                posts,
+                start_date=controls["start_date"],
+                end_date=controls["end_date"],
+                recent_days=controls["recent_days"],
+            )
+        except ValueError as exc:
+            st.error(str(exc))
+            return
+        except Exception as exc:  # pragma: no cover - UI safety net
+            st.error(f"資料載入失敗：{exc}")
+            return
 
     tab1, tab2 = st.tabs(["商品排名", "帳號信度維運"])
 
@@ -64,7 +77,10 @@ def main() -> None:
         )
 
         try:
-            result = query_products(posts, query)
+            if reports is not None:
+                result = _query_precomputed_reports(reports, query)
+            else:
+                result = query_products(posts, query)
         except ValueError as exc:
             st.error(str(exc))
             return
@@ -73,7 +89,7 @@ def main() -> None:
         _render_rankings(result)
 
     with tab2:
-        _render_account_maintenance(posts, controls)
+        _render_account_maintenance(posts, controls, profiles=profiles)
 
 
 def _render_sidebar() -> dict[str, object]:
@@ -82,15 +98,23 @@ def _render_sidebar() -> dict[str, object]:
 
         source_label = st.radio(
             "資料來源",
-            ["demo 離線樣本", "stored 已爬取資料", "crawl PTT CVS"],
+            ["results 預算結果（最快）", "demo 離線樣本", "stored 已爬取資料", "crawl PTT CVS"],
             index=0,
         )
-        source = (
-            "demo"
-            if source_label.startswith("demo")
-            else ("stored" if source_label.startswith("stored") else "crawl")
-        )
+        if source_label.startswith("results"):
+            source = "results"
+        elif source_label.startswith("demo"):
+            source = "demo"
+        elif source_label.startswith("stored"):
+            source = "stored"
+        else:
+            source = "crawl"
         crawl_pages = 5
+        if source == "results":
+            loaded = load_results_or_none()
+            if loaded is not None:
+                loaded_reports, loaded_profiles = loaded
+                st.info(f"已載入 {len(loaded_reports)} 份商品結果 / {len(loaded_profiles)} 個帳號")
         if source == "stored":
             from cvs_radar.store import store_stats
 
@@ -139,6 +163,57 @@ def _render_sidebar() -> dict[str, object]:
         "min_comments": min_comments,
         "limit": limit,
     }
+
+
+def _query_precomputed_reports(reports, query) -> ProductQueryResult:
+    filtered = filter_reports(
+        reports,
+        brand=query.brand,
+        min_score=query.min_score,
+        min_n_eff=query.min_n_eff,
+        min_posts=query.min_posts,
+        min_comments=query.min_comments,
+        limit=query.limit,
+    )
+    return ProductQueryResult(
+        filters={
+            "brand": query.brand,
+            "start_date": None,
+            "end_date": None,
+            "recent_days": None,
+            "min_score": query.min_score,
+            "min_n_eff": query.min_n_eff,
+            "min_posts": query.min_posts,
+            "min_comments": query.min_comments,
+            "limit": query.limit,
+            "internal": query.internal,
+        },
+        brands=_brand_summaries_from_reports(reports),
+        reports=filtered,
+    )
+
+
+def _brand_summaries_from_reports(reports) -> list[BrandSummary]:
+    rows = {}
+    for report in reports:
+        row = rows.setdefault(
+            report.brand,
+            {"products": 0, "post_count": 0, "comment_count": 0},
+        )
+        row["products"] += 1
+        row["post_count"] += report.n_posts
+        row["comment_count"] += report.n_comments
+    summaries = [
+        BrandSummary(
+            brand=brand,
+            product_count=values["products"],
+            post_count=values["post_count"],
+            comment_count=values["comment_count"],
+        )
+        for brand, values in rows.items()
+    ]
+    summaries.sort(key=lambda item: (-item.product_count, -item.post_count, item.brand))
+    return summaries
 
 
 def _render_summary(payload: dict[str, object], selected_brand: str) -> None:
@@ -199,17 +274,18 @@ def _render_rankings(result) -> None:
             st.write("代表性噓：", row["代表性噓"] or "無")
 
 
-def _render_account_maintenance(posts, controls: dict[str, object]) -> None:
-    try:
-        _, profiles = run_pipeline(
-            posts,
-            start_date=controls["start_date"],
-            end_date=controls["end_date"],
-            recent_days=controls["recent_days"],
-        )
-    except ValueError as exc:
-        st.error(str(exc))
-        return
+def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=None) -> None:
+    if profiles is None:
+        try:
+            _, profiles = run_pipeline(
+                posts,
+                start_date=controls["start_date"],
+                end_date=controls["end_date"],
+                recent_days=controls["recent_days"],
+            )
+        except ValueError as exc:
+            st.error(str(exc))
+            return
 
     active_profiles = [
         profile
@@ -306,7 +382,10 @@ def _render_account_maintenance(posts, controls: dict[str, object]) -> None:
     )
 
     st.markdown("#### 被標記留言")
-    st.code(render_suspicion_detail(selected_profile, posts), language="text")
+    if posts is None:
+        st.info("results 模式只載入帳號統計；若要查看原始留言，請切換到 stored 或 crawl。")
+    else:
+        st.code(render_suspicion_detail(selected_profile, posts), language="text")
 
 
 if __name__ == "__main__":

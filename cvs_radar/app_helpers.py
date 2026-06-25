@@ -13,7 +13,14 @@ from .models import Post
 from .service import ProductQuery, ProductQueryResult, list_brands
 
 ALL_BRANDS = "全部"
-SourceName = Literal["demo", "crawl", "stored"]
+SourceName = Literal["demo", "crawl", "stored", "results"]
+
+
+def load_results_or_none():
+    """Try to load precomputed results. Returns (reports, profiles) or None."""
+    from .store import load_results
+
+    return load_results()
 
 
 def load_posts(

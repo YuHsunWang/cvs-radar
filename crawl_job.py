@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import logging
 from datetime import datetime
+from pathlib import Path
 
 from cvs_radar.crawler import PttCrawler
 from cvs_radar.store import DEFAULT_STORE_PATH, save_posts, store_stats
@@ -27,6 +28,7 @@ def main() -> None:
     parser.add_argument("--pages", type=int, default=5, help="Number of PTT list pages to crawl (default: 5)")
     parser.add_argument("--store", default=DEFAULT_STORE_PATH, help=f"JSONL store path (default: {DEFAULT_STORE_PATH})")
     parser.add_argument("--recent-days", type=int, default=None, help="Only keep posts from recent N days")
+    parser.add_argument("--skip-recompute", action="store_true", help="Skip pipeline recompute after crawl")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
     args = parser.parse_args()
 
@@ -50,6 +52,20 @@ def main() -> None:
         raise
 
     new_count = save_posts(posts, args.store)
+    if not args.skip_recompute:
+        from cvs_radar.pipeline import run_pipeline
+        from cvs_radar.store import load_posts as load_stored, save_results
+
+        all_posts = load_stored(args.store)
+        if all_posts:
+            reports, profiles = run_pipeline(all_posts)
+            results_path = str(Path(args.store).parent / "results.json")
+            save_results(reports, profiles, results_path)
+            logger.info(
+                "Results updated: %d reports, %d profiles",
+                len(reports),
+                len(profiles),
+            )
     elapsed = (datetime.now() - start).total_seconds()
     stats = store_stats(args.store)
 

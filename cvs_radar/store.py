@@ -1,4 +1,4 @@
-"""JSONL persistence for Post objects."""
+"""JSONL persistence for posts and precomputed result objects."""
 
 from __future__ import annotations
 
@@ -6,9 +6,11 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from .models import Comment, Post
+from .models import Comment, Contributor, Post, ProductReport
+from .preference import AccountProfile, BrandStat
 
 DEFAULT_STORE_PATH = "data/posts.jsonl"
+DEFAULT_RESULTS_PATH = "data/results.json"
 
 
 def post_to_dict(post: Post) -> dict:
@@ -127,3 +129,131 @@ def store_stats(path: str | Path = DEFAULT_STORE_PATH) -> dict:
         "brands": sorted(brands),
         "date_range": date_range,
     }
+
+
+def report_to_store_dict(report: ProductReport) -> dict:
+    """Serialize a ProductReport for storage."""
+    return {
+        "brand": report.brand,
+        "product_name": report.product_name,
+        "fair_score": report.fair_score,
+        "consensus": report.consensus,
+        "confidence": report.confidence,
+        "n_eff": report.n_eff,
+        "score_std": report.score_std,
+        "n_posts": report.n_posts,
+        "n_comments": report.n_comments,
+        "contributors": [
+            {"user": c.user, "role": c.role, "score": c.score, "weight": c.weight}
+            for c in report.contributors
+        ],
+        "rep_positive": report.rep_positive,
+        "rep_negative": report.rep_negative,
+        "product_key": report.product_key,
+        "score_mean": report.score_mean,
+        "competitor_mention_count": report.competitor_mention_count,
+        "competitor_preference_count": report.competitor_preference_count,
+        "competitor_brands": report.competitor_brands,
+    }
+
+
+def store_dict_to_report(data: dict) -> ProductReport:
+    """Deserialize a stored dict back to ProductReport."""
+    contributors = [
+        Contributor(
+            user=c["user"],
+            role=c["role"],
+            score=c["score"],
+            weight=c["weight"],
+        )
+        for c in data.get("contributors", [])
+    ]
+    return ProductReport(
+        brand=data["brand"],
+        product_name=data["product_name"],
+        fair_score=data.get("fair_score"),
+        consensus=data["consensus"],
+        confidence=data["confidence"],
+        n_eff=data["n_eff"],
+        score_std=data["score_std"],
+        n_posts=data["n_posts"],
+        n_comments=data["n_comments"],
+        contributors=contributors,
+        rep_positive=data.get("rep_positive", []),
+        rep_negative=data.get("rep_negative", []),
+        product_key=data.get("product_key", ""),
+        score_mean=data.get("score_mean", 0.0),
+        competitor_mention_count=data.get("competitor_mention_count", 0),
+        competitor_preference_count=data.get("competitor_preference_count", 0),
+        competitor_brands=data.get("competitor_brands", []),
+    )
+
+
+def profile_to_store_dict(profile: AccountProfile) -> dict:
+    """Serialize an AccountProfile for storage."""
+    return {
+        "user": profile.user,
+        "source": profile.source,
+        "brand_stats": {
+            brand: {"count": stat.count, "avg_sentiment": stat.avg_sentiment}
+            for brand, stat in profile.brand_stats.items()
+        },
+        "lean_brand": profile.lean_brand,
+        "suspicion_score": profile.suspicion_score,
+        "suspicion_features": profile.suspicion_features,
+        "credibility": profile.credibility,
+        "total_comments": profile.total_comments,
+    }
+
+
+def store_dict_to_profile(data: dict) -> AccountProfile:
+    """Deserialize a stored dict back to AccountProfile."""
+    brand_stats = {
+        brand: BrandStat(count=s["count"], avg_sentiment=s["avg_sentiment"])
+        for brand, s in data.get("brand_stats", {}).items()
+    }
+    return AccountProfile(
+        user=data["user"],
+        source=data.get("source", "PTT"),
+        brand_stats=brand_stats,
+        lean_brand=data.get("lean_brand"),
+        suspicion_score=data.get("suspicion_score", 0.0),
+        suspicion_features=data.get("suspicion_features", {}),
+        credibility=data.get("credibility", 1.0),
+        total_comments=data.get("total_comments", 0),
+    )
+
+
+def save_results(
+    reports: list[ProductReport],
+    profiles: dict[str, AccountProfile],
+    path: str | Path = DEFAULT_RESULTS_PATH,
+) -> None:
+    """Save computed results (reports + profiles) to a JSON file."""
+    file_path = Path(path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "generated_at": datetime.now().isoformat(sep=" ", timespec="seconds"),
+        "reports": [report_to_store_dict(r) for r in reports],
+        "profiles": [profile_to_store_dict(p) for p in profiles.values()],
+    }
+    file_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+def load_results(
+    path: str | Path = DEFAULT_RESULTS_PATH,
+) -> tuple[list[ProductReport], dict[str, AccountProfile]] | None:
+    """Load precomputed results. Returns None if file doesn't exist."""
+    file_path = Path(path)
+    if not file_path.exists():
+        return None
+    data = json.loads(file_path.read_text(encoding="utf-8"))
+    reports = [store_dict_to_report(r) for r in data.get("reports", [])]
+    profiles = {
+        p["user"]: store_dict_to_profile(p)
+        for p in data.get("profiles", [])
+    }
+    return reports, profiles

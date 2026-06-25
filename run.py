@@ -12,7 +12,7 @@ from pathlib import Path
 
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import render_json, render_suspicion, render_text
-from cvs_radar.service import filter_reports, list_brands
+from cvs_radar.service import BrandSummary, filter_reports, list_brands
 from cvs_radar.filters import build_time_window
 
 
@@ -22,6 +22,7 @@ def main() -> None:
     source.add_argument("--demo", action="store_true", help="Use bundled sample data")
     source.add_argument("--crawl", action="store_true", help="Crawl PTT CVS")
     source.add_argument("--stored", action="store_true", help="Use stored crawl data from JSONL")
+    source.add_argument("--results", action="store_true", help="Use precomputed results (fastest)")
 
     parser.add_argument("--pages", type=_non_negative_int, default=5, help="PTT list pages to crawl")
     parser.add_argument("--start-date", help="Filter posts/comments from this date or datetime, e.g. 2026-06-01")
@@ -56,29 +57,44 @@ def main() -> None:
     except ValueError as exc:
         parser.error(str(exc))
 
-    posts = _load_posts(args, now=effective_now)
+    posts = None
+    reports = None
+    profiles = None
+    if args.results:
+        from cvs_radar.store import load_results
+
+        loaded = load_results()
+        if loaded is None:
+            parser.error("No precomputed results found. Run crawl_job.py first.")
+        reports, profiles = loaded
+    else:
+        posts = _load_posts(args, now=effective_now)
 
     if args.list_brands:
-        summaries = list_brands(
-            posts,
-            start_date=args.start_date,
-            end_date=args.end_date,
-            recent_days=args.recent_days,
-            now=effective_now,
-        )
+        if reports is not None:
+            summaries = _brand_summaries_from_reports(reports)
+        else:
+            summaries = list_brands(
+                posts,
+                start_date=args.start_date,
+                end_date=args.end_date,
+                recent_days=args.recent_days,
+                now=effective_now,
+            )
         print(_render_brand_summaries(summaries))
         if args.json:
             _write_text_file(args.json, json.dumps([asdict(item) for item in summaries], ensure_ascii=False, indent=2))
             print(f"\nJSON written to {args.json}")
         return
 
-    reports, profiles = run_pipeline(
-        posts,
-        start_date=args.start_date,
-        end_date=args.end_date,
-        recent_days=args.recent_days,
-        now=effective_now,
-    )
+    if reports is None:
+        reports, profiles = run_pipeline(
+            posts,
+            start_date=args.start_date,
+            end_date=args.end_date,
+            recent_days=args.recent_days,
+            now=effective_now,
+        )
     reports = filter_reports(
         reports,
         brand=args.brand,
@@ -133,6 +149,29 @@ def _render_brand_summaries(summaries) -> str:
         for item in summaries
     )
     return "\n".join(lines)
+
+
+def _brand_summaries_from_reports(reports) -> list[BrandSummary]:
+    rows = {}
+    for report in reports:
+        row = rows.setdefault(
+            report.brand,
+            {"products": 0, "post_count": 0, "comment_count": 0},
+        )
+        row["products"] += 1
+        row["post_count"] += report.n_posts
+        row["comment_count"] += report.n_comments
+    summaries = [
+        BrandSummary(
+            brand=brand,
+            product_count=values["products"],
+            post_count=values["post_count"],
+            comment_count=values["comment_count"],
+        )
+        for brand, values in rows.items()
+    ]
+    summaries.sort(key=lambda item: (-item.product_count, -item.post_count, item.brand))
+    return summaries
 
 
 def _non_negative_int(value: str) -> int:

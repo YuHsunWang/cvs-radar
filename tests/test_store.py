@@ -77,3 +77,93 @@ class StoreTest(unittest.TestCase):
 
             self.assertEqual(len(reports), 1)
             self.assertIsNotNone(reports[0].fair_score)
+
+    def test_report_roundtrip(self) -> None:
+        """ProductReport -> dict -> ProductReport preserves all fields."""
+        from cvs_radar.models import Contributor, ProductReport
+        from cvs_radar.store import report_to_store_dict, store_dict_to_report
+
+        original = ProductReport(
+            brand="7-11",
+            product_name="測試飯糰",
+            fair_score=72.5,
+            consensus="褒貶不一",
+            confidence="中",
+            n_eff=5.2,
+            score_std=0.18,
+            n_posts=3,
+            n_comments=15,
+            contributors=[Contributor("u1", "commenter", 0.8, 0.9)],
+            rep_positive=["好吃"],
+            rep_negative=["太貴"],
+            product_key="7-11:測試飯糰",
+            score_mean=0.65,
+            competitor_mention_count=2,
+            competitor_preference_count=1,
+            competitor_brands=["全家"],
+        )
+        restored = store_dict_to_report(report_to_store_dict(original))
+        self.assertEqual(restored.brand, original.brand)
+        self.assertEqual(restored.fair_score, original.fair_score)
+        self.assertEqual(restored.consensus, original.consensus)
+        self.assertEqual(len(restored.contributors), 1)
+        self.assertEqual(restored.contributors[0].user, "u1")
+        self.assertEqual(restored.rep_positive, ["好吃"])
+        self.assertEqual(restored.competitor_brands, ["全家"])
+
+    def test_profile_roundtrip(self) -> None:
+        """AccountProfile -> dict -> AccountProfile preserves all fields."""
+        from cvs_radar.preference import AccountProfile, BrandStat
+        from cvs_radar.store import profile_to_store_dict, store_dict_to_profile
+
+        original = AccountProfile(
+            user="test_user",
+            brand_stats={"7-11": BrandStat(count=10, avg_sentiment=0.75)},
+            lean_brand="7-11",
+            suspicion_score=0.42,
+            suspicion_features={"one_sided": 0.3, "single_brand": 0.8},
+            credibility=0.58,
+            total_comments=10,
+        )
+        restored = store_dict_to_profile(profile_to_store_dict(original))
+        self.assertEqual(restored.user, original.user)
+        self.assertEqual(restored.suspicion_score, original.suspicion_score)
+        self.assertEqual(restored.brand_stats["7-11"].count, 10)
+        self.assertEqual(restored.credibility, 0.58)
+
+    def test_save_and_load_results(self) -> None:
+        """Full results save/load roundtrip."""
+        from cvs_radar.models import ProductReport
+        from cvs_radar.preference import AccountProfile
+        from cvs_radar.store import load_results, save_results
+
+        reports = [
+            ProductReport(
+                brand="7-11",
+                product_name="Test",
+                fair_score=70.0,
+                consensus="褒貶不一",
+                confidence="中",
+                n_eff=4.0,
+                score_std=0.2,
+                n_posts=2,
+                n_comments=8,
+            )
+        ]
+        profiles = {"u1": AccountProfile(user="u1", total_comments=5)}
+
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "results.json"
+            save_results(reports, profiles, path)
+            loaded = load_results(path)
+
+            self.assertIsNotNone(loaded)
+            loaded_reports, loaded_profiles = loaded
+            self.assertEqual(len(loaded_reports), 1)
+            self.assertEqual(loaded_reports[0].fair_score, 70.0)
+            self.assertIn("u1", loaded_profiles)
+
+    def test_load_results_nonexistent_returns_none(self) -> None:
+        from cvs_radar.store import load_results
+
+        self.assertIsNone(load_results("/tmp/does_not_exist_results.json"))

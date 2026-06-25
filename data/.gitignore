@@ -1,3 +1,4 @@
-# 爬蟲資料不進 git（太大且含帳號資料）
+# 爬蟲資料和算好的結果不進 git
 *.jsonl
+*.json
 !.gitignore
