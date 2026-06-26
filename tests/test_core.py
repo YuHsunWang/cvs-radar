@@ -403,6 +403,88 @@ class SentimentTest(unittest.TestCase):
 
         self.assertGreater(score, 0)
 
+    def test_openai_client_parses_float_response(self) -> None:
+        """OpenAiSentimentClient.score_text returns float from API response."""
+        import sys
+        import types
+        from unittest.mock import MagicMock, patch
+        from cvs_radar.sentiment import OpenAiSentimentClient
+
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = "0.75"
+
+        client = OpenAiSentimentClient()
+        fake_openai = types.SimpleNamespace(OpenAI=MagicMock())
+        with patch.dict(sys.modules, {"openai": fake_openai}):
+            with patch("openai.OpenAI") as mock_openai:
+                mock_openai.return_value.chat.completions.create.return_value = mock_response
+                score = client.score_text("好吃會回購", provider="openai", model="gpt-4o-mini", api_key="test-key")
+
+        self.assertAlmostEqual(score, 0.75)
+
+    def test_openai_client_negative_response(self) -> None:
+        """OpenAiSentimentClient handles negative scores."""
+        import sys
+        import types
+        from unittest.mock import MagicMock, patch
+        from cvs_radar.sentiment import OpenAiSentimentClient
+
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = "-0.8"
+
+        client = OpenAiSentimentClient()
+        fake_openai = types.SimpleNamespace(OpenAI=MagicMock())
+        with patch.dict(sys.modules, {"openai": fake_openai}):
+            with patch("openai.OpenAI") as mock_openai:
+                mock_openai.return_value.chat.completions.create.return_value = mock_response
+                score = client.score_text("難吃踩雷", provider="openai", model="gpt-4o-mini", api_key="test-key")
+
+        self.assertAlmostEqual(score, -0.8)
+
+    def test_llm_backend_fallback_when_no_key(self) -> None:
+        """LlmBackend falls back to snownlp when no API key is set."""
+        import os
+        from unittest.mock import patch
+        from cvs_radar.sentiment import LlmBackend
+
+        with patch.dict(os.environ, {}, clear=True):
+            backend = LlmBackend()
+            score = backend.text_score("好吃")
+
+        self.assertIsInstance(score, float)
+        self.assertGreaterEqual(score, -1.0)
+        self.assertLessEqual(score, 1.0)
+
+    def test_llm_backend_fallback_on_api_error(self) -> None:
+        """LlmBackend falls back when API call raises."""
+        from unittest.mock import patch
+        from cvs_radar.sentiment import LlmBackend, OpenAiSentimentClient
+
+        client = OpenAiSentimentClient()
+        with patch.object(client, "score_text", side_effect=Exception("API error")):
+            backend = LlmBackend(client=client)
+            with patch.dict("os.environ", {"CVS_RADAR_LLM_API_KEY": "test"}):
+                with patch(
+                    "cvs_radar.sentiment.SENTIMENT",
+                    {
+                        "backend": "llm",
+                        "tag_prior_weight": 0.6,
+                        "llm": {
+                            "enabled": True,
+                            "provider": "openai",
+                            "model": "gpt-4o-mini",
+                            "api_key": "",
+                            "api_key_env": "CVS_RADAR_LLM_API_KEY",
+                            "fallback_backend": "lexicon",
+                        },
+                    },
+                ):
+                    score = backend.text_score("好吃")
+
+        self.assertIsInstance(score, float)
+
 
 class TimeAndServiceTest(unittest.TestCase):
     def test_pipeline_filters_posts_and_comments_by_date(self) -> None:

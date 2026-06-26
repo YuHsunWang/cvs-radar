@@ -143,6 +143,13 @@ def _load_posts(source: str, *, pages: int) -> list[Post]:
         from .sample_data import load_sample
 
         return load_sample()
+    if source == "stored":
+        from .store import load_posts as load_stored
+
+        posts = load_stored()
+        if not posts:
+            raise ValueError("No stored posts found. Run crawl_job.py first.")
+        return posts
     if source == "crawl":
         from .crawler import PttCrawler
 
@@ -152,7 +159,7 @@ def _load_posts(source: str, *, pages: int) -> list[Post]:
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Create a CVS Radar labeling CSV")
-    parser.add_argument("--source", choices=["demo", "crawl"], default="demo")
+    parser.add_argument("--source", choices=["demo", "crawl", "stored"], default="demo")
     parser.add_argument("--output", default="data/labels/to_label.csv")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--shuffle", action="store_true")

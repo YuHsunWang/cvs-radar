@@ -59,6 +59,38 @@ class LlmSentimentClient(Protocol):
         """Return text-only sentiment in [-1, 1]."""
 
 
+class OpenAiSentimentClient:
+    """LlmSentimentClient implementation using OpenAI chat completions."""
+
+    def score_text(self, text: str, *, provider: str, model: str, api_key: str) -> float:
+        import openai
+
+        client = openai.OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model=model or "gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "你是一個台灣超商食品評論的情感分析器。"
+                        "使用者會給你一則 PTT CVS 版的留言，請判斷情感分數。"
+                        "規則：\n"
+                        "- 回傳一個浮點數，範圍 -1.0（極負面）到 1.0（極正面）\n"
+                        "- 0.0 表示中性\n"
+                        "- 注意反諷語氣（例如「好棒喔，貴到可以當精品」是負面）\n"
+                        "- 注意 PTT 用語（例如「雷」=負面、「回購」=正面）\n"
+                        "- 只回傳數字，不要其他文字"
+                    ),
+                },
+                {"role": "user", "content": text},
+            ],
+            temperature=0.0,
+            max_tokens=10,
+        )
+        raw = (response.choices[0].message.content or "").strip()
+        return float(raw)
+
+
 class LexiconBackend:
     name = "lexicon"
 
@@ -96,6 +128,11 @@ class LlmBackend:
         client: LlmSentimentClient | None = None,
         fallback: SentimentBackend | None = None,
     ) -> None:
+        if client is None:
+            try:
+                client = OpenAiSentimentClient()
+            except Exception:
+                client = None
         self.client = client
         self.fallback = fallback or _backend_from_name(_llm_config().get("fallback_backend", "snownlp"), allow_llm=False)
 

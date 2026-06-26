@@ -4,6 +4,7 @@ import json
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from cvs_radar.evaluation import (
     RuleBasedPredictor,
@@ -49,6 +50,77 @@ class LabelingTest(unittest.TestCase):
             self.assertEqual(row.target_brand, "")
             self.assertEqual(row.is_comparative, "")
             self.assertEqual(row.favored_brand, "")
+
+    def test_prelabel_fills_all_label_columns(self) -> None:
+        """prelabel_rows fills sentiment, target_brand, is_comparative, favored_brand, notes."""
+        from scripts.prelabel import prelabel_rows
+
+        row = {
+            "comment_id": "test#000",
+            "source": "PTT",
+            "board": "CVS",
+            "post_id": "test",
+            "post_url": "",
+            "post_title": "[商品] 7-11 測試",
+            "post_brand": "7-11",
+            "product_name": "測試飯糰",
+            "price": "50",
+            "post_tag": "商品",
+            "comment_user": "tester",
+            "comment_tag": "推",
+            "comment_text": "好吃會回購",
+            "comment_posted_at": "",
+            "context": "貼文品牌=7-11",
+            "sentiment": "",
+            "target_brand": "",
+            "is_comparative": "",
+            "favored_brand": "",
+            "notes": "",
+        }
+        result = prelabel_rows([row])
+        self.assertEqual(len(result), 1)
+        self.assertIn(result[0]["sentiment"], ("正", "負", "中"))
+        self.assertIn(result[0]["target_brand"], ("本牌", "他牌", "無"))
+        self.assertIn(result[0]["is_comparative"], ("是", "否"))
+        self.assertIn(result[0]["favored_brand"], ("本牌", "他牌", "平手", "不明"))
+        self.assertEqual(result[0]["notes"], "auto-prelabeled")
+
+    def test_prelabel_positive_comment(self) -> None:
+        """Positive push with clear positive text gets sentiment=正."""
+        from scripts.prelabel import prelabel_rows
+
+        row = {
+            "comment_id": "pos#000",
+            "source": "PTT",
+            "board": "CVS",
+            "post_id": "pos",
+            "post_url": "",
+            "post_title": "[商品] 全家 好吃雞排",
+            "post_brand": "全家",
+            "product_name": "好吃雞排",
+            "price": "",
+            "post_tag": "商品",
+            "comment_user": "u1",
+            "comment_tag": "推",
+            "comment_text": "好吃推薦回購",
+            "comment_posted_at": "",
+            "context": "貼文品牌=全家",
+            "sentiment": "",
+            "target_brand": "",
+            "is_comparative": "",
+            "favored_brand": "",
+            "notes": "",
+        }
+        result = prelabel_rows([row])
+        self.assertEqual(result[0]["sentiment"], "正")
+
+    def test_labeling_stored_source(self) -> None:
+        """labeling _load_posts supports 'stored' source."""
+        from cvs_radar.labeling import _load_posts
+
+        with patch("cvs_radar.store.load_posts", return_value=[]):
+            with self.assertRaises(ValueError):
+                _load_posts("stored", pages=5)
 
 
 class EvaluationHarnessTest(unittest.TestCase):
