@@ -17,9 +17,11 @@ class TimeWindow:
 
     @property
     def enabled(self) -> bool:
+        """判斷時間窗是否啟用。"""
         return self.start is not None or self.end is not None
 
     def contains(self, value: datetime | None) -> bool:
+        """判斷時間是否落在時間窗內。"""
         if not self.enabled:
             return True
         if value is None:
@@ -114,6 +116,7 @@ def filter_posts_by_time(
 
 
 def filter_post_by_time(post: Post, window: TimeWindow) -> Post | None:
+    """依時間窗篩選單一貼文與留言。"""
     if not window.enabled:
         return _clone_post(post)
 

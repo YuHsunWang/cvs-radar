@@ -20,6 +20,8 @@ FAVORED_LABELS = ("own", "other", "tie", "unknown")
 
 @dataclass(frozen=True, slots=True)
 class Prediction:
+    """保存單筆標註預測結果。"""
+
     sentiment: str
     target_brand: str
     is_comparative: bool
@@ -28,6 +30,8 @@ class Prediction:
 
 
 class Predictor(Protocol):
+    """定義標註列預測器介面。"""
+
     name: str
 
     def predict_row(self, row: dict[str, str]) -> Prediction:
@@ -41,6 +45,7 @@ class RuleBasedPredictor:
     backend = "lexicon"
 
     def predict_row(self, row: dict[str, str]) -> Prediction:
+        """預測單筆標註列。"""
         text = row.get("comment_text", "")
         tag = row.get("comment_tag", "")
         post_brand = row.get("post_brand", "")
@@ -82,10 +87,12 @@ class StubPredictor:
     name = "stub"
 
     def predict_row(self, row: dict[str, str]) -> Prediction:
+        """提示尚未實作的預測器。"""
         raise NotImplementedError("Implement predict_row for an LLM or fine-tuned predictor.")
 
 
 def read_gold_csv(path: str | Path) -> list[dict[str, str]]:
+    """讀取人工標註的黃金 CSV。"""
     with Path(path).open("r", encoding="utf-8", newline="") as fh:
         rows = list(csv.DictReader(fh))
     required = {"comment_text", "post_brand", "sentiment", "is_comparative", "favored_brand"}
@@ -96,6 +103,7 @@ def read_gold_csv(path: str | Path) -> list[dict[str, str]]:
 
 
 def evaluate(gold_rows: list[dict[str, str]], predictor: Predictor | None = None) -> dict[str, object]:
+    """評估預測器在黃金標註上的表現。"""
     predictor = predictor or RuleBasedPredictor()
     gold_predictions: list[dict[str, object]] = []
     sentiment_gold: list[str] = []
@@ -157,6 +165,7 @@ def evaluate(gold_rows: list[dict[str, str]], predictor: Predictor | None = None
 
 
 def binary_metrics(gold: list[bool], pred: list[bool]) -> dict[str, float | int]:
+    """計算二元分類指標。"""
     total = len(gold)
     tp = sum(g and p for g, p in zip(gold, pred))
     tn = sum((not g) and (not p) for g, p in zip(gold, pred))
@@ -179,6 +188,7 @@ def binary_metrics(gold: list[bool], pred: list[bool]) -> dict[str, float | int]
 
 
 def multiclass_metrics(gold: list[str], pred: list[str], labels: tuple[str, ...]) -> dict[str, object]:
+    """計算多類別分類指標。"""
     total = len(gold)
     accuracy = _safe_div(sum(g == p for g, p in zip(gold, pred)), total)
     per_class: dict[str, dict[str, float | int]] = {}
@@ -217,6 +227,7 @@ def multiclass_metrics(gold: list[str], pred: list[str], labels: tuple[str, ...]
 
 
 def render_text_report(report: dict[str, object]) -> str:
+    """輸出文字版評測報告。"""
     lines = [
         "CVS Radar 評測報告",
         f"predictor: {report['predictor']}",
@@ -236,6 +247,7 @@ def render_text_report(report: dict[str, object]) -> str:
 
 
 def write_json_report(report: dict[str, object], path: str | Path) -> None:
+    """寫入 JSON 評測報告。"""
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
@@ -247,6 +259,7 @@ def compare_sentiment_backends(
     *,
     backends: list[str] | None = None,
 ) -> list[dict[str, object]]:
+    """比較多個情感後端的評測結果。"""
     selected_backends = backends or available_comparison_backends()
     rows: list[dict[str, object]] = []
 
@@ -275,6 +288,7 @@ def compare_sentiment_backends(
 
 
 def available_comparison_backends() -> list[str]:
+    """列出可用於比較的情感後端。"""
     backends = ["lexicon", "snownlp"]
     if llm_has_key():
         backends.append("llm")
@@ -282,6 +296,7 @@ def available_comparison_backends() -> list[str]:
 
 
 def write_backend_comparison_csv(rows: list[dict[str, object]], path: str | Path) -> None:
+    """寫入情感後端比較 CSV。"""
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = [
@@ -299,6 +314,7 @@ def write_backend_comparison_csv(rows: list[dict[str, object]], path: str | Path
 
 
 def normalize_sentiment(value: str) -> str:
+    """正規化情感標籤。"""
     token = (value or "").strip().casefold()
     aliases = {
         "正": "positive",
@@ -323,6 +339,7 @@ def normalize_sentiment(value: str) -> str:
 
 
 def normalize_bool(value: str) -> bool:
+    """正規化布林標籤。"""
     token = (value or "").strip().casefold()
     if token in {"是", "true", "t", "yes", "y", "1"}:
         return True
@@ -332,6 +349,7 @@ def normalize_bool(value: str) -> bool:
 
 
 def normalize_favored(value: str) -> str:
+    """正規化偏好品牌標籤。"""
     token = (value or "").strip().casefold()
     aliases = {
         "本牌": "own",
@@ -358,6 +376,7 @@ def normalize_favored(value: str) -> str:
 
 
 def normalize_target(value: str) -> str:
+    """正規化目標品牌標籤。"""
     token = (value or "").strip().casefold()
     if token in {"本牌", "own", "post"}:
         return "own"
@@ -411,6 +430,7 @@ def _sample_caveat(support: int) -> str:
 
 
 def main(argv: list[str] | None = None) -> None:
+    """執行評測命令列入口。"""
     parser = argparse.ArgumentParser(description="Evaluate CVS Radar comment-label predictions")
     parser.add_argument("--gold", required=True, help="Gold CSV path")
     parser.add_argument("--json", dest="json_path", help="Write JSON report to this path")

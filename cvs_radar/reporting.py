@@ -14,6 +14,7 @@ from .preference import AccountProfile, _burst_indices, _template_like_indices
 
 
 def render_text(reports: list[ProductReport], internal: bool = False) -> str:
+    """輸出商品報告文字。"""
     if not reports:
         return "沒有可輸出的商品報告。"
 
@@ -48,15 +49,18 @@ def render_text(reports: list[ProductReport], internal: bool = False) -> str:
 
 
 def render_json(reports: list[ProductReport], internal: bool = False) -> str:
+    """輸出商品報告 JSON。"""
     payload = [report_to_dict(report, internal=internal) for report in reports]
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
 def report_to_dict(report: ProductReport, internal: bool = False) -> dict[str, Any]:
+    """轉換商品報告為字典。"""
     return _report_to_dict(report, internal=internal)
 
 
 def render_suspicion(profiles: dict[str, AccountProfile]) -> str:
+    """輸出帳號信度摘要。"""
     if not profiles:
         return "沒有帳號輪廓。"
     lines = ["帳號信度摘要(內部維運用)"]
@@ -71,6 +75,7 @@ def render_suspicion(profiles: dict[str, AccountProfile]) -> str:
 
 
 def render_suspicion_detail(profile: AccountProfile, posts: list[Post]) -> str:
+    """輸出單一帳號信度明細。"""
     user_comments = _profile_comments(profile.user, posts)
     template_flagged = _template_flagged_comments(user_comments)
     burst_flagged = _burst_flagged_comments(user_comments)
@@ -210,5 +215,6 @@ def _public_contributor(contributor: Contributor) -> dict[str, Any]:
 
 
 def hash_user(user: str) -> str:
+    """雜湊使用者識別字。"""
     salt = str(PRIVACY["hash_salt"])
     return hashlib.sha256(f"{salt}:{user}".encode("utf-8")).hexdigest()[:12]

@@ -37,6 +37,8 @@ CSV_COLUMNS = [*CONTEXT_COLUMNS, *LABEL_COLUMNS]
 
 @dataclass(frozen=True, slots=True)
 class LabelingRow:
+    """表示一列人工標註資料。"""
+
     comment_id: str
     source: str
     board: str
@@ -59,6 +61,7 @@ class LabelingRow:
     notes: str = ""
 
     def to_dict(self) -> dict[str, str]:
+        """轉成 CSV 可寫入的字典。"""
         return {column: str(getattr(self, column)) for column in CSV_COLUMNS}
 
 
@@ -106,6 +109,7 @@ def build_labeling_rows(
 
 
 def write_labeling_csv(rows: Iterable[LabelingRow], path: str | Path) -> None:
+    """寫入人工標註 CSV。"""
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as fh:
@@ -116,6 +120,7 @@ def write_labeling_csv(rows: Iterable[LabelingRow], path: str | Path) -> None:
 
 
 def read_labeling_csv(path: str | Path) -> list[dict[str, str]]:
+    """讀取人工標註 CSV。"""
     with Path(path).open("r", encoding="utf-8", newline="") as fh:
         return list(csv.DictReader(fh))
 
@@ -158,6 +163,7 @@ def _load_posts(source: str, *, pages: int) -> list[Post]:
 
 
 def main(argv: list[str] | None = None) -> None:
+    """執行標註 CSV 產生命令。"""
     parser = argparse.ArgumentParser(description="Create a CVS Radar labeling CSV")
     parser.add_argument("--source", choices=["demo", "crawl", "stored"], default="demo")
     parser.add_argument("--output", default="data/labels/to_label.csv")

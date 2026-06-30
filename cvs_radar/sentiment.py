@@ -51,6 +51,8 @@ INTENSIFIERS = {"超": 1.3, "很": 1.2, "蠻": 1.1, "有點": 0.8, "稍微": 0.7
 
 
 class SentimentBackend(Protocol):
+    """定義文字情感後端介面。"""
+
     name: str
 
     def text_score(self, text: str) -> float:
@@ -58,6 +60,8 @@ class SentimentBackend(Protocol):
 
 
 class LlmSentimentClient(Protocol):
+    """定義 LLM 情感客戶端介面。"""
+
     def score_text(self, text: str, *, provider: str, model: str, api_key: str) -> float:
         """Return text-only sentiment in [-1, 1]."""
 
@@ -66,6 +70,7 @@ class OpenAiSentimentClient:
     """LlmSentimentClient implementation using OpenAI chat completions."""
 
     def score_text(self, text: str, *, provider: str, model: str, api_key: str) -> float:
+        """呼叫 OpenAI 取得文字情感分數。"""
         import openai
 
         client = openai.OpenAI(api_key=api_key)
@@ -95,19 +100,25 @@ class OpenAiSentimentClient:
 
 
 class LexiconBackend:
+    """使用詞典規則計算情感分數。"""
+
     name = "lexicon"
 
     def text_score(self, text: str) -> float:
+        """計算文字情感分數。"""
         return lexicon_score(text)
 
 
 class SnowNlpBackend:
+    """使用 SnowNLP 計算情感分數。"""
+
     name = "snownlp"
 
     def __init__(self, fallback: SentimentBackend | None = None) -> None:
         self.fallback = fallback or LexiconBackend()
 
     def text_score(self, text: str) -> float:
+        """計算文字情感分數。"""
         text = (text or "").strip()
         if not text:
             return 0.0
@@ -140,6 +151,7 @@ class LlmBackend:
         self.fallback = fallback or _backend_from_name(_llm_config().get("fallback_backend", "snownlp"), allow_llm=False)
 
     def text_score(self, text: str) -> float:
+        """計算 LLM 文字情感分數。"""
         text = (text or "").strip()
         if not text:
             return 0.0
@@ -170,10 +182,12 @@ class LlmBackend:
 
 
 def clamp(value: float, low: float = -1.0, high: float = 1.0) -> float:
+    """限制數值落在指定範圍。"""
     return max(low, min(high, value))
 
 
 def tag_prior(tag: str) -> float:
+    """依推文標籤給予先驗分數。"""
     tag = tag.strip()
     if tag.startswith("推"):
         return 1.0
@@ -183,6 +197,7 @@ def tag_prior(tag: str) -> float:
 
 
 def lexicon_score(text: str) -> float:
+    """使用詞典計算文字情感分數。"""
     text = (text or "").strip()
     if not text:
         return 0.0
@@ -205,6 +220,7 @@ def lexicon_score(text: str) -> float:
 
 
 def score_comment(tag: str, text: str, *, backend: str | SentimentBackend | None = None) -> float:
+    """合併標籤與文字情感分數。"""
     alpha = float(SENTIMENT["tag_prior_weight"])
     text_backend = resolve_backend(backend)
     score = alpha * tag_prior(tag) + (1.0 - alpha) * text_backend.text_score(text)
@@ -212,6 +228,7 @@ def score_comment(tag: str, text: str, *, backend: str | SentimentBackend | None
 
 
 def annotate_posts(posts: list[Post]) -> list[Post]:
+    """為貼文留言標註情感分數。"""
     backend = resolve_backend()
     for post in posts:
         for comment in post.comments:
@@ -221,6 +238,7 @@ def annotate_posts(posts: list[Post]) -> list[Post]:
 
 
 def resolve_backend(backend: str | SentimentBackend | None = None) -> SentimentBackend:
+    """解析情感後端設定。"""
     if backend is None:
         return _backend_from_name(str(SENTIMENT.get("backend", "lexicon")))
     if isinstance(backend, str):
@@ -229,6 +247,7 @@ def resolve_backend(backend: str | SentimentBackend | None = None) -> SentimentB
 
 
 def llm_has_key() -> bool:
+    """判斷是否存在 LLM API 金鑰。"""
     return bool(_llm_api_key(_llm_config()))
 
 

@@ -9,6 +9,8 @@ from typing import Any
 
 @dataclass(slots=True)
 class Comment:
+    """表示單則推文或留言。"""
+
     tag: str
     user: str
     text: str
@@ -19,6 +21,8 @@ class Comment:
 
 @dataclass(slots=True)
 class Post:
+    """表示單篇商品心得貼文。"""
+
     id: str
     source: str = "PTT"
     board: str = "CVS"
@@ -39,6 +43,8 @@ class Post:
 
 @dataclass(slots=True)
 class Contributor:
+    """表示分數貢獻者。"""
+
     user: str
     role: str
     score: float
@@ -47,6 +53,8 @@ class Contributor:
 
 @dataclass(slots=True)
 class ProductReport:
+    """表示商品彙整評價報告。"""
+
     brand: str
     product_name: str
     fair_score: float | None

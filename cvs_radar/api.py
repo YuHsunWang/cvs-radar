@@ -26,6 +26,7 @@ PRECOMPUTED_TIME_FILTER_NOTE = "precomputed data does not support time filtering
 
 @app.get("/health")
 def health() -> dict[str, str]:
+    """回傳服務健康狀態。"""
     return {"status": "ok"}
 
 
@@ -37,6 +38,7 @@ def brands(
     end_date: date | None = None,
     recent_days: int | None = Query(None, ge=0),
 ) -> list[dict[str, object]]:
+    """回傳品牌摘要清單。"""
     try:
         if source == "results":
             loaded = load_results()
@@ -78,6 +80,7 @@ def products(
     limit: int | None = Query(None, ge=0),
     internal: bool = False,
 ) -> dict[str, object]:
+    """回傳商品查詢結果。"""
     try:
         query = build_product_query(
             brand=brand,

@@ -21,6 +21,8 @@ from .scoring import normalize_product
 
 @dataclass(frozen=True, slots=True)
 class ProductQuery:
+    """表示商品查詢條件。"""
+
     brand: str | None = None
     start_date: str | date | datetime | None = None
     end_date: str | date | datetime | None = None
@@ -35,6 +37,8 @@ class ProductQuery:
 
 @dataclass(frozen=True, slots=True)
 class BrandSummary:
+    """表示品牌摘要統計。"""
+
     brand: str
     product_count: int
     post_count: int
@@ -43,11 +47,14 @@ class BrandSummary:
 
 @dataclass(frozen=True, slots=True)
 class ProductQueryResult:
+    """表示商品查詢回傳結果。"""
+
     filters: dict[str, Any]
     brands: list[BrandSummary]
     reports: list[ProductReport]
 
     def to_dict(self) -> dict[str, Any]:
+        """轉換查詢結果為字典。"""
         return {
             "filters": self.filters,
             "brands": [asdict(brand) for brand in self.brands],
@@ -190,6 +197,7 @@ def filter_reports(
     min_comments: int | None = None,
     limit: int | None = None,
 ) -> list[ProductReport]:
+    """依查詢條件篩選商品報告。"""
     _validate_non_negative("min_score", min_score)
     _validate_non_negative("min_n_eff", min_n_eff)
     _validate_non_negative("min_posts", min_posts)

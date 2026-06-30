@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class PttCrawler:
+    """爬取 PTT CVS 文章並轉成貼文資料。"""
+
     def __init__(
         self,
         base_url: str | None = None,
@@ -49,6 +51,7 @@ class PttCrawler:
         recent_days: int | None = None,
         now: datetime | None = None,
     ) -> list[Post]:
+        """爬取指定頁數內的商品貼文。"""
         board = board or str(CRAWL["board"])
         max_pages = int(max_pages if max_pages is not None else CRAWL["max_pages"])
         window = build_time_window(

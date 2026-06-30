@@ -459,6 +459,7 @@ def _compact_key(name: str) -> str:
 
 
 def group_products(posts: list[Post]) -> dict[tuple[str, str], list[Post]]:
+    """依品牌與商品鍵分組貼文。"""
     groups: dict[tuple[str, str], list[Post]] = {}
     representatives: dict[str, list[str]] = defaultdict(list)
     for post in posts:
@@ -866,6 +867,7 @@ def _author_pairs(posts: list[Post]) -> tuple[list[tuple[float, float]], list[Co
 
 
 def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> ProductReport:
+    """計算單一商品彙整分數。"""
     if not posts:
         raise ValueError("score_product requires at least one post")
 
@@ -944,6 +946,7 @@ def _rep_comments(posts: list[Post], k: int = 3) -> tuple[list[str], list[str]]:
 
 
 def representative_product_name(posts: list[Post]) -> str:
+    """選出代表性商品名稱。"""
     if not posts:
         return "unknown"
     names = [canonical_product_name(posts[0].brand, post.product_name) for post in posts]
@@ -978,6 +981,7 @@ def _dedupe_ranked_comments(items: list[tuple[float, str]], k: int) -> list[str]
 
 
 def score_all(posts: list[Post], profiles: dict[str, AccountProfile]) -> list[ProductReport]:
+    """計算所有商品報告並排序。"""
     reports = [score_product(group, profiles) for group in group_products(posts).values()]
     reports.sort(
         key=lambda report: (

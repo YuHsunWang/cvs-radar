@@ -9,14 +9,15 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any, Literal
 
-from .models import Post
+from .models import Post, ProductReport
+from .preference import AccountProfile
 from .service import ProductQuery, ProductQueryResult, list_brands
 
 ALL_BRANDS = "全部"
 SourceName = Literal["demo", "crawl", "stored", "results"]
 
 
-def load_results_or_none():
+def load_results_or_none() -> tuple[list[ProductReport], dict[str, AccountProfile]] | None:
     """Try to load precomputed results. Returns (reports, profiles) or None."""
     from .store import load_results
 

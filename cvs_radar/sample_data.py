@@ -8,6 +8,7 @@ from .models import Comment, Post
 
 
 def load_sample() -> list[Post]:
+    """載入離線範例貼文。"""
     return [
         Post(
             id="sample-711-fuhang",

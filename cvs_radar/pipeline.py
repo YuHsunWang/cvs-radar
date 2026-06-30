@@ -19,6 +19,7 @@ def run_pipeline(
     recent_days: int | None = None,
     now: datetime | None = None,
 ) -> tuple[list[ProductReport], dict[str, AccountProfile]]:
+    """執行完整資料處理管線。"""
     selected = filter_posts_by_time(
         posts,
         start_date=start_date,

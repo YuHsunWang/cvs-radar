@@ -14,12 +14,16 @@ from .models import Post
 
 @dataclass(slots=True)
 class BrandStat:
+    """表示帳號對單一品牌的互動統計。"""
+
     count: int
     avg_sentiment: float
 
 
 @dataclass(slots=True)
 class AccountProfile:
+    """表示帳號偏好與信度輪廓。"""
+
     user: str
     source: str = "PTT"
     brand_stats: dict[str, BrandStat] = field(default_factory=dict)
@@ -31,6 +35,7 @@ class AccountProfile:
 
 
 def build_profiles(posts: list[Post]) -> dict[str, AccountProfile]:
+    """從貼文留言建立帳號輪廓。"""
     rows: dict[str, list[tuple[str, float, str]]] = defaultdict(list)
     timestamps: dict[str, dict[str, list[datetime]]] = defaultdict(lambda: defaultdict(list))
     for post in posts:

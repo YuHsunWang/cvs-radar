@@ -15,10 +15,12 @@ FIELD_RE = re.compile(r"【\s*(?P<key>[^】\n]+?)\s*】\s*(?P<value>.*?)(?=\n\s*
 
 
 def is_product_title(title: str) -> bool:
+    """判斷標題是否為商品文。"""
     return "[商品]" in title or "［商品］" in title
 
 
 def infer_brand(*texts: str) -> str:
+    """從文字推斷便利商店品牌。"""
     haystack = " ".join(t for t in texts if t).lower()
     for brand, keywords in BRANDS.items():
         for keyword in keywords:
@@ -28,6 +30,7 @@ def infer_brand(*texts: str) -> str:
 
 
 def parse_score(raw: str | None) -> float | None:
+    """解析心得分數為百分制。"""
     if not raw:
         return None
     text = raw.strip()
@@ -50,6 +53,7 @@ def parse_score(raw: str | None) -> float | None:
 
 
 def parse_push_count(raw: str | None) -> int | None:
+    """解析 PTT 推文數。"""
     if raw is None:
         return None
     text = raw.strip()
@@ -69,6 +73,7 @@ def parse_push_count(raw: str | None) -> int | None:
 
 
 def parse_ptt_article(html: str, url: str = "", board: str = "CVS") -> Post | None:
+    """解析 PTT 文章 HTML。"""
     soup = BeautifulSoup(html, "html.parser")
     metadata = _parse_metadata(soup)
     title = metadata.get("title", "")
@@ -106,6 +111,7 @@ def parse_ptt_article(html: str, url: str = "", board: str = "CVS") -> Post | No
 
 
 def parse_ptt_list(html: str, base_url: str = "https://www.ptt.cc") -> tuple[list[dict[str, str]], str | None]:
+    """解析 PTT 列表頁商品文章。"""
     soup = BeautifulSoup(html, "html.parser")
     rows: list[dict[str, str]] = []
     for ent in soup.select(".r-ent"):
@@ -244,6 +250,7 @@ def _post_id(url: str, title: str, author: str) -> str:
 
 
 def parse_ptt_datetime(raw: str | None) -> datetime | None:
+    """解析 PTT 文章時間。"""
     if not raw:
         return None
     for fmt in ("%a %b %d %H:%M:%S %Y", "%Y-%m-%d %H:%M:%S"):
@@ -255,6 +262,7 @@ def parse_ptt_datetime(raw: str | None) -> datetime | None:
 
 
 def parse_push_datetime(raw: str | None, reference: datetime | None = None) -> datetime | None:
+    """解析 PTT 推文時間。"""
     if not raw:
         return None
     text = raw.strip()
