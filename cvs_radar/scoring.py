@@ -35,7 +35,7 @@ _NOISE_RE = re.compile(
     r"大推|激推|微雷|不雷|二訪|回味|雷)"
 )
 _OPTIONAL_RE = re.compile(
-    r"(\d+(\.\d+)?\s*(入|包|個|顆|片|枚|杯|瓶|罐|盒|組|ml|毫升|g|公克|克)|"
+    r"((?:\d+(?:\.\d+)?|[一二三四五六七八九十]+)\s*(入|包|個|顆|片|枚|杯|瓶|罐|盒|組|ml|毫升|g|公克|克|支)|"
     r"(口味|數量|容量|規格|加量|限定|新品|新上市))"
 )
 _PROMO_RE = re.compile(
@@ -46,7 +46,7 @@ _PROMO_RE = re.compile(
     r"[買滿]\d+[送打折抽]|"
     r"\d+買[一二三四五六七八九十\d]+[支個入包瓶罐杯盒組件]?|"
     r"可以抽抽樂|抽抽樂|集點|加購|"
-    r"限時特價|特惠|促銷|優惠|折扣|"
+    r"限時特價|目前特價|原價|特價|價格|售價|價錢|台幣|特惠|促銷|優惠|折扣|"
     r"買就送|滿額|加價購)"
 )
 _TRAILING_PRICE_RE = re.compile(
@@ -73,6 +73,15 @@ _QUANTITY_SUFFIX_RE = re.compile(
     r"[兩三四五六七八九十\d]+[支個入包瓶罐杯盒組件份]$"
 )
 _COMMENT_NOISE_RE = re.compile(r"(這款|這個|這品|這次|個人覺得|我覺得|覺得|補充[:：]?|推薦|推推|再推一次)")
+_PTT_PRODUCT_TEMPLATE = "(區域型商品請註明 試吃試用品請標示價格0元)"
+_URL_RE = re.compile(r"https?://", re.IGNORECASE)
+_PRICE_TOKEN_RE = re.compile(r"(?<!\d)(\d{1,3})(?!\d)\s*(?:元|台幣)?")
+_PRICE_CONTEXT_RE = re.compile(
+    r"^\s*(?:價格|售價|價錢|原價|特價|目前|活動價|NT\$?|\$|\d+\s*(?:ML|毫升|G|公克|克))",
+    re.IGNORECASE,
+)
+_MIN_PRICE = 15
+_MAX_PRICE = 400
 _SYNONYM_MAP = {
     "蕃薯": "地瓜",
     "番薯": "地瓜",
@@ -127,24 +136,85 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
     Handles single products with trailing prices ("BF薄荷岩鹽檸檬糖35")
     and multi-product titles ("抹茶霜淇淋兩支55抹茶千層59").
     """
+    raw = unicodedata.normalize("NFKC", raw_name or "").strip()
+    raw = re.sub(r"^[：:]+\s*", "", raw)
+    lines = _candidate_product_lines(raw)
+    if len(lines) > 1:
+        results = _extract_multiline_products(lines, brand)
+        if results:
+            return results
+        return _extract_products_and_prices_from_text(" ".join(lines), brand)
+    if lines:
+        return _extract_products_and_prices_from_text(lines[0], brand)
+    return _extract_products_and_prices_from_text("", brand)
+
+
+def _candidate_product_lines(raw_name: str) -> list[str]:
+    lines = []
+    for line in raw_name.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if line == _PTT_PRODUCT_TEMPLATE:
+            continue
+        if _URL_RE.search(line):
+            continue
+        lines.append(line)
+    return lines
+
+
+def _extract_multiline_products(lines: list[str], brand: str) -> list[tuple[str, int | None]]:
+    results: list[tuple[str, int | None]] = []
+    pending_name: str | None = None
+
+    for line in lines:
+        if _is_price_context_line(line):
+            price = _best_price_from_text(line)
+            if pending_name and price is not None:
+                results.append((pending_name, price))
+                pending_name = None
+            continue
+
+        split_results = _extract_multiple_price_segments(line, brand)
+        if len(split_results) >= 2:
+            results.extend(split_results)
+            pending_name = None
+            continue
+
+        parsed = _extract_products_and_prices_from_text(line, brand)
+        priced = [(name, price) for name, price in parsed if name and price is not None]
+        if priced:
+            results.extend(priced)
+            pending_name = None
+            continue
+        if parsed and parsed[0][0]:
+            pending_name = parsed[0][0]
+
+    return results
+
+
+def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
+    """Extract product names and prices from one logical product-name text."""
     s = unicodedata.normalize("NFKC", raw_name or "").strip()
-    s = s.split("\n")[0].strip()
     s = re.sub(r"^[：:]+\s*", "", s)
+    s = _normalize_marketing_text(s)
     s = re.sub(r"\$(\d)", r"\1", s)
     s = re.sub(r"(\d)\$", r"\1", s)
     s = _BRACKET_RE.sub(" ", s)
-    keywords = [*BRANDS.get(brand, []), brand] if brand else []
-    for kw in sorted(set(keywords), key=len, reverse=True):
-        if kw:
-            s = re.sub(re.escape(kw), " ", s, flags=re.IGNORECASE)
+    s = _strip_brand_keywords(s, brand)
+    s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
     s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s).strip()
 
+    segmented = _extract_multiple_price_segments(s, brand)
+    if len(segmented) >= 2:
+        return segmented
+
     matches = list(_MULTI_PRODUCT_RE.finditer(s))
     valid = [(m.group(1), int(m.group(2))) for m in matches
-             if 15 <= int(m.group(2)) <= 300 and len(m.group(1)) >= 2]
+             if _MIN_PRICE <= int(m.group(2)) <= _MAX_PRICE and len(m.group(1)) >= 2]
 
     if len(valid) >= 2:
         results = []
@@ -161,7 +231,7 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
     if m:
         name = m.group(1).strip()
         price = int(m.group(2))
-        if 15 <= price <= 300 and len(name) >= 2:
+        if _MIN_PRICE <= price <= _MAX_PRICE and len(name) >= 2:
             name = _QUANTITY_SUFFIX_RE.sub("", name).strip()
             name = _OPTIONAL_RE.sub("", name).strip()
             name = _PROMO_RE.sub("", name).strip()
@@ -173,7 +243,7 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
     if mp:
         name = mp.group(1).strip()
         price = int(mp.group(2))
-        if 15 <= price <= 300 and len(name) >= 2:
+        if _MIN_PRICE <= price <= _MAX_PRICE and len(name) >= 2:
             name = _QUANTITY_SUFFIX_RE.sub("", name).strip()
             name = _OPTIONAL_RE.sub("", name).strip()
             if len(name) >= 2:
@@ -185,7 +255,7 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
     if m2:
         name = m2.group(1).strip()
         price = int(m2.group(2))
-        if 15 <= price <= 300 and len(name) >= 2:
+        if _MIN_PRICE <= price <= _MAX_PRICE and len(name) >= 2:
             name = _QUANTITY_SUFFIX_RE.sub("", name).strip()
             name = _OPTIONAL_RE.sub("", name).strip()
             if len(name) >= 2:
@@ -199,6 +269,77 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
     return [(cleaned, None)]
 
 
+def _extract_multiple_price_segments(text: str, brand: str) -> list[tuple[str, int | None]]:
+    results: list[tuple[str, int | None]] = []
+    start = 0
+    for match in _PRICE_TOKEN_RE.finditer(text):
+        price = int(match.group(1))
+        if not (_MIN_PRICE <= price <= _MAX_PRICE):
+            continue
+        raw_name = text[start:match.start()].strip()
+        start = match.end()
+        if not raw_name:
+            continue
+        name = _clean_extracted_product_name(raw_name, brand)
+        if len(name) >= 2 and not _is_price_label_name(name):
+            results.append((name, price))
+    return results
+
+
+def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
+    s = unicodedata.normalize("NFKC", raw_name or "").strip()
+    s = _normalize_marketing_text(s)
+    s = _BRACKET_RE.sub(" ", s)
+    s = _strip_brand_keywords(s, brand)
+    s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
+    s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
+    s = _TITLE_PREFIX_RE.sub(" ", s)
+    s = _NOISE_RE.sub(" ", s)
+    s = _OPTIONAL_RE.sub(" ", s)
+    s = _PROMO_RE.sub(" ", s)
+    s = _QUANTITY_SUFFIX_RE.sub("", s).strip()
+    s = re.sub(r"\s+", "", s)
+    s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
+    return s
+
+
+def _best_price_from_text(text: str) -> int | None:
+    prices = [
+        int(match.group(1))
+        for match in _PRICE_TOKEN_RE.finditer(text)
+        if _MIN_PRICE <= int(match.group(1)) <= _MAX_PRICE
+    ]
+    return prices[-1] if prices else None
+
+
+def _is_price_context_line(line: str) -> bool:
+    return bool(_PRICE_CONTEXT_RE.search(line))
+
+
+def _is_price_label_name(name: str) -> bool:
+    return bool(re.fullmatch(r"(價格|售價|價錢|原價|特價|目前特價|活動價|台幣)+", name))
+
+
+def _normalize_marketing_text(text: str) -> str:
+    return re.sub(r"Fami!ce", "Famice", text, flags=re.IGNORECASE)
+
+
+def _strip_brand_keywords(text: str, brand: str) -> str:
+    if not brand:
+        return text
+    s = text
+    keywords = [*BRANDS.get(brand, []), brand]
+    for kw in sorted(set(keywords), key=len, reverse=True):
+        if not kw:
+            continue
+        if re.search(r"[A-Za-z0-9]", kw):
+            pattern = rf"(?<![A-Za-z0-9]){re.escape(kw)}(?![A-Za-z0-9])"
+            s = re.sub(pattern, " ", s, flags=re.IGNORECASE)
+        else:
+            s = re.sub(re.escape(kw), " ", s, flags=re.IGNORECASE)
+    return s
+
+
 def categorize_product(name: str) -> str:
     """Assign a category to a product name based on keyword matching."""
     text = unicodedata.normalize("NFKC", name or "").lower()
@@ -209,7 +350,12 @@ def categorize_product(name: str) -> str:
     return "其他"
 
 
-_GARBAGE_NAME_RE = re.compile(r"^\d{1,3}$|^unknown$|^任\d|^折後$|^消費滿|^期間|^友善時光$|^牧場直送$")
+_GARBAGE_NAME_RE = re.compile(
+    r"^\d{1,3}$|^unknown$|^任\d|^折後$|^消費滿|^期間|"
+    r"^友善時光$|^牧場直送$|.*(?:FMC|系列商品|即期品)|"
+    r"任[0-9二三四五六七八九十]|^\d+元$|^\d+金",
+    re.IGNORECASE,
+)
 
 
 def preprocess_posts(posts: list[Post]) -> list[Post]:
