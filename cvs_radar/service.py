@@ -111,6 +111,30 @@ def list_brands(
     return summaries
 
 
+def brand_summaries_from_reports(reports: list[ProductReport]) -> list[BrandSummary]:
+    """Aggregate brand summaries from scored ProductReport objects."""
+    rows: dict[str, dict[str, int]] = {}
+    for report in reports:
+        row = rows.setdefault(
+            report.brand,
+            {"products": 0, "post_count": 0, "comment_count": 0},
+        )
+        row["products"] += 1
+        row["post_count"] += report.n_posts
+        row["comment_count"] += report.n_comments
+    summaries = [
+        BrandSummary(
+            brand=brand,
+            product_count=values["products"],
+            post_count=values["post_count"],
+            comment_count=values["comment_count"],
+        )
+        for brand, values in rows.items()
+    ]
+    summaries.sort(key=lambda item: (-item.product_count, -item.post_count, item.brand))
+    return summaries
+
+
 def query_products(
     posts: list[Post],
     query: ProductQuery | None = None,

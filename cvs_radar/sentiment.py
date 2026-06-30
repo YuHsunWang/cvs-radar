@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 from typing import Protocol
 
 from .config import SENTIMENT
 from .models import Post
+
+logger = logging.getLogger(__name__)
 
 POSITIVE_WORDS = {
     "好吃": 1.0,
@@ -144,7 +147,13 @@ class LlmBackend:
         llm_config = _llm_config()
         api_key = _llm_api_key(llm_config)
         enabled = bool(llm_config.get("enabled"))
-        if not enabled or not api_key or self.client is None:
+        if not enabled:
+            logger.warning("LLM sentiment disabled by config; using %s backend", self.fallback.name)
+            return self.fallback.text_score(text)
+        if not api_key:
+            logger.warning("LLM sentiment API key missing; using %s backend", self.fallback.name)
+            return self.fallback.text_score(text)
+        if self.client is None:
             return self.fallback.text_score(text)
 
         try:
@@ -154,7 +163,8 @@ class LlmBackend:
                 model=str(llm_config.get("model", "")),
                 api_key=api_key,
             )
-        except Exception:
+        except Exception as exc:
+            logger.warning("LLM sentiment API call failed; using %s backend: %s", self.fallback.name, exc)
             return self.fallback.text_score(text)
         return clamp(float(score))
 
@@ -206,6 +216,7 @@ def annotate_posts(posts: list[Post]) -> list[Post]:
     for post in posts:
         for comment in post.comments:
             comment.sentiment = score_comment(comment.tag, comment.text, backend=backend)
+            comment.backend = backend.name
     return posts
 
 

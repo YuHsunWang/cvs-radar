@@ -14,6 +14,7 @@ class Comment:
     text: str
     posted_at: datetime | None = None
     sentiment: float | None = None
+    backend: str = ""
 
 
 @dataclass(slots=True)

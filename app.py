@@ -18,7 +18,7 @@ from cvs_radar.app_helpers import (
 )
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import render_suspicion_detail
-from cvs_radar.service import BrandSummary, ProductQueryResult, filter_reports, query_products
+from cvs_radar.service import BrandSummary, ProductQueryResult, brand_summaries_from_reports, filter_reports, query_products
 
 
 def main() -> None:
@@ -570,32 +570,11 @@ def _query_precomputed_reports(reports, query) -> ProductQueryResult:
             "internal": query.internal,
             "note": "precomputed results 不支援時間篩選，顯示全部已計算結果",
         },
-        brands=_brand_summaries_from_reports(reports),
+        brands=brand_summaries_from_reports(reports),
         reports=filtered,
     )
 
 
-def _brand_summaries_from_reports(reports) -> list[BrandSummary]:
-    rows = {}
-    for report in reports:
-        row = rows.setdefault(
-            report.brand,
-            {"products": 0, "post_count": 0, "comment_count": 0},
-        )
-        row["products"] += 1
-        row["post_count"] += report.n_posts
-        row["comment_count"] += report.n_comments
-    summaries = [
-        BrandSummary(
-            brand=brand,
-            product_count=values["products"],
-            post_count=values["post_count"],
-            comment_count=values["comment_count"],
-        )
-        for brand, values in rows.items()
-    ]
-    summaries.sort(key=lambda item: (-item.product_count, -item.post_count, item.brand))
-    return summaries
 
 
 def _render_summary(payload: dict[str, object], selected_brand: str) -> None:

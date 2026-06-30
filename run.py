@@ -12,7 +12,7 @@ from pathlib import Path
 
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import render_json, render_suspicion, render_text
-from cvs_radar.service import BrandSummary, filter_reports, list_brands
+from cvs_radar.service import BrandSummary, brand_summaries_from_reports, filter_reports, list_brands
 from cvs_radar.filters import build_time_window
 
 
@@ -72,7 +72,7 @@ def main() -> None:
 
     if args.list_brands:
         if reports is not None:
-            summaries = _brand_summaries_from_reports(reports)
+            summaries = brand_summaries_from_reports(reports)
         else:
             summaries = list_brands(
                 posts,
@@ -151,27 +151,6 @@ def _render_brand_summaries(summaries) -> str:
     return "\n".join(lines)
 
 
-def _brand_summaries_from_reports(reports) -> list[BrandSummary]:
-    rows = {}
-    for report in reports:
-        row = rows.setdefault(
-            report.brand,
-            {"products": 0, "post_count": 0, "comment_count": 0},
-        )
-        row["products"] += 1
-        row["post_count"] += report.n_posts
-        row["comment_count"] += report.n_comments
-    summaries = [
-        BrandSummary(
-            brand=brand,
-            product_count=values["products"],
-            post_count=values["post_count"],
-            comment_count=values["comment_count"],
-        )
-        for brand, values in rows.items()
-    ]
-    summaries.sort(key=lambda item: (-item.product_count, -item.post_count, item.brand))
-    return summaries
 
 
 def _non_negative_int(value: str) -> int:

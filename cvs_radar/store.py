@@ -38,6 +38,7 @@ def post_to_dict(post: Post) -> dict:
                 "text": c.text,
                 "posted_at": c.posted_at.isoformat() if c.posted_at else None,
                 "sentiment": c.sentiment,
+                "backend": c.backend,
             }
             for c in post.comments
         ],
@@ -53,6 +54,7 @@ def dict_to_post(data: dict) -> Post:
             text=c["text"],
             posted_at=datetime.fromisoformat(c["posted_at"]) if c.get("posted_at") else None,
             sentiment=c.get("sentiment"),
+            backend=c.get("backend", ""),
         )
         for c in data.get("comments", [])
     ]

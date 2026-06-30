@@ -7,12 +7,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from cvs_radar import store
 from cvs_radar.crawler import PttCrawler
-from cvs_radar.models import Comment, Post
+from cvs_radar.models import Comment, Post, ProductReport
 from cvs_radar.parser import parse_ptt_article, parse_push_datetime, parse_score
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import render_json, render_text
-from cvs_radar.scoring import normalize_product
+from cvs_radar.scoring import categorize_product, extract_products_and_prices, normalize_product
 from cvs_radar.sentiment import LlmBackend, score_comment
 
 
@@ -428,6 +429,103 @@ class ScoringTest(unittest.TestCase):
         self.assertEqual(report.competitor_mention_count, 1)
         self.assertEqual(report.competitor_preference_count, 0)
         self.assertEqual(report.competitor_brands, ["7-11"])
+
+
+class ExtractionRegressionTest(unittest.TestCase):
+    def test_extract_products_and_prices_cases(self) -> None:
+        cases = [
+            ("BF薄荷岩鹽檸檬糖35", [("BF薄荷岩鹽檸檬糖", 35)]),
+            ("抹茶霜淇淋兩支55抹茶千層59", [("抹茶霜淇淋", 55), ("抹茶千層", 59)]),
+            ("：\n大大大香辣鹹酥雞/59\n兩件88元", [("大大大香辣鹹酥雞", 59)]),
+            ("詹姆士香蒜胡椒肉骨茶泡麵 79元", [("詹姆士香蒜胡椒肉骨茶泡麵", 79)]),
+            ("莊園牛奶霜淇淋49\n取件優惠買一送一", [("莊園牛奶霜淇淋", 49)]),
+            ("https://example.test/deal/999\nBF薄荷岩鹽檸檬糖35", [("BF薄荷岩鹽檸檬糖", 35)]),
+        ]
+
+        for raw_name, expected in cases:
+            with self.subTest(raw_name=raw_name):
+                self.assertEqual(extract_products_and_prices(raw_name), expected)
+
+    def test_extract_products_and_prices_template_garbage(self) -> None:
+        results = extract_products_and_prices("：\n(區域型商品請註明 試吃試用品請標示價格0元)")
+
+        self.assertFalse(
+            [
+                (name, price)
+                for name, price in results
+                if name.strip() and price is not None
+            ]
+        )
+
+
+class CategoryRegressionTest(unittest.TestCase):
+    def test_categorize_product_cases(self) -> None:
+        cases = [
+            ("霜淇淋", "冰品"),
+            ("拿鐵", "飲料"),
+            ("蛋糕", "甜點"),
+            ("可頌", "麵包"),
+            ("捏捏球", "周邊"),
+            ("吊飾", "周邊"),
+            ("雞排", "鹹食"),
+            ("unknown_product_xyz", "其他"),
+        ]
+
+        for name, expected in cases:
+            with self.subTest(name=name):
+                self.assertEqual(categorize_product(name), expected)
+
+
+class PrecomputedResultsTest(unittest.TestCase):
+    def _report(self, price: int | None = 49, category: str = "冰品") -> ProductReport:
+        return ProductReport(
+            brand="7-11",
+            product_name="莊園牛奶霜淇淋",
+            fair_score=85.0,
+            consensus="推薦",
+            confidence="中",
+            n_eff=1.0,
+            score_std=0.0,
+            n_posts=1,
+            n_comments=0,
+            price=price,
+            category=category,
+        )
+
+    def test_load_results_preserves_price_and_category(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "results.json"
+            payload = {
+                "generated_at": "2026-06-30 12:00:00",
+                "reports": [store.report_to_store_dict(self._report())],
+                "profiles": [],
+            }
+            path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+            loaded = store.load_results(path)
+
+        assert loaded is not None
+        reports, profiles = loaded
+        self.assertEqual(profiles, {})
+        stored = store.report_to_store_dict(reports[0])
+        self.assertEqual(stored["price"], 49)
+        self.assertEqual(stored["category"], "冰品")
+
+    def test_store_dict_to_report_handles_missing_price_and_category(self) -> None:
+        data = store.report_to_store_dict(self._report())
+        data.pop("price")
+        data.pop("category")
+
+        report = store.store_dict_to_report(data)
+
+        self.assertIsNone(report.price)
+        self.assertEqual(report.category, "")
+
+    def test_report_to_store_dict_includes_price_and_category(self) -> None:
+        data = store.report_to_store_dict(self._report(price=59, category="甜點"))
+
+        self.assertEqual(data["price"], 59)
+        self.assertEqual(data["category"], "甜點")
 
 
 class SentimentTest(unittest.TestCase):
