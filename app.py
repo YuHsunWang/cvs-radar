@@ -68,7 +68,7 @@ def main() -> None:
         with col_brand:
             selected_brand = st.selectbox("品牌", options, index=0)
         with col_cat:
-            cat_options = ["全部分類", "冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "其他"]
+            cat_options = ["全部分類", "冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊", "其他"]
             selected_category = st.selectbox("分類", cat_options, index=0)
 
         query = build_product_query(
@@ -559,15 +559,16 @@ def _query_precomputed_reports(reports, query) -> ProductQueryResult:
     return ProductQueryResult(
         filters={
             "brand": query.brand,
-            "start_date": None,
-            "end_date": None,
-            "recent_days": None,
+            "start_date": str(query.start_date) if query.start_date else None,
+            "end_date": str(query.end_date) if query.end_date else None,
+            "recent_days": query.recent_days,
             "min_score": query.min_score,
             "min_n_eff": query.min_n_eff,
             "min_posts": query.min_posts,
             "min_comments": query.min_comments,
             "limit": query.limit,
             "internal": query.internal,
+            "note": "precomputed results 不支援時間篩選，顯示全部已計算結果",
         },
         brands=_brand_summaries_from_reports(reports),
         reports=filtered,

@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import json
 import unittest
+from datetime import datetime
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
+from cvs_radar.crawler import PttCrawler
 from cvs_radar.models import Comment, Post
 from cvs_radar.parser import parse_ptt_article, parse_push_datetime, parse_score
 from cvs_radar.pipeline import run_pipeline
@@ -133,6 +138,53 @@ class ParserTest(unittest.TestCase):
         parsed = parse_push_datetime("02/29 08:15", reference=datetime(2024, 2, 29, 8, 0))
 
         self.assertEqual(parsed, datetime(2024, 2, 29, 8, 15))
+
+
+class CrawlerSeenCacheTest(unittest.TestCase):
+    def _crawl_one(self, parsed_post: Post | None) -> tuple[str, PttCrawler, list[str], list[Post]]:
+        article_url = "https://example.test/bbs/CVS/M.1.html"
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / ".cvs_radar_seen.json"
+            crawler = PttCrawler(
+                base_url="https://example.test",
+                request_delay_sec=0,
+                timeout_sec=0.1,
+                retries=0,
+                cache_path=cache_path,
+            )
+            crawler._get = lambda url: "article-html" if url == article_url else "list-html"  # type: ignore[method-assign]
+            with (
+                patch("cvs_radar.crawler.parse_ptt_list", return_value=([{"url": article_url, "push_count": "1"}], None)),
+                patch("cvs_radar.crawler.parse_ptt_article", return_value=parsed_post),
+            ):
+                posts = crawler.crawl(max_pages=1, start_date="2026-06-10", end_date="2026-06-10")
+            cached_urls = json.loads(cache_path.read_text(encoding="utf-8"))
+        return article_url, crawler, cached_urls, posts
+
+    def test_crawl_does_not_mark_out_of_window_post_seen(self) -> None:
+        post = Post(id="old", url="https://example.test/bbs/CVS/M.1.html", posted_at=datetime(2026, 6, 1, 12, 0))
+
+        article_url, crawler, cached_urls, posts = self._crawl_one(post)
+
+        self.assertEqual(posts, [])
+        self.assertNotIn(article_url, crawler.seen_urls)
+        self.assertNotIn(article_url, cached_urls)
+
+    def test_crawl_marks_non_product_post_seen(self) -> None:
+        article_url, crawler, cached_urls, posts = self._crawl_one(None)
+
+        self.assertEqual(posts, [])
+        self.assertIn(article_url, crawler.seen_urls)
+        self.assertIn(article_url, cached_urls)
+
+    def test_crawl_marks_in_window_post_seen(self) -> None:
+        post = Post(id="in", url="https://example.test/bbs/CVS/M.1.html", posted_at=datetime(2026, 6, 10, 12, 0))
+
+        article_url, crawler, cached_urls, posts = self._crawl_one(post)
+
+        self.assertEqual([post.id for post in posts], ["in"])
+        self.assertIn(article_url, crawler.seen_urls)
+        self.assertIn(article_url, cached_urls)
 
 
 class ScoringTest(unittest.TestCase):
@@ -690,7 +742,7 @@ class CrawlerTest(unittest.TestCase):
 
             self.assertTrue(cache_path.exists())
 
-    def test_crawl_marks_filtered_out_articles_as_seen(self) -> None:
+    def test_crawl_does_not_mark_filtered_out_articles_as_seen(self) -> None:
         from pathlib import Path
         from tempfile import TemporaryDirectory
         from cvs_radar.crawler import PttCrawler
@@ -724,7 +776,7 @@ class CrawlerTest(unittest.TestCase):
             posts = crawler.crawl(max_pages=1, start_date="2026-06-02", end_date="2026-06-03")
 
             self.assertEqual(posts, [])
-            self.assertIn("https://www.ptt.cc/bbs/CVS/M.old.html", crawler.seen_urls)
+            self.assertNotIn("https://www.ptt.cc/bbs/CVS/M.old.html", crawler.seen_urls)
 
 
 class CliTest(unittest.TestCase):

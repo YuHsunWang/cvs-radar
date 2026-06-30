@@ -30,6 +30,7 @@ def post_to_dict(post: Post) -> dict:
         "posted_at": post.posted_at.isoformat() if post.posted_at else None,
         "is_reply": post.is_reply,
         "push_count": post.push_count,
+        "raw": post.raw,
         "comments": [
             {
                 "tag": c.tag,
@@ -70,6 +71,7 @@ def dict_to_post(data: dict) -> Post:
         posted_at=datetime.fromisoformat(data["posted_at"]) if data.get("posted_at") else None,
         is_reply=data.get("is_reply", False),
         push_count=data.get("push_count"),
+        raw=data.get("raw"),
         comments=comments,
     )
 

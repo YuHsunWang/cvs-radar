@@ -77,8 +77,8 @@ class PttCrawler:
                     continue
                 post.push_count = parse_push_count(item.get("push_count"))
                 filtered_post = filter_post_by_time(post, window)
-                self.seen_urls.add(article_url)
                 if filtered_post is not None:
+                    self.seen_urls.add(article_url)
                     posts.append(filtered_post)
             if not prev_url:
                 break

@@ -23,11 +23,21 @@ from cvs_radar.crawler import PttCrawler
 from cvs_radar.store import DEFAULT_STORE_PATH, save_posts, store_stats
 
 
+def _non_negative_int(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"invalid integer value: {value!r}") from None
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be non-negative")
+    return parsed
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="CVS Radar scheduled crawl job")
-    parser.add_argument("--pages", type=int, default=5, help="Number of PTT list pages to crawl (default: 5)")
+    parser.add_argument("--pages", type=_non_negative_int, default=5, help="Number of PTT list pages to crawl (default: 5)")
     parser.add_argument("--store", default=DEFAULT_STORE_PATH, help=f"JSONL store path (default: {DEFAULT_STORE_PATH})")
-    parser.add_argument("--recent-days", type=int, default=None, help="Only keep posts from recent N days")
+    parser.add_argument("--recent-days", type=_non_negative_int, default=None, help="Only keep posts from recent N days")
     parser.add_argument("--skip-recompute", action="store_true", help="Skip pipeline recompute after crawl")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
     args = parser.parse_args()
