@@ -354,6 +354,7 @@ def categorize_product(name: str) -> str:
 _GARBAGE_NAME_RE = re.compile(
     r"^\d{1,3}$|^unknown$|^任\d|^折後$|^消費滿|^期間|"
     r"^友善時光$|^牧場直送$|.*(?:FMC|系列商品|即期品)|"
+    r".*(?:兩件|兩瓶|合購|加購|app|折價券|好康|扣|跨店|指定商品|點數換)|"
     r"任[0-9二三四五六七八九十]|^\d+元$|^\d+金",
     re.IGNORECASE,
 )
