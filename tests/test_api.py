@@ -5,7 +5,7 @@ import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-from cvs_radar.api import app
+from cvs_radar.api import app, health, products
 
 
 class _Response:
@@ -63,6 +63,10 @@ class _SandboxSafeTestClient(TestClient):
 client = _SandboxSafeTestClient(app)
 
 
+def test_health_returns_ok_status() -> None:
+    assert health() == {"status": "ok"}
+
+
 def test_brands_demo_returns_valid_brand_list() -> None:
     response = client.get("/brands", params={"source": "demo"})
 
@@ -79,6 +83,26 @@ def test_products_demo_returns_valid_product_results() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert isinstance(payload["reports"], list)
+
+
+def test_products_function_accepts_default_demo_source() -> None:
+    payload = products(
+        source="demo",
+        crawl_pages=5,
+        brand=None,
+        start_date=None,
+        end_date=None,
+        recent_days=None,
+        min_score=None,
+        min_n_eff=None,
+        min_posts=None,
+        min_comments=None,
+        limit=None,
+        internal=False,
+    )
+
+    assert isinstance(payload["reports"], list)
+    assert "brands" in payload
 
 
 def test_brands_stored_returns_valid_brand_list_when_data_exists() -> None:

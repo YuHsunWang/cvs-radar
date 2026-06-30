@@ -7,12 +7,23 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from cvs_radar.evaluation import (
+    Prediction,
+    Predictor,
     RuleBasedPredictor,
     SentimentBackendPredictor,
+    StubPredictor,
+    available_comparison_backends,
+    binary_metrics,
     compare_sentiment_backends,
     evaluate,
+    multiclass_metrics,
+    normalize_bool,
+    normalize_favored,
+    normalize_sentiment,
+    normalize_target,
     read_gold_csv,
     render_text_report,
+    write_backend_comparison_csv,
     write_json_report,
 )
 from cvs_radar.labeling import build_labeling_rows, read_labeling_csv, write_labeling_csv
@@ -124,6 +135,68 @@ class LabelingTest(unittest.TestCase):
 
 
 class EvaluationHarnessTest(unittest.TestCase):
+    def test_predictor_methods_and_metric_helpers(self) -> None:
+        row = {
+            "comment_id": "direct#000",
+            "post_brand": "7-11",
+            "comment_tag": "推",
+            "comment_user": "u1",
+            "comment_text": "好吃會回購",
+            "sentiment": "正",
+            "target_brand": "本牌",
+            "is_comparative": "否",
+            "favored_brand": "",
+        }
+
+        prediction = RuleBasedPredictor().predict_row(row)
+        binary = binary_metrics([True, False, True], [True, True, False])
+        multiclass = multiclass_metrics(["positive", "negative"], ["positive", "neutral"], ("positive", "negative", "neutral"))
+
+        self.assertIsNone(Predictor.predict_row(object(), row))
+        with self.assertRaises(NotImplementedError):
+            StubPredictor().predict_row(row)
+        self.assertIsInstance(prediction, Prediction)
+        self.assertEqual(prediction.sentiment, "positive")
+        self.assertEqual(binary["tp"], 1)
+        self.assertEqual(binary["fp"], 1)
+        self.assertEqual(multiclass["support"], 2)
+        self.assertIn("neutral", multiclass["per_class"])
+
+    def test_label_normalizers_accept_aliases_and_reject_unknowns(self) -> None:
+        self.assertEqual(normalize_sentiment("正向"), "positive")
+        self.assertEqual(normalize_bool("yes"), True)
+        self.assertEqual(normalize_favored("競品"), "other")
+        self.assertEqual(normalize_target("他牌:全家"), "other")
+
+        with self.assertRaises(ValueError):
+            normalize_sentiment("mixed")
+        with self.assertRaises(ValueError):
+            normalize_bool("maybe")
+        with self.assertRaises(ValueError):
+            normalize_favored("winner")
+
+    def test_backend_discovery_and_csv_writer(self) -> None:
+        rows = [
+            {
+                "dataset": "gold.csv",
+                "backend": "lexicon",
+                "n_rows": 2,
+                "sentiment_polarity_accuracy": 1.0,
+                "meets_80pct_target": "true",
+                "sample_caveat": "",
+            }
+        ]
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "nested" / "comparison.csv"
+            write_backend_comparison_csv(rows, path)
+            loaded = path.read_text(encoding="utf-8")
+
+        with patch("cvs_radar.evaluation.llm_has_key", return_value=True):
+            backends = available_comparison_backends()
+
+        self.assertIn("dataset,backend,n_rows", loaded)
+        self.assertEqual(backends, ["lexicon", "snownlp", "llm"])
+
     def test_rule_harness_runs_on_gold_smoke_and_computes_metrics(self) -> None:
         rows = read_gold_csv("data/labels/gold_smoke.csv")
 

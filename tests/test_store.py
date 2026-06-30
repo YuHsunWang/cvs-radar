@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 
 from cvs_radar.models import Comment, Post
 from cvs_radar.pipeline import run_pipeline
-from cvs_radar.store import dict_to_post, load_posts, post_to_dict, save_posts
+from cvs_radar.store import dict_to_post, load_posts, post_to_dict, save_posts, store_stats
 
 
 class StoreTest(unittest.TestCase):
@@ -57,6 +57,34 @@ class StoreTest(unittest.TestCase):
 
     def test_load_from_nonexistent_returns_empty(self) -> None:
         self.assertEqual(load_posts("/tmp/does_not_exist_xyz.jsonl"), [])
+
+    def test_store_stats_summarizes_posts_comments_brands_and_dates(self) -> None:
+        posts = [
+            Post(
+                id="stats-1",
+                brand="7-11",
+                product_name="Coffee",
+                posted_at=datetime(2026, 6, 1, 12, 0),
+                comments=[Comment("推", "u1", "好喝")],
+            ),
+            Post(
+                id="stats-2",
+                brand="全家",
+                product_name="Tea",
+                posted_at=datetime(2026, 6, 2, 12, 0),
+            ),
+        ]
+
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "posts.jsonl"
+            save_posts(posts, path)
+            stats = store_stats(path)
+
+        self.assertEqual(stats["path"], str(path))
+        self.assertEqual(stats["post_count"], 2)
+        self.assertEqual(stats["comment_count"], 1)
+        self.assertEqual(stats["brands"], ["7-11", "全家"])
+        self.assertEqual(stats["date_range"], ("2026-06-01T12:00:00", "2026-06-02T12:00:00"))
 
     def test_stored_posts_flow_through_pipeline(self) -> None:
         """Posts saved and loaded from store produce valid pipeline output."""

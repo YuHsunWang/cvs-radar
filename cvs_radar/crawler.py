@@ -8,6 +8,7 @@ import time
 from datetime import date, datetime
 from pathlib import Path
 from typing import Iterable
+from urllib.parse import urlparse
 
 import requests
 
@@ -36,6 +37,7 @@ class PttCrawler:
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": str(CRAWL["user_agent"])})
         self.session.cookies.set("over18", "1", domain="www.ptt.cc")
+        self._base_origin = urlparse(self.base_url)
         self.seen_urls = self._load_seen()
 
     def crawl(
@@ -64,6 +66,9 @@ class PttCrawler:
             items, prev_url = parse_ptt_list(html, self.base_url)
             for item in items:
                 article_url = item["url"]
+                if not self._is_allowed_url(article_url):
+                    logger.warning("skipping off-site article URL: %s", article_url)
+                    continue
                 if article_url in self.seen_urls:
                     continue
                 try:
@@ -81,6 +86,9 @@ class PttCrawler:
                     self.seen_urls.add(article_url)
                     posts.append(filtered_post)
             if not prev_url:
+                break
+            if not self._is_allowed_url(prev_url):
+                logger.warning("stopping crawl at off-site pagination URL: %s", prev_url)
                 break
             url = prev_url
 
@@ -102,6 +110,14 @@ class PttCrawler:
                 logger.warning("request failed (%s/%s) %s: %s", attempt + 1, self.retries + 1, url, exc)
         assert last_error is not None
         raise last_error
+
+    def _is_allowed_url(self, url: str) -> bool:
+        parsed = urlparse(url)
+        return (
+            parsed.scheme in {"http", "https"}
+            and parsed.netloc == self._base_origin.netloc
+            and parsed.path.startswith("/bbs/")
+        )
 
     def _load_seen(self) -> set[str]:
         if not self.cache_path.exists():

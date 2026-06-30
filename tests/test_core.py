@@ -10,14 +10,67 @@ from unittest.mock import patch
 from cvs_radar import store
 from cvs_radar.crawler import PttCrawler
 from cvs_radar.models import Comment, Post, ProductReport
-from cvs_radar.parser import parse_ptt_article, parse_push_datetime, parse_score
+from cvs_radar.parser import (
+    infer_brand,
+    is_product_title,
+    parse_ptt_article,
+    parse_ptt_datetime,
+    parse_ptt_list,
+    parse_push_count,
+    parse_push_datetime,
+    parse_score,
+)
 from cvs_radar.pipeline import run_pipeline
-from cvs_radar.reporting import render_json, render_text
-from cvs_radar.scoring import categorize_product, extract_products_and_prices, normalize_product
-from cvs_radar.sentiment import LlmBackend, score_comment
+from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
+from cvs_radar.scoring import (
+    canonical_product_name,
+    categorize_product,
+    extract_products_and_prices,
+    group_products,
+    normalize_product,
+    preprocess_posts,
+    representative_product_name,
+    score_all,
+    score_product,
+)
+from cvs_radar.sentiment import LlmBackend, annotate_posts, clamp, llm_has_key, resolve_backend, score_comment, tag_prior
 
 
 class ParserTest(unittest.TestCase):
+    def test_public_parser_helpers_for_titles_brands_counts_and_lists(self) -> None:
+        html = """
+        <div class="r-ent">
+          <div class="nrec">爆</div>
+          <div class="title"><a href="/bbs/CVS/M.1.html">[商品] 711 測試飯糰</a></div>
+          <div class="author">tester</div>
+          <div class="date">6/01</div>
+        </div>
+        <div class="r-ent">
+          <div class="title"><a href="/bbs/CVS/M.2.html">[閒聊] ignored</a></div>
+        </div>
+        <a class="btn wide" href="/bbs/CVS/index123.html">上頁</a>
+        """
+
+        rows, prev_url = parse_ptt_list(html, base_url="https://www.ptt.cc")
+
+        self.assertTrue(is_product_title("［商品］全家 測試甜點"))
+        self.assertFalse(is_product_title("[閒聊] 測試"))
+        self.assertEqual(infer_brand("family mart 測試"), "全家")
+        self.assertEqual(parse_push_count("爆"), 100)
+        self.assertEqual(parse_push_count("X2"), -2)
+        self.assertEqual(rows, [
+            {
+                "title": "[商品] 711 測試飯糰",
+                "url": "https://www.ptt.cc/bbs/CVS/M.1.html",
+                "author": "tester",
+                "date": "6/01",
+                "push_count": "爆",
+            }
+        ])
+        self.assertEqual(prev_url, "https://www.ptt.cc/bbs/CVS/index123.html")
+        self.assertEqual(parse_ptt_datetime("Mon Jun  1 12:00:00 2026"), datetime(2026, 6, 1, 12, 0))
+        self.assertIsNone(parse_ptt_datetime("not a date"))
+
     def test_parse_score_edge_cases(self) -> None:
         self.assertEqual(parse_score("85"), 85)
         self.assertEqual(parse_score("8/10"), 80)
@@ -178,6 +231,26 @@ class CrawlerSeenCacheTest(unittest.TestCase):
         self.assertIn(article_url, crawler.seen_urls)
         self.assertIn(article_url, cached_urls)
 
+    def test_crawl_skips_off_site_article_urls(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            crawler = PttCrawler(
+                base_url="https://example.test",
+                request_delay_sec=0,
+                timeout_sec=0.1,
+                retries=0,
+                cache_path=Path(tmpdir) / ".cvs_radar_seen.json",
+            )
+            requested_urls = []
+            crawler._get = lambda url: requested_urls.append(url) or "list-html"  # type: ignore[method-assign]
+            with patch(
+                "cvs_radar.crawler.parse_ptt_list",
+                return_value=([{"url": "http://169.254.169.254/latest/meta-data", "push_count": "1"}], None),
+            ):
+                posts = crawler.crawl(max_pages=1)
+
+        self.assertEqual(posts, [])
+        self.assertEqual(requested_urls, ["https://example.test/bbs/CVS/index.html"])
+
     def test_crawl_marks_in_window_post_seen(self) -> None:
         post = Post(id="in", url="https://example.test/bbs/CVS/M.1.html", posted_at=datetime(2026, 6, 10, 12, 0))
 
@@ -189,6 +262,37 @@ class CrawlerSeenCacheTest(unittest.TestCase):
 
 
 class ScoringTest(unittest.TestCase):
+    def test_public_scoring_helpers_directly_score_and_group_products(self) -> None:
+        posts = [
+            Post(
+                id="multi",
+                brand="7-11",
+                product_name="抹茶霜淇淋55草莓蛋糕59",
+                author="a1",
+                author_score=80,
+            ),
+            Post(
+                id="single",
+                brand="7-11",
+                product_name="小7 阜杭饅頭豬排蛋 心得",
+                author="a2",
+                author_score=90,
+                comments=[Comment("推", "u1", "好吃會回購", sentiment=0.9)],
+            ),
+        ]
+
+        processed = preprocess_posts(posts)
+        groups = group_products(processed)
+        report = score_product([processed[-1]], {})
+        reports = score_all(processed, {})
+
+        self.assertEqual(canonical_product_name("7-11", "小7 阜杭饅頭豬排蛋 心得"), "阜杭豆漿饅頭夾豬排蛋")
+        self.assertIn("抹茶霜淇淋", [post.product_name for post in processed])
+        self.assertTrue(groups)
+        self.assertEqual(report.product_name, "阜杭豆漿饅頭夾豬排蛋")
+        self.assertEqual(representative_product_name([processed[-1]]), "阜杭豆漿饅頭夾豬排蛋")
+        self.assertEqual([item.product_name for item in reports], ["阜杭豆漿饅頭夾豬排蛋", "抹茶霜淇淋", "草莓蛋糕"])
+
     def test_product_normalization_removes_brand(self) -> None:
         self.assertEqual(normalize_product("7-11", "711  測試飯糰"), "測試飯糰")
 
@@ -529,6 +633,26 @@ class PrecomputedResultsTest(unittest.TestCase):
 
 
 class SentimentTest(unittest.TestCase):
+    def test_public_sentiment_helpers_resolve_annotate_and_check_key(self) -> None:
+        post = Post(
+            id="sentiment",
+            brand="7-11",
+            product_name="測試飯糰",
+            comments=[Comment("推", "u1", "好吃會回購")],
+        )
+
+        with patch.dict("os.environ", {}, clear=True):
+            has_key = llm_has_key()
+        annotated = annotate_posts([post])
+
+        self.assertEqual(clamp(2.5), 1.0)
+        self.assertEqual(clamp(-2.5), -1.0)
+        self.assertEqual(tag_prior("噓"), -1.0)
+        self.assertEqual(resolve_backend("lexicon").name, "lexicon")
+        self.assertFalse(has_key)
+        self.assertGreater(annotated[0].comments[0].sentiment, 0)
+        self.assertEqual(annotated[0].comments[0].backend, "lexicon")
+
     def test_tag_and_lexicon_mix(self) -> None:
         self.assertGreater(score_comment("推", "好吃會回購"), 0)
         self.assertLess(score_comment("噓", "難吃踩雷"), 0)
@@ -637,6 +761,33 @@ class SentimentTest(unittest.TestCase):
 
 
 class TimeAndServiceTest(unittest.TestCase):
+    def test_time_window_public_helpers_parse_validate_and_clone_posts(self) -> None:
+        from cvs_radar.filters import TimeWindow, build_time_window, filter_post_by_time, filter_posts_by_time, parse_datetime
+
+        post = Post(
+            id="dated",
+            brand="7-11",
+            product_name="Coffee",
+            author_score=80,
+            posted_at=datetime(2026, 6, 2, 10, 0),
+            comments=[
+                Comment("推", "in", "好吃", datetime(2026, 6, 2, 11, 0)),
+                Comment("噓", "out", "難吃", datetime(2026, 6, 3, 11, 0)),
+            ],
+        )
+        window = build_time_window(start_date="2026/06/02", end_date="20260602")
+
+        selected_post = filter_post_by_time(post, window)
+        selected_posts = filter_posts_by_time([post], start_date="2026-06-02", end_date="2026-06-02")
+
+        assert selected_post is not None
+        self.assertEqual(parse_datetime("2026-06-02").isoformat(), "2026-06-02T00:00:00")
+        self.assertTrue(window.enabled)
+        self.assertTrue(window.contains(datetime(2026, 6, 2, 23, 59)))
+        self.assertFalse(TimeWindow(start=datetime(2026, 6, 4)).contains(None))
+        self.assertEqual([comment.user for comment in selected_post.comments], ["in"])
+        self.assertEqual([comment.user for comment in selected_posts[0].comments], ["in"])
+
     def test_pipeline_filters_posts_and_comments_by_date(self) -> None:
         from datetime import datetime
 
@@ -795,8 +946,30 @@ class TimeAndServiceTest(unittest.TestCase):
         self.assertEqual(result.filters["start_date"], "2026-06-12T12:00:00")
         self.assertEqual(result.filters["end_date"], "2026-06-15T12:00:00")
 
+    def test_brand_summaries_from_reports_aggregates_product_reports(self) -> None:
+        from cvs_radar.service import brand_summaries_from_reports
+
+        reports = [
+            ProductReport("7-11", "A", 80, "一致好評", "低", 1, 0, 2, 3),
+            ProductReport("7-11", "B", 70, "褒貶不一", "低", 1, 0, 1, 1),
+            ProductReport("全家", "C", 60, "褒貶不一", "低", 1, 0, 4, 5),
+        ]
+
+        summaries = brand_summaries_from_reports(reports)
+
+        self.assertEqual([(item.brand, item.product_count, item.post_count, item.comment_count) for item in summaries], [
+            ("7-11", 2, 3, 4),
+            ("全家", 1, 4, 5),
+        ])
+
 
 class AppHelperTest(unittest.TestCase):
+    def test_load_results_or_none_delegates_to_store_loader(self) -> None:
+        from cvs_radar.app_helpers import load_results_or_none
+
+        with patch("cvs_radar.store.load_results", return_value=([], {})):
+            self.assertEqual(load_results_or_none(), ([], {}))
+
     def test_app_helpers_use_service_query_shape(self) -> None:
         from datetime import datetime
         from cvs_radar.app_helpers import ALL_BRANDS, brand_options, build_product_query, product_rows
@@ -823,6 +996,33 @@ class AppHelperTest(unittest.TestCase):
         self.assertLessEqual(len(rows), 5)
         self.assertIn("fair_score", rows[0])
         self.assertIn("代表性推", rows[0])
+
+
+class ReportingTest(unittest.TestCase):
+    def test_reporting_public_helpers_render_dict_suspicion_and_hash(self) -> None:
+        from cvs_radar.preference import AccountProfile
+
+        report = ProductReport(
+            brand="7-11",
+            product_name="測試飯糰",
+            fair_score=80,
+            consensus="一致好評",
+            confidence="高",
+            n_eff=5,
+            score_std=0.1,
+            n_posts=1,
+            n_comments=1,
+        )
+        profile = AccountProfile(user="alice", total_comments=3, suspicion_score=0.2, credibility=0.8)
+
+        payload = report_to_dict(report)
+        suspicion = render_suspicion({"alice": profile})
+
+        self.assertEqual(payload["brand"], "7-11")
+        self.assertNotIn("contributors", payload)
+        self.assertIn("alice", suspicion)
+        self.assertEqual(hash_user("alice"), hash_user("alice"))
+        self.assertNotEqual(hash_user("alice"), hash_user("bob"))
 
 
 class CrawlerTest(unittest.TestCase):
