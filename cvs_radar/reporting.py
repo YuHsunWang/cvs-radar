@@ -116,6 +116,8 @@ def _report_to_dict(report: ProductReport, internal: bool) -> dict[str, Any]:
     data = {
         "brand": report.brand,
         "product_name": report.product_name,
+        "price": report.price,
+        "category": report.category,
         "fair_score": report.fair_score,
         "consensus": report.consensus,
         "confidence": report.confidence,

@@ -17,6 +17,7 @@ from .config import (
     CONFIDENCE_BANDS,
     CONSENSUS,
     PRODUCT_ALIASES,
+    PRODUCT_CATEGORIES,
     PRODUCT_NORMALIZATION,
     SCORING,
 )
@@ -36,6 +37,40 @@ _NOISE_RE = re.compile(
 _OPTIONAL_RE = re.compile(
     r"(\d+(\.\d+)?\s*(入|包|個|顆|片|枚|杯|瓶|罐|盒|組|ml|毫升|g|公克|克)|"
     r"(口味|數量|容量|規格|加量|限定|新品|新上市))"
+)
+_PROMO_RE = re.compile(
+    r"(\d+元|\$\d+|"
+    r"買[一二三四五六七八九十\d]+[送得]|"
+    r"第[二三四五六七八九十\d]+件\d*折|"
+    r"任選\d+件?\d*元?|"
+    r"[買滿]\d+[送打折抽]|"
+    r"\d+買[一二三四五六七八九十\d]+[支個入包瓶罐杯盒組件]?|"
+    r"可以抽抽樂|抽抽樂|集點|加購|"
+    r"限時特價|特惠|促銷|優惠|折扣|"
+    r"買就送|滿額|加價購)"
+)
+_TRAILING_PRICE_RE = re.compile(
+    r"^(.+?)\s*(\d{2,3})\s*元?$"
+)
+_PRICE_BEFORE_PROMO_RE = re.compile(
+    r"^(.+?)"
+    r"(\d{2,3})"
+    r"(?:元)?"
+    r"(?:搭|取件|隨買|跨店|"
+    r"買[一二三四五六七八九十\d]+[送得支個入包瓶罐杯盒組件份]|"
+    r"第[二三四五六七八九十\d]+件|任選|滿額|加購|優惠|半價|"
+    r"[買滿]\d+[送打折抽]|好康|活動|限時|特惠|促銷|折扣).*$"
+)
+_PROMO_TAIL_RE = re.compile(
+    r"(隨買|跨店|取件|搭配|好康|活動|優惠|加購|半價|滿額).*$"
+)
+_MULTI_PRODUCT_RE = re.compile(
+    r"([一-鿿A-Za-z][一-鿿A-Za-z\w]*?)"
+    r"(?:[兩三四五六七八九十\d]*[支個入包瓶罐杯盒組件份])*"
+    r"(\d{2,3})"
+)
+_QUANTITY_SUFFIX_RE = re.compile(
+    r"[兩三四五六七八九十\d]+[支個入包瓶罐杯盒組件份]$"
 )
 _COMMENT_NOISE_RE = re.compile(r"(這款|這個|這品|這次|個人覺得|我覺得|覺得|補充[:：]?|推薦|推推|再推一次)")
 _SYNONYM_MAP = {
@@ -86,6 +121,130 @@ class _CommentAttribution:
     competitor_preference: bool = False
 
 
+def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
+    """Split a raw product name into (name, price) pairs.
+
+    Handles single products with trailing prices ("BF薄荷岩鹽檸檬糖35")
+    and multi-product titles ("抹茶霜淇淋兩支55抹茶千層59").
+    """
+    s = unicodedata.normalize("NFKC", raw_name or "").strip()
+    s = s.split("\n")[0].strip()
+    s = re.sub(r"^[：:]+\s*", "", s)
+    s = re.sub(r"\$(\d)", r"\1", s)
+    s = re.sub(r"(\d)\$", r"\1", s)
+    s = _BRACKET_RE.sub(" ", s)
+    keywords = [*BRANDS.get(brand, []), brand] if brand else []
+    for kw in sorted(set(keywords), key=len, reverse=True):
+        if kw:
+            s = re.sub(re.escape(kw), " ", s, flags=re.IGNORECASE)
+    s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
+    s = _TITLE_PREFIX_RE.sub(" ", s)
+    s = _NOISE_RE.sub(" ", s)
+    s = re.sub(r"\s+", "", s).strip()
+
+    matches = list(_MULTI_PRODUCT_RE.finditer(s))
+    valid = [(m.group(1), int(m.group(2))) for m in matches
+             if 15 <= int(m.group(2)) <= 300 and len(m.group(1)) >= 2]
+
+    if len(valid) >= 2:
+        results = []
+        for name, price in valid:
+            name = _QUANTITY_SUFFIX_RE.sub("", name).strip()
+            name = _PROMO_RE.sub("", name).strip()
+            name = re.sub(r"半價$", "", name).strip()
+            if len(name) >= 2:
+                results.append((name, price))
+        if len(results) >= 2:
+            return results
+
+    m = _TRAILING_PRICE_RE.match(s)
+    if m:
+        name = m.group(1).strip()
+        price = int(m.group(2))
+        if 15 <= price <= 300 and len(name) >= 2:
+            name = _QUANTITY_SUFFIX_RE.sub("", name).strip()
+            name = _OPTIONAL_RE.sub("", name).strip()
+            name = _PROMO_RE.sub("", name).strip()
+            name = _PROMO_TAIL_RE.sub("", name).strip()
+            if len(name) >= 2:
+                return [(name, price)]
+
+    mp = _PRICE_BEFORE_PROMO_RE.match(s)
+    if mp:
+        name = mp.group(1).strip()
+        price = int(mp.group(2))
+        if 15 <= price <= 300 and len(name) >= 2:
+            name = _QUANTITY_SUFFIX_RE.sub("", name).strip()
+            name = _OPTIONAL_RE.sub("", name).strip()
+            if len(name) >= 2:
+                return [(name, price)]
+
+    s_clean = _PROMO_RE.sub(" ", s)
+    s_clean = re.sub(r"\s+", "", s_clean).strip()
+    m2 = _TRAILING_PRICE_RE.match(s_clean)
+    if m2:
+        name = m2.group(1).strip()
+        price = int(m2.group(2))
+        if 15 <= price <= 300 and len(name) >= 2:
+            name = _QUANTITY_SUFFIX_RE.sub("", name).strip()
+            name = _OPTIONAL_RE.sub("", name).strip()
+            if len(name) >= 2:
+                return [(name, price)]
+
+    cleaned = _PROMO_RE.sub(" ", s)
+    cleaned = re.sub(r"\d{2,3}元?$", "", cleaned).strip()
+    cleaned = re.sub(r"\s+", "", cleaned).strip()
+    if not cleaned:
+        cleaned = re.sub(r"\s+", "", s).strip()
+    return [(cleaned, None)]
+
+
+def categorize_product(name: str) -> str:
+    """Assign a category to a product name based on keyword matching."""
+    text = unicodedata.normalize("NFKC", name or "").lower()
+    for category, keywords in PRODUCT_CATEGORIES.items():
+        for kw in keywords:
+            if kw.lower() in text:
+                return category
+    return "其他"
+
+
+_GARBAGE_NAME_RE = re.compile(r"^\d{1,3}$|^unknown$|^任\d|^折後$|^消費滿|^期間|^友善時光$|^牧場直送$")
+
+
+def preprocess_posts(posts: list[Post]) -> list[Post]:
+    """Split multi-product posts and extract prices."""
+    result: list[Post] = []
+    for post in posts:
+        items = extract_products_and_prices(post.product_name, post.brand)
+        if len(items) == 1 and items[0][0] == post.product_name and items[0][1] is None:
+            result.append(post)
+            continue
+        for name, price in items:
+            if _GARBAGE_NAME_RE.match(name) or len(name) < 2:
+                continue
+            new_post = Post(
+                id=f"{post.id}_{_compact_key(name)}" if len(items) > 1 else post.id,
+                source=post.source,
+                board=post.board,
+                url=post.url,
+                title=post.title,
+                brand=post.brand,
+                product_name=name,
+                price=str(price) if price is not None else post.price,
+                author=post.author,
+                author_score=post.author_score,
+                review_text=post.review_text,
+                posted_at=post.posted_at,
+                is_reply=post.is_reply,
+                push_count=post.push_count,
+                comments=post.comments,
+                raw=post.raw,
+            )
+            result.append(new_post)
+    return result
+
+
 def normalize_product(brand: str, name: str) -> str:
     """Return a stable, reproducible product key for one brand/name pair."""
     return _compact_key(canonical_product_name(brand, name))
@@ -108,6 +267,7 @@ def _clean_product_name(brand: str, name: str) -> str:
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
     s = _OPTIONAL_RE.sub(" ", s)
+    s = _PROMO_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
     s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
     for old, new in _SYNONYM_MAP.items():
@@ -137,6 +297,7 @@ def _clean_product_name_without_alias(brand: str, name: str) -> str:
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
     s = _OPTIONAL_RE.sub(" ", s)
+    s = _PROMO_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
     s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
     for old, new in _SYNONYM_MAP.items():
@@ -587,6 +748,9 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
     product_key = f"{posts[0].brand}:{normalize_product(posts[0].brand, product_name)}"
     competitor_mention_count, competitor_preference_count, competitor_brands = _competitor_stats(posts)
 
+    prices = [int(p.price) for p in posts if p.price and p.price.isdigit()]
+    price = prices[0] if prices else None
+
     return ProductReport(
         brand=posts[0].brand,
         product_name=product_name,
@@ -602,6 +766,8 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         rep_negative=rep_neg,
         product_key=product_key,
         score_mean=round(mean01, 4),
+        price=price,
+        category=categorize_product(product_name),
         competitor_mention_count=competitor_mention_count,
         competitor_preference_count=competitor_preference_count,
         competitor_brands=competitor_brands,

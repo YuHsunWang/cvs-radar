@@ -122,6 +122,8 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
                 "排名": rank,
                 "品牌": report.brand,
                 "商品": report.product_name,
+                "價格": report.price,
+                "分類": report.category or "其他",
                 "fair_score": report.fair_score,
                 "consensus": report.consensus,
                 "confidence": report.confidence,

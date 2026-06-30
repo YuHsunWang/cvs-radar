@@ -7,7 +7,7 @@ from datetime import date, datetime
 from .filters import filter_posts_by_time
 from .models import Post, ProductReport
 from .preference import AccountProfile, build_profiles
-from .scoring import score_all
+from .scoring import preprocess_posts, score_all
 from .sentiment import annotate_posts
 
 
@@ -26,7 +26,8 @@ def run_pipeline(
         recent_days=recent_days,
         now=now,
     )
-    annotated = annotate_posts(selected)
+    preprocessed = preprocess_posts(selected)
+    annotated = annotate_posts(preprocessed)
     profiles = build_profiles(annotated)
     reports = score_all(annotated, profiles)
     return reports, profiles
