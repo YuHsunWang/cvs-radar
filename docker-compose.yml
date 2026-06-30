@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      CVS_RADAR_LLM_API_KEY: ${CVS_RADAR_LLM_API_KEY:-}
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8501/_stcore/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
