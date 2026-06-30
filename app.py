@@ -699,7 +699,7 @@ def _render_product_card(row: dict[str, Any]) -> None:
     positive_comments = _split_comments(row.get("代表性推"))
     negative_comments = _split_comments(row.get("代表性噓"))
     competitor_brands = str(row.get("提及競品") or "無")
-    shill_badge = f'<span class="pill consensus-neg">⚠ 疑似業配</span>' if shill_label else ""
+    shill_badge = '<span class="pill consensus-neg">⚠ 疑似業配</span>' if shill_label else ""
 
     st.markdown(
         f"""
