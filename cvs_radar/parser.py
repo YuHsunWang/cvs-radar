@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import re
 from datetime import datetime, timedelta
-from typing import Iterable
 
 from bs4 import BeautifulSoup
 

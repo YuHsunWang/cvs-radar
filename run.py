@@ -12,7 +12,7 @@ from pathlib import Path
 
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import render_json, render_suspicion, render_text
-from cvs_radar.service import BrandSummary, brand_summaries_from_reports, filter_reports, list_brands
+from cvs_radar.service import brand_summaries_from_reports, filter_reports, list_brands
 from cvs_radar.filters import build_time_window
 
 

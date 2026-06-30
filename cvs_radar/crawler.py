@@ -7,7 +7,6 @@ import logging
 import time
 from datetime import date, datetime
 from pathlib import Path
-from typing import Iterable
 from urllib.parse import urlparse
 
 import requests

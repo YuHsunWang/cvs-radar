@@ -18,7 +18,7 @@ from cvs_radar.app_helpers import (
 )
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import render_suspicion_detail
-from cvs_radar.service import BrandSummary, ProductQueryResult, brand_summaries_from_reports, filter_reports, query_products
+from cvs_radar.service import ProductQueryResult, brand_summaries_from_reports, filter_reports, query_products
 
 
 def main() -> None:
