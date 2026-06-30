@@ -7,6 +7,7 @@ from cvs_radar.models import Comment, Post
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.preference import _burst_ratio, _template_like_ratio, build_profiles
 from cvs_radar.reporting import render_suspicion_detail
+from cvs_radar.scoring import _is_shill_comment, _shill_stats
 
 
 class SuspicionSignalTest(unittest.TestCase):
@@ -104,6 +105,93 @@ class SuspicionSignalTest(unittest.TestCase):
         self.assertNotIn("repeated_text", profile.suspicion_features)
         self.assertLess(profile.credibility, 1.0)
         self.assertAlmostEqual(contributor.weight, profile.credibility, places=4)
+
+
+class ShillDetectionTest(unittest.TestCase):
+    def test_shill_keyword_detected(self) -> None:
+        self.assertTrue(_is_shill_comment("葉"))
+        self.assertTrue(_is_shill_comment("業配吧"))
+        self.assertTrue(_is_shill_comment("業"))
+        self.assertTrue(_is_shill_comment("滿滿的葉味"))
+
+    def test_false_positive_excluded(self) -> None:
+        self.assertFalse(_is_shill_comment("茶葉蛋好吃"))
+        self.assertFalse(_is_shill_comment("好吃"))
+        self.assertFalse(_is_shill_comment(""))
+
+    def test_shill_stats_flags_high_ratio(self) -> None:
+        start = datetime(2026, 6, 10, 14, 0)
+        posts = [
+            Post(
+                id="shill-test",
+                brand="7-11",
+                product_name="測試",
+                comments=[
+                    Comment("推", "a", "好吃", start),
+                    Comment("噓", "b", "葉", start + timedelta(minutes=1)),
+                    Comment("噓", "c", "業配", start + timedelta(minutes=2)),
+                    Comment("→", "d", "業", start + timedelta(minutes=3)),
+                ],
+            )
+        ]
+        ratio, flag = _shill_stats(posts)
+        self.assertTrue(flag)
+        self.assertAlmostEqual(ratio, 0.75, places=2)
+
+    def test_shill_stats_no_flag_below_threshold(self) -> None:
+        start = datetime(2026, 6, 10, 14, 0)
+        posts = [
+            Post(
+                id="normal-test",
+                brand="7-11",
+                product_name="測試",
+                comments=[
+                    Comment("推", "a", "好吃", start),
+                    Comment("推", "b", "不錯", start + timedelta(minutes=1)),
+                    Comment("推", "c", "會回購", start + timedelta(minutes=2)),
+                    Comment("→", "d", "普通", start + timedelta(minutes=3)),
+                ],
+            )
+        ]
+        ratio, flag = _shill_stats(posts)
+        self.assertFalse(flag)
+        self.assertEqual(ratio, 0.0)
+
+    def test_shill_flag_reduces_score_via_pipeline(self) -> None:
+        start = datetime(2026, 6, 10, 14, 0)
+        shill_posts = [
+            Post(
+                id="shill-pipe",
+                brand="全家",
+                product_name="業配商品",
+                author="promo",
+                author_score=95,
+                comments=[
+                    Comment("推", "a", "好吃", start),
+                    Comment("噓", "b", "葉", start + timedelta(minutes=1)),
+                    Comment("噓", "c", "業配", start + timedelta(minutes=2)),
+                    Comment("→", "d", "業", start + timedelta(minutes=3)),
+                ],
+            )
+        ]
+        reports, _ = run_pipeline(shill_posts)
+        self.assertTrue(reports[0].shill_flag)
+        self.assertGreater(reports[0].shill_ratio, 0.0)
+
+    def test_shill_stats_ignores_too_few_comments(self) -> None:
+        posts = [
+            Post(
+                id="few",
+                brand="7-11",
+                product_name="測試",
+                comments=[
+                    Comment("噓", "a", "葉", datetime(2026, 6, 10, 14, 0)),
+                ],
+            )
+        ]
+        ratio, flag = _shill_stats(posts)
+        self.assertFalse(flag)
+        self.assertEqual(ratio, 0.0)
 
 
 if __name__ == "__main__":

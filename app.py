@@ -655,9 +655,10 @@ def _render_rankings(result) -> None:
             "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f"),
             "consensus": st.column_config.TextColumn("共識"),
             "confidence": st.column_config.TextColumn("信心"),
-            "有效樣本": st.column_config.NumberColumn("有效樣本", format="%.2f"),
+            "有效樣本": st.column_config.TextColumn("有效樣本"),
             "n_posts": st.column_config.NumberColumn("貼文數"),
             "n_comments": st.column_config.NumberColumn("留言數"),
+            "業配嫌疑": st.column_config.TextColumn("業配嫌疑"),
             "競品提及": st.column_config.NumberColumn("競品提及"),
             "偏好他牌": st.column_config.NumberColumn("偏好他牌"),
             "提及競品": st.column_config.TextColumn(width="small"),
@@ -694,9 +695,11 @@ def _render_product_card(row: dict[str, Any]) -> None:
     consensus = str(row.get("consensus") or "-")
     confidence = str(row.get("confidence") or "-")
     evidence = str(row.get("資料狀態") or "-")
+    shill_label = str(row.get("業配嫌疑") or "")
     positive_comments = _split_comments(row.get("代表性推"))
     negative_comments = _split_comments(row.get("代表性噓"))
     competitor_brands = str(row.get("提及競品") or "無")
+    shill_badge = f'<span class="pill consensus-neg">⚠ 疑似業配</span>' if shill_label else ""
 
     st.markdown(
         f"""
@@ -709,6 +712,7 @@ def _render_product_card(row: dict[str, Any]) -> None:
                         <span class="pill {_brand_class(brand)}">{escape(brand)}</span>
                         <span class="pill {_consensus_class(consensus)}">共識：{escape(consensus)}</span>
                         <span class="pill consensus-low">信心：{escape(confidence)}</span>
+                        {shill_badge}
                     </div>
                 </div>
                 <div class="score-panel">
@@ -717,7 +721,7 @@ def _render_product_card(row: dict[str, Any]) -> None:
                 </div>
             </div>
             <div class="product-stats">
-                {_mini_stat("有效樣本", _format_decimal(row.get("有效樣本")))}
+                {_mini_stat("有效樣本", escape(str(row.get("有效樣本") or "-")))}
                 {_mini_stat("貼文 / 留言", f'{int(row.get("n_posts") or 0):,} / {int(row.get("n_comments") or 0):,}')}
                 {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}
                 {_mini_stat("資料狀態", evidence)}

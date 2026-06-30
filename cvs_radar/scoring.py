@@ -20,6 +20,7 @@ from .config import (
     PRODUCT_CATEGORIES,
     PRODUCT_NORMALIZATION,
     SCORING,
+    SHILL_DETECTION,
 )
 from .models import Comment, Contributor, Post, ProductReport
 from .preference import AccountProfile
@@ -866,6 +867,35 @@ def _author_pairs(posts: list[Post]) -> tuple[list[tuple[float, float]], list[Co
     return pairs, contributors
 
 
+def _is_shill_comment(text: str) -> bool:
+    """判斷留言是否在喊「業配」。排除茶葉蛋等誤判。"""
+    for fp in SHILL_DETECTION["false_positive_contexts"]:
+        if fp in text:
+            return False
+    for kw in SHILL_DETECTION["keywords"]:
+        if kw in text:
+            return True
+    return False
+
+
+def _shill_stats(posts: list[Post]) -> tuple[float, bool]:
+    """計算貼文群組的業配喊聲比例與是否標記。"""
+    total = 0
+    shill_count = 0
+    for post in posts:
+        for comment in post.comments:
+            if not comment.text.strip():
+                continue
+            total += 1
+            if _is_shill_comment(comment.text):
+                shill_count += 1
+    if total < int(SHILL_DETECTION["min_comments"]):
+        return 0.0, False
+    ratio = shill_count / total
+    flag = ratio >= float(SHILL_DETECTION["ratio_threshold"])
+    return round(ratio, 4), flag
+
+
 def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> ProductReport:
     """計算單一商品彙整分數。"""
     if not posts:
@@ -873,9 +903,15 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
 
     mu0 = float(SCORING["prior_mean"])
     prior_strength = float(SCORING["prior_strength"])
+    shill_ratio, shill_flag = _shill_stats(posts)
+    shill_penalty = float(SHILL_DETECTION["post_weight_penalty"]) if shill_flag else 1.0
+
     author_pairs, author_contributors = _author_pairs(posts)
     commenter_pairs, commenter_contributors = _commenter_pairs(posts, profiles)
     opinion_pairs = author_pairs + commenter_pairs
+
+    if shill_flag and opinion_pairs:
+        opinion_pairs = [(score, weight * shill_penalty) for score, weight in opinion_pairs]
 
     if opinion_pairs:
         weighted_sum = sum(score * weight for score, weight in opinion_pairs)
@@ -919,6 +955,8 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         competitor_mention_count=competitor_mention_count,
         competitor_preference_count=competitor_preference_count,
         competitor_brands=competitor_brands,
+        shill_ratio=shill_ratio,
+        shill_flag=shill_flag,
     )
 
 

@@ -136,6 +136,8 @@ def _report_to_dict(report: ProductReport, internal: bool) -> dict[str, Any]:
             "preferred_other": report.competitor_preference_count,
             "brands": report.competitor_brands,
         },
+        "shill_flag": report.shill_flag,
+        "shill_ratio": report.shill_ratio,
     }
     if internal:
         data["product_key"] = report.product_key
