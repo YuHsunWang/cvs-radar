@@ -700,14 +700,14 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
                 "討論聲量",
             ],
             column_config={
-                "排名": st.column_config.NumberColumn("排名", width="small"),
-                "品牌": st.column_config.TextColumn("品牌", width="small"),
-                "商品": st.column_config.TextColumn("商品"),
-                "價格": st.column_config.NumberColumn("價格", format="%d", width="small"),
-                "分類": st.column_config.TextColumn("分類", width="small"),
-                "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f", width="small"),
-                "consensus": st.column_config.TextColumn("共識", width="small"),
-                "討論聲量": st.column_config.TextColumn("討論聲量", width="small"),
+                "排名": st.column_config.NumberColumn("排名", width="small", disabled=True),
+                "品牌": st.column_config.TextColumn("品牌", width="small", disabled=True),
+                "商品": st.column_config.TextColumn("商品", disabled=True),
+                "價格": st.column_config.NumberColumn("價格", format="%d", width="small", disabled=True),
+                "分類": st.column_config.TextColumn("分類", width="small", disabled=True),
+                "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f", width="small", disabled=True),
+                "consensus": st.column_config.TextColumn("共識", width="small", disabled=True),
+                "討論聲量": st.column_config.TextColumn("討論聲量", width="small", disabled=True),
             },
         )
         selected_idx = _selected_idx_from_dataframe_state(event, fallback_idx=selected_idx, row_count=len(rows))
