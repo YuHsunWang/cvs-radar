@@ -1,4 +1,2 @@
-# 爬蟲資料和算好的結果不進 git
-*.jsonl
-*.json
+# 爬蟲快取不進 git
 !.gitignore
