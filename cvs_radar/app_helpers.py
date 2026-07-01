@@ -128,7 +128,6 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
                 "fair_score": report.fair_score,
                 "consensus": report.consensus,
                 "討論聲量": volume_label(report),
-                "業配嫌疑": "⚠ 疑似業配" if report.shill_flag else "",
                 "競品提及": report.competitor_mention_count,
                 "偏好他牌": report.competitor_preference_count,
                 "提及競品": " / ".join(report.competitor_brands),
@@ -139,12 +138,12 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     return rows
 
 
-_VOLUME_TIER = {"高": "充足", "中": "中等", "低": "偏少"}
+_VOLUME_TIER = {"高": "充足", "中": "中等", "低": "不足"}
 
 
 def volume_label(report: ProductReport) -> str:
     """把資料狀態、有效樣本、貼文/留言數合併成單一討論聲量描述。"""
-    tier = _VOLUME_TIER.get(report.confidence, "偏少")
+    tier = _VOLUME_TIER.get(report.confidence, "不足")
     if report.consensus == "資料不足":
-        tier = "偏少"
-    return f"聲量{tier}·{report.n_posts}篇/{report.n_comments}則·約{round(report.n_eff)}人"
+        tier = "不足"
+    return f"聲量{tier}"

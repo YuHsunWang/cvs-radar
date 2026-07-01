@@ -686,7 +686,6 @@ def _render_rankings(result) -> None:
             "fair_score",
             "consensus",
             "討論聲量",
-            "業配嫌疑",
             "競品提及",
         ],
         column_config={
@@ -695,7 +694,6 @@ def _render_rankings(result) -> None:
             "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f"),
             "consensus": st.column_config.TextColumn("共識"),
             "討論聲量": st.column_config.TextColumn("討論聲量", width="medium"),
-            "業配嫌疑": st.column_config.TextColumn("業配嫌疑"),
             "競品提及": st.column_config.NumberColumn("競品提及"),
         },
     )
@@ -757,11 +755,9 @@ def _product_card_html(row: dict[str, Any]) -> str:
     brand = str(row.get("品牌") or "-")
     consensus = str(row.get("consensus") or "-")
     volume = str(row.get("討論聲量") or "-")
-    shill_label = str(row.get("業配嫌疑") or "")
     positive_comments = _split_comments(row.get("正向留言"))
     negative_comments = _split_comments(row.get("負向留言"))
     competitor_brands = str(row.get("提及競品") or "無")
-    shill_badge = '<span class="pill consensus-neg">疑似業配</span>' if shill_label else ""
 
     return f"""
     <div class="product-card">
@@ -772,7 +768,6 @@ def _product_card_html(row: dict[str, Any]) -> str:
                 <div class="badge-row">
                     <span class="pill {_brand_class(brand)}">{escape(brand)}</span>
                     <span class="pill {_consensus_class(consensus)}">共識：{escape(consensus)}</span>
-                    {shill_badge}
                 </div>
             </div>
             <div class="score-panel">
@@ -816,12 +811,12 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
         """
         <div class="section-head">
             <p class="section-title">帳號概覽</p>
-            <span class="section-note">依可疑分排序，保留信度、品牌互動與標記留言檢視。</span>
+            <span class="section-note">預設只顯示可疑分達門檻的帳號，可調整篩選範圍。</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    min_suspicion = st.slider("最低可疑分", 0.0, 1.0, 0.0, 0.01)
+    min_suspicion = st.slider("最低可疑分", 0.0, 1.0, 0.4, 0.01)
     filtered_profiles = [
         profile for profile in active_profiles if profile.suspicion_score >= min_suspicion
     ]
@@ -832,12 +827,11 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
             "留言數": profile.total_comments,
             "傾向品牌": profile.lean_brand or "-",
             "可疑分": profile.suspicion_score,
-            "信度": profile.credibility,
         }
         for profile in filtered_profiles
     ]
 
-    cols = st.columns(4)
+    cols = st.columns(3)
     with cols[0]:
         _render_kpi("可疑帳號", f"{len(filtered_profiles):,}", "符合目前門檻")
     with cols[1]:
@@ -850,13 +844,6 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
     with cols[2]:
         top_user = filtered_profiles[0].user if filtered_profiles else "-"
         _render_kpi("最高風險帳號", top_user, "依可疑分排序")
-    with cols[3]:
-        avg_credibility = (
-            sum(profile.credibility for profile in filtered_profiles) / len(filtered_profiles)
-            if filtered_profiles
-            else None
-        )
-        _render_kpi("平均信度", _format_decimal(avg_credibility, digits=2), "分數越低越需檢視")
 
     st.dataframe(
         overview_rows,
@@ -865,7 +852,6 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
         column_config={
             "留言數": st.column_config.NumberColumn("留言數"),
             "可疑分": st.column_config.NumberColumn("可疑分", format="%.2f"),
-            "信度": st.column_config.NumberColumn("信度", format="%.2f"),
         },
     )
 
@@ -888,11 +874,10 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
     )
 
     with st.container():
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
         col1.metric("留言數", selected_profile.total_comments)
-        col2.metric("信度", f"{selected_profile.credibility:.2f}")
-        col3.metric("可疑分", f"{selected_profile.suspicion_score:.2f}")
-        col4.metric("傾向品牌", selected_profile.lean_brand or "-")
+        col2.metric("可疑分", f"{selected_profile.suspicion_score:.2f}")
+        col3.metric("傾向品牌", selected_profile.lean_brand or "-")
 
     st.markdown("#### 品牌互動")
     brand_rows = [

@@ -203,6 +203,11 @@ def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> li
     s = re.sub(r"(\d)\$", r"\1", s)
     s = _BRACKET_RE.sub(" ", s)
     s = _strip_brand_keywords(s, brand)
+
+    same_price = _extract_slash_same_price_products(s)
+    if same_price:
+        return same_price
+
     s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
     s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
@@ -268,6 +273,30 @@ def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> li
     if not cleaned:
         cleaned = re.sub(r"\s+", "", s).strip()
     return [(cleaned, None)]
+
+
+_SLASH_SAME_PRICE_RE = re.compile(
+    r"^\s*(?P<names>[^\d/／]+(?:[/／][^\d/／]+)+)\s*[，,]?\s*都\s*(?P<price>\d{2,3})\s*(?:元)?\s*\$?\s*$"
+)
+
+
+def _extract_slash_same_price_products(s: str) -> list[tuple[str, int | None]] | None:
+    """Handle 'A/B都N元' style: multiple products sharing one trailing price."""
+    match = _SLASH_SAME_PRICE_RE.match(s.strip())
+    if not match:
+        return None
+    price = int(match.group("price"))
+    if not (_MIN_PRICE <= price <= _MAX_PRICE):
+        return None
+    segments = re.split(r"[/／]", match.group("names"))
+    results: list[tuple[str, int | None]] = []
+    for segment in segments:
+        name = _NOISE_RE.sub(" ", segment.strip())
+        name = re.sub(r"[，,、]+$", "", name).strip()
+        name = re.sub(r"\s+", "", name).strip()
+        if len(name) >= 2:
+            results.append((name, price))
+    return results if len(results) >= 2 else None
 
 
 def _extract_multiple_price_segments(text: str, brand: str) -> list[tuple[str, int | None]]:
@@ -364,6 +393,42 @@ _GARBAGE_NAME_RE = re.compile(
 )
 
 
+def _name_bigrams(text: str) -> set[str]:
+    chars = re.sub(r"[^\w\u4e00-\u9fff]", "", text)
+    if len(chars) < 2:
+        return {chars} if chars else set()
+    return {chars[i : i + 2] for i in range(len(chars) - 1)}
+
+
+def _route_comments_by_product(comments: list[Comment], names: list[str]) -> list[list[Comment]]:
+    """Route each comment to the split product whose name it distinctly matches.
+
+    Falls back to sharing a comment across all split products when its text
+    does not uniquely single out one product's distinctive name fragments,
+    so ambiguous comments still count (previous behavior) instead of being
+    silently dropped.
+    """
+    bigrams = [_name_bigrams(name) for name in names]
+    distinctive: list[set[str]] = []
+    for i, grams in enumerate(bigrams):
+        others: set[str] = set()
+        for j, other_grams in enumerate(bigrams):
+            if j != i:
+                others |= other_grams
+        distinctive.append(grams - others)
+
+    routed: list[list[Comment]] = [[] for _ in names]
+    for comment in comments:
+        comment_grams = _name_bigrams(comment.text)
+        hits = [i for i, dset in enumerate(distinctive) if dset and (comment_grams & dset)]
+        if len(hits) == 1:
+            routed[hits[0]].append(comment)
+        else:
+            for bucket in routed:
+                bucket.append(comment)
+    return routed
+
+
 def preprocess_posts(posts: list[Post]) -> list[Post]:
     """Split multi-product posts and extract prices."""
     result: list[Post] = []
@@ -372,9 +437,17 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
         if len(items) == 1 and items[0][0] == post.product_name and items[0][1] is None:
             result.append(post)
             continue
-        for name, price in items:
-            if _GARBAGE_NAME_RE.match(name) or len(name) < 2:
-                continue
+        valid_items = [
+            (name, price) for name, price in items
+            if not _GARBAGE_NAME_RE.match(name) and len(name) >= 2
+        ]
+        if len(valid_items) > 1:
+            routed_comments = _route_comments_by_product(
+                post.comments, [name for name, _ in valid_items]
+            )
+        else:
+            routed_comments = [post.comments for _ in valid_items]
+        for (name, price), comments in zip(valid_items, routed_comments):
             new_post = Post(
                 id=f"{post.id}_{_compact_key(name)}" if len(items) > 1 else post.id,
                 source=post.source,
@@ -390,7 +463,7 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
                 posted_at=post.posted_at,
                 is_reply=post.is_reply,
                 push_count=post.push_count,
-                comments=post.comments,
+                comments=comments,
                 raw=post.raw,
             )
             result.append(new_post)
