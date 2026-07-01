@@ -665,30 +665,38 @@ def _render_rankings(result) -> None:
         """
         <div class="section-head">
             <p class="section-title">評分排名</p>
-            <span class="section-note">排序與欄位維持服務層結果，卡片呈現重點訊號。</span>
+            <span class="section-note">點選任一列，即可在下方看到該商品的洞察卡。</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.dataframe(
+    event = st.dataframe(
         rows,
         hide_index=True,
         use_container_width=True,
+        on_select="rerun",
+        selection_mode="single-row",
+        key="ranking_table",
+        column_order=[
+            "排名",
+            "品牌",
+            "商品",
+            "價格",
+            "分類",
+            "fair_score",
+            "consensus",
+            "討論聲量",
+            "業配嫌疑",
+            "競品提及",
+        ],
         column_config={
             "價格": st.column_config.NumberColumn("價格", format="%d"),
             "分類": st.column_config.TextColumn("分類"),
             "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f"),
             "consensus": st.column_config.TextColumn("共識"),
-            "confidence": st.column_config.TextColumn("信心"),
-            "有效樣本": st.column_config.TextColumn("有效樣本"),
-            "n_posts": st.column_config.NumberColumn("貼文數"),
-            "n_comments": st.column_config.NumberColumn("留言數"),
+            "討論聲量": st.column_config.TextColumn("討論聲量", width="medium"),
             "業配嫌疑": st.column_config.TextColumn("業配嫌疑"),
             "競品提及": st.column_config.NumberColumn("競品提及"),
-            "偏好他牌": st.column_config.NumberColumn("偏好他牌"),
-            "提及競品": st.column_config.TextColumn(width="small"),
-            "代表性推": st.column_config.TextColumn(width="medium"),
-            "代表性噓": st.column_config.TextColumn(width="medium"),
         },
     )
 
@@ -698,10 +706,17 @@ def _render_rankings(result) -> None:
     csv = df.to_csv(index=False).encode("utf-8-sig")
     st.download_button("下載 CSV", csv, "cvs_radar_rankings.csv", "text/csv")
 
+    selected_rows = list(event.selection.rows) if event and event.selection else []
     st.markdown("#### 商品洞察卡")
-    with st.expander("商品洞察卡（點擊展開）", expanded=False):
-        cards_html = "\n".join(_product_card_html(row) for row in rows)
-        st.html(f"<style>{_CARD_CSS}</style>\n{cards_html}")
+    if selected_rows:
+        row = rows[selected_rows[0]]
+        st.caption(f"目前檢視：#{row['排名']} {row['商品']}（再次點選表格該列可取消）")
+        st.html(f"<style>{_CARD_CSS}</style>\n{_product_card_html(row)}")
+    else:
+        st.caption("點選上方表格任一列查看單一商品洞察卡，或展開下方檢視全部。")
+        with st.expander("展開全部商品洞察卡", expanded=False):
+            cards_html = "\n".join(_product_card_html(row) for row in rows)
+            st.html(f"<style>{_CARD_CSS}</style>\n{cards_html}")
 
 
 _CARD_CSS = """
@@ -741,11 +756,10 @@ def _product_card_html(row: dict[str, Any]) -> str:
     score_cls = _score_class(score)
     brand = str(row.get("品牌") or "-")
     consensus = str(row.get("consensus") or "-")
-    confidence = str(row.get("confidence") or "-")
-    evidence = str(row.get("資料狀態") or "-")
+    volume = str(row.get("討論聲量") or "-")
     shill_label = str(row.get("業配嫌疑") or "")
-    positive_comments = _split_comments(row.get("代表性推"))
-    negative_comments = _split_comments(row.get("代表性噓"))
+    positive_comments = _split_comments(row.get("正向留言"))
+    negative_comments = _split_comments(row.get("負向留言"))
     competitor_brands = str(row.get("提及競品") or "無")
     shill_badge = '<span class="pill consensus-neg">疑似業配</span>' if shill_label else ""
 
@@ -758,7 +772,6 @@ def _product_card_html(row: dict[str, Any]) -> str:
                 <div class="badge-row">
                     <span class="pill {_brand_class(brand)}">{escape(brand)}</span>
                     <span class="pill {_consensus_class(consensus)}">共識：{escape(consensus)}</span>
-                    <span class="pill consensus-low">信心：{escape(confidence)}</span>
                     {shill_badge}
                 </div>
             </div>
@@ -767,18 +780,15 @@ def _product_card_html(row: dict[str, Any]) -> str:
                 <div class="score-track"><div class="score-fill {score_cls}" style="width:{score_width}%;"></div></div>
             </div>
         </div>
-        <div class="product-stats">
-            {_mini_stat("有效樣本", escape(str(row.get("有效樣本") or "-")))}
-            {_mini_stat("貼文 / 留言", f'{int(row.get("n_posts") or 0):,} / {int(row.get("n_comments") or 0):,}')}
+        <div class="product-stats" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+            {_mini_stat("討論聲量", escape(volume))}
             {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}
-            {_mini_stat("資料狀態", evidence)}
-        </div>
-        <div class="product-stats" style="grid-template-columns: 1fr;">
             {_mini_stat("提及競品", competitor_brands)}
         </div>
-        <div class="comment-grid">
-            {_comment_box("代表性推", positive_comments, "positive")}
-            {_comment_box("代表性噓", negative_comments, "negative")}
+        <div class="comment-title" style="margin-top:0.9rem;font-size:0.92rem;font-weight:780;color:#16202a;">代表性留言</div>
+        <div class="comment-grid" style="margin-top:0.4rem;">
+            {_comment_box("正向", positive_comments, "positive")}
+            {_comment_box("負向", negative_comments, "negative")}
         </div>
     </div>"""
 
@@ -967,7 +977,7 @@ def _mini_stat(label: str, value: object) -> str:
 
 def _comment_box(title: str, comments: list[str], tone: str) -> str:
     css_class = "comment-positive" if tone == "positive" else "comment-negative"
-    fallback = "尚無代表性推文" if tone == "positive" else "尚無代表性噓文"
+    fallback = "尚無正向留言" if tone == "positive" else "尚無負向留言"
     items = comments or [fallback]
     body = "".join(f"<li>{escape(comment)}</li>" for comment in items)
     return (

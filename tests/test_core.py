@@ -995,7 +995,8 @@ class AppHelperTest(unittest.TestCase):
         self.assertTrue(rows)
         self.assertLessEqual(len(rows), 5)
         self.assertIn("fair_score", rows[0])
-        self.assertIn("代表性推", rows[0])
+        self.assertIn("正向留言", rows[0])
+        self.assertIn("討論聲量", rows[0])
 
 
 class ReportingTest(unittest.TestCase):

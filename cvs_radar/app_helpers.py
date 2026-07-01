@@ -127,25 +127,24 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
                 "分類": report.category or "其他",
                 "fair_score": report.fair_score,
                 "consensus": report.consensus,
-                "confidence": report.confidence,
-                "資料狀態": _evidence_note(report.confidence, report.consensus),
-                "有效樣本": f"約 {round(report.n_eff)} 人",
-                "n_posts": report.n_posts,
-                "n_comments": report.n_comments,
+                "討論聲量": volume_label(report),
                 "業配嫌疑": "⚠ 疑似業配" if report.shill_flag else "",
                 "競品提及": report.competitor_mention_count,
                 "偏好他牌": report.competitor_preference_count,
                 "提及競品": " / ".join(report.competitor_brands),
-                "代表性推": " / ".join(report.rep_positive),
-                "代表性噓": " / ".join(report.rep_negative),
+                "正向留言": " / ".join(report.rep_positive),
+                "負向留言": " / ".join(report.rep_negative),
             }
         )
     return rows
 
 
-def _evidence_note(confidence: str, consensus: str) -> str:
-    if confidence == "低" or consensus == "資料不足":
-        return "資料仍少，排名已降權"
-    if confidence == "中":
-        return "樣本量中等"
-    return "樣本量較充足"
+_VOLUME_TIER = {"高": "充足", "中": "中等", "低": "偏少"}
+
+
+def volume_label(report: ProductReport) -> str:
+    """把資料狀態、有效樣本、貼文/留言數合併成單一討論聲量描述。"""
+    tier = _VOLUME_TIER.get(report.confidence, "偏少")
+    if report.consensus == "資料不足":
+        tier = "偏少"
+    return f"聲量{tier}·{report.n_posts}篇/{report.n_comments}則·約{round(report.n_eff)}人"
