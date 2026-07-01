@@ -53,6 +53,12 @@ _PROMO_RE = re.compile(
     r"限時特價|目前特價|原價|特價|價格|售價|價錢|台幣|特惠|促銷|優惠|折扣|"
     r"買就送|滿額|加價購)"
 )
+_BUNDLE_PRICE_SUFFIX_RE = re.compile(
+    r"(?P<count>[2-6])\s*(?P<unit>支|入|個|包|瓶|罐|杯|盒|組|件|份)\s*$"
+)
+_BUNDLE_PRICE_RE = re.compile(
+    r"(?P<count>[2-6])\s*(?P<unit>支|入|個|包|瓶|罐|杯|盒|組|件|份)\s*\$?\s*(?P<total>\d{2,3})\s*(?:元)?"
+)
 _TRAILING_PRICE_RE = re.compile(
     r"^(.+?)\s*(\d{2,3})\s*元?$"
 )
@@ -78,7 +84,8 @@ _QUANTITY_SUFFIX_RE = re.compile(
 )
 _COMMENT_NOISE_RE = re.compile(r"(這款|這個|這品|這次|個人覺得|我覺得|覺得|補充[:：]?|推薦|推推|再推一次)")
 _OFF_TOPIC_COMMENT_RE = re.compile(
-    r"(沒看到|買不到|找不到|缺貨|改名|停產|哪裡有|沒有賣|沒在賣|漲價|降價|調漲|區域限定|限定區)"
+    r"(沒看到|買不到|找不到|缺貨|改名|停產|哪裡有|沒有賣|沒在賣|漲價|降價|調漲|"
+    r"區域限定|限定區|庫存|截圖|圖片|照片|拍照|陰影|謝謝.*分享|感謝.*分享|加碼分享)"
 )
 _PTT_PRODUCT_TEMPLATE = "(區域型商品請註明 試吃試用品請標示價格0元)"
 _URL_RE = re.compile(r"https?://", re.IGNORECASE)
@@ -96,6 +103,8 @@ _SYNONYM_MAP = {
     "芝士": "起司",
     "優格": "優酪",
     "吐司": "土司",
+    "哈蜜瓜": "哈密瓜",
+    "贅澤": "贅沢",
 }
 _DISTINCTIVE_TERMS = {
     "原味",
@@ -106,26 +115,115 @@ _DISTINCTIVE_TERMS = {
     "乳酪",
     "巧克力",
     "可可",
+    "哈密瓜",
+    "芒果",
+    "荔枝",
+    "水蜜桃",
+    "桃",
+    "蘋果",
+    "青蘋果",
+    "木瓜",
+    "香蕉",
+    "奇異果",
+    "火龍果",
+    "鳳梨",
+    "葡萄柚",
+    "葡萄",
+    "柳橙",
+    "橘",
+    "橙",
+    "芭樂",
+    "莓",
     "草莓",
+    "野莓",
+    "蔓越莓",
     "抹茶",
+    "焙茶",
+    "紅茶",
+    "綠茶",
+    "烏龍",
     "咖啡",
     "奶茶",
+    "牛奶",
+    "鮮奶",
+    "優酪",
     "香草",
     "焦糖",
     "蜂蜜",
     "海鹽",
     "檸檬",
+    "柚",
     "藍莓",
     "芋頭",
     "花生",
+    "開心果",
+    "栗子",
+    "榛果",
+    "堅果",
     "芝麻",
     "紅豆",
     "綠豆",
+    "玉米",
     "牛肉",
     "豬肉",
     "雞肉",
     "鮪魚",
     "鮭魚",
+    "椒麻",
+    "麻油",
+    "咖哩",
+    "蒜",
+    "蔥",
+    "辣椒",
+}
+_GENERIC_CATEGORY_KEYWORDS = {
+    "牛奶",
+    "鮮奶",
+    "巧克力",
+    "可可",
+    "草莓",
+    "抹茶",
+    "咖啡",
+    "奶茶",
+    "紅茶",
+    "綠茶",
+    "烏龍",
+    "梅子",
+    "芭樂",
+    "葡萄",
+    "鳳梨",
+    "檸檬",
+    "蘋果",
+    "木瓜",
+    "芒果",
+    "起司",
+    "乳酪",
+    "糖",
+    "捲",
+}
+_CATEGORY_STRONG_KEYWORDS = {
+    "周邊": {"捏捏球", "吊飾", "積木", "置物箱", "盲盒", "杯組", "公仔", "玩具", "文具", "襪套"},
+    "冰品": {"酷聖霜", "霜淇淋", "雪糕", "冰棒", "冰淇淋", "冰沙", "聖代", "甜筒", "酷繽沙", "繽球"},
+    "飲料": {"拿鐵", "咖啡", "奶茶", "紅茶", "綠茶", "烏龍", "豆漿", "果汁", "汽水", "可樂", "啤酒", "氣泡", "檸檬水", "蜜茶", "冬瓜茶", "貝納頌", "光泉", "林鳳營", "瑞穗", "御茶園", "茶裏王", "原萃", "麥茶", "果昔", "冰茶", "水果茶", "龜記", "微醉", "純喫茶", "青茶"},
+    "甜點": {"蛋糕", "泡芙", "布丁", "慕斯", "銅鑼燒", "麻糬", "大福", "鯛魚燒", "甜甜圈", "奶酪", "果凍", "蕨餅", "糰子"},
+    "麵包": {"麵包", "吐司", "土司", "貝果", "餐包", "菠蘿", "可頌", "三明治"},
+    "便當": {"便當", "飯糰", "御飯糰", "炒飯", "燴飯", "丼", "餐盒", "壽司", "捲餅", "燉飯", "涼麵", "雞飯", "鰻魚飯", "豬腳飯"},
+    "零食": {"洋芋片", "餅乾", "軟糖", "脆條", "乖乖", "蝦味先", "科學麵", "米果", "仙貝", "堅果", "果乾", "肉乾", "魷魚絲", "玉米片", "多力多滋", "多利多茲", "樂事", "爆脆捲"},
+    "泡麵": {"泡麵", "速食麵", "杯麵", "碗麵", "拉麵", "一度贊", "來一客", "統一麵", "滿漢"},
+}
+_PRODUCT_FORM_TERMS = {
+    "霜淇淋",
+    "冰淇淋",
+    "雪糕",
+    "冰棒",
+    "冰沙",
+    "甜筒",
+    "麵包",
+    "餅乾",
+    "脆條",
+    "飯糰",
+    "便當",
+    "飲料",
 }
 
 
@@ -208,17 +306,44 @@ def _extract_first_line_with_price_anywhere(lines: list[str], brand: str) -> lis
     can leak stray characters from unrelated promo/quantity lines into the
     name, e.g. '橘貓款冰棒襪套' + '3支冰+19元加購...' -> '橘貓款冰棒襪套冰').
     """
-    first = _extract_products_and_prices_from_text(lines[0], brand)
+    first_index = 0
+    first: list[tuple[str, int | None]] = []
+    for index, line in enumerate(lines):
+        first = _extract_products_and_prices_from_text(line, brand)
+        if first and first[0][0]:
+            first_index = index
+            break
     if not first or not first[0][0]:
         return _extract_products_and_prices_from_text(" ".join(lines), brand)
     name, price = first[0]
     if price is None:
-        for line in lines[1:]:
+        for line in lines[first_index + 1:]:
             found = _best_price_from_text(line)
             if found is not None:
                 price = found
                 break
+            continuation = _name_continuation(line, brand)
+            if continuation and continuation not in name:
+                name = f"{name}{continuation}"
     return [(name, price)]
+
+
+def _name_continuation(line: str, brand: str) -> str:
+    text = unicodedata.normalize("NFKC", line or "").strip()
+    text = re.sub(r"^[：:]+\s*", "", text)
+    if not text or len(text) > 16:
+        return ""
+    if any(pattern.search(text) for pattern in (_URL_RE, _PRICE_TOKEN_RE, _PROMO_RE, _OPTIONAL_RE)):
+        return ""
+    if text == _PTT_PRODUCT_TEMPLATE:
+        return ""
+    parsed = _extract_products_and_prices_from_text(text, brand)
+    if not parsed or parsed[0][1] is not None:
+        return ""
+    name = parsed[0][0]
+    if len(name) < 2 or _is_price_label_name(name):
+        return ""
+    return name
 
 
 def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
@@ -246,7 +371,7 @@ def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> li
     s = re.sub(r"\s+", "", s).strip()
 
     segmented = _extract_multiple_price_segments(s, brand)
-    if len(segmented) >= 2:
+    if len(segmented) >= 2 or (len(segmented) == 1 and _BUNDLE_PRICE_RE.search(s)):
         return segmented
 
     matches = list(_MULTI_PRODUCT_RE.finditer(s))
@@ -373,10 +498,25 @@ def _extract_multiple_price_segments(text: str, brand: str) -> list[tuple[str, i
         start = match.end()
         if not raw_name:
             continue
+        price, raw_name = _bundle_adjusted_price(raw_name, price)
+        if price is None:
+            continue
         name = _clean_extracted_product_name(raw_name, brand)
         if len(name) >= 2 and not _is_price_label_name(name):
             results.append((name, price))
     return results
+
+
+def _bundle_adjusted_price(raw_name: str, price: int) -> tuple[int | None, str]:
+    match = _BUNDLE_PRICE_SUFFIX_RE.search(raw_name)
+    if not match:
+        return price, raw_name
+    count = int(match.group("count"))
+    unit_price = int((price / count) + 0.5)
+    cleaned_name = raw_name[: match.start()].strip()
+    if not (_MIN_PRICE <= unit_price <= _MAX_PRICE):
+        return None, cleaned_name
+    return unit_price, cleaned_name
 
 
 def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
@@ -390,6 +530,7 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
     s = _NOISE_RE.sub(" ", s)
     s = _OPTIONAL_RE.sub(" ", s)
     s = _PROMO_RE.sub(" ", s)
+    s = _PROMO_TAIL_RE.sub(" ", s)
     s = _QUANTITY_SUFFIX_RE.sub("", s).strip()
     s = re.sub(r"\s+", "", s)
     s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
@@ -397,12 +538,27 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
 
 
 def _best_price_from_text(text: str) -> int | None:
-    prices = [
-        int(match.group(1))
-        for match in _PRICE_TOKEN_RE.finditer(text)
-        if _MIN_PRICE <= int(match.group(1)) <= _MAX_PRICE
-    ]
-    return prices[-1] if prices else None
+    bundle_spans: list[tuple[int, int]] = []
+    bundle_prices: list[int] = []
+    for match in _BUNDLE_PRICE_RE.finditer(text):
+        count = int(match.group("count"))
+        total = int(match.group("total"))
+        unit_price = int((total / count) + 0.5)
+        if _MIN_PRICE <= unit_price <= _MAX_PRICE:
+            bundle_prices.append(unit_price)
+            bundle_spans.append(match.span("total"))
+
+    prices: list[int] = []
+    for match in _PRICE_TOKEN_RE.finditer(text):
+        span = match.span(1)
+        if any(start <= span[0] and span[1] <= end for start, end in bundle_spans):
+            continue
+        price = int(match.group(1))
+        if _MIN_PRICE <= price <= _MAX_PRICE:
+            prices.append(price)
+    if prices:
+        return prices[-1]
+    return bundle_prices[-1] if bundle_prices else None
 
 
 def _is_price_context_line(line: str) -> bool:
@@ -436,10 +592,25 @@ def _strip_brand_keywords(text: str, brand: str) -> str:
 def categorize_product(name: str) -> str:
     """Assign a category to a product name based on keyword matching."""
     text = unicodedata.normalize("NFKC", name or "").lower()
-    for category, keywords in PRODUCT_CATEGORIES.items():
-        for kw in keywords:
-            if kw.lower() in text:
-                return category
+    matches: list[tuple[tuple[int, int, int, int], str]] = []
+    for index, (category, keywords) in enumerate(PRODUCT_CATEGORIES.items()):
+        matched = [kw for kw in keywords if kw.lower() in text]
+        if not matched:
+            continue
+        strong = [kw for kw in matched if kw in _CATEGORY_STRONG_KEYWORDS.get(category, set())]
+        specific = [kw for kw in matched if kw not in _GENERIC_CATEGORY_KEYWORDS]
+        score = (
+            len(strong),
+            max((len(kw) for kw in strong), default=0),
+            len(specific),
+            max((len(kw) for kw in specific), default=0),
+            len(matched),
+            -index,
+        )
+        matches.append((score, category))
+    if matches:
+        matches.sort(reverse=True)
+        return matches[0][1]
     return "其他"
 
 
@@ -651,6 +822,8 @@ def _same_product(brand: str, left: str, right: str) -> bool:
         return False
     if _has_distinctive_difference(left_key, right_key):
         return False
+    if _same_combo_flavor_product(left_key, right_key):
+        return True
     ratio = SequenceMatcher(None, left_key, right_key).ratio()
     jaccard = _char_jaccard(left_key, right_key)
     return ratio >= float(PRODUCT_NORMALIZATION["similarity_threshold"]) or jaccard >= float(
@@ -670,6 +843,29 @@ def _has_distinctive_difference(left: str, right: str) -> bool:
         if (term in left) != (term in right):
             return True
     return False
+
+
+def _same_combo_flavor_product(left: str, right: str) -> bool:
+    left_flavors = _matched_flavor_terms(left)
+    right_flavors = _matched_flavor_terms(right)
+    if len(left_flavors) < 2 or left_flavors != right_flavors:
+        return False
+    left_forms = _matched_product_forms(left)
+    right_forms = _matched_product_forms(right)
+    return not left_forms or not right_forms or bool(left_forms & right_forms) or _both_ice_forms(left_forms, right_forms)
+
+
+def _matched_flavor_terms(text: str) -> frozenset[str]:
+    return frozenset(term for term in _DISTINCTIVE_TERMS if term in text)
+
+
+def _matched_product_forms(text: str) -> frozenset[str]:
+    return frozenset(term for term in _PRODUCT_FORM_TERMS if term in text)
+
+
+def _both_ice_forms(left_forms: frozenset[str], right_forms: frozenset[str]) -> bool:
+    ice_forms = {"霜淇淋", "冰淇淋", "雪糕", "冰棒", "冰沙", "甜筒"}
+    return bool(left_forms & ice_forms) and bool(right_forms & ice_forms)
 
 
 def _comment_attribution(post_brand: str, comment: Comment) -> _CommentAttribution:
@@ -997,6 +1193,8 @@ def _commenter_pairs(
                 continue
             if SCORING["exclude_self_push"] and comment.user == post.author:
                 continue
+            if _OFF_TOPIC_COMMENT_RE.search(comment.text):
+                continue
             attribution = _comment_attribution(post.brand, comment)
             if not attribution.include_score or attribution.effective_sentiment is None:
                 continue
@@ -1105,10 +1303,11 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
     ) = _competitor_stats(posts)
     review_excerpt = _load_review_excerpt_overrides().get(product_key) or _review_excerpt(posts)
 
-    prices = [int(p.price) for p in posts if p.price and p.price.isdigit()]
-    price = prices[0] if prices else None
     post_dates = [p.posted_at for p in posts if p.posted_at]
     latest_post_date = max(post_dates) if post_dates else None
+    priced_posts = [p for p in posts if p.price and p.price.isdigit()]
+    latest_priced_post = max(priced_posts, key=lambda p: p.posted_at or datetime.min, default=None)
+    price = int(latest_priced_post.price) if latest_priced_post is not None and latest_priced_post.price else None
     post_urls = sorted({p.url for p in posts if p.url})
 
     return ProductReport(

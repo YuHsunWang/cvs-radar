@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .models import Comment, Contributor, Post, ProductReport
+from .parser import infer_brand
 from .preference import AccountProfile, BrandStat
 
 DEFAULT_STORE_PATH = "data/posts.jsonl"
@@ -58,13 +59,18 @@ def dict_to_post(data: dict) -> Post:
         )
         for c in data.get("comments", [])
     ]
+    raw = data.get("raw") or {}
+    fields = raw.get("fields") if isinstance(raw, dict) else {}
+    vendor = _first_stored_field(fields or {}, "便利商店/廠商名稱", "便利商店", "廠商名稱", "商店")
+    authoritative_brand = infer_brand(vendor or "", data.get("title", ""))
+    brand = authoritative_brand if authoritative_brand != "其他" else data.get("brand", "其他")
     return Post(
         id=data["id"],
         source=data.get("source", "PTT"),
         board=data.get("board", "CVS"),
         url=data.get("url", ""),
         title=data.get("title", ""),
-        brand=data.get("brand", "其他"),
+        brand=brand,
         product_name=data.get("product_name", ""),
         price=data.get("price"),
         author=data.get("author", ""),
@@ -73,9 +79,20 @@ def dict_to_post(data: dict) -> Post:
         posted_at=datetime.fromisoformat(data["posted_at"]) if data.get("posted_at") else None,
         is_reply=data.get("is_reply", False),
         push_count=data.get("push_count"),
-        raw=data.get("raw"),
+        raw=raw,
         comments=comments,
     )
+
+
+def _first_stored_field(fields: dict, *keys: str) -> str | None:
+    for key in keys:
+        compact = "".join(str(key).split())
+        if compact in fields and fields[compact]:
+            return str(fields[compact])
+    for key, value in fields.items():
+        if any(token in str(key) for token in keys) and value:
+            return str(value)
+    return None
 
 
 def save_posts(posts: list[Post], path: str | Path = DEFAULT_STORE_PATH) -> int:

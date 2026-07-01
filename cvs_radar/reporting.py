@@ -138,6 +138,8 @@ def _report_to_dict(report: ProductReport, internal: bool) -> dict[str, Any]:
         },
         "shill_flag": report.shill_flag,
         "shill_ratio": report.shill_ratio,
+        "latest_post_date": report.latest_post_date.isoformat() if report.latest_post_date else None,
+        "post_urls": report.post_urls,
     }
     if internal:
         data["product_key"] = report.product_key

@@ -53,56 +53,53 @@ def main() -> None:
             st.error(f"資料載入失敗：{exc}")
             return
 
-    tab1, tab2 = st.tabs(["商品排名", "帳號信度維運"])
+    filters = _render_ranking_filters(controls["source"], posts, options)
 
-    with tab1:
-        filters = _render_ranking_filters(controls["source"], posts, options)
+    query = build_product_query(
+        brand=filters["selected_brand"],
+        start_date=filters["start_date"],
+        end_date=filters["end_date"],
+        recent_days=filters["recent_days"],
+        min_score=filters["min_score"],
+        min_n_eff=filters["min_n_eff"],
+        min_posts=filters["min_posts"],
+        min_comments=filters["min_comments"],
+        limit=None,
+        internal=False,
+    )
 
-        query = build_product_query(
-            brand=filters["selected_brand"],
-            start_date=filters["start_date"],
-            end_date=filters["end_date"],
-            recent_days=filters["recent_days"],
-            min_score=filters["min_score"],
-            min_n_eff=filters["min_n_eff"],
-            min_posts=filters["min_posts"],
-            min_comments=filters["min_comments"],
-            limit=filters["limit"],
-            internal=False,
-        )
+    try:
+        if reports is not None:
+            result = _query_precomputed_reports(reports, query)
+        else:
+            result = query_products(posts, query)
+    except ValueError as exc:
+        st.error(str(exc))
+        return
 
-        try:
-            if reports is not None:
-                result = _query_precomputed_reports(reports, query)
-            else:
-                result = query_products(posts, query)
-        except ValueError as exc:
-            st.error(str(exc))
-            return
-
-        if filters["selected_category"] != "全部分類":
-            result = ProductQueryResult(
-                filters=result.filters,
-                brands=result.brands,
-                reports=[r for r in result.reports if (r.category or "其他") == filters["selected_category"]],
-            )
-
-        sorted_reports = _sort_reports(result.reports, filters["sort_by"])
+    if filters["selected_category"] != "全部分類":
         result = ProductQueryResult(
             filters=result.filters,
-            brands=brand_summaries_from_reports(sorted_reports),
-            reports=sorted_reports,
+            brands=result.brands,
+            reports=[r for r in result.reports if (r.category or "其他") == filters["selected_category"]],
         )
 
-        _render_summary(result.to_dict(), str(filters["selected_brand"]))
-        selection_key = "|".join(
-            str(filters[k])
-            for k in ("selected_brand", "selected_category", "sort_by", "limit", "start_date", "end_date", "recent_days")
-        )
-        _render_rankings(result, selection_key=selection_key)
+    sorted_reports = _sort_reports(result.reports, filters["sort_by"])
+    sorted_reports = sorted_reports[: int(filters["limit"])]
+    result_filters = dict(result.filters)
+    result_filters["limit"] = filters["limit"]
+    result = ProductQueryResult(
+        filters=result_filters,
+        brands=brand_summaries_from_reports(sorted_reports),
+        reports=sorted_reports,
+    )
 
-    with tab2:
-        _render_account_maintenance(posts, controls, profiles=profiles)
+    _render_summary(result.to_dict(), str(filters["selected_brand"]))
+    selection_key = "|".join(
+        str(filters[k])
+        for k in ("selected_brand", "selected_category", "sort_by", "limit", "start_date", "end_date", "recent_days")
+    )
+    _render_rankings(result, selection_key=selection_key)
 
 
 def _sort_reports(reports: list, sort_by: str) -> list:
@@ -662,7 +659,7 @@ def _render_summary(payload: dict[str, object], selected_brand: str) -> None:
                         <p class="section-title">目前領先商品：{escape(str(top_report.get("product_name", "-")))}</p>
                         <span class="pill {_score_class(top_report.get("fair_score"))}">最高分 {_format_score(top_report.get("fair_score"))}</span>
                     </div>
-                    <div class="section-note">時間模式：{escape(time_label)}；查詢條件可在下方展開檢視。</div>
+                    <div class="section-note">時間模式：{escape(time_label)}；分類與進階篩選已套用後再取筆數上限。</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -677,9 +674,6 @@ def _render_summary(payload: dict[str, object], selected_brand: str) -> None:
                 """,
                 unsafe_allow_html=True,
             )
-
-    with st.expander("目前查詢條件", expanded=False):
-        st.json(_localized_filters(filters))
 
 
 def _render_rankings(result, *, selection_key: str = "") -> None:
@@ -799,6 +793,7 @@ def _product_card_html(row: dict[str, Any]) -> str:
     negative_comments = _split_comments(row.get("負向留言"))
     competitor_brands = str(row.get("提及競品") or "無")
     excerpt = str(row.get("心得節錄") or "").strip()
+    latest_post = str(row.get("最新發文") or "未知")
 
     return f"""
     <div class="product-card">
@@ -818,6 +813,7 @@ def _product_card_html(row: dict[str, Any]) -> str:
         </div>
         {_excerpt_html(excerpt)}
         <div class="product-stats">
+            {_mini_stat("最新發文", latest_post)}
             {_mini_stat("討論聲量", escape(volume))}
             {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}
             {_mini_stat("提及競品", competitor_brands)}

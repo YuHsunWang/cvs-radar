@@ -135,6 +135,7 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
                 "正向留言": " / ".join(report.rep_positive),
                 "負向留言": " / ".join(report.rep_negative),
                 "心得節錄": report.review_excerpt,
+                "最新發文": report.latest_post_date.strftime("%Y-%m-%d") if report.latest_post_date else "",
                 "貼文連結": list(report.post_urls),
             }
         )

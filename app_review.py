@@ -16,7 +16,6 @@ from cvs_radar.app_helpers import (
     product_rows,
 )
 from cvs_radar.pipeline import run_pipeline
-from cvs_radar.reporting import render_suspicion_detail
 from cvs_radar.service import ProductQueryResult, brand_summaries_from_reports, filter_reports, query_products
 
 
@@ -50,7 +49,7 @@ def main() -> None:
             min_n_eff=filters["min_n_eff"],
             min_posts=filters["min_posts"],
             min_comments=filters["min_comments"],
-            limit=filters["limit"],
+            limit=None,
             internal=False,
         )
 
@@ -71,8 +70,11 @@ def main() -> None:
             )
 
         sorted_reports = _sort_reports(result.reports, filters["sort_by"])
+        sorted_reports = sorted_reports[: int(filters["limit"])]
+        result_filters = dict(result.filters)
+        result_filters["limit"] = filters["limit"]
         result = ProductQueryResult(
-            filters=result.filters,
+            filters=result_filters,
             brands=brand_summaries_from_reports(sorted_reports),
             reports=sorted_reports,
         )
@@ -119,13 +121,13 @@ def _inject_css() -> None:
         }
 
         .stApp {
-            background: linear-gradient(180deg, #f7fafc 0%, #eef3f8 260px, #f7fafc 100%);
+            background: #f7fafc;
         }
 
         .block-container {
-            padding-top: 2rem;
+            padding-top: 1rem;
             padding-bottom: 3rem;
-            max-width: 1400px;
+            max-width: 1280px;
         }
 
         section[data-testid="stSidebar"] {
@@ -139,37 +141,37 @@ def _inject_css() -> None:
 
         .dashboard-hero {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: space-between;
             gap: 1.25rem;
-            padding: 1.25rem 0 0.75rem;
+            padding: 0.55rem 0 0.65rem;
             border-bottom: 1px solid rgba(97, 112, 128, 0.18);
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .dashboard-title {
             margin: 0;
             color: var(--cvs-ink);
-            font-size: 2.35rem;
-            line-height: 1.1;
+            font-size: 1.55rem;
+            line-height: 1.2;
             letter-spacing: 0;
             font-weight: 760;
         }
 
         .dashboard-caption {
             color: var(--cvs-muted);
-            margin-top: 0.5rem;
-            font-size: 1rem;
+            margin-top: 0.25rem;
+            font-size: 0.88rem;
         }
 
         .source-chip {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 36px;
-            padding: 0.42rem 0.8rem;
-            border-radius: 999px;
-            background: var(--cvs-blue-bg);
+            min-height: 30px;
+            padding: 0.25rem 0.55rem;
+            border-radius: 6px;
+            background: #ffffff;
             color: #174ea6;
             font-weight: 700;
             border: 1px solid #cfe1ff;
@@ -177,24 +179,24 @@ def _inject_css() -> None:
         }
 
         .kpi-card {
-            min-height: 126px;
-            padding: 1rem 1.05rem;
-            background: rgba(255, 255, 255, 0.94);
+            min-height: 76px;
+            padding: 0.62rem 0.72rem;
+            background: #ffffff;
             border: 1px solid var(--cvs-line);
             border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(22, 32, 42, 0.06);
+            box-shadow: none;
         }
 
         .kpi-label {
             color: var(--cvs-muted);
             font-size: 0.86rem;
             font-weight: 700;
-            margin-bottom: 0.55rem;
+            margin-bottom: 0.25rem;
         }
 
         .kpi-value {
             color: var(--cvs-ink);
-            font-size: 1.78rem;
+            font-size: 1.16rem;
             line-height: 1.1;
             font-weight: 780;
             overflow-wrap: anywhere;
@@ -411,8 +413,36 @@ def _inject_css() -> None:
             background: #ffffff;
             border: 1px solid var(--cvs-line);
             border-radius: 8px;
-            padding: 0.8rem 0.95rem;
-            margin: 0.8rem 0 1.1rem;
+            padding: 0.62rem 0.75rem;
+            margin: 0.65rem 0 0.9rem;
+        }
+
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+            gap: 0.45rem;
+            margin: 0.65rem 0 0.9rem;
+        }
+
+        .summary-item {
+            background: #ffffff;
+            border: 1px solid var(--cvs-line);
+            border-radius: 6px;
+            padding: 0.45rem 0.55rem;
+        }
+
+        .summary-label {
+            color: var(--cvs-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .summary-value {
+            color: var(--cvs-ink);
+            font-size: 0.95rem;
+            font-weight: 760;
+            margin-top: 0.12rem;
+            overflow-wrap: anywhere;
         }
 
         .account-strip {
@@ -454,10 +484,10 @@ def _render_header() -> None:
         """
         <div class="dashboard-hero">
             <div>
-                <h1 class="dashboard-title">CVS Radar 商品評分排名</h1>
-                <div class="dashboard-caption">依時間挑選評論、依品牌挑選商品，並用服務層評分結果排序。</div>
+                <h1 class="dashboard-title">CVS Radar 檢查版</h1>
+                <div class="dashboard-caption">快速查詢商品排名、洞察卡與原始 PTT 來源。</div>
             </div>
-            <div class="source-chip">商品輿情儀表板</div>
+            <div class="source-chip">QA 查詢工具</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -579,17 +609,21 @@ def _render_summary(payload: dict[str, object], selected_brand: str) -> None:
     top_brand = _top_brand_name(brands)
     time_label = "近 N 天" if filters["recent_days"] is not None else "起訖日期/不限"
 
-    cols = st.columns(5)
-    kpis = [
-        ("查詢品牌", selected_brand if selected_brand != ALL_BRANDS else "全部品牌", "目前商品篩選範圍"),
-        ("符合商品", f"{len(reports):,}", f"{len(brands):,} 個品牌命中"),
-        ("平均分數", _format_decimal(avg_score), "篩選後商品平均"),
-        ("熱門品牌", top_brand, "依商品數與貼文數排序"),
-        ("討論量", f"{total_posts:,} / {total_comments:,}", "貼文 / 留言"),
+    items = [
+        ("品牌", selected_brand if selected_brand != ALL_BRANDS else "全部"),
+        ("符合商品", f"{len(reports):,}"),
+        ("平均分數", _format_decimal(avg_score)),
+        ("熱門品牌", top_brand),
+        ("貼文 / 留言", f"{total_posts:,} / {total_comments:,}"),
     ]
-    for col, (label, value, help_text) in zip(cols, kpis):
-        with col:
-            _render_kpi(label, value, help_text)
+    summary_html = "".join(
+        '<div class="summary-item">'
+        f'<div class="summary-label">{escape(label)}</div>'
+        f'<div class="summary-value">{escape(value)}</div>'
+        "</div>"
+        for label, value in items
+    )
+    st.markdown(f'<div class="summary-strip">{summary_html}</div>', unsafe_allow_html=True)
 
     with st.container():
         if top_report is not None:
@@ -600,7 +634,7 @@ def _render_summary(payload: dict[str, object], selected_brand: str) -> None:
                         <p class="section-title">目前領先商品：{escape(str(top_report.get("product_name", "-")))}</p>
                         <span class="pill {_score_class(top_report.get("fair_score"))}">最高分 {_format_score(top_report.get("fair_score"))}</span>
                     </div>
-                    <div class="section-note">時間模式：{escape(time_label)}；查詢條件可在下方展開檢視。</div>
+                    <div class="section-note">時間模式：{escape(time_label)}；分類與進階篩選已套用後再取筆數上限。</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -615,9 +649,6 @@ def _render_summary(payload: dict[str, object], selected_brand: str) -> None:
                 """,
                 unsafe_allow_html=True,
             )
-
-    with st.expander("目前查詢條件", expanded=False):
-        st.json(_localized_filters(filters))
 
 
 def _render_rankings(result, *, selection_key: str = "") -> None:
@@ -681,12 +712,6 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
         )
         selected_idx = _selected_idx_from_dataframe_state(event, fallback_idx=selected_idx, row_count=len(rows))
         st.session_state[state_key] = selected_idx
-
-        import pandas as pd
-
-        df = pd.DataFrame(rows)
-        csv = df.to_csv(index=False).encode("utf-8-sig")
-        st.download_button("下載 CSV", csv, "cvs_radar_rankings.csv", "text/csv")
 
     row = rows[selected_idx]
     with right:
@@ -787,6 +812,7 @@ def _product_card_html(row: dict[str, Any]) -> str:
     competitor_brands = str(row.get("提及競品") or "無")
     excerpt = str(row.get("心得節錄") or "").strip()
     post_urls = [u for u in (row.get("貼文連結") or []) if u]
+    latest_post = str(row.get("最新發文") or "未知")
 
     return f"""
     <div class="product-card">
@@ -806,6 +832,7 @@ def _product_card_html(row: dict[str, Any]) -> str:
         </div>
         {_excerpt_html(excerpt)}
         <div class="product-stats">
+            {_mini_stat("最新發文", latest_post)}
             {_mini_stat("討論聲量", escape(volume))}
             {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}
             {_mini_stat("提及競品", competitor_brands)}
@@ -991,6 +1018,9 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
             "template_like": ("樣板留言", "完全重複或近似樣板留言比例"),
             "burst": ("爆發留言", "同品牌短時間爆發留言比例"),
         }
+        st.info(
+            "可疑分由下列特徵加權而成；值越高代表該帳號越符合單一品牌偏向、極端情緒、樣板化或短時間爆發留言等維運檢查訊號。"
+        )
         feature_rows = [
             {
                 "特徵": label,
@@ -1021,7 +1051,43 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
         if display_posts is None:
             st.info("尚無原始留言資料；請先執行爬取或切換到 stored 模式。")
         else:
-            st.code(render_suspicion_detail(selected_profile, display_posts), language="text")
+            rows = _account_comment_rows(selected_profile.user, display_posts)
+            if not rows:
+                st.info("找不到此帳號在目前原始資料中的留言。")
+            else:
+                st.caption(f"共 {len(rows):,} 則留言；表格顯示完整留言，不只顯示被標記的子集合。")
+                st.dataframe(
+                    rows,
+                    hide_index=True,
+                    use_container_width=True,
+                    column_order=["時間", "品牌", "商品/標題", "留言", "原文"],
+                    column_config={
+                        "時間": st.column_config.TextColumn("時間", width="small"),
+                        "品牌": st.column_config.TextColumn("品牌", width="small"),
+                        "商品/標題": st.column_config.TextColumn("商品/標題", width="medium"),
+                        "留言": st.column_config.TextColumn("留言", width="large"),
+                        "原文": st.column_config.LinkColumn("原文", display_text="PTT"),
+                    },
+                )
+
+
+def _account_comment_rows(user: str, posts) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for post in posts or []:
+        for comment in post.comments:
+            if comment.user != user:
+                continue
+            rows.append(
+                {
+                    "時間": comment.posted_at.strftime("%Y-%m-%d %H:%M") if comment.posted_at else "",
+                    "品牌": post.brand,
+                    "商品/標題": post.product_name or post.title,
+                    "留言": comment.text,
+                    "原文": post.url,
+                }
+            )
+    rows.sort(key=lambda row: str(row["時間"]), reverse=True)
+    return rows
 
 
 def _render_kpi(label: str, value: str, help_text: str) -> None:

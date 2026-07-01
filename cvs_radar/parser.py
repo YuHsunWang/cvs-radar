@@ -20,8 +20,20 @@ def is_product_title(title: str) -> bool:
 
 
 def infer_brand(*texts: str) -> str:
-    """從文字推斷便利商店品牌。"""
-    haystack = " ".join(t for t in texts if t).lower()
+    """從文字推斷便利商店品牌。
+
+    The caller passes vendor, title, then body text. Vendor/title are the
+    authoritative product identity signals; body text is only a fallback because
+    reviews often mention competing stores for comparison.
+    """
+    primary = " ".join(t for t in texts[:2] if t).lower()
+    brand = _infer_brand_from_text(primary)
+    if brand != "其他":
+        return brand
+    return _infer_brand_from_text(" ".join(t for t in texts[2:] if t).lower())
+
+
+def _infer_brand_from_text(haystack: str) -> str:
     for brand, keywords in BRANDS.items():
         for keyword in keywords:
             if keyword.lower() in haystack:
