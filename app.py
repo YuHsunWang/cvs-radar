@@ -477,10 +477,12 @@ def _render_sidebar() -> dict[str, object]:
     with st.sidebar:
         st.header("篩選")
 
+        _source_options = ["results 預算結果（最快）", "demo 離線樣本", "stored 已爬取資料", "crawl PTT CVS"]
+        _default_idx = 0 if load_results_or_none() is not None else 1
         source_label = st.radio(
             "資料來源",
-            ["results 預算結果（最快）", "demo 離線樣本", "stored 已爬取資料", "crawl PTT CVS"],
-            index=0,
+            _source_options,
+            index=_default_idx,
         )
         if source_label.startswith("results"):
             source = "results"
