@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 
+import csv
 import logging
 import os
 import re
+import unicodedata
+from pathlib import Path
 from typing import Protocol
 
 from .config import SENTIMENT
 from .models import Post
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_OVERRIDES_PATH = "data/labels/sentiment_overrides.csv"
 
 POSITIVE_WORDS = {
     "好吃": 1.0,
@@ -234,6 +239,47 @@ def annotate_posts(posts: list[Post]) -> list[Post]:
         for comment in post.comments:
             comment.sentiment = score_comment(comment.tag, comment.text, backend=backend)
             comment.backend = backend.name
+    return posts
+
+
+def _normalize_override_text(text: str) -> str:
+    s = unicodedata.normalize("NFKC", str(text or ""))
+    s = s.replace("\r", " ").replace("\n", " ").replace("\t", " ")
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def load_sentiment_overrides(path: str | Path = DEFAULT_OVERRIDES_PATH) -> dict[str, float]:
+    """載入人工/LLM 覆寫的留言情感分數（文字 -> 分數）。檔案不存在時回傳空字典。"""
+    file_path = Path(path)
+    if not file_path.exists():
+        return {}
+    overrides: dict[str, float] = {}
+    with open(file_path, encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            key = _normalize_override_text(row.get("留言內容", ""))
+            if not key:
+                continue
+            try:
+                overrides[key] = clamp(float(row.get("llm分數", "")))
+            except (TypeError, ValueError):
+                continue
+    return overrides
+
+
+def apply_sentiment_overrides(
+    posts: list[Post], overrides: dict[str, float] | None = None
+) -> list[Post]:
+    """以覆寫表取代留言情感分數；未命中的留言維持原後端分數。"""
+    if overrides is None:
+        overrides = load_sentiment_overrides()
+    if not overrides:
+        return posts
+    for post in posts:
+        for comment in post.comments:
+            key = _normalize_override_text(comment.text)
+            if key in overrides:
+                comment.sentiment = round(overrides[key], 4)
+                comment.backend = "codex"
     return posts
 
 

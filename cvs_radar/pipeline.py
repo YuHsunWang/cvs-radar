@@ -8,7 +8,7 @@ from .filters import filter_posts_by_time
 from .models import Post, ProductReport
 from .preference import AccountProfile, build_profiles
 from .scoring import preprocess_posts, score_all
-from .sentiment import annotate_posts
+from .sentiment import annotate_posts, apply_sentiment_overrides
 
 
 def run_pipeline(
@@ -28,7 +28,7 @@ def run_pipeline(
         now=now,
     )
     preprocessed = preprocess_posts(selected)
-    annotated = annotate_posts(preprocessed)
+    annotated = apply_sentiment_overrides(annotate_posts(preprocessed))
     profiles = build_profiles(annotated)
     reports = score_all(annotated, profiles)
     return reports, profiles
