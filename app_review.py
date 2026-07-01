@@ -637,16 +637,27 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
     )
 
     state_key = f"review_selected_idx::{selection_key}"
+    table_key = f"ranking_table::{selection_key}"
     if state_key not in st.session_state:
         st.session_state[state_key] = 0
     selected_idx = min(int(st.session_state[state_key]), len(rows) - 1)
+    selected_idx = _selected_idx_from_dataframe_state(
+        st.session_state.get(table_key),
+        fallback_idx=selected_idx,
+        row_count=len(rows),
+    )
+    st.session_state[state_key] = selected_idx
 
     left, right = st.columns([2.3, 1])
     with left:
-        st.dataframe(
+        event = st.dataframe(
             rows,
             hide_index=True,
             use_container_width=True,
+            on_select="rerun",
+            selection_mode="single-cell",
+            selection_default={"selection": {"cells": [[selected_idx, "商品"]]}},
+            key=table_key,
             column_order=[
                 "排名",
                 "品牌",
@@ -668,6 +679,8 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
                 "討論聲量": st.column_config.TextColumn("討論聲量", width="small"),
             },
         )
+        selected_idx = _selected_idx_from_dataframe_state(event, fallback_idx=selected_idx, row_count=len(rows))
+        st.session_state[state_key] = selected_idx
 
         import pandas as pd
 
@@ -675,23 +688,48 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
         csv = df.to_csv(index=False).encode("utf-8-sig")
         st.download_button("下載 CSV", csv, "cvs_radar_rankings.csv", "text/csv")
 
-        st.markdown("###### 點選任一排即可切換右側洞察卡")
-        for i, row in enumerate(rows):
-            score_text = _format_score(row.get("fair_score"))
-            label = (
-                f"#{row['排名']} ・ {row['品牌']} ・ {row['商品']} ・ "
-                f"{score_text}分 ・ {row.get('consensus') or '-'}"
-            )
-            button_type = "primary" if i == selected_idx else "secondary"
-            if st.button(label, key=f"row_btn::{selection_key}::{i}", use_container_width=True, type=button_type):
-                st.session_state[state_key] = i
-                selected_idx = i
-
     row = rows[selected_idx]
     with right:
         st.markdown("#### 商品洞察卡")
         st.caption(f"目前檢視：#{row['排名']} {row['商品']}")
         st.html(f"<style>{_CARD_CSS}</style>\n{_product_card_html(row)}")
+
+
+def _selected_idx_from_dataframe_state(event: Any, *, fallback_idx: int, row_count: int) -> int:
+    if not event:
+        return fallback_idx
+    selection = getattr(event, "selection", None)
+    if not selection and isinstance(event, dict):
+        selection = event.get("selection")
+    if not selection:
+        return fallback_idx
+
+    cells = _selection_values(selection, "cells")
+    if cells:
+        first_cell = cells[0]
+        try:
+            selected_idx = int(first_cell[0])
+        except (TypeError, ValueError, IndexError):
+            return fallback_idx
+        if 0 <= selected_idx < row_count:
+            return selected_idx
+
+    rows = _selection_values(selection, "rows")
+    if rows:
+        try:
+            selected_idx = int(rows[0])
+        except (TypeError, ValueError):
+            return fallback_idx
+        if 0 <= selected_idx < row_count:
+            return selected_idx
+
+    return fallback_idx
+
+
+def _selection_values(selection: Any, key: str) -> list:
+    if isinstance(selection, dict):
+        return list(selection.get(key) or [])
+    return list(getattr(selection, key, []) or [])
 
 
 _CARD_CSS = """
