@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from html import escape
 from typing import Any
+from urllib.parse import quote
 
 import streamlit as st
 
@@ -19,28 +20,63 @@ from cvs_radar.app_helpers import (
 from cvs_radar.service import ProductQueryResult, brand_summaries_from_reports, filter_reports, query_products
 
 
-CONSENSUS_ICONS = {
-    "一致好評": ("👍👍👍👍👍", "signal-good"),
-    "褒貶不一": ("👍👍👍👎👎", "signal-mixed"),
-    "評價兩極": ("👍👍⚡👎👎", "signal-polar"),
-    "一致負評": ("👎👎👎👎👎", "signal-bad"),
-    "資料不足": ("▫️▫️▫️▫️▫️", "signal-low"),
+CONSENSUS_SIGNALS = {
+    "一致好評": ("好評明確", "signal-good", ("pos", "pos", "pos", "pos", "pos")),
+    "褒貶不一": ("褒貶不一", "signal-mixed", ("pos", "pos", "pos", "neg", "neg")),
+    "評價兩極": ("兩極分歧", "signal-polar", ("pos", "pos", "split", "neg", "neg")),
+    "一致負評": ("負評明確", "signal-bad", ("neg", "neg", "neg", "neg", "neg")),
+    "資料不足": ("資料不足", "signal-low", ("empty", "empty", "empty", "empty", "empty")),
 }
 
-VOLUME_ICONS = {
-    "聲量充足": ("🔥🔥🔥", "volume-high"),
-    "聲量中等": ("🔥🔥", "volume-mid"),
-    "聲量不足": ("🔥", "volume-low"),
+VOLUME_SIGNALS = {
+    "聲量充足": ("高聲量", "volume-high", 3),
+    "聲量中等": ("中聲量", "volume-mid", 2),
+    "聲量不足": ("低聲量", "volume-low", 1),
 }
 
-# 各超商用不同顏色圓點快速辨識（品牌欄位＝這篇評論所屬的超商，非鋪貨範圍）
-BRAND_BADGES = {
-    "7-11": "🟢",
-    "全家": "🔵",
-    "萊爾富": "🟠",
-    "OK": "🟡",
-    "美聯社": "🟣",
-    "其他": "⚪",
+BRAND_LOGO_SPECS = {
+    "7-11": {
+        "text": "7-11",
+        "bg": "#ffffff",
+        "fg": "#0c6b3c",
+        "border": "#0c6b3c",
+        "bars": ("#0c8f48", "#f58220", "#d71920"),
+    },
+    "全家": {
+        "text": "全家",
+        "bg": "#ffffff",
+        "fg": "#005bac",
+        "border": "#00a650",
+        "bars": ("#005bac", "#00a650", "#005bac"),
+    },
+    "萊爾富": {
+        "text": "HiLife",
+        "bg": "#fff7f5",
+        "fg": "#d71920",
+        "border": "#d71920",
+        "bars": ("#d71920", "#f15a24", "#d71920"),
+    },
+    "OK": {
+        "text": "OK",
+        "bg": "#fff8df",
+        "fg": "#c45f00",
+        "border": "#f4a300",
+        "bars": ("#f4a300", "#ef7d00", "#c45f00"),
+    },
+    "美聯社": {
+        "text": "美聯",
+        "bg": "#f7f1ff",
+        "fg": "#6d2ea0",
+        "border": "#7a3db8",
+        "bars": ("#7a3db8", "#2e9d57", "#7a3db8"),
+    },
+    "其他": {
+        "text": "店",
+        "bg": "#f4f6f8",
+        "fg": "#536170",
+        "border": "#a7b2bf",
+        "bars": ("#a7b2bf", "#c7d0d9", "#a7b2bf"),
+    },
 }
 
 
@@ -268,25 +304,16 @@ def _inject_css() -> None:
             box-shadow: 0 0 0 2px rgba(240, 180, 95, 0.25), 0 10px 26px rgba(26, 35, 47, 0.08);
         }
 
-        /* 架上候選商品：整張卡就是一個按鈕，點任一處即可選取 */
-        [class*="st-key-shelfcard"] button {
-            text-align: left;
-            justify-content: flex-start;
-            align-items: flex-start;
-            height: auto;
-            min-height: 58px;
-            padding: 0.7rem 0.9rem;
-            margin-bottom: 0.1rem;
-            border-radius: 8px;
-            line-height: 1.5;
-            white-space: normal;
-            box-shadow: 0 6px 18px rgba(26, 35, 47, 0.05);
-        }
-
-        [class*="st-key-shelfcard"] button p {
-            text-align: left;
-            width: 100%;
-            font-size: 0.9rem;
+        /*
+         * The shopper shelf uses st.dataframe as a navigational grid: logo
+         * images need ImageColumn, and any selected cell should switch the
+         * right-side product detail. Suppress glide's read-only edit overlay.
+         */
+        div[class*="gdg-d19meir1"],
+        div.gdg-style:has(.gdg-clip-region) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         .tile-grid {
@@ -404,21 +431,51 @@ def _inject_css() -> None:
             font-weight: 760;
         }
 
-        .signal-icons {
-            font-size: 1rem;
+        .signal-value {
+            color: var(--cvs-ink);
+            font-size: 0.9rem;
             line-height: 1;
-            letter-spacing: 0;
             white-space: nowrap;
         }
 
-        .signal-good { background: var(--cvs-green-bg); border-color: #bee8d3; }
-        .signal-mixed { background: var(--cvs-amber-bg); border-color: #ffe0a0; }
-        .signal-polar { background: #fff0df; border-color: #ffd1a8; }
-        .signal-bad { background: var(--cvs-red-bg); border-color: #ffd1cb; }
-        .signal-low { background: #eef2f6; border-color: #dce4ec; opacity: 0.82; }
+        .signal-good { background: var(--cvs-green-bg); border-color: #bee8d3; color: var(--cvs-green); }
+        .signal-mixed { background: var(--cvs-amber-bg); border-color: #ffe0a0; color: var(--cvs-amber); }
+        .signal-polar { background: #fff0df; border-color: #ffd1a8; color: #9a4a00; }
+        .signal-bad { background: var(--cvs-red-bg); border-color: #ffd1cb; color: var(--cvs-red); }
+        .signal-low { background: #eef2f6; border-color: #dce4ec; color: #536170; }
         .volume-high { background: #fff0df; border-color: #ffc98d; }
         .volume-mid { background: #fff5d6; border-color: #ffe4a3; }
         .volume-low { background: #eef2f6; border-color: #dce4ec; }
+
+        .signal-bar,
+        .heat-bar {
+            display: inline-grid;
+            grid-auto-flow: column;
+            gap: 0.16rem;
+            align-items: center;
+        }
+
+        .signal-bar {
+            grid-template-columns: repeat(5, 0.78rem);
+        }
+
+        .signal-seg,
+        .heat-seg {
+            height: 0.42rem;
+            border-radius: 999px;
+            background: #dce4ec;
+        }
+
+        .signal-seg.pos { background: #149066; }
+        .signal-seg.neg { background: #c33329; }
+        .signal-seg.split { background: linear-gradient(90deg, #149066 0 50%, #c33329 50% 100%); }
+        .signal-seg.empty { background: #c7d0d9; }
+
+        .heat-bar {
+            grid-template-columns: repeat(3, 0.7rem);
+        }
+
+        .heat-seg.on { background: #ef7d00; }
 
         .sample-count {
             color: var(--cvs-muted);
@@ -762,8 +819,15 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
         return
 
     state_key = f"shopper_selected_idx::{selection_key}"
+    table_key = f"shopper_table::{selection_key}"
     if state_key not in st.session_state or int(st.session_state[state_key]) >= len(rows):
         st.session_state[state_key] = 0
+    selected_idx = _selected_idx_from_dataframe_state(
+        st.session_state.get(table_key),
+        fallback_idx=min(int(st.session_state[state_key]), len(rows) - 1),
+        row_count=len(rows),
+    )
+    st.session_state[state_key] = selected_idx
 
     shelf_col, detail_col = st.columns([1.08, 0.92], gap="large")
     with shelf_col:
@@ -771,20 +835,34 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
             """
             <div class="shelf-head">
                 <p class="section-title">架上候選商品</p>
-                <span class="section-note">點任一張卡片，右側就會顯示完整心得。</span>
+                <span class="section-note">點任一列的任一格，右側就會顯示完整心得。</span>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        for idx, row in enumerate(rows):
-            selected = idx == int(st.session_state[state_key])
-            if st.button(
-                _product_tile_label(row),
-                key=f"shelfcard_{idx}",
-                use_container_width=True,
-                type="primary" if selected else "secondary",
-            ):
-                st.session_state[state_key] = idx
+        event = st.dataframe(
+            _shopper_table_rows(rows, selected_idx=selected_idx),
+            hide_index=True,
+            use_container_width=True,
+            on_select="rerun",
+            selection_mode="single-cell",
+            key=table_key,
+            row_height=54,
+            height=min(54 * (len(rows) + 1) + 8, 650),
+            column_order=["選取", "商標", "品牌", "商品", "分數", "共識", "聲量", "價格"],
+            column_config={
+                "選取": st.column_config.TextColumn("選取", width="small"),
+                "商標": st.column_config.ImageColumn("商標", width="small"),
+                "品牌": st.column_config.TextColumn("品牌", width="small"),
+                "商品": st.column_config.TextColumn("商品"),
+                "分數": st.column_config.NumberColumn("分數", format="%.0f", width="small"),
+                "共識": st.column_config.TextColumn("共識", width="small"),
+                "聲量": st.column_config.TextColumn("聲量", width="small"),
+                "價格": st.column_config.TextColumn("價格", width="small"),
+            },
+        )
+        selected_idx = _selected_idx_from_dataframe_state(event, fallback_idx=selected_idx, row_count=len(rows))
+        st.session_state[state_key] = selected_idx
 
     selected_idx = int(st.session_state[state_key])
     with detail_col:
@@ -810,22 +888,86 @@ def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     return rows
 
 
-def _product_tile_label(row: dict[str, Any]) -> str:
-    """整張卡片就是一個 st.button 的 label（點任一處即可選取）。"""
-    brand = str(row.get("品牌") or "-")
-    badge = BRAND_BADGES.get(brand, "🏪")
-    name = str(row.get("商品") or "-")
-    score = _format_score(row.get("fair_score"))
-    consensus = str(row.get("consensus") or "資料不足")
-    volume = str(row.get("討論聲量") or "聲量不足")
-    cons_icons = CONSENSUS_ICONS.get(consensus, CONSENSUS_ICONS["資料不足"])[0]
-    vol_icons = VOLUME_ICONS.get(volume, VOLUME_ICONS["聲量不足"])[0]
-    price = _format_price(row.get("價格"))
-    # st.button label 支援 markdown：粗體品名 + 換行後放分數與訊號
-    return (
-        f"{badge} {brand}　**{name}**  \n"
-        f"{score} 分 ·  {cons_icons} ·  {vol_icons} ·  {price}"
+def _shopper_table_rows(rows: list[dict[str, Any]], *, selected_idx: int) -> list[dict[str, Any]]:
+    table_rows = []
+    for idx, row in enumerate(rows):
+        consensus = str(row.get("consensus") or "資料不足")
+        volume = str(row.get("討論聲量") or "聲量不足")
+        table_rows.append(
+            {
+                "選取": "目前" if idx == selected_idx else "",
+                "商標": _brand_logo_data_uri(str(row.get("品牌") or "其他")),
+                "品牌": str(row.get("品牌") or "-"),
+                "商品": str(row.get("商品") or "-"),
+                "分數": _score_value(row.get("fair_score")),
+                "共識": _consensus_signal(consensus)[0],
+                "聲量": _volume_signal(volume)[0],
+                "價格": _format_price(row.get("價格")),
+            }
+        )
+    return table_rows
+
+
+def _brand_logo_data_uri(brand: str) -> str:
+    spec = BRAND_LOGO_SPECS.get(brand, BRAND_LOGO_SPECS["其他"])
+    bars = "".join(
+        f'<rect x="{8 + i * 24}" y="6" width="18" height="4" rx="2" fill="{color}"/>'
+        for i, color in enumerate(spec["bars"])
     )
+    svg = f"""
+    <svg xmlns="http://www.w3.org/2000/svg" width="88" height="36" viewBox="0 0 88 36" role="img" aria-label="{escape(brand)}">
+      <rect x="1" y="1" width="86" height="34" rx="7" fill="{spec["bg"]}" stroke="{spec["border"]}" stroke-width="2"/>
+      {bars}
+      <text x="44" y="25" text-anchor="middle" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="14" font-weight="800" fill="{spec["fg"]}">{escape(str(spec["text"]))}</text>
+    </svg>
+    """
+    return "data:image/svg+xml;utf8," + quote(" ".join(svg.split()))
+
+
+def _score_value(score: object) -> float | None:
+    if score is None:
+        return None
+    try:
+        return float(score)
+    except (TypeError, ValueError):
+        return None
+
+
+def _selected_idx_from_dataframe_state(event: Any, *, fallback_idx: int, row_count: int) -> int:
+    if not event:
+        return fallback_idx
+    selection = getattr(event, "selection", None)
+    if not selection and isinstance(event, dict):
+        selection = event.get("selection")
+    if not selection:
+        return fallback_idx
+
+    cells = _selection_values(selection, "cells")
+    if cells:
+        first_cell = cells[0]
+        try:
+            selected_idx = int(first_cell[0])
+        except (TypeError, ValueError, IndexError):
+            return fallback_idx
+        if 0 <= selected_idx < row_count:
+            return selected_idx
+
+    selected_rows = _selection_values(selection, "rows")
+    if selected_rows:
+        try:
+            selected_idx = int(selected_rows[0])
+        except (TypeError, ValueError):
+            return fallback_idx
+        if 0 <= selected_idx < row_count:
+            return selected_idx
+
+    return fallback_idx
+
+
+def _selection_values(selection: Any, key: str) -> list:
+    if isinstance(selection, dict):
+        return list(selection.get(key) or [])
+    return list(getattr(selection, key, []) or [])
 
 
 def _product_detail_html(row: dict[str, Any]) -> str:
@@ -863,20 +1005,43 @@ def _product_detail_html(row: dict[str, Any]) -> str:
 def _signals_html(row: dict[str, Any]) -> str:
     consensus = str(row.get("consensus") or "資料不足")
     volume = str(row.get("討論聲量") or "聲量不足")
-    consensus_icons, consensus_class = CONSENSUS_ICONS.get(consensus, CONSENSUS_ICONS["資料不足"])
-    volume_icons, volume_class = VOLUME_ICONS.get(volume, VOLUME_ICONS["聲量不足"])
+    consensus_label, consensus_class, consensus_segments = _consensus_signal(consensus)
+    volume_label, volume_class, volume_level = _volume_signal(volume)
     return (
         '<div class="signal-row">'
         f'<span class="signal {consensus_class}" title="共識：{escape(consensus)}">'
         '<span class="signal-label">共識</span>'
-        f'<span class="signal-icons">{escape(consensus_icons)}</span>'
+        f'<span class="signal-value">{escape(consensus_label)}</span>'
+        f'{_signal_bar_html(consensus_segments)}'
         "</span>"
         f'<span class="signal {volume_class}" title="討論聲量：{escape(volume)}">'
         '<span class="signal-label">聲量</span>'
-        f'<span class="signal-icons">{escape(volume_icons)}</span>'
+        f'<span class="signal-value">{escape(volume_label)}</span>'
+        f'{_heat_bar_html(volume_level)}'
         "</span>"
         "</div>"
     )
+
+
+def _consensus_signal(consensus: str) -> tuple[str, str, tuple[str, ...]]:
+    return CONSENSUS_SIGNALS.get(consensus, CONSENSUS_SIGNALS["資料不足"])
+
+
+def _volume_signal(volume: str) -> tuple[str, str, int]:
+    return VOLUME_SIGNALS.get(volume, VOLUME_SIGNALS["聲量不足"])
+
+
+def _signal_bar_html(segments: tuple[str, ...]) -> str:
+    bars = "".join(f'<span class="signal-seg {escape(segment)}"></span>' for segment in segments)
+    return f'<span class="signal-bar" aria-hidden="true">{bars}</span>'
+
+
+def _heat_bar_html(level: int) -> str:
+    bars = "".join(
+        f'<span class="heat-seg{" on" if idx < level else ""}"></span>'
+        for idx in range(3)
+    )
+    return f'<span class="heat-bar" aria-hidden="true">{bars}</span>'
 
 
 def _excerpt_html(excerpt: str) -> str:
