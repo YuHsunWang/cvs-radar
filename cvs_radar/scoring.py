@@ -1089,6 +1089,7 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
     price = prices[0] if prices else None
     post_dates = [p.posted_at for p in posts if p.posted_at]
     latest_post_date = max(post_dates) if post_dates else None
+    post_urls = sorted({p.url for p in posts if p.url})
 
     return ProductReport(
         brand=posts[0].brand,
@@ -1115,6 +1116,7 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         shill_flag=shill_flag,
         latest_post_date=latest_post_date,
         review_excerpt=review_excerpt,
+        post_urls=post_urls,
     )
 
 

@@ -163,6 +163,7 @@ def report_to_store_dict(report: ProductReport) -> dict:
         "competitor_brands": report.competitor_brands,
         "latest_post_date": report.latest_post_date.isoformat() if report.latest_post_date else None,
         "review_excerpt": report.review_excerpt,
+        "post_urls": report.post_urls,
     }
 
 
@@ -200,6 +201,7 @@ def store_dict_to_report(data: dict) -> ProductReport:
         competitor_brands=data.get("competitor_brands", []),
         latest_post_date=datetime.fromisoformat(data["latest_post_date"]) if data.get("latest_post_date") else None,
         review_excerpt=data.get("review_excerpt", ""),
+        post_urls=data.get("post_urls", []),
     )
 
 
