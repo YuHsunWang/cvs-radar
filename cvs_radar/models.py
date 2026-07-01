@@ -77,3 +77,4 @@ class ProductReport:
     shill_ratio: float = 0.0
     shill_flag: bool = False
     latest_post_date: datetime | None = None
+    image_url: str | None = None

@@ -74,6 +74,19 @@ _QUANTITY_SUFFIX_RE = re.compile(
     r"[兩三四五六七八九十\d]+[支個入包瓶罐杯盒組件份]$"
 )
 _COMMENT_NOISE_RE = re.compile(r"(這款|這個|這品|這次|個人覺得|我覺得|覺得|補充[:：]?|推薦|推推|再推一次)")
+_IMAGE_URL_RE = re.compile(
+    r"https?://[^\s\"'<>]+?\.(?:jpg|jpeg|png|gif|webp)",
+    re.IGNORECASE,
+)
+
+
+def _representative_image(posts: list[Post]) -> str | None:
+    """從貼文群組的心得內文取第一張商品圖網址。"""
+    for post in posts:
+        match = _IMAGE_URL_RE.search(post.review_text or "")
+        if match:
+            return match.group(0)
+    return None
 _PTT_PRODUCT_TEMPLATE = "(區域型商品請註明 試吃試用品請標示價格0元)"
 _URL_RE = re.compile(r"https?://", re.IGNORECASE)
 _PRICE_TOKEN_RE = re.compile(r"(?<!\d)(\d{1,3})(?!\d)\s*(?:元|台幣)?")
@@ -962,6 +975,7 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
     price = prices[0] if prices else None
     post_dates = [p.posted_at for p in posts if p.posted_at]
     latest_post_date = max(post_dates) if post_dates else None
+    image_url = _representative_image(posts)
 
     return ProductReport(
         brand=posts[0].brand,
@@ -986,6 +1000,7 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         shill_ratio=shill_ratio,
         shill_flag=shill_flag,
         latest_post_date=latest_post_date,
+        image_url=image_url,
     )
 
 
