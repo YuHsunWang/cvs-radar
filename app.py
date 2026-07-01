@@ -95,13 +95,19 @@ def main() -> None:
         )
 
         _render_summary(result.to_dict(), str(filters["selected_brand"]))
-        _render_rankings(result)
+        selection_key = "|".join(
+            str(filters[k])
+            for k in ("selected_brand", "selected_category", "sort_by", "limit", "start_date", "end_date", "recent_days")
+        )
+        _render_rankings(result, selection_key=selection_key)
 
     with tab2:
         _render_account_maintenance(posts, controls, profiles=profiles)
 
 
 def _sort_reports(reports: list, sort_by: str) -> list:
+    if sort_by == "評分最低":
+        return sorted(reports, key=lambda r: (r.fair_score is None, r.fair_score if r.fair_score is not None else 0.0))
     if sort_by == "最新發文":
         return sorted(reports, key=lambda r: r.latest_post_date or datetime.min, reverse=True)
     if sort_by == "討論最多":
@@ -562,7 +568,7 @@ def _render_ranking_filters(source: object, posts: object, options: list[str]) -
         with filter_cols[2]:
             limit = int(st.number_input("筆數上限", min_value=1, max_value=500, value=20, step=1))
         with filter_cols[3]:
-            sort_by = st.selectbox("排序方式", ["評分最高", "最新發文", "討論最多"], index=0)
+            sort_by = st.selectbox("排序方式", ["評分最高", "評分最低", "最新發文", "討論最多"], index=0)
         with filter_cols[4]:
             with st.popover("進階篩選", use_container_width=True):
                 use_min_score = st.checkbox("啟用最低分", value=False)
@@ -676,7 +682,7 @@ def _render_summary(payload: dict[str, object], selected_brand: str) -> None:
         st.json(_localized_filters(filters))
 
 
-def _render_rankings(result) -> None:
+def _render_rankings(result, *, selection_key: str = "") -> None:
     rows = product_rows(result)
     if not rows:
         st.info("目前條件下沒有符合的商品。請放寬時間、品牌或進階篩選。")
@@ -691,7 +697,7 @@ def _render_rankings(result) -> None:
         """,
         unsafe_allow_html=True,
     )
-    left, right = st.columns([1.7, 1])
+    left, right = st.columns([2.3, 1])
     with left:
         event = st.dataframe(
             rows,
@@ -699,7 +705,7 @@ def _render_rankings(result) -> None:
             use_container_width=True,
             on_select="rerun",
             selection_mode="single-row",
-            key="ranking_table",
+            key=f"ranking_table::{selection_key}",
             column_order=[
                 "排名",
                 "品牌",
@@ -712,15 +718,15 @@ def _render_rankings(result) -> None:
                 "競品提及",
             ],
             column_config={
-                "排名": st.column_config.NumberColumn("排名"),
-                "品牌": st.column_config.TextColumn("品牌"),
-                "商品": st.column_config.TextColumn("商品", width="large"),
-                "價格": st.column_config.NumberColumn("價格", format="%d"),
-                "分類": st.column_config.TextColumn("分類"),
-                "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f"),
-                "consensus": st.column_config.TextColumn("共識"),
-                "討論聲量": st.column_config.TextColumn("討論聲量", width="medium"),
-                "競品提及": st.column_config.NumberColumn("競品提及"),
+                "排名": st.column_config.NumberColumn("排名", width="small"),
+                "品牌": st.column_config.TextColumn("品牌", width="small"),
+                "商品": st.column_config.TextColumn("商品"),
+                "價格": st.column_config.NumberColumn("價格", format="%d", width="small"),
+                "分類": st.column_config.TextColumn("分類", width="small"),
+                "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f", width="small"),
+                "consensus": st.column_config.TextColumn("共識", width="small"),
+                "討論聲量": st.column_config.TextColumn("討論聲量", width="small"),
+                "競品提及": st.column_config.NumberColumn("競品提及", width="small"),
             },
         )
 
@@ -747,24 +753,25 @@ def _render_rankings(result) -> None:
 _CARD_CSS = """
 body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 .product-card { background:#fff; border:1px solid #dce4ec; border-radius:8px; padding:1.05rem; margin-bottom:0.9rem; box-shadow:0 8px 22px rgba(22,32,42,0.055); }
-.product-topline { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:1rem; align-items:start; }
+.product-topline { display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-start; justify-content:space-between; }
+.product-topline > div:first-child { flex:1 1 220px; min-width:0; }
 .product-rank { color:#617080; font-size:0.86rem; font-weight:700; }
 .product-name { color:#16202a; font-size:1.18rem; line-height:1.35; font-weight:760; margin-top:0.2rem; overflow-wrap:anywhere; }
 .badge-row { display:flex; flex-wrap:wrap; gap:0.45rem; margin-top:0.62rem; }
 .pill { display:inline-flex; align-items:center; min-height:28px; padding:0.22rem 0.58rem; border-radius:999px; font-size:0.78rem; font-weight:730; border:1px solid transparent; white-space:nowrap; }
 .brand-badge-0{background:#e9f7f4;color:#0f766e;border-color:#b7ebe2;} .brand-badge-1{background:#edf4ff;color:#1d4ed8;border-color:#cfe1ff;} .brand-badge-2{background:#f3efff;color:#6d28d9;border-color:#ded3ff;} .brand-badge-3{background:#fff4e5;color:#9a5b00;border-color:#ffdca8;} .brand-badge-4{background:#f0f7e8;color:#3f7617;border-color:#d2edb8;} .brand-badge-5{background:#f8eef3;color:#9d174d;border-color:#f3cade;}
 .consensus-good{background:#e8f6ef;color:#12805c;border-color:#bee8d3;} .consensus-mid{background:#fff5d6;color:#9f6b00;border-color:#ffe39a;} .consensus-bad{background:#fff0ed;color:#b42318;border-color:#ffd1cb;} .consensus-low{background:#eef2f6;color:#506070;border-color:#dce4ec;} .consensus-neg{background:#fff0ed;color:#b42318;border-color:#ffd1cb;}
-.score-panel { min-width:132px; text-align:right; }
+.score-panel { flex:0 0 auto; min-width:132px; text-align:right; }
 .score-badge { display:inline-flex; align-items:center; justify-content:center; min-width:80px; min-height:40px; border-radius:999px; color:#fff; font-size:1.08rem; font-weight:800; box-shadow:inset 0 -1px 0 rgba(0,0,0,0.12); }
 .score-green{background:#16a46f;} .score-yellow{background:#d39b12;} .score-red{background:#dc3f31;} .score-empty{background:#7b8794;}
 .pill.score-green,.pill.score-yellow,.pill.score-red,.pill.score-empty{color:#fff;border-color:transparent;}
 .score-track { height:8px; width:132px; border-radius:999px; background:#e8edf3; margin-top:0.5rem; overflow:hidden; margin-left:auto; }
 .score-fill { height:8px; border-radius:999px; }
-.product-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0.65rem; margin-top:1rem; }
+.product-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.65rem; margin-top:1rem; }
 .mini-stat { background:#f7fafc; border:1px solid #e4ebf2; border-radius:8px; padding:0.62rem 0.68rem; }
 .mini-stat-label { color:#617080; font-size:0.74rem; font-weight:700; margin-bottom:0.2rem; }
 .mini-stat-value { color:#16202a; font-size:0.98rem; font-weight:760; overflow-wrap:anywhere; }
-.comment-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.75rem; margin-top:0.9rem; }
+.comment-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem; margin-top:0.9rem; }
 .comment-box { border-radius:8px; padding:0.75rem 0.82rem; min-height:104px; }
 .comment-positive { background:#e8f6ef; border:1px solid #bee8d3; } .comment-negative { background:#fff0ed; border:1px solid #ffd1cb; }
 .comment-title { font-size:0.82rem; font-weight:780; margin-bottom:0.48rem; }
@@ -802,7 +809,7 @@ def _product_card_html(row: dict[str, Any]) -> str:
                 <div class="score-track"><div class="score-fill {score_cls}" style="width:{score_width}%;"></div></div>
             </div>
         </div>
-        <div class="product-stats" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+        <div class="product-stats">
             {_mini_stat("討論聲量", escape(volume))}
             {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}
             {_mini_stat("提及競品", competitor_brands)}
@@ -878,7 +885,7 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
         use_container_width=True,
         on_select="rerun",
         selection_mode="single-row",
-        key="account_table",
+        key=f"account_table::{min_suspicion}",
         column_config={
             "帳號": st.column_config.TextColumn("帳號", width="medium"),
             "留言數": st.column_config.NumberColumn("留言數"),

@@ -74,6 +74,9 @@ _QUANTITY_SUFFIX_RE = re.compile(
     r"[兩三四五六七八九十\d]+[支個入包瓶罐杯盒組件份]$"
 )
 _COMMENT_NOISE_RE = re.compile(r"(這款|這個|這品|這次|個人覺得|我覺得|覺得|補充[:：]?|推薦|推推|再推一次)")
+_OFF_TOPIC_COMMENT_RE = re.compile(
+    r"(沒看到|買不到|找不到|缺貨|改名|停產|哪裡有|沒有賣|沒在賣|漲價|降價|調漲|區域限定|限定區)"
+)
 _PTT_PRODUCT_TEMPLATE = "(區域型商品請註明 試吃試用品請標示價格0元)"
 _URL_RE = re.compile(r"https?://", re.IGNORECASE)
 _PRICE_TOKEN_RE = re.compile(r"(?<!\d)(\d{1,3})(?!\d)\s*(?:元|台幣)?")
@@ -1071,6 +1074,8 @@ def _rep_comments(posts: list[Post], k: int = 3) -> tuple[list[str], list[str]]:
                 continue
             attribution = _comment_attribution(post.brand, comment)
             if not attribution.include_score or attribution.effective_sentiment is None:
+                continue
+            if _OFF_TOPIC_COMMENT_RE.search(comment.text):
                 continue
             text = _clean_representative_comment(post.brand, comment.text)
             if not text:
