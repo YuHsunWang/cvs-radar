@@ -73,7 +73,9 @@ class ProductReport:
     category: str = ""
     competitor_mention_count: int = 0
     competitor_preference_count: int = 0
+    competitor_own_preference_count: int = 0
     competitor_brands: list[str] = field(default_factory=list)
     shill_ratio: float = 0.0
     shill_flag: bool = False
     latest_post_date: datetime | None = None
+    review_excerpt: str = ""

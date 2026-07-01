@@ -132,6 +132,7 @@ class _CommentAttribution:
     effective_sentiment: float | None
     competitor_brands: tuple[str, ...] = ()
     competitor_preference: bool = False
+    own_preference: bool = False
 
 
 def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
@@ -628,7 +629,9 @@ def _comment_attribution(post_brand: str, comment: Comment) -> _CommentAttributi
     if favored == canonical_post_brand:
         positive_floor = float(BRAND_COMPARISON.get("own_brand_positive_floor", 0.4))
         effective = max(sentiment if sentiment is not None else 0.0, positive_floor)
-        return _CommentAttribution(True, effective, other_brands, competitor_preference=False)
+        return _CommentAttribution(
+            True, effective, other_brands, competitor_preference=False, own_preference=True
+        )
 
     return _CommentAttribution(False, sentiment, other_brands, competitor_preference=True)
 
@@ -762,9 +765,10 @@ def _favored_by_nearby_positive(
         return next(iter(closest_brands))
     return None
 
-def _competitor_stats(posts: list[Post]) -> tuple[int, int, list[str]]:
+def _competitor_stats(posts: list[Post]) -> tuple[int, int, int, list[str]]:
     mentioned_count = 0
     preferred_count = 0
+    own_preferred_count = 0
     brand_counter: Counter[str] = Counter()
     for post in posts:
         for comment in post.comments:
@@ -775,8 +779,10 @@ def _competitor_stats(posts: list[Post]) -> tuple[int, int, list[str]]:
             brand_counter.update(attribution.competitor_brands)
             if attribution.competitor_preference:
                 preferred_count += 1
+            elif attribution.own_preference:
+                own_preferred_count += 1
     brands = [brand for brand, _ in sorted(brand_counter.items(), key=lambda item: (-item[1], item[0]))]
-    return mentioned_count, preferred_count, brands
+    return mentioned_count, preferred_count, own_preferred_count, brands
 
 
 def _all_brand_spans(text: str, brands: tuple[str, ...]) -> list[tuple[str, int, int]]:
@@ -1032,7 +1038,13 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
     rep_pos, rep_neg = _rep_comments(posts)
     product_name = representative_product_name(posts)
     product_key = f"{posts[0].brand}:{normalize_product(posts[0].brand, product_name)}"
-    competitor_mention_count, competitor_preference_count, competitor_brands = _competitor_stats(posts)
+    (
+        competitor_mention_count,
+        competitor_preference_count,
+        competitor_own_preference_count,
+        competitor_brands,
+    ) = _competitor_stats(posts)
+    review_excerpt = _review_excerpt(posts)
 
     prices = [int(p.price) for p in posts if p.price and p.price.isdigit()]
     price = prices[0] if prices else None
@@ -1058,11 +1070,49 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         category=categorize_product(product_name),
         competitor_mention_count=competitor_mention_count,
         competitor_preference_count=competitor_preference_count,
+        competitor_own_preference_count=competitor_own_preference_count,
         competitor_brands=competitor_brands,
         shill_ratio=shill_ratio,
         shill_flag=shill_flag,
         latest_post_date=latest_post_date,
+        review_excerpt=review_excerpt,
     )
+
+
+_EXCERPT_DROP_RE = re.compile(
+    r"^\s*(?:https?://|[（(]?區域型商品|試吃試用品|[-—─＝=]{2,}|※|◎|●|▲|Sent from|發信站|文章網址|批踢踢|˙|·)"
+)
+_EXCERPT_LABEL_RE = re.compile(r"^\s*[【\[]?\s*(?:心得|商品名稱|商品|便利商店|廠商名稱|價格|評分|分數|口味)\s*[】\]]?\s*[:：]")
+
+
+def _review_excerpt(posts: list[Post], max_len: int = 120) -> str:
+    """從發文者的心得內文擷取重點句，供選購參考（原文節錄，不改寫）。"""
+    best = max(posts, key=lambda p: len(p.review_text or ""), default=None)
+    if best is None or not (best.review_text or "").strip():
+        return ""
+    text = unicodedata.normalize("NFKC", best.review_text)
+    lines: list[str] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if len(line) < 4:
+            continue
+        if _URL_RE.search(line) or _EXCERPT_DROP_RE.search(line):
+            continue
+        line = _EXCERPT_LABEL_RE.sub("", line).strip()
+        if len(line) < 4:
+            continue
+        lines.append(line)
+    if not lines:
+        return ""
+    excerpt = ""
+    for line in lines:
+        candidate = f"{excerpt} {line}".strip() if excerpt else line
+        if len(candidate) > max_len:
+            if not excerpt:
+                excerpt = line[:max_len].rstrip()
+            break
+        excerpt = candidate
+    return excerpt
 
 
 def _rep_comments(posts: list[Post], k: int = 3) -> tuple[list[str], list[str]]:

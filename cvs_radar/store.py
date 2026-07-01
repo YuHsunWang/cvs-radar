@@ -159,8 +159,10 @@ def report_to_store_dict(report: ProductReport) -> dict:
         "category": report.category,
         "competitor_mention_count": report.competitor_mention_count,
         "competitor_preference_count": report.competitor_preference_count,
+        "competitor_own_preference_count": report.competitor_own_preference_count,
         "competitor_brands": report.competitor_brands,
         "latest_post_date": report.latest_post_date.isoformat() if report.latest_post_date else None,
+        "review_excerpt": report.review_excerpt,
     }
 
 
@@ -194,8 +196,10 @@ def store_dict_to_report(data: dict) -> ProductReport:
         category=data.get("category", ""),
         competitor_mention_count=data.get("competitor_mention_count", 0),
         competitor_preference_count=data.get("competitor_preference_count", 0),
+        competitor_own_preference_count=data.get("competitor_own_preference_count", 0),
         competitor_brands=data.get("competitor_brands", []),
         latest_post_date=datetime.fromisoformat(data["latest_post_date"]) if data.get("latest_post_date") else None,
+        review_excerpt=data.get("review_excerpt", ""),
     )
 
 

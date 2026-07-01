@@ -130,9 +130,11 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
                 "討論聲量": volume_label(report),
                 "競品提及": report.competitor_mention_count,
                 "偏好他牌": report.competitor_preference_count,
+                "偏好本品": report.competitor_own_preference_count,
                 "提及競品": " / ".join(report.competitor_brands),
                 "正向留言": " / ".join(report.rep_positive),
                 "負向留言": " / ".join(report.rep_negative),
+                "心得節錄": report.review_excerpt,
             }
         )
     return rows

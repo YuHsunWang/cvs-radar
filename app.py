@@ -741,13 +741,11 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
         st.markdown("#### 商品洞察卡")
         if selected_rows:
             row = rows[selected_rows[0]]
-            st.caption(f"目前檢視：#{row['排名']} {row['商品']}（再次點選表格該列可取消）")
-            st.html(f"<style>{_CARD_CSS}</style>\n{_product_card_html(row)}")
+            st.caption(f"目前檢視：#{row['排名']} {row['商品']}")
         else:
-            st.info("尚未選取商品。點選左側排名表任一列，即可查看單一商品洞察。")
-            with st.expander("展開全部商品洞察卡", expanded=False):
-                cards_html = "\n".join(_product_card_html(row) for row in rows)
-                st.html(f"<style>{_CARD_CSS}</style>\n{cards_html}")
+            row = rows[0]
+            st.caption(f"預設顯示第 1 名，點左側表格任一列可切換：#{row['排名']} {row['商品']}")
+        st.html(f"<style>{_CARD_CSS}</style>\n{_product_card_html(row)}")
 
 
 _CARD_CSS = """
@@ -778,6 +776,14 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
 .comment-positive .comment-title{color:#12805c;} .comment-negative .comment-title{color:#b42318;}
 .comment-list { margin:0; padding-left:1rem; color:#16202a; font-size:0.88rem; line-height:1.48; }
 .comment-list li { margin-bottom:0.28rem; overflow-wrap:anywhere; }
+.review-excerpt { margin-top:0.9rem; background:#f7fafc; border:1px solid #e4ebf2; border-left:3px solid #2563eb; border-radius:6px; padding:0.6rem 0.75rem; }
+.review-excerpt-title { color:#617080; font-size:0.74rem; font-weight:700; margin-bottom:0.3rem; }
+.review-excerpt-body { color:#16202a; font-size:0.86rem; line-height:1.5; overflow-wrap:anywhere; }
+.competitor-verdict { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem; margin-top:0.75rem; }
+.cv-label { color:#617080; font-size:0.78rem; font-weight:700; }
+.cv-pill { display:inline-flex; align-items:center; padding:0.18rem 0.5rem; border-radius:999px; font-size:0.78rem; font-weight:730; border:1px solid transparent; }
+.cv-win { background:#e8f6ef; color:#12805c; border-color:#bee8d3; }
+.cv-lose { background:#fff0ed; color:#b42318; border-color:#ffd1cb; }
 @media(max-width:900px){ .product-topline{display:block;} .score-panel{text-align:left;margin-top:0.8rem;} .score-track{margin-left:0;} .product-stats,.comment-grid{grid-template-columns:1fr;} }
 """
 
@@ -792,6 +798,7 @@ def _product_card_html(row: dict[str, Any]) -> str:
     positive_comments = _split_comments(row.get("正向留言"))
     negative_comments = _split_comments(row.get("負向留言"))
     competitor_brands = str(row.get("提及競品") or "無")
+    excerpt = str(row.get("心得節錄") or "").strip()
 
     return f"""
     <div class="product-card">
@@ -809,17 +816,44 @@ def _product_card_html(row: dict[str, Any]) -> str:
                 <div class="score-track"><div class="score-fill {score_cls}" style="width:{score_width}%;"></div></div>
             </div>
         </div>
+        {_excerpt_html(excerpt)}
         <div class="product-stats">
             {_mini_stat("討論聲量", escape(volume))}
             {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}
             {_mini_stat("提及競品", competitor_brands)}
         </div>
+        {_competitor_verdict_html(row)}
         <div class="comment-title" style="margin-top:0.9rem;font-size:0.92rem;font-weight:780;color:#16202a;">代表性留言</div>
         <div class="comment-grid" style="margin-top:0.4rem;">
             {_comment_box("正向", positive_comments, "positive")}
             {_comment_box("負向", negative_comments, "negative")}
         </div>
     </div>"""
+
+
+def _excerpt_html(excerpt: str) -> str:
+    if not excerpt:
+        return ""
+    return (
+        '<div class="review-excerpt">'
+        '<div class="review-excerpt-title">原PO心得節錄</div>'
+        f'<div class="review-excerpt-body">{escape(excerpt)}</div>'
+        "</div>"
+    )
+
+
+def _competitor_verdict_html(row: dict[str, Any]) -> str:
+    other = int(row.get("偏好他牌") or 0)
+    own = int(row.get("偏好本品") or 0)
+    if other == 0 and own == 0:
+        return ""
+    return (
+        '<div class="competitor-verdict">'
+        '<span class="cv-label">競品比較</span>'
+        f'<span class="cv-pill cv-win">本品較優 {own}</span>'
+        f'<span class="cv-pill cv-lose">他牌較優 {other}</span>'
+        "</div>"
+    )
 
 
 def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=None) -> None:
