@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import math
 import re
 import unicodedata
@@ -9,6 +10,8 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from difflib import SequenceMatcher
+from functools import lru_cache
+from pathlib import Path
 from statistics import mean
 
 from .config import (
@@ -1080,7 +1083,7 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         competitor_own_preference_count,
         competitor_brands,
     ) = _competitor_stats(posts)
-    review_excerpt = _review_excerpt(posts)
+    review_excerpt = _load_review_excerpt_overrides().get(product_key) or _review_excerpt(posts)
 
     prices = [int(p.price) for p in posts if p.price and p.price.isdigit()]
     price = prices[0] if prices else None
@@ -1119,6 +1122,24 @@ _EXCERPT_DROP_RE = re.compile(
     r"^\s*(?:https?://|[（(]?區域型商品|試吃試用品|[-—─＝=]{2,}|※|◎|●|▲|Sent from|發信站|文章網址|批踢踢|˙|·)"
 )
 _EXCERPT_LABEL_RE = re.compile(r"^\s*[【\[]?\s*(?:心得|商品名稱|商品|便利商店|廠商名稱|價格|評分|分數|口味)\s*[】\]]?\s*[:：]")
+
+DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH = "data/labels/review_excerpt_batch_scored.csv"
+
+
+@lru_cache(maxsize=4)
+def _load_review_excerpt_overrides(path: str = DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH) -> dict[str, str]:
+    """載入 Codex 節錄覆寫表（product_key -> 節錄）。檔案不存在時回傳空字典。"""
+    file_path = Path(path)
+    if not file_path.exists():
+        return {}
+    overrides: dict[str, str] = {}
+    with open(file_path, encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            key = (row.get("product_key") or "").strip()
+            excerpt = (row.get("節錄") or "").strip()
+            if key and excerpt:
+                overrides[key] = excerpt
+    return overrides
 
 
 def _review_excerpt(posts: list[Post], max_len: int = 120) -> str:
