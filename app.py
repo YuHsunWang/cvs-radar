@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import csv
 from datetime import datetime, timedelta
 from html import escape
-from io import StringIO
 from typing import Any
 
 import streamlit as st
@@ -33,6 +31,16 @@ VOLUME_ICONS = {
     "聲量充足": ("🔥🔥🔥", "volume-high"),
     "聲量中等": ("🔥🔥", "volume-mid"),
     "聲量不足": ("🔥", "volume-low"),
+}
+
+# 各超商用不同顏色圓點快速辨識（品牌欄位＝這篇評論所屬的超商，非鋪貨範圍）
+BRAND_BADGES = {
+    "7-11": "🟢",
+    "全家": "🔵",
+    "萊爾富": "🟠",
+    "OK": "🟡",
+    "美聯社": "🟣",
+    "其他": "⚪",
 }
 
 
@@ -258,6 +266,27 @@ def _inject_css() -> None:
         .product-tile.selected {
             border-color: #f0b45f;
             box-shadow: 0 0 0 2px rgba(240, 180, 95, 0.25), 0 10px 26px rgba(26, 35, 47, 0.08);
+        }
+
+        /* 架上候選商品：整張卡就是一個按鈕，點任一處即可選取 */
+        [class*="st-key-shelfcard"] button {
+            text-align: left;
+            justify-content: flex-start;
+            align-items: flex-start;
+            height: auto;
+            min-height: 58px;
+            padding: 0.7rem 0.9rem;
+            margin-bottom: 0.1rem;
+            border-radius: 8px;
+            line-height: 1.5;
+            white-space: normal;
+            box-shadow: 0 6px 18px rgba(26, 35, 47, 0.05);
+        }
+
+        [class*="st-key-shelfcard"] button p {
+            text-align: left;
+            width: 100%;
+            font-size: 0.9rem;
         }
 
         .tile-grid {
@@ -742,24 +771,20 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
             """
             <div class="shelf-head">
                 <p class="section-title">架上候選商品</p>
-                <span class="section-note">先看分數、共識和聲量；點按鈕查看完整心得。</span>
+                <span class="section-note">點任一張卡片，右側就會顯示完整心得。</span>
             </div>
             """,
             unsafe_allow_html=True,
         )
         for idx, row in enumerate(rows):
             selected = idx == int(st.session_state[state_key])
-            st.markdown(_product_tile_html(row, selected=selected), unsafe_allow_html=True)
-            if st.button("看這個商品", key=f"select_product::{selection_key}::{idx}", use_container_width=True):
+            if st.button(
+                _product_tile_label(row),
+                key=f"shelfcard_{idx}",
+                use_container_width=True,
+                type="primary" if selected else "secondary",
+            ):
                 st.session_state[state_key] = idx
-
-        st.download_button(
-            "下載目前清單 CSV",
-            _rows_to_csv(rows),
-            "cvs_radar_products.csv",
-            "text/csv",
-            use_container_width=True,
-        )
 
     selected_idx = int(st.session_state[state_key])
     with detail_col:
@@ -785,30 +810,22 @@ def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     return rows
 
 
-def _product_tile_html(row: dict[str, Any], *, selected: bool) -> str:
-    score = row.get("fair_score")
-    selected_class = " selected" if selected else ""
-    return f"""
-    <div class="product-tile{selected_class}">
-        <div class="tile-grid">
-            <div>
-                <div class="tile-rank">#{escape(str(row.get("排名", "-")))} · {escape(str(row.get("分類") or "其他"))}</div>
-                <div class="tile-name">{escape(str(row.get("商品") or "-"))}</div>
-                <div class="tile-meta">
-                    <span class="pill {_brand_class(str(row.get("品牌") or ""))}">{escape(str(row.get("品牌") or "-"))}</span>
-                    <span class="pill price-pill">{escape(_format_price(row.get("價格")))}</span>
-                    <span class="pill date-pill">更新 {escape(str(row.get("最新發文") or "未知"))}</span>
-                </div>
-                {_signals_html(row)}
-                <div class="sample-count">{_sample_count(row)}</div>
-            </div>
-            <div class="score-block">
-                <div class="score-number {_score_class(score)}">{escape(_format_score(score))}<small>/100</small></div>
-                <div class="score-caption">{escape(_score_label(score))}</div>
-            </div>
-        </div>
-    </div>
-    """
+def _product_tile_label(row: dict[str, Any]) -> str:
+    """整張卡片就是一個 st.button 的 label（點任一處即可選取）。"""
+    brand = str(row.get("品牌") or "-")
+    badge = BRAND_BADGES.get(brand, "🏪")
+    name = str(row.get("商品") or "-")
+    score = _format_score(row.get("fair_score"))
+    consensus = str(row.get("consensus") or "資料不足")
+    volume = str(row.get("討論聲量") or "聲量不足")
+    cons_icons = CONSENSUS_ICONS.get(consensus, CONSENSUS_ICONS["資料不足"])[0]
+    vol_icons = VOLUME_ICONS.get(volume, VOLUME_ICONS["聲量不足"])[0]
+    price = _format_price(row.get("價格"))
+    # st.button label 支援 markdown：粗體品名 + 換行後放分數與訊號
+    return (
+        f"{badge} {brand}　**{name}**  \n"
+        f"{score} 分 ·  {cons_icons} ·  {vol_icons} ·  {price}"
+    )
 
 
 def _product_detail_html(row: dict[str, Any]) -> str:
@@ -917,34 +934,6 @@ def _competitor_html(row: dict[str, Any]) -> str:
     )
 
 
-def _rows_to_csv(rows: list[dict[str, Any]]) -> bytes:
-    output = StringIO()
-    fieldnames = [
-        "排名",
-        "品牌",
-        "商品",
-        "價格",
-        "分類",
-        "fair_score",
-        "consensus",
-        "討論聲量",
-        "貼文數",
-        "留言數",
-        "有效樣本",
-        "競品提及",
-        "偏好本品",
-        "偏好他牌",
-        "正向留言",
-        "負向留言",
-        "心得節錄",
-        "最新發文",
-    ]
-    writer = csv.DictWriter(output, fieldnames=fieldnames, extrasaction="ignore")
-    writer.writeheader()
-    writer.writerows(rows)
-    return output.getvalue().encode("utf-8-sig")
-
-
 def _split_comments(value: object) -> list[str]:
     if value is None:
         return []
@@ -986,18 +975,6 @@ def _score_class(score: object) -> str:
     return "score-bad"
 
 
-def _score_label(score: object) -> str:
-    try:
-        value = float(score)
-    except (TypeError, ValueError):
-        return "資料不足"
-    if value >= 70:
-        return "值得優先看"
-    if value >= 50:
-        return "可以再比較"
-    return "先保守"
-
-
 def _decision_text(score: object) -> str:
     try:
         value = float(score)
@@ -1019,11 +996,6 @@ def _sample_count(row: dict[str, Any]) -> str:
     except (TypeError, ValueError):
         n_eff_text = "-"
     return f"{posts:,} 篇心得 / {comments:,} 則留言，有效樣本 {n_eff_text}"
-
-
-def _brand_class(brand: str) -> str:
-    index = sum(ord(char) for char in brand) % 6
-    return f"brand-badge-{index}"
 
 
 if __name__ == "__main__":
