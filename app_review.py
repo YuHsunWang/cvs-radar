@@ -630,20 +630,23 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
         """
         <div class="section-head">
             <p class="section-title">評分排名</p>
-            <span class="section-note">點選任一列，即可在右側看到該商品的洞察卡。</span>
+            <span class="section-note">下方清單點整排任一處即可切換右側洞察卡。</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+    state_key = f"review_selected_idx::{selection_key}"
+    if state_key not in st.session_state:
+        st.session_state[state_key] = 0
+    selected_idx = min(int(st.session_state[state_key]), len(rows) - 1)
+
     left, right = st.columns([2.3, 1])
     with left:
-        event = st.dataframe(
+        st.dataframe(
             rows,
             hide_index=True,
             use_container_width=True,
-            on_select="rerun",
-            selection_mode="single-row",
-            key=f"ranking_table::{selection_key}",
             column_order=[
                 "排名",
                 "品牌",
@@ -653,7 +656,6 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
                 "fair_score",
                 "consensus",
                 "討論聲量",
-                "競品提及",
             ],
             column_config={
                 "排名": st.column_config.NumberColumn("排名", width="small"),
@@ -664,7 +666,6 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
                 "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f", width="small"),
                 "consensus": st.column_config.TextColumn("共識", width="small"),
                 "討論聲量": st.column_config.TextColumn("討論聲量", width="small"),
-                "競品提及": st.column_config.NumberColumn("競品提及", width="small"),
             },
         )
 
@@ -674,15 +675,22 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
         csv = df.to_csv(index=False).encode("utf-8-sig")
         st.download_button("下載 CSV", csv, "cvs_radar_rankings.csv", "text/csv")
 
-    selected_rows = list(event.selection.rows) if event and event.selection else []
+        st.markdown("###### 點選任一排即可切換右側洞察卡")
+        for i, row in enumerate(rows):
+            score_text = _format_score(row.get("fair_score"))
+            label = (
+                f"#{row['排名']} ・ {row['品牌']} ・ {row['商品']} ・ "
+                f"{score_text}分 ・ {row.get('consensus') or '-'}"
+            )
+            button_type = "primary" if i == selected_idx else "secondary"
+            if st.button(label, key=f"row_btn::{selection_key}::{i}", use_container_width=True, type=button_type):
+                st.session_state[state_key] = i
+                selected_idx = i
+
+    row = rows[selected_idx]
     with right:
         st.markdown("#### 商品洞察卡")
-        if selected_rows:
-            row = rows[selected_rows[0]]
-            st.caption(f"目前檢視：#{row['排名']} {row['商品']}")
-        else:
-            row = rows[0]
-            st.caption(f"預設顯示第 1 名，點左側表格任一列可切換：#{row['排名']} {row['商品']}")
+        st.caption(f"目前檢視：#{row['排名']} {row['商品']}")
         st.html(f"<style>{_CARD_CSS}</style>\n{_product_card_html(row)}")
 
 
