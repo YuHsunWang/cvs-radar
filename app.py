@@ -100,11 +100,26 @@ def main() -> None:
                 reports=[r for r in result.reports if (r.category or "其他") == selected_category],
             )
 
+        sorted_reports = _sort_reports(result.reports, controls["sort_by"])
+        result = ProductQueryResult(
+            filters=result.filters,
+            brands=result.brands,
+            reports=sorted_reports,
+        )
+
         _render_summary(result.to_dict(), selected_brand)
         _render_rankings(result)
 
     with tab2:
         _render_account_maintenance(posts, controls, profiles=profiles)
+
+
+def _sort_reports(reports: list, sort_by: str) -> list:
+    if sort_by == "最新發文":
+        return sorted(reports, key=lambda r: r.latest_post_date or datetime.min, reverse=True)
+    if sort_by == "討論最多":
+        return sorted(reports, key=lambda r: r.n_posts + r.n_comments, reverse=True)
+    return list(reports)
 
 
 def _inject_css() -> None:
@@ -534,6 +549,13 @@ def _render_sidebar() -> dict[str, object]:
             min_comments = int(st.number_input("最少留言", min_value=0, value=0, step=1))
         limit = int(st.number_input("筆數上限", min_value=1, max_value=500, value=20, step=1))
 
+        sort_by = st.radio(
+            "排序方式",
+            ["評分最高", "最新發文", "討論最多"],
+            index=0,
+            horizontal=True,
+        )
+
     return {
         "source": source,
         "crawl_pages": crawl_pages,
@@ -545,6 +567,7 @@ def _render_sidebar() -> dict[str, object]:
         "min_posts": min_posts,
         "min_comments": min_comments,
         "limit": limit,
+        "sort_by": sort_by,
     }
 
 
@@ -675,24 +698,47 @@ def _render_rankings(result) -> None:
     csv = df.to_csv(index=False).encode("utf-8-sig")
     st.download_button("下載 CSV", csv, "cvs_radar_rankings.csv", "text/csv")
 
-    st.markdown(
-        """
-        <div class="section-head">
-            <p class="section-title">商品洞察卡</p>
-            <span class="section-note">分數、共識、品牌與代表留言摘要</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown("#### 商品洞察卡")
     with st.expander("商品洞察卡（點擊展開）", expanded=False):
-        for row in rows:
-            _render_product_card(row)
+        cards_html = "\n".join(_product_card_html(row) for row in rows)
+        st.html(f"<style>{_CARD_CSS}</style>\n{cards_html}")
 
 
-def _render_product_card(row: dict[str, Any]) -> None:
+_CARD_CSS = """
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+.product-card { background:#fff; border:1px solid #dce4ec; border-radius:8px; padding:1.05rem; margin-bottom:0.9rem; box-shadow:0 8px 22px rgba(22,32,42,0.055); }
+.product-topline { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:1rem; align-items:start; }
+.product-rank { color:#617080; font-size:0.86rem; font-weight:700; }
+.product-name { color:#16202a; font-size:1.18rem; line-height:1.35; font-weight:760; margin-top:0.2rem; overflow-wrap:anywhere; }
+.badge-row { display:flex; flex-wrap:wrap; gap:0.45rem; margin-top:0.62rem; }
+.pill { display:inline-flex; align-items:center; min-height:28px; padding:0.22rem 0.58rem; border-radius:999px; font-size:0.78rem; font-weight:730; border:1px solid transparent; white-space:nowrap; }
+.brand-badge-0{background:#e9f7f4;color:#0f766e;border-color:#b7ebe2;} .brand-badge-1{background:#edf4ff;color:#1d4ed8;border-color:#cfe1ff;} .brand-badge-2{background:#f3efff;color:#6d28d9;border-color:#ded3ff;} .brand-badge-3{background:#fff4e5;color:#9a5b00;border-color:#ffdca8;} .brand-badge-4{background:#f0f7e8;color:#3f7617;border-color:#d2edb8;} .brand-badge-5{background:#f8eef3;color:#9d174d;border-color:#f3cade;}
+.consensus-good{background:#e8f6ef;color:#12805c;border-color:#bee8d3;} .consensus-mid{background:#fff5d6;color:#9f6b00;border-color:#ffe39a;} .consensus-bad{background:#fff0ed;color:#b42318;border-color:#ffd1cb;} .consensus-low{background:#eef2f6;color:#506070;border-color:#dce4ec;} .consensus-neg{background:#fff0ed;color:#b42318;border-color:#ffd1cb;}
+.score-panel { min-width:132px; text-align:right; }
+.score-badge { display:inline-flex; align-items:center; justify-content:center; min-width:80px; min-height:40px; border-radius:999px; color:#fff; font-size:1.08rem; font-weight:800; box-shadow:inset 0 -1px 0 rgba(0,0,0,0.12); }
+.score-green{background:#16a46f;} .score-yellow{background:#d39b12;} .score-red{background:#dc3f31;} .score-empty{background:#7b8794;}
+.pill.score-green,.pill.score-yellow,.pill.score-red,.pill.score-empty{color:#fff;border-color:transparent;}
+.score-track { height:8px; width:132px; border-radius:999px; background:#e8edf3; margin-top:0.5rem; overflow:hidden; margin-left:auto; }
+.score-fill { height:8px; border-radius:999px; }
+.product-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0.65rem; margin-top:1rem; }
+.mini-stat { background:#f7fafc; border:1px solid #e4ebf2; border-radius:8px; padding:0.62rem 0.68rem; }
+.mini-stat-label { color:#617080; font-size:0.74rem; font-weight:700; margin-bottom:0.2rem; }
+.mini-stat-value { color:#16202a; font-size:0.98rem; font-weight:760; overflow-wrap:anywhere; }
+.comment-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.75rem; margin-top:0.9rem; }
+.comment-box { border-radius:8px; padding:0.75rem 0.82rem; min-height:104px; }
+.comment-positive { background:#e8f6ef; border:1px solid #bee8d3; } .comment-negative { background:#fff0ed; border:1px solid #ffd1cb; }
+.comment-title { font-size:0.82rem; font-weight:780; margin-bottom:0.48rem; }
+.comment-positive .comment-title{color:#12805c;} .comment-negative .comment-title{color:#b42318;}
+.comment-list { margin:0; padding-left:1rem; color:#16202a; font-size:0.88rem; line-height:1.48; }
+.comment-list li { margin-bottom:0.28rem; overflow-wrap:anywhere; }
+@media(max-width:900px){ .product-topline{display:block;} .score-panel{text-align:left;margin-top:0.8rem;} .score-track{margin-left:0;} .product-stats,.comment-grid{grid-template-columns:1fr;} }
+"""
+
+
+def _product_card_html(row: dict[str, Any]) -> str:
     score = row.get("fair_score")
     score_width = _score_width(score)
-    score_class = _score_class(score)
+    score_cls = _score_class(score)
     brand = str(row.get("品牌") or "-")
     consensus = str(row.get("consensus") or "-")
     confidence = str(row.get("confidence") or "-")
@@ -701,44 +747,40 @@ def _render_product_card(row: dict[str, Any]) -> None:
     positive_comments = _split_comments(row.get("代表性推"))
     negative_comments = _split_comments(row.get("代表性噓"))
     competitor_brands = str(row.get("提及競品") or "無")
-    shill_badge = '<span class="pill consensus-neg">⚠ 疑似業配</span>' if shill_label else ""
+    shill_badge = '<span class="pill consensus-neg">疑似業配</span>' if shill_label else ""
 
-    st.markdown(
-        f"""
-        <div class="product-card">
-            <div class="product-topline">
-                <div>
-                    <div class="product-rank">#{escape(str(row.get("排名", "-")))} 商品排名</div>
-                    <div class="product-name">{escape(str(row.get("商品") or "-"))}</div>
-                    <div class="badge-row">
-                        <span class="pill {_brand_class(brand)}">{escape(brand)}</span>
-                        <span class="pill {_consensus_class(consensus)}">共識：{escape(consensus)}</span>
-                        <span class="pill consensus-low">信心：{escape(confidence)}</span>
-                        {shill_badge}
-                    </div>
-                </div>
-                <div class="score-panel">
-                    <div class="score-badge {score_class}">{escape(_format_score(score))}</div>
-                    <div class="score-track"><div class="score-fill {score_class}" style="width:{score_width}%;"></div></div>
+    return f"""
+    <div class="product-card">
+        <div class="product-topline">
+            <div>
+                <div class="product-rank">#{escape(str(row.get("排名", "-")))} 商品排名</div>
+                <div class="product-name">{escape(str(row.get("商品") or "-"))}</div>
+                <div class="badge-row">
+                    <span class="pill {_brand_class(brand)}">{escape(brand)}</span>
+                    <span class="pill {_consensus_class(consensus)}">共識：{escape(consensus)}</span>
+                    <span class="pill consensus-low">信心：{escape(confidence)}</span>
+                    {shill_badge}
                 </div>
             </div>
-            <div class="product-stats">
-                {_mini_stat("有效樣本", escape(str(row.get("有效樣本") or "-")))}
-                {_mini_stat("貼文 / 留言", f'{int(row.get("n_posts") or 0):,} / {int(row.get("n_comments") or 0):,}')}
-                {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}
-                {_mini_stat("資料狀態", evidence)}
-            </div>
-            <div class="product-stats" style="grid-template-columns: 1fr;">
-                {_mini_stat("提及競品", competitor_brands)}
-            </div>
-            <div class="comment-grid">
-                {_comment_box("代表性推", positive_comments, "positive")}
-                {_comment_box("代表性噓", negative_comments, "negative")}
+            <div class="score-panel">
+                <div class="score-badge {score_cls}">{escape(_format_score(score))}</div>
+                <div class="score-track"><div class="score-fill {score_cls}" style="width:{score_width}%;"></div></div>
             </div>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        <div class="product-stats">
+            {_mini_stat("有效樣本", escape(str(row.get("有效樣本") or "-")))}
+            {_mini_stat("貼文 / 留言", f'{int(row.get("n_posts") or 0):,} / {int(row.get("n_comments") or 0):,}')}
+            {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}
+            {_mini_stat("資料狀態", evidence)}
+        </div>
+        <div class="product-stats" style="grid-template-columns: 1fr;">
+            {_mini_stat("提及競品", competitor_brands)}
+        </div>
+        <div class="comment-grid">
+            {_comment_box("代表性推", positive_comments, "positive")}
+            {_comment_box("代表性噓", negative_comments, "negative")}
+        </div>
+    </div>"""
 
 
 def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=None) -> None:

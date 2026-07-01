@@ -355,7 +355,11 @@ _GARBAGE_NAME_RE = re.compile(
     r"^\d{1,3}$|^unknown$|^任\d|^折後$|^消費滿|^期間|"
     r"^友善時光$|^牧場直送$|.*(?:FMC|系列商品|即期品)|"
     r".*(?:兩件|兩瓶|合購|加購|app|折價券|好康|扣|跨店|指定商品|點數換)|"
-    r"任[0-9二三四五六七八九十]|^\d+元$|^\d+金",
+    r"任[0-9二三四五六七八九十]|^\d+元$|^\d+金|"
+    r"^ps|^配\S{0,3}$|^記得|^最近\S{0,2}$|^大卡$|^OP$|"
+    r"^i珍食|^APP券|^惜福|^555|^36\d{3}|"
+    r".*(?:ibon|票券).*(?:ibon|票券)|"
+    r".{60,}",
     re.IGNORECASE,
 )
 
@@ -418,9 +422,30 @@ def _clean_product_name(brand: str, name: str) -> str:
     s = _PROMO_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
     s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
+    s = _strip_trailing_noise(s)
     for old, new in _SYNONYM_MAP.items():
         s = s.replace(old, new)
     return s or "unknown"
+
+
+_TRAILING_NOISE_CLEAN_RE = re.compile(
+    r"\d{2,3}(?:ibon|\u7968\u5238|[xX\u00d7]|\u6298|\u4ef6|\u9ede|\u74f6|\u676f|\u91d1).*$"
+)
+_TRAILING_PRICE_CLEAN_RE = re.compile(r"\d{1,3}$")
+_TRAILING_FILLER_RE = re.compile(
+    r"(?:\u5617\u9bae\u50f9|\u5690\u9bae\u50f9|\u534a\u50f9|\u55ae\u4ef6|\u50f9|\u90fd|\u4e00|\u7684|\u819b)$"
+)
+
+
+def _strip_trailing_noise(s: str) -> str:
+    s = _TRAILING_NOISE_CLEAN_RE.sub("", s)
+    s = _TRAILING_PRICE_CLEAN_RE.sub("", s)
+    s = _TRAILING_FILLER_RE.sub("", s)
+    if len(s) >= 6:
+        half = len(s) // 2
+        if s[:half] == s[half : half * 2]:
+            s = s[:half]
+    return s
 
 
 def _apply_product_alias(brand: str, cleaned_name: str) -> str:
@@ -935,6 +960,8 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
 
     prices = [int(p.price) for p in posts if p.price and p.price.isdigit()]
     price = prices[0] if prices else None
+    post_dates = [p.posted_at for p in posts if p.posted_at]
+    latest_post_date = max(post_dates) if post_dates else None
 
     return ProductReport(
         brand=posts[0].brand,
@@ -958,6 +985,7 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         competitor_brands=competitor_brands,
         shill_ratio=shill_ratio,
         shill_flag=shill_flag,
+        latest_post_date=latest_post_date,
     )
 
 
