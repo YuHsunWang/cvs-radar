@@ -725,7 +725,6 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
 .product-topline { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:1rem; align-items:start; }
 .product-rank { color:#617080; font-size:0.86rem; font-weight:700; }
 .product-name { color:#16202a; font-size:1.18rem; line-height:1.35; font-weight:760; margin-top:0.2rem; overflow-wrap:anywhere; }
-.product-photo { width:100%; max-height:220px; object-fit:cover; border-radius:8px; border:1px solid #e4ebf2; margin-top:0.9rem; display:block; }
 .badge-row { display:flex; flex-wrap:wrap; gap:0.45rem; margin-top:0.62rem; }
 .pill { display:inline-flex; align-items:center; min-height:28px; padding:0.22rem 0.58rem; border-radius:999px; font-size:0.78rem; font-weight:730; border:1px solid transparent; white-space:nowrap; }
 .brand-badge-0{background:#e9f7f4;color:#0f766e;border-color:#b7ebe2;} .brand-badge-1{background:#edf4ff;color:#1d4ed8;border-color:#cfe1ff;} .brand-badge-2{background:#f3efff;color:#6d28d9;border-color:#ded3ff;} .brand-badge-3{background:#fff4e5;color:#9a5b00;border-color:#ffdca8;} .brand-badge-4{background:#f0f7e8;color:#3f7617;border-color:#d2edb8;} .brand-badge-5{background:#f8eef3;color:#9d174d;border-color:#f3cade;}
@@ -763,14 +762,6 @@ def _product_card_html(row: dict[str, Any]) -> str:
     negative_comments = _split_comments(row.get("負向留言"))
     competitor_brands = str(row.get("提及競品") or "無")
     shill_badge = '<span class="pill consensus-neg">疑似業配</span>' if shill_label else ""
-    image_url = str(row.get("image_url") or "").strip()
-    photo_html = (
-        f'<img class="product-photo" src="{escape(image_url, quote=True)}" '
-        f'loading="lazy" referrerpolicy="no-referrer" '
-        f'onerror="this.style.display=\'none\'" alt="商品照片">'
-        if image_url.startswith("http")
-        else ""
-    )
 
     return f"""
     <div class="product-card">
@@ -789,7 +780,6 @@ def _product_card_html(row: dict[str, Any]) -> str:
                 <div class="score-track"><div class="score-fill {score_cls}" style="width:{score_width}%;"></div></div>
             </div>
         </div>
-        {photo_html}
         <div class="product-stats" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
             {_mini_stat("討論聲量", escape(volume))}
             {_mini_stat("競品提及", f'{int(row.get("競品提及") or 0):,} 則')}

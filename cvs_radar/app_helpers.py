@@ -134,7 +134,6 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
                 "提及競品": " / ".join(report.competitor_brands),
                 "正向留言": " / ".join(report.rep_positive),
                 "負向留言": " / ".join(report.rep_negative),
-                "image_url": report.image_url or "",
             }
         )
     return rows
