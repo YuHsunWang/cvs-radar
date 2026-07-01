@@ -663,6 +663,21 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
             <p class="section-title">評分排名</p>
             <span class="section-note">下方清單點整排任一處即可切換右側洞察卡。</span>
         </div>
+        <style>
+        /*
+         * Streamlit 1.58.0 renders dataframe cells through glide-data-grid.
+         * A read-only dataframe can still open glide's overlay editor on a
+         * double-click; with selection reruns, that portal can remain visible
+         * below the grid. The ranking table is navigational, not editable, so
+         * suppress only the overlay editor while preserving cell selection.
+         */
+        div[class*="gdg-d19meir1"],
+        div.gdg-style:has(.gdg-clip-region) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+        </style>
         """,
         unsafe_allow_html=True,
     )
@@ -687,7 +702,6 @@ def _render_rankings(result, *, selection_key: str = "") -> None:
             use_container_width=True,
             on_select="rerun",
             selection_mode="single-cell",
-            selection_default={"selection": {"cells": [[selected_idx, "商品"]]}},
             key=table_key,
             column_order=[
                 "排名",
