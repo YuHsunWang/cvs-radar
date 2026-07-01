@@ -212,6 +212,10 @@ def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> li
     if same_price:
         return same_price
 
+    shared_flavors = _extract_shared_prefix_flavors(s)
+    if shared_flavors:
+        return shared_flavors
+
     s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
     s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
@@ -298,6 +302,38 @@ def _extract_slash_same_price_products(s: str) -> list[tuple[str, int | None]] |
         name = _NOISE_RE.sub(" ", segment.strip())
         name = re.sub(r"[，,、]+$", "", name).strip()
         name = re.sub(r"\s+", "", name).strip()
+        if len(name) >= 2:
+            results.append((name, price))
+    return results if len(results) >= 2 else None
+
+
+_SHARED_FLAVOR_RE = re.compile(
+    r"(?P<prefix>[^-－/／]{2,}?)[-－]"
+    r"(?P<flavors>[^-－/／]*?、[^-－/／]*?)"
+    r"(?P<marker>雙風味|雙口味|雙口感|兩種口味|兩款口味)"
+)
+
+
+def _extract_shared_prefix_flavors(s: str) -> list[tuple[str, int | None]] | None:
+    """Handle '<共同前綴>-<口味A>、<口味B>雙風味' style: shared prefix over flavors.
+
+    e.g. '乖乖玉米脆條-蘋果牛奶、木瓜牛奶雙風味 / 35元'
+      -> ('乖乖玉米脆條蘋果牛奶風味', 35), ('乖乖玉米脆條木瓜牛奶風味', 35)
+    """
+    match = _SHARED_FLAVOR_RE.search(s)
+    if not match:
+        return None
+    prefix = match.group("prefix").strip()
+    if len(prefix) < 2:
+        return None
+    suffix = "口味" if "口味" in match.group("marker") else "風味"
+    flavors = [f.strip() for f in match.group("flavors").split("、") if f.strip()]
+    if len(flavors) < 2:
+        return None
+    price = _best_price_from_text(s)
+    results: list[tuple[str, int | None]] = []
+    for flavor in flavors:
+        name = re.sub(r"\s+", "", f"{prefix}{flavor}{suffix}")
         if len(name) >= 2:
             results.append((name, price))
     return results if len(results) >= 2 else None
