@@ -44,16 +44,8 @@ def main() -> None:
             posts = load_posts(
                 controls["source"],
                 crawl_pages=controls["crawl_pages"],
-                start_date=controls["start_date"],
-                end_date=controls["end_date"],
-                recent_days=controls["recent_days"],
             )
-            options = brand_options(
-                posts,
-                start_date=controls["start_date"],
-                end_date=controls["end_date"],
-                recent_days=controls["recent_days"],
-            )
+            options = []
         except ValueError as exc:
             st.error(str(exc))
             return
@@ -64,23 +56,18 @@ def main() -> None:
     tab1, tab2 = st.tabs(["商品排名", "帳號信度維運"])
 
     with tab1:
-        col_brand, col_cat = st.columns(2)
-        with col_brand:
-            selected_brand = st.selectbox("品牌", options, index=0)
-        with col_cat:
-            cat_options = ["全部分類", "冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊", "其他"]
-            selected_category = st.selectbox("分類", cat_options, index=0)
+        filters = _render_ranking_filters(controls["source"], posts, options)
 
         query = build_product_query(
-            brand=selected_brand,
-            start_date=controls["start_date"],
-            end_date=controls["end_date"],
-            recent_days=controls["recent_days"],
-            min_score=controls["min_score"],
-            min_n_eff=controls["min_n_eff"],
-            min_posts=controls["min_posts"],
-            min_comments=controls["min_comments"],
-            limit=controls["limit"],
+            brand=filters["selected_brand"],
+            start_date=filters["start_date"],
+            end_date=filters["end_date"],
+            recent_days=filters["recent_days"],
+            min_score=filters["min_score"],
+            min_n_eff=filters["min_n_eff"],
+            min_posts=filters["min_posts"],
+            min_comments=filters["min_comments"],
+            limit=filters["limit"],
             internal=False,
         )
 
@@ -93,21 +80,21 @@ def main() -> None:
             st.error(str(exc))
             return
 
-        if selected_category != "全部分類":
+        if filters["selected_category"] != "全部分類":
             result = ProductQueryResult(
                 filters=result.filters,
                 brands=result.brands,
-                reports=[r for r in result.reports if (r.category or "其他") == selected_category],
+                reports=[r for r in result.reports if (r.category or "其他") == filters["selected_category"]],
             )
 
-        sorted_reports = _sort_reports(result.reports, controls["sort_by"])
+        sorted_reports = _sort_reports(result.reports, filters["sort_by"])
         result = ProductQueryResult(
             filters=result.filters,
-            brands=result.brands,
+            brands=brand_summaries_from_reports(sorted_reports),
             reports=sorted_reports,
         )
 
-        _render_summary(result.to_dict(), selected_brand)
+        _render_summary(result.to_dict(), str(filters["selected_brand"]))
         _render_rankings(result)
 
     with tab2:
@@ -490,75 +477,110 @@ def _render_header() -> None:
 
 def _render_sidebar() -> dict[str, object]:
     with st.sidebar:
-        st.header("篩選")
+        st.header("資料來源")
 
-        _source_options = ["results 預算結果（最快）", "demo 離線樣本", "stored 已爬取資料", "crawl PTT CVS"]
-        _default_idx = 0 if load_results_or_none() is not None else 1
-        source_label = st.radio(
+        labels = {
+            "results": "results 預算結果",
+            "demo": "demo 離線樣本",
+            "stored": "stored 已爬取資料",
+            "crawl": "crawl PTT CVS",
+        }
+        default_source = "results" if load_results_or_none() is not None else "demo"
+        source = st.segmented_control(
             "資料來源",
-            _source_options,
-            index=_default_idx,
+            options=list(labels),
+            default=default_source,
+            format_func=lambda value: labels[str(value)],
         )
-        if source_label.startswith("results"):
-            source = "results"
-        elif source_label.startswith("demo"):
-            source = "demo"
-        elif source_label.startswith("stored"):
-            source = "stored"
-        else:
-            source = "crawl"
+        source = str(source or default_source)
+
         crawl_pages = 5
-        if source == "results":
-            loaded = load_results_or_none()
-            if loaded is not None:
-                loaded_reports, loaded_profiles = loaded
-                st.info(f"已載入 {len(loaded_reports)} 份商品結果 / {len(loaded_profiles)} 個帳號")
-        if source == "stored":
-            from cvs_radar.store import store_stats
+        with st.popover("來源設定", use_container_width=True):
+            if source == "results":
+                loaded = load_results_or_none()
+                if loaded is not None:
+                    loaded_reports, loaded_profiles = loaded
+                    st.info(f"已載入 {len(loaded_reports)} 份商品結果 / {len(loaded_profiles)} 個帳號")
+                else:
+                    st.warning("尚無預算結果，將無法使用 results 模式。")
+            elif source == "stored":
+                from cvs_radar.store import store_stats
 
-            stats = store_stats()
-            st.info(f"已載入 {stats['post_count']} 篇文 / {stats['comment_count']} 則留言")
-        if source == "crawl":
-            st.warning("crawl 會連線到 PTT；demo 不會連網。")
-            crawl_pages = int(st.number_input("PTT 頁數", min_value=1, max_value=50, value=5, step=1))
-
-        time_mode = st.radio("時間選擇", ["近 N 天", "起訖日期"], horizontal=True)
-        recent_days = None
-        start_date = None
-        end_date = None
-        if time_mode == "近 N 天":
-            recent_days = int(st.number_input("近 N 天", min_value=0, max_value=3650, value=30, step=1))
-        else:
-            today = datetime.now().date()
-            default_start = today - timedelta(days=30)
-            start_date = st.date_input("起始日期", value=default_start)
-            end_date = st.date_input("結束日期", value=today)
-
-        with st.expander("進階篩選", expanded=False):
-            use_min_score = st.checkbox("啟用最低分", value=False)
-            min_score = None
-            if use_min_score:
-                min_score = float(st.number_input("最低分數", min_value=0.0, max_value=100.0, value=60.0, step=1.0))
-
-            use_min_n_eff = st.checkbox("啟用最低有效樣本", value=False)
-            min_n_eff = None
-            if use_min_n_eff:
-                min_n_eff = float(st.number_input("最低有效樣本值", min_value=0.0, value=1.0, step=0.5))
-
-            min_posts = int(st.number_input("最少貼文", min_value=0, value=0, step=1))
-            min_comments = int(st.number_input("最少留言", min_value=0, value=0, step=1))
-        limit = int(st.number_input("筆數上限", min_value=1, max_value=500, value=20, step=1))
-
-        sort_by = st.radio(
-            "排序方式",
-            ["評分最高", "最新發文", "討論最多"],
-            index=0,
-            horizontal=True,
-        )
+                stats = store_stats()
+                st.info(f"已載入 {stats['post_count']} 篇文 / {stats['comment_count']} 則留言")
+            elif source == "crawl":
+                st.warning("crawl 會連線到 PTT；demo 不會連網。")
+                crawl_pages = int(st.number_input("PTT 頁數", min_value=1, max_value=50, value=5, step=1))
+            else:
+                st.info("使用內建離線樣本，不會連網。")
 
     return {
         "source": source,
         "crawl_pages": crawl_pages,
+    }
+
+
+def _render_ranking_filters(source: object, posts: object, options: list[str]) -> dict[str, object]:
+    source_name = str(source)
+    with st.container(border=True):
+        st.markdown("##### 商品篩選")
+        recent_days = None
+        start_date = None
+        end_date = None
+
+        if source_name == "results":
+            st.info("results 模式顯示已預先計算的快照，不支援時間篩選；以下排名會套用品牌、分類與進階條件。")
+        else:
+            time_mode_col, time_value_col = st.columns([1, 2])
+            with time_mode_col:
+                time_mode = st.radio("時間選擇", ["近 N 天", "起訖日期"], horizontal=True)
+            with time_value_col:
+                if time_mode == "近 N 天":
+                    recent_days = int(st.number_input("近 N 天", min_value=0, max_value=3650, value=30, step=1))
+                else:
+                    today = datetime.now().date()
+                    default_start = today - timedelta(days=30)
+                    date_cols = st.columns(2)
+                    with date_cols[0]:
+                        start_date = st.date_input("起始日期", value=default_start)
+                    with date_cols[1]:
+                        end_date = st.date_input("結束日期", value=today)
+
+            options = brand_options(
+                posts,
+                start_date=start_date,
+                end_date=end_date,
+                recent_days=recent_days,
+            )
+
+        cat_options = ["全部分類", "冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊", "其他"]
+        filter_cols = st.columns([1.2, 1.1, 0.9, 1.1, 0.8])
+        with filter_cols[0]:
+            selected_brand = st.selectbox("品牌", options, index=0)
+        with filter_cols[1]:
+            selected_category = st.selectbox("分類", cat_options, index=0)
+        with filter_cols[2]:
+            limit = int(st.number_input("筆數上限", min_value=1, max_value=500, value=20, step=1))
+        with filter_cols[3]:
+            sort_by = st.selectbox("排序方式", ["評分最高", "最新發文", "討論最多"], index=0)
+        with filter_cols[4]:
+            with st.popover("進階篩選", use_container_width=True):
+                use_min_score = st.checkbox("啟用最低分", value=False)
+                min_score = None
+                if use_min_score:
+                    min_score = float(st.number_input("最低分數", min_value=0.0, max_value=100.0, value=60.0, step=1.0))
+
+                use_min_n_eff = st.checkbox("啟用最低有效樣本", value=False)
+                min_n_eff = None
+                if use_min_n_eff:
+                    min_n_eff = float(st.number_input("最低有效樣本值", min_value=0.0, value=1.0, step=0.5))
+
+                min_posts = int(st.number_input("最少貼文", min_value=0, value=0, step=1))
+                min_comments = int(st.number_input("最少留言", min_value=0, value=0, step=1))
+
+    return {
+        "selected_brand": selected_brand,
+        "selected_category": selected_category,
         "recent_days": recent_days,
         "start_date": start_date,
         "end_date": end_date,
@@ -593,9 +615,8 @@ def _query_precomputed_reports(reports, query) -> ProductQueryResult:
             "min_comments": query.min_comments,
             "limit": query.limit,
             "internal": query.internal,
-            "note": "precomputed results 不支援時間篩選，顯示全部已計算結果",
         },
-        brands=brand_summaries_from_reports(reports),
+        brands=brand_summaries_from_reports(filtered),
         reports=filtered,
     )
 
@@ -665,56 +686,62 @@ def _render_rankings(result) -> None:
         """
         <div class="section-head">
             <p class="section-title">評分排名</p>
-            <span class="section-note">點選任一列，即可在下方看到該商品的洞察卡。</span>
+            <span class="section-note">點選任一列，即可在右側看到該商品的洞察卡。</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    event = st.dataframe(
-        rows,
-        hide_index=True,
-        use_container_width=True,
-        on_select="rerun",
-        selection_mode="single-row",
-        key="ranking_table",
-        column_order=[
-            "排名",
-            "品牌",
-            "商品",
-            "價格",
-            "分類",
-            "fair_score",
-            "consensus",
-            "討論聲量",
-            "競品提及",
-        ],
-        column_config={
-            "價格": st.column_config.NumberColumn("價格", format="%d"),
-            "分類": st.column_config.TextColumn("分類"),
-            "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f"),
-            "consensus": st.column_config.TextColumn("共識"),
-            "討論聲量": st.column_config.TextColumn("討論聲量", width="medium"),
-            "競品提及": st.column_config.NumberColumn("競品提及"),
-        },
-    )
+    left, right = st.columns([1.7, 1])
+    with left:
+        event = st.dataframe(
+            rows,
+            hide_index=True,
+            use_container_width=True,
+            on_select="rerun",
+            selection_mode="single-row",
+            key="ranking_table",
+            column_order=[
+                "排名",
+                "品牌",
+                "商品",
+                "價格",
+                "分類",
+                "fair_score",
+                "consensus",
+                "討論聲量",
+                "競品提及",
+            ],
+            column_config={
+                "排名": st.column_config.NumberColumn("排名"),
+                "品牌": st.column_config.TextColumn("品牌"),
+                "商品": st.column_config.TextColumn("商品", width="large"),
+                "價格": st.column_config.NumberColumn("價格", format="%d"),
+                "分類": st.column_config.TextColumn("分類"),
+                "fair_score": st.column_config.NumberColumn("公平分數", format="%.1f"),
+                "consensus": st.column_config.TextColumn("共識"),
+                "討論聲量": st.column_config.TextColumn("討論聲量", width="medium"),
+                "競品提及": st.column_config.NumberColumn("競品提及"),
+            },
+        )
 
-    import pandas as pd
+        import pandas as pd
 
-    df = pd.DataFrame(rows)
-    csv = df.to_csv(index=False).encode("utf-8-sig")
-    st.download_button("下載 CSV", csv, "cvs_radar_rankings.csv", "text/csv")
+        df = pd.DataFrame(rows)
+        csv = df.to_csv(index=False).encode("utf-8-sig")
+        st.download_button("下載 CSV", csv, "cvs_radar_rankings.csv", "text/csv")
 
     selected_rows = list(event.selection.rows) if event and event.selection else []
-    st.markdown("#### 商品洞察卡")
-    if selected_rows:
-        row = rows[selected_rows[0]]
-        st.caption(f"目前檢視：#{row['排名']} {row['商品']}（再次點選表格該列可取消）")
-        st.html(f"<style>{_CARD_CSS}</style>\n{_product_card_html(row)}")
-    else:
-        st.caption("點選上方表格任一列查看單一商品洞察卡，或展開下方檢視全部。")
-        with st.expander("展開全部商品洞察卡", expanded=False):
-            cards_html = "\n".join(_product_card_html(row) for row in rows)
-            st.html(f"<style>{_CARD_CSS}</style>\n{cards_html}")
+    with right:
+        st.markdown("#### 商品洞察卡")
+        if selected_rows:
+            row = rows[selected_rows[0]]
+            st.caption(f"目前檢視：#{row['排名']} {row['商品']}（再次點選表格該列可取消）")
+            st.html(f"<style>{_CARD_CSS}</style>\n{_product_card_html(row)}")
+        else:
+            st.info("尚未選取商品。點選左側排名表任一列，即可查看單一商品洞察。")
+            with st.expander("展開全部商品洞察卡", expanded=False):
+                cards_html = "\n".join(_product_card_html(row) for row in rows)
+                st.html(f"<style>{_CARD_CSS}</style>\n{cards_html}")
 
 
 _CARD_CSS = """
@@ -793,9 +820,9 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
         try:
             _, profiles = run_pipeline(
                 posts,
-                start_date=controls["start_date"],
-                end_date=controls["end_date"],
-                recent_days=controls["recent_days"],
+                start_date=controls.get("start_date"),
+                end_date=controls.get("end_date"),
+                recent_days=controls.get("recent_days"),
             )
         except ValueError as exc:
             st.error(str(exc))
@@ -845,12 +872,17 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
         top_user = filtered_profiles[0].user if filtered_profiles else "-"
         _render_kpi("最高風險帳號", top_user, "依可疑分排序")
 
-    st.dataframe(
+    event = st.dataframe(
         overview_rows,
         hide_index=True,
         use_container_width=True,
+        on_select="rerun",
+        selection_mode="single-row",
+        key="account_table",
         column_config={
+            "帳號": st.column_config.TextColumn("帳號", width="medium"),
             "留言數": st.column_config.NumberColumn("留言數"),
+            "傾向品牌": st.column_config.TextColumn("傾向品牌"),
             "可疑分": st.column_config.NumberColumn("可疑分", format="%.2f"),
         },
     )
@@ -859,83 +891,93 @@ def _render_account_maintenance(posts, controls: dict[str, object], *, profiles=
         st.info("目前條件下沒有達活動量門檻且符合最低可疑分的帳號。")
         return
 
+    selected_rows = list(event.selection.rows) if event and event.selection else []
+    if not selected_rows:
+        st.info("點選上方帳號表任一列，查看品牌互動、特徵分數與被標記留言。")
+        return
+
     st.markdown(
         """
         <div class="section-head">
             <p class="section-title">帳號明細</p>
-            <span class="section-note">檢視品牌互動、特徵分數與被標記留言。</span>
+            <span class="section-note">點選表格列切換檢視帳號。</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    selected_user = st.selectbox("選擇帳號", [profile.user for profile in filtered_profiles])
-    selected_profile = next(
-        profile for profile in filtered_profiles if profile.user == selected_user
-    )
+    selected_profile = filtered_profiles[selected_rows[0]]
+    st.caption(f"目前檢視：{selected_profile.user}")
 
-    with st.container():
+    overview_tab, features_tab, comments_tab = st.tabs(["總覽", "特徵", "留言"])
+
+    with overview_tab:
         col1, col2, col3 = st.columns(3)
         col1.metric("留言數", selected_profile.total_comments)
         col2.metric("可疑分", f"{selected_profile.suspicion_score:.2f}")
         col3.metric("傾向品牌", selected_profile.lean_brand or "-")
 
-    st.markdown("#### 品牌互動")
-    brand_rows = [
-        {
-            "品牌": brand,
-            "留言數": stat.count,
-            "平均情感": stat.avg_sentiment,
-        }
-        for brand, stat in sorted(
-            selected_profile.brand_stats.items(),
-            key=lambda item: (-item[1].count, item[0]),
+        st.markdown("#### 品牌互動")
+        brand_rows = [
+            {
+                "品牌": brand,
+                "留言數": stat.count,
+                "平均情感": stat.avg_sentiment,
+            }
+            for brand, stat in sorted(
+                selected_profile.brand_stats.items(),
+                key=lambda item: (-item[1].count, item[0]),
+            )
+        ]
+        st.dataframe(
+            brand_rows,
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "品牌": st.column_config.TextColumn("品牌"),
+                "留言數": st.column_config.NumberColumn("留言數"),
+                "平均情感": st.column_config.NumberColumn("平均情感", format="%.2f"),
+            },
         )
-    ]
-    st.dataframe(
-        brand_rows,
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "留言數": st.column_config.NumberColumn("留言數"),
-            "平均情感": st.column_config.NumberColumn("平均情感", format="%.2f"),
-        },
-    )
 
-    st.markdown("#### 特徵明細")
-    explanations = {
-        "one_sided": ("單一品牌偏向", "偏向單一品牌正面、競品負面的程度"),
-        "single_brand": ("單一品牌集中", "留言集中在單一品牌的程度"),
-        "extreme": ("極端情感", "極端情感留言比例"),
-        "template_like": ("樣板留言", "完全重複或近似樣板留言比例"),
-        "burst": ("爆發留言", "同品牌短時間爆發留言比例"),
-    }
-    feature_rows = [
-        {
-            "特徵": label,
-            "值": selected_profile.suspicion_features.get(name, 0.0),
-            "說明": explanation,
+    with features_tab:
+        explanations = {
+            "one_sided": ("單一品牌偏向", "偏向單一品牌正面、競品負面的程度"),
+            "single_brand": ("單一品牌集中", "留言集中在單一品牌的程度"),
+            "extreme": ("極端情感", "極端情感留言比例"),
+            "template_like": ("樣板留言", "完全重複或近似樣板留言比例"),
+            "burst": ("爆發留言", "同品牌短時間爆發留言比例"),
         }
-        for name, (label, explanation) in explanations.items()
-    ]
-    st.dataframe(
-        feature_rows,
-        hide_index=True,
-        use_container_width=True,
-        column_config={"值": st.column_config.NumberColumn("值", format="%.2f")},
-    )
+        feature_rows = [
+            {
+                "特徵": label,
+                "值": selected_profile.suspicion_features.get(name, 0.0),
+                "說明": explanation,
+            }
+            for name, (label, explanation) in explanations.items()
+        ]
+        st.dataframe(
+            feature_rows,
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "特徵": st.column_config.TextColumn("特徵"),
+                "值": st.column_config.NumberColumn("值", format="%.2f"),
+                "說明": st.column_config.TextColumn("說明", width="large"),
+            },
+        )
 
-    st.markdown("#### 被標記留言")
-    display_posts = posts
-    if display_posts is None:
-        from cvs_radar.store import load_posts as load_stored_posts
-        try:
-            display_posts = load_stored_posts()
-        except Exception:
-            display_posts = None
-    if display_posts is None:
-        st.info("尚無原始留言資料；請先執行爬取或切換到 stored 模式。")
-    else:
-        st.code(render_suspicion_detail(selected_profile, display_posts), language="text")
+    with comments_tab:
+        display_posts = posts
+        if display_posts is None:
+            from cvs_radar.store import load_posts as load_stored_posts
+            try:
+                display_posts = load_stored_posts()
+            except Exception:
+                display_posts = None
+        if display_posts is None:
+            st.info("尚無原始留言資料；請先執行爬取或切換到 stored 模式。")
+        else:
+            st.code(render_suspicion_detail(selected_profile, display_posts), language="text")
 
 
 def _render_kpi(label: str, value: str, help_text: str) -> None:
