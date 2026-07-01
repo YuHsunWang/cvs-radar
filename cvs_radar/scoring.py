@@ -151,7 +151,7 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
         results = _extract_multiline_products(lines, brand)
         if results:
             return results
-        return _extract_products_and_prices_from_text(" ".join(lines), brand)
+        return _extract_first_line_with_price_anywhere(lines, brand)
     if lines:
         return _extract_products_and_prices_from_text(lines[0], brand)
     return _extract_products_and_prices_from_text("", brand)
@@ -199,6 +199,26 @@ def _extract_multiline_products(lines: list[str], brand: str) -> list[tuple[str,
             pending_name = parsed[0][0]
 
     return results
+
+
+def _extract_first_line_with_price_anywhere(lines: list[str], brand: str) -> list[tuple[str, int | None]]:
+    """Fallback when line-by-line splitting finds no product: treat the first
+    line as the product name and only scan the remaining lines for a price,
+    instead of joining every line into one string and re-parsing it (which
+    can leak stray characters from unrelated promo/quantity lines into the
+    name, e.g. '橘貓款冰棒襪套' + '3支冰+19元加購...' -> '橘貓款冰棒襪套冰').
+    """
+    first = _extract_products_and_prices_from_text(lines[0], brand)
+    if not first or not first[0][0]:
+        return _extract_products_and_prices_from_text(" ".join(lines), brand)
+    name, price = first[0]
+    if price is None:
+        for line in lines[1:]:
+            found = _best_price_from_text(line)
+            if found is not None:
+                price = found
+                break
+    return [(name, price)]
 
 
 def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
