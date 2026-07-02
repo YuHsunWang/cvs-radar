@@ -534,6 +534,26 @@ class ScoringTest(unittest.TestCase):
         self.assertEqual(report.competitor_preference_count, 0)
         self.assertEqual(report.competitor_brands, ["7-11"])
 
+    def test_reaction_echo_comments_do_not_count_as_independent_complaints(self) -> None:
+        post = Post(
+            id="M.1782841359.A.FDF",
+            brand="7-11",
+            product_name="富錦樹金沙南瓜",
+            author="author",
+            author_score=50,
+            comments=[
+                Comment("→", "reactor", "原來這麼雷", sentiment=-0.9),
+                Comment("→", "firsthand", "我吃過真的難吃", sentiment=-0.9),
+            ],
+        )
+
+        report = score_product([post], {})
+
+        self.assertNotIn("reactor", {c.user for c in report.contributors})
+        self.assertIn("firsthand", {c.user for c in report.contributors})
+        self.assertNotIn("原來這麼雷", report.rep_negative)
+        self.assertIn("我吃過真的難吃", report.rep_negative)
+
 
 class ExtractionRegressionTest(unittest.TestCase):
     def test_extract_products_and_prices_cases(self) -> None:
@@ -544,6 +564,7 @@ class ExtractionRegressionTest(unittest.TestCase):
             ("詹姆士香蒜胡椒肉骨茶泡麵 79元", [("詹姆士香蒜胡椒肉骨茶泡麵", 79)]),
             ("莊園牛奶霜淇淋49\n取件優惠買一送一", [("莊園牛奶霜淇淋", 49)]),
             ("https://example.test/deal/999\nBF薄荷岩鹽檸檬糖35", [("BF薄荷岩鹽檸檬糖", 35)]),
+            ("抹茶霜淇淋/草莓蛋糕都55元", [("抹茶霜淇淋", 55), ("草莓蛋糕", 55)]),
         ]
 
         for raw_name, expected in cases:
@@ -560,6 +581,39 @@ class ExtractionRegressionTest(unittest.TestCase):
                 if name.strip() and price is not None
             ]
         )
+
+    def test_reply_post_signature_commentary_is_not_a_product(self) -> None:
+        raw_name = (
+            "：7-11 切達起士貝果 28元\n\n"
+            ": 【便利商店/廠商名稱】：7-11\n\n"
+            ": 【心得】：\n\n"
+            ": 藍莓寒天貝果，這款也是我愛吃的口味，\n\n"
+            ": --\n\n"
+            "身為友善人 這2款貝果是少數無打折會去買的\n\n"
+            "28元撐了15年  今天看到藍莓口味改版變35元\n\n"
+            "--"
+        )
+        post = Post(
+            id="M.1782550157.A.0A3",
+            brand="7-11",
+            product_name=raw_name,
+            is_reply=True,
+        )
+
+        processed = preprocess_posts([post])
+        names = [item.product_name for item in processed]
+
+        self.assertIn("切達起士貝果", names)
+        self.assertFalse(any("今天看到藍莓" in name or "年今天" in name for name in names))
+
+    def test_payment_aside_after_slash_is_not_product_name(self) -> None:
+        raw_name = "：萊爾富X頂呱呱13cm娃包/ipass聯邦卡付款71元（？\n\nhttps://i.mopix.cc/CbGuR4.jpg"
+
+        result = extract_products_and_prices(raw_name, "萊爾富")
+
+        self.assertEqual(result, [("X頂呱呱13cm娃包", 71)])
+        self.assertNotIn("ipass", result[0][0].lower())
+        self.assertNotIn("聯邦卡付款", result[0][0])
 
 
 class CategoryRegressionTest(unittest.TestCase):
