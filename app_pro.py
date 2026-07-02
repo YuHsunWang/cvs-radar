@@ -94,32 +94,19 @@ def main() -> None:
     _inject_css()
     _render_header()
 
-    controls = _render_sidebar()
-
     posts = None
     reports = None
-    source = str(controls["source"])
-    if source == "results":
-        loaded = load_results_or_none()
-        if loaded is None:
-            st.warning("找不到預算結果，已改用離線示範資料。")
-            source = "demo"
-            posts = load_posts("demo")
-            options: list[str] = []
-        else:
-            reports, _profiles = loaded
-            brand_set = sorted(set(r.brand for r in reports))
-            options = [ALL_BRANDS, *brand_set]
+    source = "results"
+    loaded = load_results_or_none()
+    if loaded is None:
+        st.warning("找不到預算結果，已改用離線示範資料。")
+        source = "demo"
+        posts = load_posts("demo")
+        options: list[str] = []
     else:
-        try:
-            posts = load_posts(source, crawl_pages=int(controls["crawl_pages"]))
-            options = []
-        except ValueError as exc:
-            st.error(str(exc))
-            return
-        except Exception as exc:  # pragma: no cover - UI safety net
-            st.error(f"資料載入失敗：{exc}")
-            return
+        reports, _profiles = loaded
+        brand_set = sorted(set(r.brand for r in reports))
+        options = [ALL_BRANDS, *brand_set]
 
     filters = _render_filters(source, posts, options)
     query = build_product_query(
@@ -556,8 +543,6 @@ def _inject_css() -> None:
 
         .detail-card {
             padding: 1.15rem;
-            position: sticky;
-            top: 1rem;
         }
 
         .detail-eyebrow {
@@ -756,10 +741,6 @@ def _inject_css() -> None:
                 margin-top: 0.4rem;
             }
 
-            .detail-card {
-                position: static;
-            }
-
             .tile-grid,
             .decision-band,
             .comment-grid {
@@ -789,46 +770,6 @@ def _render_header() -> None:
         """,
         unsafe_allow_html=True,
     )
-
-
-def _render_sidebar() -> dict[str, object]:
-    with st.sidebar:
-        st.caption("預設使用已計算好的 results 快照；開發或驗證時才切換其他來源。")
-
-        labels = {
-            "results": "最新 results 快照",
-            "demo": "離線示範資料",
-            "stored": "本機已爬資料",
-            "crawl": "即時爬 PTT CVS",
-        }
-        default_source = "results" if load_results_or_none() is not None else "demo"
-        crawl_pages = 5
-        with st.expander("資料來源設定", expanded=False):
-            source = st.selectbox(
-                "資料來源",
-                options=list(labels),
-                index=list(labels).index(default_source),
-                format_func=lambda value: labels[str(value)],
-            )
-            if source == "results":
-                loaded = load_results_or_none()
-                if loaded is not None:
-                    loaded_reports, loaded_profiles = loaded
-                    st.caption(f"{len(loaded_reports):,} 項商品結果，{len(loaded_profiles):,} 個帳號輪廓")
-                else:
-                    st.warning("目前沒有 results，主畫面會改用 demo。")
-            elif source == "stored":
-                from cvs_radar.store import store_stats
-
-                stats = store_stats()
-                st.caption(f"{stats['post_count']:,} 篇文，{stats['comment_count']:,} 則留言")
-            elif source == "crawl":
-                st.warning("crawl 會連線到 PTT。")
-                crawl_pages = int(st.number_input("PTT 頁數", min_value=1, max_value=50, value=5, step=1))
-            else:
-                st.caption("demo 不連網，適合快速預覽。")
-
-    return {"source": str(source), "crawl_pages": crawl_pages}
 
 
 def _render_filters(source: str, posts: object, options: list[str]) -> dict[str, object]:
@@ -963,6 +904,7 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
         return
 
     state_key = f"shopper_selected_idx::{selection_key}"
+    dialog_open_key = f"shopper_detail_dialog_open::{selection_key}"
     try:
         selected_idx = int(st.session_state.get(state_key, 0))
     except (TypeError, ValueError):
@@ -973,36 +915,29 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
     else:
         st.session_state[state_key] = selected_idx
 
-    shelf_col, detail_col = st.columns([1.08, 0.92], gap="large")
-    with shelf_col:
-        st.markdown(
-            """
-            <div class="shelf-head">
-                <p class="section-title">架上候選商品</p>
-                <span class="section-note">點任一卡片，右側就會顯示完整心得。</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        _render_shopper_card_list(
-            rows,
-            selected_idx=selected_idx,
-            selection_key=selection_key,
-            state_key=state_key,
-        )
+    st.markdown(
+        """
+        <div class="shelf-head">
+            <p class="section-title">架上候選商品</p>
+            <span class="section-note">點任一卡片，會立即開啟完整心得。</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    _render_shopper_card_list(
+        rows,
+        selected_idx=selected_idx,
+        selection_key=selection_key,
+        state_key=state_key,
+        dialog_open_key=dialog_open_key,
+    )
 
     selected_idx = int(st.session_state[state_key])
-    with detail_col:
-        st.markdown(
-            """
-            <div class="shelf-head">
-                <p class="section-title">單品判斷</p>
-                <span class="section-note">把商品拿在手上時，看這張就夠。</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown(_product_detail_html(rows[selected_idx]), unsafe_allow_html=True)
+    should_open_dialog = bool(st.session_state.get(dialog_open_key, False))
+    if should_open_dialog:
+        st.session_state[dialog_open_key] = False
+        if 0 <= selected_idx < len(rows):
+            _render_product_detail_dialog(rows[selected_idx])
 
 
 def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
@@ -1016,7 +951,12 @@ def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
 
 
 def _render_shopper_card_list(
-    rows: list[dict[str, Any]], *, selected_idx: int, selection_key: str, state_key: str
+    rows: list[dict[str, Any]],
+    *,
+    selected_idx: int,
+    selection_key: str,
+    state_key: str,
+    dialog_open_key: str,
 ) -> None:
     widget_scope = _shopper_widget_scope(selection_key)
     with st.container(key=f"shopper_shelf_list_{widget_scope}", gap=None):
@@ -1030,7 +970,7 @@ def _render_shopper_card_list(
                     f"選取 {idx + 1}: {row.get('商品') or '-'}",
                     key=f"shopper_shelf_select_{widget_scope}_{idx}",
                     on_click=_set_shopper_selected_idx,
-                    args=(state_key, idx),
+                    args=(state_key, idx, dialog_open_key),
                     use_container_width=True,
                 )
 
@@ -1039,8 +979,38 @@ def _shopper_widget_scope(selection_key: str) -> str:
     return blake2s(selection_key.encode("utf-8"), digest_size=8).hexdigest()
 
 
-def _set_shopper_selected_idx(state_key: str, idx: int) -> None:
+def _set_shopper_selected_idx(state_key: str, idx: int, dialog_open_key: str | None = None) -> None:
     st.session_state[state_key] = idx
+    if dialog_open_key is not None:
+        st.session_state[dialog_open_key] = True
+
+
+_streamlit_dialog = getattr(st, "dialog", None) or getattr(st, "experimental_dialog", None)
+
+
+def _render_product_detail_dialog_body(row: dict[str, Any]) -> None:
+    st.markdown(
+        """
+        <div class="shelf-head">
+            <p class="section-title">單品判斷</p>
+            <span class="section-note">把商品拿在手上時，看這張就夠。</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(_product_detail_html(row), unsafe_allow_html=True)
+
+
+if _streamlit_dialog is not None:
+
+    @_streamlit_dialog("單品判斷")
+    def _render_product_detail_dialog(row: dict[str, Any]) -> None:
+        _render_product_detail_dialog_body(row)
+
+else:
+
+    def _render_product_detail_dialog(row: dict[str, Any]) -> None:
+        _render_product_detail_dialog_body(row)
 
 
 def _shopper_card_html(row: dict[str, Any], *, idx: int, selected_idx: int) -> str:
