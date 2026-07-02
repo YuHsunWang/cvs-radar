@@ -545,27 +545,6 @@ def _inject_css() -> None:
             padding: 1.15rem;
         }
 
-        /* Dialog: keep the ✕ close button and title pinned while scrolling long detail. */
-        [data-testid="stDialog"] div[role="dialog"] {
-            max-height: 86vh;
-        }
-
-        [data-testid="stDialog"] div[role="dialog"] button[aria-label="Close"] {
-            position: sticky !important;
-            top: 0.35rem;
-            z-index: 6;
-        }
-
-        [data-testid="stDialog"] .shelf-head {
-            position: sticky;
-            top: 0;
-            z-index: 5;
-            margin: 0 0 0.7rem;
-            padding: 0.35rem 2.6rem 0.55rem 0;
-            background: var(--pro-background);
-            border-bottom: 2px solid var(--pro-foreground);
-        }
-
         .detail-eyebrow {
             color: rgba(15, 23, 42, 0.64);
             font-size: 0.78rem;
@@ -1010,15 +989,6 @@ _streamlit_dialog = getattr(st, "dialog", None) or getattr(st, "experimental_dia
 
 
 def _render_product_detail_dialog_body(row: dict[str, Any]) -> None:
-    st.markdown(
-        """
-        <div class="shelf-head">
-            <p class="section-title">單品判斷</p>
-            <span class="section-note">把商品拿在手上時，看這張就夠。</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
     st.markdown(_product_detail_html(row), unsafe_allow_html=True)
 
 
