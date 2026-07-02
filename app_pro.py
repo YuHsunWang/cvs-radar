@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import unicodedata
 from datetime import datetime, timedelta
+from difflib import SequenceMatcher
 from hashlib import blake2s
 from html import escape
 from typing import Any
@@ -138,10 +140,19 @@ def main() -> None:
             reports=[r for r in result.reports if (r.category or "其他") == filters["selected_category"]],
         )
 
+    search_query = str(filters["search_query"])
+    if search_query.strip():
+        result = ProductQueryResult(
+            filters=result.filters,
+            brands=result.brands,
+            reports=[r for r in result.reports if _product_matches_query(r.product_name, search_query)],
+        )
+
     sorted_reports = _sort_reports(result.reports, str(filters["sort_by"]))
     sorted_reports = sorted_reports[: int(filters["limit"])]
     result_filters = dict(result.filters)
     result_filters["limit"] = filters["limit"]
+    result_filters["search_query"] = search_query
     result = ProductQueryResult(
         filters=result_filters,
         brands=brand_summaries_from_reports(sorted_reports),
@@ -150,7 +161,16 @@ def main() -> None:
 
     selection_key = "|".join(
         str(filters[k])
-        for k in ("selected_brand", "selected_category", "sort_by", "limit", "start_date", "end_date", "recent_days")
+        for k in (
+            "selected_brand",
+            "selected_category",
+            "search_query",
+            "sort_by",
+            "limit",
+            "start_date",
+            "end_date",
+            "recent_days",
+        )
     )
     _render_shopper_view(result, selection_key=selection_key)
 
@@ -163,6 +183,52 @@ def _sort_reports(reports: list, sort_by: str) -> list:
     if sort_by == "討論最多":
         return sorted(reports, key=lambda r: r.n_posts + r.n_comments, reverse=True)
     return sorted(reports, key=lambda r: (r.fair_score is not None, r.fair_score or 0.0), reverse=True)
+
+
+def _normalize_product_search_text(value: str) -> str:
+    return "".join(unicodedata.normalize("NFKC", value).casefold().split())
+
+
+def _product_search_threshold(query: str) -> float:
+    query_len = len(query)
+    if query_len <= 2:
+        return 1.0
+    if query_len <= 4:
+        return 0.66
+    if query_len <= 8:
+        return 0.72
+    return 0.78
+
+
+def _product_match_score(name: str, query: str) -> float:
+    normalized_name = _normalize_product_search_text(name)
+    normalized_query = _normalize_product_search_text(query)
+    if not normalized_query:
+        return 1.0
+    if not normalized_name:
+        return 0.0
+    if normalized_query in normalized_name:
+        return 1.0
+
+    best = SequenceMatcher(None, normalized_name, normalized_query).ratio()
+    if len(normalized_query) > len(normalized_name):
+        return best
+
+    min_window_len = max(1, len(normalized_query) - 2)
+    max_window_len = min(len(normalized_name), len(normalized_query) + 2)
+    for window_len in range(min_window_len, max_window_len + 1):
+        for start in range(0, len(normalized_name) - window_len + 1):
+            window = normalized_name[start : start + window_len]
+            best = max(best, SequenceMatcher(None, window, normalized_query).ratio())
+
+    return best
+
+
+def _product_matches_query(name: str, query: str) -> bool:
+    normalized_query = _normalize_product_search_text(query)
+    if not normalized_query:
+        return True
+    return _product_match_score(name, query) >= _product_search_threshold(normalized_query)
 
 
 def _inject_css() -> None:
@@ -863,16 +929,18 @@ def _render_filters(source: str, posts: object, options: list[str]) -> dict[str,
             )
 
         cat_options = ["全部分類", "冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊", "其他"]
-        filter_cols = st.columns([1.25, 1.05, 1.05, 0.8, 0.8])
+        filter_cols = st.columns([1.35, 1.2, 1.05, 1.05, 0.8, 0.8])
         with filter_cols[0]:
-            selected_brand = st.selectbox("品牌", options, index=0)
+            search_query = st.text_input("搜尋商品", value="", placeholder="輸入商品名稱")
         with filter_cols[1]:
-            selected_category = st.selectbox("分類", cat_options, index=0)
+            selected_brand = st.selectbox("品牌", options, index=0)
         with filter_cols[2]:
-            sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=2)
+            selected_category = st.selectbox("分類", cat_options, index=0)
         with filter_cols[3]:
-            limit = int(st.number_input("顯示", min_value=1, max_value=200, value=50, step=1))
+            sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=2)
         with filter_cols[4]:
+            limit = int(st.number_input("顯示", min_value=1, max_value=200, value=50, step=1))
+        with filter_cols[5]:
             with st.popover("更多條件", use_container_width=True):
                 use_min_score = st.checkbox("最低分數", value=False)
                 min_score = None
@@ -890,6 +958,7 @@ def _render_filters(source: str, posts: object, options: list[str]) -> dict[str,
     return {
         "selected_brand": selected_brand,
         "selected_category": selected_category,
+        "search_query": search_query,
         "recent_days": recent_days,
         "start_date": start_date,
         "end_date": end_date,

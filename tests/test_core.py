@@ -1035,6 +1035,28 @@ class TimeAndServiceTest(unittest.TestCase):
         ])
 
 
+class AppProSearchTest(unittest.TestCase):
+    def test_product_search_matches_exact_substring(self) -> None:
+        from app_pro import _product_matches_query
+
+        self.assertTrue(_product_matches_query("阜杭豆漿饅頭夾豬排蛋", "豆漿饅頭"))
+
+    def test_product_search_matches_one_character_typo(self) -> None:
+        from app_pro import _product_matches_query
+
+        self.assertTrue(_product_matches_query("莊園牛奶霜淇淋", "牛奶箱"))
+
+    def test_product_search_matches_nfkc_case_and_space_variants(self) -> None:
+        from app_pro import _product_matches_query
+
+        self.assertTrue(_product_matches_query("ＣＶＳ厚奶茶", "cvs 厚奶茶"))
+
+    def test_product_search_rejects_unrelated_query(self) -> None:
+        from app_pro import _product_matches_query
+
+        self.assertFalse(_product_matches_query("草莓蛋糕", "咖啡拿鐵"))
+
+
 class AppHelperTest(unittest.TestCase):
     def test_load_results_or_none_delegates_to_store_loader(self) -> None:
         from cvs_radar.app_helpers import load_results_or_none
