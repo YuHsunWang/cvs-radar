@@ -793,7 +793,6 @@ def _render_header() -> None:
 
 def _render_sidebar() -> dict[str, object]:
     with st.sidebar:
-        st.header("今天想找什麼？")
         st.caption("預設使用已計算好的 results 快照；開發或驗證時才切換其他來源。")
 
         labels = {
