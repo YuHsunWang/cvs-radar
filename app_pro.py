@@ -148,7 +148,6 @@ def main() -> None:
         reports=sorted_reports,
     )
 
-    _render_context_bar(result, selected_brand=str(filters["selected_brand"]), sort_by=str(filters["sort_by"]), source=source)
     selection_key = "|".join(
         str(filters[k])
         for k in ("selected_brand", "selected_category", "sort_by", "limit", "start_date", "end_date", "recent_days")
@@ -910,28 +909,6 @@ def _query_precomputed_reports(reports, query) -> ProductQueryResult:
     )
 
 
-def _render_context_bar(result: ProductQueryResult, *, selected_brand: str, sort_by: str, source: str) -> None:
-    count = len(result.reports)
-    brand_label = selected_brand if selected_brand != ALL_BRANDS else "全部品牌"
-    if count:
-        best = result.reports[0]
-        best_text = f"目前最值得先看：{best.product_name}（{_format_score(best.fair_score)} 分）"
-    else:
-        best_text = "目前沒有符合條件的商品"
-    st.markdown(
-        f"""
-        <div class="context-bar">
-            <div>
-                <div class="context-main">{escape(best_text)}</div>
-                <div class="context-note">找到 {count:,} 項商品，品牌：{escape(brand_label)}，排序：{escape(sort_by)}。</div>
-            </div>
-            <div class="context-note">source={escape(source)}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> None:
     rows = _shopper_rows(result)
     if not rows:
@@ -1043,6 +1020,12 @@ def _shopper_card_html(row: dict[str, Any], *, idx: int, selected_idx: int) -> s
     score = row.get("fair_score")
     selected_class = " selected" if idx == selected_idx else ""
     aria_current = ' aria-current="true"' if idx == selected_idx else ""
+    posted_date = str(row.get("最新發文") or "").strip()
+    date_pill = (
+        f'<span class="pill date-pill">最新發文 {escape(posted_date)}</span>'
+        if posted_date
+        else ""
+    )
     return (
         f'<div class="product-tile{selected_class}"{aria_current}>'
         '<div class="tile-grid">'
@@ -1050,6 +1033,7 @@ def _shopper_card_html(row: dict[str, Any], *, idx: int, selected_idx: int) -> s
         '<div class="tile-meta">'
         f'{_brand_badge_html(str(row.get("品牌") or "其他"))}'
         f'<span class="pill price-pill">{escape(_format_price(row.get("價格")))}</span>'
+        f"{date_pill}"
         "</div>"
         f'<div class="tile-name">{escape(str(row.get("商品") or "-"))}</div>'
         f"{_signals_html(row)}"
