@@ -60,7 +60,7 @@ _BUNDLE_PRICE_RE = re.compile(
     r"(?P<count>[2-6])\s*(?P<unit>支|入|個|包|瓶|罐|杯|盒|組|件|份)\s*\$?\s*(?P<total>\d{2,3})\s*(?:元)?"
 )
 _TRAILING_PRICE_RE = re.compile(
-    r"^(.+?)\s*(\d{2,3})\s*元?$"
+    r"^(.+?)\s*(?:各)?\s*(\d{2,3})\s*元?$"
 )
 _PRICE_BEFORE_PROMO_RE = re.compile(
     r"^(.+?)"
@@ -100,6 +100,7 @@ _FIRST_HAND_COMMENT_RE = re.compile(
 )
 _PTT_PRODUCT_TEMPLATE = "(區域型商品請註明 試吃試用品請標示價格0元)"
 _URL_RE = re.compile(r"https?://", re.IGNORECASE)
+_PRODUCT_REVIEW_START_RE = re.compile(r"^\s*[：:]?\s*[【\[]?\s*心得\s*[】\]]?\s*[:：]")
 _PRICE_TOKEN_RE = re.compile(r"(?<!\d)(\d{1,3})(?!\d)\s*(?:元|台幣)?")
 _PRICE_CONTEXT_RE = re.compile(
     r"^\s*(?:價格|售價|價錢|原價|特價|目前|活動價|NT\$?|\$|\d+\s*(?:ML|毫升|G|公克|克))",
@@ -272,6 +273,8 @@ def _candidate_product_lines(raw_name: str) -> list[str]:
         line = line.strip()
         if not line:
             continue
+        if _PRODUCT_REVIEW_START_RE.match(line):
+            break
         if line == _PTT_PRODUCT_TEMPLATE:
             continue
         if _URL_RE.search(line):
@@ -291,6 +294,12 @@ def _reply_product_extraction_text(raw_name: str) -> str:
 
 
 def _extract_multiline_products(lines: list[str], brand: str) -> list[tuple[str, int | None]]:
+    same_price = _extract_slash_same_price_products(
+        _normalize_product_pattern_text(" ".join(lines), brand)
+    )
+    if same_price:
+        return same_price
+
     results: list[tuple[str, int | None]] = []
     pending_name: str | None = None
 
@@ -369,15 +378,7 @@ def _name_continuation(line: str, brand: str) -> str:
 
 def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
     """Extract product names and prices from one logical product-name text."""
-    s = unicodedata.normalize("NFKC", raw_name or "").strip()
-    s = re.sub(r"^[：:]+\s*", "", s)
-    s = _normalize_marketing_text(s)
-    s = re.sub(r"\$(\d)", r"\1", s)
-    s = re.sub(r"(\d)\$", r"\1", s)
-    s = _BRACKET_RE.sub(" ", s)
-    s = re.sub(r"[\[\(（【][^\]\)）】]*$", " ", s)
-    s = _strip_brand_keywords(s, brand)
-    s = _strip_payment_asides(s)
+    s = _normalize_product_pattern_text(raw_name, brand)
 
     same_price = _extract_slash_same_price_products(s)
     if same_price:
@@ -454,20 +455,23 @@ def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> li
     return [(cleaned, None)]
 
 
-_SLASH_SAME_PRICE_RE = re.compile(
-    r"^\s*(?P<names>[^\d/／]+(?:[/／][^\d/／]+)+)\s*[，,]?\s*都\s*(?P<price>\d{2,3})\s*(?:元)?\s*\$?\s*$"
+_SHARED_SAME_PRICE_RE = re.compile(
+    r"^\s*(?P<names>.+?)\s*(?:[/／]\s*)?(?:都|各)\s*(?P<price>\d{2,3})\s*(?:元)?\s*\$?\s*$"
 )
 
 
 def _extract_slash_same_price_products(s: str) -> list[tuple[str, int | None]] | None:
-    """Handle 'A/B都N元' style: multiple products sharing one trailing price."""
-    match = _SLASH_SAME_PRICE_RE.match(s.strip())
+    """Handle 'A/B都N元' or 'A、B/各N元' style shared trailing prices."""
+    match = _SHARED_SAME_PRICE_RE.match(s.strip())
     if not match:
         return None
     price = int(match.group("price"))
     if not (_MIN_PRICE <= price <= _MAX_PRICE):
         return None
-    segments = re.split(r"[/／]", match.group("names"))
+    names = match.group("names")
+    if not re.search(r"[/／、]", names):
+        return None
+    segments = re.split(r"[/／、]", names)
     results: list[tuple[str, int | None]] = []
     for segment in segments:
         name = _NOISE_RE.sub(" ", segment.strip())
@@ -476,6 +480,18 @@ def _extract_slash_same_price_products(s: str) -> list[tuple[str, int | None]] |
         if len(name) >= 2:
             results.append((name, price))
     return results if len(results) >= 2 else None
+
+
+def _normalize_product_pattern_text(raw_name: str, brand: str = "") -> str:
+    s = unicodedata.normalize("NFKC", raw_name or "").strip()
+    s = re.sub(r"^[：:]+\s*", "", s)
+    s = _normalize_marketing_text(s)
+    s = re.sub(r"\$(\d)", r"\1", s)
+    s = re.sub(r"(\d)\$", r"\1", s)
+    s = _BRACKET_RE.sub(" ", s)
+    s = re.sub(r"[\[\(（【][^\]\)）】]*$", " ", s)
+    s = _strip_brand_keywords(s, brand)
+    return _strip_payment_asides(s)
 
 
 def _strip_payment_asides(text: str) -> str:

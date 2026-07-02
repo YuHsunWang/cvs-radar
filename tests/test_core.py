@@ -565,6 +565,10 @@ class ExtractionRegressionTest(unittest.TestCase):
             ("莊園牛奶霜淇淋49\n取件優惠買一送一", [("莊園牛奶霜淇淋", 49)]),
             ("https://example.test/deal/999\nBF薄荷岩鹽檸檬糖35", [("BF薄荷岩鹽檸檬糖", 35)]),
             ("抹茶霜淇淋/草莓蛋糕都55元", [("抹茶霜淇淋", 55), ("草莓蛋糕", 55)]),
+            (
+                "：\n沙漠之星(石榴洛神氣泡飲)、\n法老的紅寶石(草莓氣泡飲)、\n拉神之眼(柑橘氣泡飲)/各49$",
+                [("沙漠之星", 49), ("法老的紅寶石", 49), ("拉神之眼", 49)],
+            ),
         ]
 
         for raw_name, expected in cases:
@@ -605,6 +609,20 @@ class ExtractionRegressionTest(unittest.TestCase):
 
         self.assertIn("切達起士貝果", names)
         self.assertFalse(any("今天看到藍莓" in name or "年今天" in name for name in names))
+
+    def test_reply_post_quoted_review_prose_is_not_a_product(self) -> None:
+        posts = {
+            post.id: post
+            for post in store.load_posts()
+            if post.id == "M.1782550157.A.0A3"
+        }
+        post = posts["M.1782550157.A.0A3"]
+
+        processed = preprocess_posts([post])
+
+        self.assertEqual([item.product_name for item in processed], ["切達起士貝果"])
+        self.assertEqual(processed[0].price, "28")
+        self.assertFalse(any("可惜價格太貴了" in item.product_name for item in processed))
 
     def test_payment_aside_after_slash_is_not_product_name(self) -> None:
         raw_name = "：萊爾富X頂呱呱13cm娃包/ipass聯邦卡付款71元（？\n\nhttps://i.mopix.cc/CbGuR4.jpg"
