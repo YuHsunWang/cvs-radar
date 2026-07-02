@@ -545,6 +545,41 @@ def _inject_css() -> None:
             padding: 1.15rem;
         }
 
+        [data-testid="stDialog"] {
+            overflow: hidden;
+        }
+
+        [data-testid="stDialog"] > div {
+            height: 100%;
+            min-height: 100%;
+            overflow: hidden;
+        }
+
+        [data-testid="stDialog"] [role="dialog"] {
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 4.5rem);
+            max-height: calc(100dvh - 4.5rem);
+            overflow: hidden;
+        }
+
+        [data-testid="stDialog"] [role="dialog"] > div:first-of-type {
+            flex: 0 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        [data-testid="stDialog"] [role="dialog"] > div:nth-of-type(2) {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        [data-testid="stDialog"] [role="dialog"] > button[aria-label="Close"] {
+            z-index: 3;
+        }
+
         .detail-eyebrow {
             color: rgba(15, 23, 42, 0.64);
             font-size: 0.78rem;
