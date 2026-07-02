@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from html import escape
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import urlencode
 
 import streamlit as st
 
@@ -61,48 +61,32 @@ VOLUME_SIGNALS = {
     "聲量不足": ("低聲量", "volume-low", 1),
 }
 
-BRAND_LOGO_SPECS = {
+SHELF_SELECTION_PARAM = "cvs_shelf"
+
+BRAND_BADGE_SPECS = {
     "7-11": {
         "text": "7-11",
-        "bg": "#ffffff",
-        "fg": "#0c6b3c",
-        "border": "#0c6b3c",
-        "bars": ("#0c8f48", "#f58220", "#d71920"),
+        "class": "brand-badge-711",
     },
     "全家": {
-        "text": "全家",
-        "bg": "#ffffff",
-        "fg": "#005bac",
-        "border": "#00a650",
-        "bars": ("#005bac", "#00a650", "#005bac"),
+        "text": "FM",
+        "class": "brand-badge-family",
     },
     "萊爾富": {
-        "text": "HiLife",
-        "bg": "#fff7f5",
-        "fg": "#d71920",
-        "border": "#d71920",
-        "bars": ("#d71920", "#f15a24", "#d71920"),
+        "text": "HL",
+        "class": "brand-badge-hilife",
     },
     "OK": {
         "text": "OK",
-        "bg": "#fff8df",
-        "fg": "#c45f00",
-        "border": "#f4a300",
-        "bars": ("#f4a300", "#ef7d00", "#c45f00"),
+        "class": "brand-badge-ok",
     },
     "美聯社": {
         "text": "美聯",
-        "bg": "#f7f1ff",
-        "fg": "#6d2ea0",
-        "border": "#7a3db8",
-        "bars": ("#7a3db8", "#2e9d57", "#7a3db8"),
+        "class": "brand-badge-simplemart",
     },
     "其他": {
-        "text": "店",
-        "bg": "#f4f6f8",
-        "fg": "#536170",
-        "border": "#a7b2bf",
-        "bars": ("#a7b2bf", "#c7d0d9", "#a7b2bf"),
+        "text": "其他",
+        "class": "brand-badge-other",
     },
 }
 
@@ -365,45 +349,34 @@ def _inject_css() -> None:
             box-shadow: var(--pro-hard-shadow);
         }
 
+        .shelf-card-list {
+            display: grid;
+            gap: 0.68rem;
+            max-height: 650px;
+            overflow-y: auto;
+            padding: 0 0.42rem 0.42rem 0;
+        }
+
         .product-tile {
+            display: block;
             padding: 0.98rem;
-            margin-bottom: 0.62rem;
+            color: inherit;
+            text-decoration: none !important;
             transition: transform 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
+        }
+
+        .product-tile:hover,
+        .product-tile:focus-visible {
+            color: inherit;
+            outline: none;
+            transform: translate(-1px, -1px);
+            box-shadow: 6px 6px 0 var(--pro-foreground);
         }
 
         .product-tile.selected {
             border-color: var(--pro-primary);
             background: #fffbeb;
             box-shadow: 5px 5px 0 var(--pro-primary);
-        }
-
-        /*
-         * The shopper shelf uses st.dataframe as a navigational grid: logo
-         * images need ImageColumn, and any selected cell should switch the
-         * right-side product detail. Suppress glide's read-only edit overlay.
-         */
-        div[class*="gdg-d19meir1"],
-        div.gdg-style:has(.gdg-clip-region) {
-            display: none !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-        }
-
-        div[data-testid="stDataFrame"] {
-            border: 2px solid var(--pro-foreground);
-            border-radius: var(--pro-radius);
-            box-shadow: var(--pro-hard-shadow);
-            overflow: hidden;
-        }
-
-        div[data-testid="stDataFrame"] [role="gridcell"] {
-            font-family: "Nunito Sans", sans-serif;
-            font-weight: 700;
-        }
-
-        div[data-testid="stDataFrame"] [role="columnheader"] {
-            font-family: "Rubik", sans-serif;
-            font-weight: 800;
         }
 
         .tile-grid {
@@ -454,12 +427,18 @@ def _inject_css() -> None:
             white-space: nowrap;
         }
 
-        .brand-badge-0 { background: #e7f8ec; color: #14532d; border-color: #16A34A; }
-        .brand-badge-1 { background: #eff6ff; color: #1d4ed8; border-color: #2563eb; }
-        .brand-badge-2 { background: #fef3c7; color: #92400e; border-color: #F59E0B; }
-        .brand-badge-3 { background: #fff7ed; color: #9a3412; border-color: #F97316; }
-        .brand-badge-4 { background: #f0fdf4; color: #166534; border-color: #86efac; }
-        .brand-badge-5 { background: #fdf2f8; color: #9d174d; border-color: #f9a8d4; }
+        .brand-badge {
+            min-width: 44px;
+            justify-content: center;
+            font-family: "Rubik", sans-serif;
+        }
+
+        .brand-badge-family { background: #e7f8ec; color: #14532d; border-color: #16A34A; }
+        .brand-badge-711 { background: #fff7ed; color: #9a3412; border-color: #F97316; }
+        .brand-badge-hilife { background: #fee2e2; color: #991b1b; border-color: #DC2626; }
+        .brand-badge-ok { background: #fef3c7; color: #92400e; border-color: #FBBF24; }
+        .brand-badge-simplemart { background: #f7f1ff; color: #6d2ea0; border-color: #7a3db8; }
+        .brand-badge-other { background: #f4f6f8; color: #536170; border-color: #a7b2bf; }
 
         .price-pill { background: #ffffff; color: var(--pro-foreground); border-color: var(--pro-foreground); }
         .date-pill { background: var(--pro-muted); color: rgba(15, 23, 42, 0.76); border-color: var(--pro-border); }
@@ -848,9 +827,9 @@ def _render_filters(source: str, posts: object, options: list[str]) -> dict[str,
         with filter_cols[1]:
             selected_category = st.selectbox("分類", cat_options, index=0)
         with filter_cols[2]:
-            sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=0)
+            sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=2)
         with filter_cols[3]:
-            limit = int(st.number_input("顯示", min_value=1, max_value=200, value=12, step=1))
+            limit = int(st.number_input("顯示", min_value=1, max_value=200, value=50, step=1))
         with filter_cols[4]:
             with st.popover("更多條件", use_container_width=True):
                 use_min_score = st.checkbox("最低分數", value=False)
@@ -938,11 +917,10 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
         return
 
     state_key = f"shopper_selected_idx::{selection_key}"
-    table_key = f"shopper_table::{selection_key}"
     if state_key not in st.session_state or int(st.session_state[state_key]) >= len(rows):
         st.session_state[state_key] = 0
-    selected_idx = _selected_idx_from_dataframe_state(
-        st.session_state.get(table_key),
+    selected_idx = _selected_idx_from_shelf_query(
+        selection_key=selection_key,
         fallback_idx=min(int(st.session_state[state_key]), len(rows) - 1),
         row_count=len(rows),
     )
@@ -954,34 +932,15 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
             """
             <div class="shelf-head">
                 <p class="section-title">架上候選商品</p>
-                <span class="section-note">點任一列的任一格，右側就會顯示完整心得。</span>
+                <span class="section-note">點任一卡片，右側就會顯示完整心得。</span>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        event = st.dataframe(
-            _shopper_table_rows(rows, selected_idx=selected_idx),
-            hide_index=True,
-            use_container_width=True,
-            on_select="rerun",
-            selection_mode="single-cell",
-            key=table_key,
-            row_height=54,
-            height=min(54 * (len(rows) + 1) + 8, 650),
-            column_order=["選取", "商標", "品牌", "商品", "分數", "共識", "聲量", "價格"],
-            column_config={
-                "選取": st.column_config.TextColumn("選取", width="small"),
-                "商標": st.column_config.ImageColumn("商標", width="small"),
-                "品牌": st.column_config.TextColumn("品牌", width="small"),
-                "商品": st.column_config.TextColumn("商品"),
-                "分數": st.column_config.NumberColumn("分數", format="%.0f", width="small"),
-                "共識": st.column_config.TextColumn("共識", width="small"),
-                "聲量": st.column_config.TextColumn("聲量", width="small"),
-                "價格": st.column_config.TextColumn("價格", width="small"),
-            },
+        st.markdown(
+            _shopper_card_list_html(rows, selected_idx=selected_idx, selection_key=selection_key),
+            unsafe_allow_html=True,
         )
-        selected_idx = _selected_idx_from_dataframe_state(event, fallback_idx=selected_idx, row_count=len(rows))
-        st.session_state[state_key] = selected_idx
 
     selected_idx = int(st.session_state[state_key])
     with detail_col:
@@ -1007,86 +966,75 @@ def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     return rows
 
 
-def _shopper_table_rows(rows: list[dict[str, Any]], *, selected_idx: int) -> list[dict[str, Any]]:
-    table_rows = []
-    for idx, row in enumerate(rows):
-        consensus = str(row.get("consensus") or "資料不足")
-        volume = str(row.get("討論聲量") or "聲量不足")
-        table_rows.append(
-            {
-                "選取": "目前" if idx == selected_idx else "",
-                "商標": _brand_logo_data_uri(str(row.get("品牌") or "其他")),
-                "品牌": str(row.get("品牌") or "-"),
-                "商品": str(row.get("商品") or "-"),
-                "分數": _score_value(row.get("fair_score")),
-                "共識": _consensus_signal(consensus)[0],
-                "聲量": _volume_signal(volume)[0],
-                "價格": _format_price(row.get("價格")),
-            }
-        )
-    return table_rows
-
-
-def _brand_logo_data_uri(brand: str) -> str:
-    spec = BRAND_LOGO_SPECS.get(brand, BRAND_LOGO_SPECS["其他"])
-    bars = "".join(
-        f'<rect x="{8 + i * 24}" y="6" width="18" height="4" rx="2" fill="{color}"/>'
-        for i, color in enumerate(spec["bars"])
+def _shopper_card_list_html(rows: list[dict[str, Any]], *, selected_idx: int, selection_key: str) -> str:
+    cards = "".join(
+        _shopper_card_html(row, idx=idx, selected_idx=selected_idx, selection_key=selection_key)
+        for idx, row in enumerate(rows)
     )
-    svg = f"""
-    <svg xmlns="http://www.w3.org/2000/svg" width="88" height="36" viewBox="0 0 88 36" role="img" aria-label="{escape(brand)}">
-      <rect x="1" y="1" width="86" height="34" rx="7" fill="{spec["bg"]}" stroke="{spec["border"]}" stroke-width="2"/>
-      {bars}
-      <text x="44" y="25" text-anchor="middle" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="14" font-weight="800" fill="{spec["fg"]}">{escape(str(spec["text"]))}</text>
-    </svg>
+    return f'<div class="shelf-card-list">{cards}</div>'
+
+
+def _shopper_card_html(row: dict[str, Any], *, idx: int, selected_idx: int, selection_key: str) -> str:
+    score = row.get("fair_score")
+    selected_class = " selected" if idx == selected_idx else ""
+    aria_current = ' aria-current="true"' if idx == selected_idx else ""
+    href = "?" + urlencode({SHELF_SELECTION_PARAM: f"{selection_key}|{idx}"})
+    return f"""
+    <a class="product-tile{selected_class}" href="{escape(href, quote=True)}"{aria_current}>
+        <div class="tile-grid">
+            <div>
+                <div class="tile-meta">
+                    {_brand_badge_html(str(row.get("品牌") or "其他"))}
+                    <span class="pill price-pill">{escape(_format_price(row.get("價格")))}</span>
+                </div>
+                <div class="tile-name">{escape(str(row.get("商品") or "-"))}</div>
+                {_signals_html(row)}
+            </div>
+            <div class="score-block">
+                <div class="score-number {_score_class(score)}">{escape(_format_score(score))}<small>/100</small></div>
+                <div class="score-caption">公正分數</div>
+            </div>
+        </div>
+    </a>
     """
-    return "data:image/svg+xml;utf8," + quote(" ".join(svg.split()))
 
 
-def _score_value(score: object) -> float | None:
-    if score is None:
-        return None
+def _brand_badge_html(brand: str) -> str:
+    spec = BRAND_BADGE_SPECS.get(brand, BRAND_BADGE_SPECS["其他"])
+    return (
+        f'<span class="pill brand-badge {escape(str(spec["class"]))}" title="{escape(brand)}">'
+        f'{escape(str(spec["text"]))}'
+        "</span>"
+    )
+
+
+def _selected_idx_from_shelf_query(*, selection_key: str, fallback_idx: int, row_count: int) -> int:
+    token = _query_param_value(SHELF_SELECTION_PARAM)
+    prefix = f"{selection_key}|"
+    if not token or not token.startswith(prefix):
+        return fallback_idx
     try:
-        return float(score)
-    except (TypeError, ValueError):
-        return None
-
-
-def _selected_idx_from_dataframe_state(event: Any, *, fallback_idx: int, row_count: int) -> int:
-    if not event:
+        selected_idx = int(token[len(prefix):])
+    except ValueError:
         return fallback_idx
-    selection = getattr(event, "selection", None)
-    if not selection and isinstance(event, dict):
-        selection = event.get("selection")
-    if not selection:
-        return fallback_idx
-
-    cells = _selection_values(selection, "cells")
-    if cells:
-        first_cell = cells[0]
-        try:
-            selected_idx = int(first_cell[0])
-        except (TypeError, ValueError, IndexError):
-            return fallback_idx
-        if 0 <= selected_idx < row_count:
-            return selected_idx
-
-    selected_rows = _selection_values(selection, "rows")
-    if selected_rows:
-        try:
-            selected_idx = int(selected_rows[0])
-        except (TypeError, ValueError):
-            return fallback_idx
-        if 0 <= selected_idx < row_count:
-            return selected_idx
-
+    if 0 <= selected_idx < row_count:
+        return selected_idx
     return fallback_idx
 
 
-def _selection_values(selection: Any, key: str) -> list:
-    if isinstance(selection, dict):
-        return list(selection.get(key) or [])
-    return list(getattr(selection, key, []) or [])
+def _query_param_value(name: str) -> str | None:
+    query_params = getattr(st, "query_params", None)
+    if query_params is None:
+        return None
+    try:
+        value = query_params.get(name)
+    except AttributeError:
+        return None
+    if isinstance(value, list):
+        return str(value[0]) if value else None
+    if value is None:
+        return None
+    return str(value)
 
 
 def _product_detail_html(row: dict[str, Any]) -> str:
