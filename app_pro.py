@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from hashlib import blake2s
 from html import escape
 from typing import Any
-from urllib.parse import urlencode
 
 import streamlit as st
 
@@ -60,8 +60,6 @@ VOLUME_SIGNALS = {
     "聲量中等": ("中聲量", "volume-mid", 2),
     "聲量不足": ("低聲量", "volume-low", 1),
 }
-
-SHELF_SELECTION_PARAM = "cvs_shelf"
 
 BRAND_BADGE_SPECS = {
     "7-11": {
@@ -697,6 +695,55 @@ def _inject_css() -> None:
             box-shadow: 3px 3px 0 var(--pro-foreground);
         }
 
+        [class*="st-key-shopper_shelf_list_"] {
+            max-height: 650px;
+            overflow-y: auto;
+            padding: 0 0.42rem 0.42rem 0;
+        }
+
+        [class*="st-key-shopper_shelf_list_"] > div[data-testid="stVerticalBlock"] {
+            gap: 0.68rem;
+        }
+
+        [class*="st-key-shopper_shelf_card_"] {
+            position: relative;
+        }
+
+        [class*="st-key-shopper_shelf_card_"]:hover .product-tile,
+        [class*="st-key-shopper_shelf_card_"]:focus-within .product-tile {
+            color: inherit;
+            outline: none;
+            transform: translate(-1px, -1px);
+            box-shadow: 6px 6px 0 var(--pro-foreground);
+        }
+
+        [class*="st-key-shopper_shelf_card_"] [data-testid="stElementContainer"]:has([data-testid="stButton"]) {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+        }
+
+        [class*="st-key-shopper_shelf_card_"] [data-testid="stButton"],
+        [class*="st-key-shopper_shelf_card_"] [data-testid="stButton"] button {
+            width: 100%;
+            height: 100%;
+        }
+
+        [class*="st-key-shopper_shelf_card_"] [data-testid="stButton"] button,
+        [class*="st-key-shopper_shelf_card_"] [data-testid="stButton"] button:hover,
+        [class*="st-key-shopper_shelf_card_"] [data-testid="stButton"] button:focus {
+            min-height: 0;
+            margin: 0;
+            padding: 0;
+            border-color: transparent !important;
+            background: transparent !important;
+            color: transparent !important;
+            opacity: 0;
+            box-shadow: none !important;
+            transform: none !important;
+            cursor: pointer;
+        }
+
         @media (max-width: 920px) {
             .shopper-header,
             .context-bar,
@@ -917,14 +964,15 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
         return
 
     state_key = f"shopper_selected_idx::{selection_key}"
-    if state_key not in st.session_state or int(st.session_state[state_key]) >= len(rows):
+    try:
+        selected_idx = int(st.session_state.get(state_key, 0))
+    except (TypeError, ValueError):
+        selected_idx = 0
+    if not 0 <= selected_idx < len(rows):
         st.session_state[state_key] = 0
-    selected_idx = _selected_idx_from_shelf_query(
-        selection_key=selection_key,
-        fallback_idx=min(int(st.session_state[state_key]), len(rows) - 1),
-        row_count=len(rows),
-    )
-    st.session_state[state_key] = selected_idx
+        selected_idx = 0
+    else:
+        st.session_state[state_key] = selected_idx
 
     shelf_col, detail_col = st.columns([1.08, 0.92], gap="large")
     with shelf_col:
@@ -937,9 +985,11 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
             """,
             unsafe_allow_html=True,
         )
-        st.markdown(
-            _shopper_card_list_html(rows, selected_idx=selected_idx, selection_key=selection_key),
-            unsafe_allow_html=True,
+        _render_shopper_card_list(
+            rows,
+            selected_idx=selected_idx,
+            selection_key=selection_key,
+            state_key=state_key,
         )
 
     selected_idx = int(st.session_state[state_key])
@@ -966,21 +1016,40 @@ def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     return rows
 
 
-def _shopper_card_list_html(rows: list[dict[str, Any]], *, selected_idx: int, selection_key: str) -> str:
-    cards = "".join(
-        _shopper_card_html(row, idx=idx, selected_idx=selected_idx, selection_key=selection_key)
-        for idx, row in enumerate(rows)
-    )
-    return f'<div class="shelf-card-list">{cards}</div>'
+def _render_shopper_card_list(
+    rows: list[dict[str, Any]], *, selected_idx: int, selection_key: str, state_key: str
+) -> None:
+    widget_scope = _shopper_widget_scope(selection_key)
+    with st.container(key=f"shopper_shelf_list_{widget_scope}", gap=None):
+        for idx, row in enumerate(rows):
+            with st.container(key=f"shopper_shelf_card_{widget_scope}_{idx}", gap=None):
+                st.markdown(
+                    _shopper_card_html(row, idx=idx, selected_idx=selected_idx),
+                    unsafe_allow_html=True,
+                )
+                st.button(
+                    f"選取 {idx + 1}: {row.get('商品') or '-'}",
+                    key=f"shopper_shelf_select_{widget_scope}_{idx}",
+                    on_click=_set_shopper_selected_idx,
+                    args=(state_key, idx),
+                    use_container_width=True,
+                )
 
 
-def _shopper_card_html(row: dict[str, Any], *, idx: int, selected_idx: int, selection_key: str) -> str:
+def _shopper_widget_scope(selection_key: str) -> str:
+    return blake2s(selection_key.encode("utf-8"), digest_size=8).hexdigest()
+
+
+def _set_shopper_selected_idx(state_key: str, idx: int) -> None:
+    st.session_state[state_key] = idx
+
+
+def _shopper_card_html(row: dict[str, Any], *, idx: int, selected_idx: int) -> str:
     score = row.get("fair_score")
     selected_class = " selected" if idx == selected_idx else ""
     aria_current = ' aria-current="true"' if idx == selected_idx else ""
-    href = "?" + urlencode({SHELF_SELECTION_PARAM: f"{selection_key}|{idx}"})
     return (
-        f'<a class="product-tile{selected_class}" href="{escape(href, quote=True)}"{aria_current}>'
+        f'<div class="product-tile{selected_class}"{aria_current}>'
         '<div class="tile-grid">'
         "<div>"
         '<div class="tile-meta">'
@@ -995,7 +1064,7 @@ def _shopper_card_html(row: dict[str, Any], *, idx: int, selected_idx: int, sele
         '<div class="score-caption">公正分數</div>'
         "</div>"
         "</div>"
-        "</a>"
+        "</div>"
     )
 
 
@@ -1006,35 +1075,6 @@ def _brand_badge_html(brand: str) -> str:
         f'{escape(str(spec["text"]))}'
         "</span>"
     )
-
-
-def _selected_idx_from_shelf_query(*, selection_key: str, fallback_idx: int, row_count: int) -> int:
-    token = _query_param_value(SHELF_SELECTION_PARAM)
-    prefix = f"{selection_key}|"
-    if not token or not token.startswith(prefix):
-        return fallback_idx
-    try:
-        selected_idx = int(token[len(prefix):])
-    except ValueError:
-        return fallback_idx
-    if 0 <= selected_idx < row_count:
-        return selected_idx
-    return fallback_idx
-
-
-def _query_param_value(name: str) -> str | None:
-    query_params = getattr(st, "query_params", None)
-    if query_params is None:
-        return None
-    try:
-        value = query_params.get(name)
-    except AttributeError:
-        return None
-    if isinstance(value, list):
-        return str(value[0]) if value else None
-    if value is None:
-        return None
-    return str(value)
 
 
 def _product_detail_html(row: dict[str, Any]) -> str:
