@@ -427,6 +427,27 @@ def _inject_css() -> None:
         .price-pill { background: #ffffff; color: var(--pro-foreground); border-color: var(--pro-foreground); }
         .date-pill { background: var(--pro-muted); color: rgba(15, 23, 42, 0.76); border-color: var(--pro-border); }
 
+        .post-links {
+            margin-top: 1rem;
+            padding-top: 0.7rem;
+            border-top: 1px dashed var(--pro-border);
+        }
+
+        .post-links-label {
+            font-family: "Rubik", sans-serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: rgba(15, 23, 42, 0.7);
+            margin-bottom: 0.3rem;
+        }
+
+        .post-link {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--pro-blue);
+            word-break: break-all;
+        }
+
         .score-block {
             min-width: 92px;
             text-align: right;
@@ -1084,8 +1105,20 @@ def _product_detail_html(row: dict[str, Any]) -> str:
             {_comment_box("需要留意的點", negative_comments, "negative")}
         </div>
         {_competitor_html(row)}
+        {_post_links_html(row)}
     </div>
     """
+
+
+def _post_links_html(row: dict[str, Any]) -> str:
+    urls = [str(u).strip() for u in (row.get("貼文連結") or []) if str(u).strip()]
+    if not urls:
+        return ""
+    links = "".join(
+        f'<a class="post-link" href="{escape(u, quote=True)}" target="_blank" rel="noopener">{escape(u)}</a>'
+        for u in urls
+    )
+    return f'<div class="post-links"><div class="post-links-label">文章網址</div>{links}</div>'
 
 
 def _signals_html(row: dict[str, Any]) -> str:
