@@ -979,24 +979,24 @@ def _shopper_card_html(row: dict[str, Any], *, idx: int, selected_idx: int, sele
     selected_class = " selected" if idx == selected_idx else ""
     aria_current = ' aria-current="true"' if idx == selected_idx else ""
     href = "?" + urlencode({SHELF_SELECTION_PARAM: f"{selection_key}|{idx}"})
-    return f"""
-    <a class="product-tile{selected_class}" href="{escape(href, quote=True)}"{aria_current}>
-        <div class="tile-grid">
-            <div>
-                <div class="tile-meta">
-                    {_brand_badge_html(str(row.get("品牌") or "其他"))}
-                    <span class="pill price-pill">{escape(_format_price(row.get("價格")))}</span>
-                </div>
-                <div class="tile-name">{escape(str(row.get("商品") or "-"))}</div>
-                {_signals_html(row)}
-            </div>
-            <div class="score-block">
-                <div class="score-number {_score_class(score)}">{escape(_format_score(score))}<small>/100</small></div>
-                <div class="score-caption">公正分數</div>
-            </div>
-        </div>
-    </a>
-    """
+    return (
+        f'<a class="product-tile{selected_class}" href="{escape(href, quote=True)}"{aria_current}>'
+        '<div class="tile-grid">'
+        "<div>"
+        '<div class="tile-meta">'
+        f'{_brand_badge_html(str(row.get("品牌") or "其他"))}'
+        f'<span class="pill price-pill">{escape(_format_price(row.get("價格")))}</span>'
+        "</div>"
+        f'<div class="tile-name">{escape(str(row.get("商品") or "-"))}</div>'
+        f"{_signals_html(row)}"
+        "</div>"
+        '<div class="score-block">'
+        f'<div class="score-number {_score_class(score)}">{escape(_format_score(score))}<small>/100</small></div>'
+        '<div class="score-caption">公正分數</div>'
+        "</div>"
+        "</div>"
+        "</a>"
+    )
 
 
 def _brand_badge_html(brand: str) -> str:
