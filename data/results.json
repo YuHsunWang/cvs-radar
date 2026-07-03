@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02 14:03:24",
+  "generated_at": "2026-07-03 01:51:29",
   "reports": [
     {
       "brand": "全家",
@@ -217,6 +217,92 @@
     },
     {
       "brand": "全家",
+      "product_name": "梨山水蜜桃牛奶綜合霜淇淋",
+      "fair_score": 78.7,
+      "consensus": "一致好評",
+      "confidence": "高",
+      "n_eff": 8.88,
+      "score_std": 0.132,
+      "n_posts": 1,
+      "n_comments": 8,
+      "contributors": [
+        {
+          "user": "extremevs",
+          "role": "author",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "cf904e18",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "BroDians",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "a556655a",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "Kel",
+          "role": "commenter",
+          "score": 1.0,
+          "weight": 1.0
+        },
+        {
+          "user": "conychiwa",
+          "role": "commenter",
+          "score": 0.872,
+          "weight": 1.0
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8258
+        },
+        {
+          "user": "za755029",
+          "role": "commenter",
+          "score": 0.92,
+          "weight": 0.7628
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.9466,
+          "weight": 0.7418
+        }
+      ],
+      "rep_positive": [
+        "以 水果口味來說算好吃",
+        "那個粉嫩嫩的水蜜桃 霜淇淋,真的好吃 我是吃,只有水蜜桃,下次我也要吃配牛奶口味的",
+        "看起來不錯欸"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:梨山水蜜桃牛奶綜合霜淇淋",
+      "score_mean": 0.821,
+      "price": 98,
+      "category": "冰品",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-07-02T13:59:40",
+      "review_excerpt": "全家7月新口味 蠻還原水蜜桃的香氣跟甜味 單吃水蜜桃的味道很濃 不過小缺點是有點甜 吃了幾口開始覺得有點膩 跟牛奶一起剛好綜合甜味 水蜜桃的香氣混合一點奶香 又同時降低了水蜜桃的甜味 比單吃水蜜桃好吃 個人覺得贏過之前的哈密瓜",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1782971982.A.45C.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "杏仁可可蜂蜜蛋糕",
       "fair_score": 73.5,
       "consensus": "一致好評",
@@ -396,7 +482,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.65,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "monar",
@@ -1334,7 +1420,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "bear7977",
@@ -1652,7 +1738,7 @@
       "fair_score": 70.6,
       "consensus": "一致好評",
       "confidence": "中",
-      "n_eff": 7.88,
+      "n_eff": 7.87,
       "score_std": 0.084,
       "n_posts": 2,
       "n_comments": 6,
@@ -1697,7 +1783,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.8,
-          "weight": 0.7559
+          "weight": 0.7418
         },
         {
           "user": "faint019",
@@ -1713,7 +1799,7 @@
       ],
       "rep_negative": [],
       "product_key": "全家:厚豆腐蛋白蕈菇豬肉堡",
-      "score_mean": 0.7338,
+      "score_mean": 0.7337,
       "price": 69,
       "category": "鹹食",
       "competitor_mention_count": 0,
@@ -2022,7 +2108,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.9,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "hf0932964541",
@@ -2238,7 +2324,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.4,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "liquidlyn",
@@ -2440,7 +2526,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.625,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "linm",
@@ -2738,7 +2824,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.7,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -2878,7 +2964,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.3,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Aixtron",
@@ -3026,7 +3112,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.65,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "tinabjqs",
@@ -3329,7 +3415,7 @@
       "fair_score": 68.9,
       "consensus": "一致好評",
       "confidence": "高",
-      "n_eff": 11.91,
+      "n_eff": 11.9,
       "score_std": 0.143,
       "n_posts": 1,
       "n_comments": 13,
@@ -3404,7 +3490,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.75,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -3414,7 +3500,7 @@
       ],
       "rep_negative": [],
       "product_key": "全家:柚檸海灣貝飯糰",
-      "score_mean": 0.7059,
+      "score_mean": 0.7058,
       "price": 49,
       "category": "便當",
       "competitor_mention_count": 1,
@@ -3772,7 +3858,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "fcz973",
@@ -4934,7 +5020,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.75,
-          "weight": 0.8261
+          "weight": 0.8258
         }
       ],
       "rep_positive": [
@@ -5028,7 +5114,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.65,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "fcz973",
@@ -5331,7 +5417,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "QBoyo",
@@ -5992,7 +6078,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.6,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "hank25772767",
@@ -6132,125 +6218,12 @@
       ]
     },
     {
-      "brand": "OK",
-      "product_name": "燻雞起司米披薩卷",
+      "brand": "7-11",
+      "product_name": "香烤魚排青醬燉飯",
       "fair_score": 64.7,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 12.84,
-      "score_std": 0.16,
-      "n_posts": 1,
-      "n_comments": 14,
-      "contributors": [
-        {
-          "user": "dressingfrad",
-          "role": "author",
-          "score": 0.82,
-          "weight": 1.0
-        },
-        {
-          "user": "thunder19",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "x710466",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "tatalzy",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "k1245963",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "as518182011",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "kano2525",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "FreshTea",
-          "role": "commenter",
-          "score": 0.55,
-          "weight": 1.0
-        },
-        {
-          "user": "firetim",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8281
-        },
-        {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8261
-        },
-        {
-          "user": "toro077",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 0.8133
-        },
-        {
-          "user": "TCY0523",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7559
-        },
-        {
-          "user": "q210216",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 0.7391
-        }
-      ],
-      "rep_positive": [
-        "這系列的東西都很好吃哈哈",
-        "這可以買 好吃",
-        "蠻好吃的"
-      ],
-      "rep_negative": [],
-      "product_key": "OK:燻雞起司米披薩卷",
-      "score_mean": 0.6594,
-      "price": null,
-      "category": "鹹食",
-      "competitor_mention_count": 2,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "全家",
-        "萊爾富"
-      ],
-      "latest_post_date": "2026-04-10T11:15:38",
-      "review_excerpt": "本以為會有米飯感，但本體吃起來像是饅頭一樣柔軟；裡面有燻雞肉和切塊起司，還滿特別。",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1775790944.A.ADF.html"
-      ]
-    },
-    {
-      "brand": "7-11",
-      "product_name": "香烤魚排青醬燉飯",
-      "fair_score": 64.6,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 26.6,
+      "n_eff": 26.59,
       "score_std": 0.203,
       "n_posts": 1,
       "n_comments": 29,
@@ -6265,12 +6238,6 @@
           "user": "marah",
           "role": "commenter",
           "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "za755029",
-          "role": "commenter",
-          "score": 0.5,
           "weight": 1.0
         },
         {
@@ -6361,7 +6328,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "bear7977",
@@ -6392,6 +6359,12 @@
           "role": "commenter",
           "score": 0.75,
           "weight": 0.7735
+        },
+        {
+          "user": "za755029",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7628
         },
         {
           "user": "q210216",
@@ -6429,7 +6402,7 @@
         "太薄"
       ],
       "product_key": "7-11:香烤魚排青醬燉飯",
-      "score_mean": 0.652,
+      "score_mean": 0.6535,
       "price": 65,
       "category": "便當",
       "competitor_mention_count": 0,
@@ -6440,6 +6413,119 @@
       "review_excerpt": "青醬燉飯記得要攪拌均勻，燉飯分量真的滿多；巴利魚排口感像多利魚，份量也還不錯。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1777091929.A.D2A.html"
+      ]
+    },
+    {
+      "brand": "OK",
+      "product_name": "燻雞起司米披薩卷",
+      "fair_score": 64.7,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 12.83,
+      "score_std": 0.16,
+      "n_posts": 1,
+      "n_comments": 14,
+      "contributors": [
+        {
+          "user": "dressingfrad",
+          "role": "author",
+          "score": 0.82,
+          "weight": 1.0
+        },
+        {
+          "user": "thunder19",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "x710466",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "tatalzy",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "k1245963",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "as518182011",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "kano2525",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "FreshTea",
+          "role": "commenter",
+          "score": 0.55,
+          "weight": 1.0
+        },
+        {
+          "user": "firetim",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8281
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8258
+        },
+        {
+          "user": "toro077",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.8133
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7418
+        },
+        {
+          "user": "q210216",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 0.7391
+        }
+      ],
+      "rep_positive": [
+        "這系列的東西都很好吃哈哈",
+        "這可以買 好吃",
+        "蠻好吃的"
+      ],
+      "rep_negative": [],
+      "product_key": "OK:燻雞起司米披薩卷",
+      "score_mean": 0.6596,
+      "price": null,
+      "category": "鹹食",
+      "competitor_mention_count": 2,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "全家",
+        "萊爾富"
+      ],
+      "latest_post_date": "2026-04-10T11:15:38",
+      "review_excerpt": "本以為會有米飯感，但本體吃起來像是饅頭一樣柔軟；裡面有燻雞肉和切塊起司，還滿特別。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1775790944.A.ADF.html"
       ]
     },
     {
@@ -6665,10 +6751,10 @@
     {
       "brand": "7-11",
       "product_name": "懷舊滷雙拼便當",
-      "fair_score": 63.6,
+      "fair_score": 63.5,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 16.79,
+      "n_eff": 16.78,
       "score_std": 0.141,
       "n_posts": 1,
       "n_comments": 18,
@@ -6773,7 +6859,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.7,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -6786,7 +6872,7 @@
         "那個千層麵兩塊好小"
       ],
       "product_key": "7-11:懷舊滷雙拼便當",
-      "score_mean": 0.6443,
+      "score_mean": 0.6442,
       "price": 99,
       "category": "便當",
       "competitor_mention_count": 1,
@@ -7467,7 +7553,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "chenchen520",
@@ -8074,7 +8160,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "paomian1026",
@@ -8133,7 +8219,7 @@
       "fair_score": 62.5,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 8.9,
+      "n_eff": 8.89,
       "score_std": 0.203,
       "n_posts": 1,
       "n_comments": 9,
@@ -8178,7 +8264,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.25,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "ccc67",
@@ -8190,7 +8276,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.75,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -8202,7 +8288,7 @@
         "生鮭魚? 我怕肚子無法承受...先pass"
       ],
       "product_key": "全家:鹽蔥生鮭飯糰",
-      "score_mean": 0.6399,
+      "score_mean": 0.6397,
       "price": 52,
       "category": "便當",
       "competitor_mention_count": 0,
@@ -8811,7 +8897,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.6,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "BOARAY",
@@ -9505,7 +9591,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.65,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "chenchen520",
@@ -9623,7 +9709,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "summerhsia",
@@ -10127,7 +10213,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "j855081221",
@@ -10352,7 +10438,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Ttei",
@@ -10414,7 +10500,7 @@
       "fair_score": 60.5,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 18.82,
+      "n_eff": 18.81,
       "score_std": 0.141,
       "n_posts": 1,
       "n_comments": 22,
@@ -10507,7 +10593,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.425,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Gwaygo",
@@ -10531,7 +10617,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.65,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -10754,8 +10840,8 @@
       "fair_score": 60.2,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 94.99,
-      "score_std": 0.187,
+      "n_eff": 94.95,
+      "score_std": 0.188,
       "n_posts": 3,
       "n_comments": 123,
       "contributors": [
@@ -10953,12 +11039,6 @@
         },
         {
           "user": "ken10272",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "za755029",
           "role": "commenter",
           "score": 0.5,
           "weight": 1.0
@@ -11288,6 +11368,12 @@
           "weight": 0.772
         },
         {
+          "user": "za755029",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7628
+        },
+        {
           "user": "Everybody99",
           "role": "commenter",
           "score": 0.75,
@@ -11347,7 +11433,7 @@
         "自己是 不好吃,或者不對我的口味。再來沒子瑜小卡應該i珍食會變多,因為也不能集點又相對貴,想試的人等就行了"
       ],
       "product_key": "7-11:麻辣奶油鮮蝦義大利麵",
-      "score_mean": 0.6028,
+      "score_mean": 0.6031,
       "price": 55,
       "category": "便當",
       "competitor_mention_count": 6,
@@ -11592,7 +11678,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         }
       ],
       "rep_positive": [
@@ -12281,7 +12367,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "spp782002",
@@ -12540,7 +12626,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.6375,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "joy159357",
@@ -13178,7 +13264,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "linm",
@@ -13241,7 +13327,7 @@
       "consensus": "褒貶不一",
       "confidence": "高",
       "n_eff": 10.74,
-      "score_std": 0.238,
+      "score_std": 0.237,
       "n_posts": 1,
       "n_comments": 10,
       "contributors": [
@@ -13273,7 +13359,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.65,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "hank25772767",
@@ -13297,7 +13383,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.9,
-          "weight": 0.7559
+          "weight": 0.7418
         },
         {
           "user": "darianchiu",
@@ -13323,7 +13409,7 @@
         "原價貴"
       ],
       "product_key": "全家:嫩烤香料雞胸排蔬滿盒",
-      "score_mean": 0.5831,
+      "score_mean": 0.5826,
       "price": 129,
       "category": "鹹食",
       "competitor_mention_count": 0,
@@ -13338,11 +13424,208 @@
     },
     {
       "brand": "全家",
-      "product_name": "泰式奶茶霜淇淋",
+      "product_name": "鮮蝦旬彩炊飯飯糰",
       "fair_score": 57.4,
       "consensus": "褒貶不一",
+      "confidence": "中",
+      "n_eff": 4.91,
+      "score_std": 0.163,
+      "n_posts": 1,
+      "n_comments": 4,
+      "contributors": [
+        {
+          "user": "dus68",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "sw9834",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "steven183",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 1.0
+        },
+        {
+          "user": "idxxxx",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.772
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 0.7418
+        }
+      ],
+      "rep_positive": [],
+      "rep_negative": [
+        "這蝦是起到一個裝飾的作用嗎"
+      ],
+      "product_key": "全家:鮮蝦旬彩炊飯飯糰",
+      "score_mean": 0.5905,
+      "price": 39,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-03-25T01:36:19",
+      "review_excerpt": "炊飯有牛蒡和昆布的味道，味道沒有很重，整體是鹹甜口、清爽的類型；不到40元有蝦子我覺得很棒。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1774373781.A.22D.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "香蒜胡椒肉骨茶麵",
+      "fair_score": 57.3,
+      "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 52.14,
+      "n_eff": 16.75,
+      "score_std": 0.23,
+      "n_posts": 1,
+      "n_comments": 17,
+      "contributors": [
+        {
+          "user": "S09420330",
+          "role": "author",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "TeamFrotress",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 1.0
+        },
+        {
+          "user": "Yun9626",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 1.0
+        },
+        {
+          "user": "bamboo588",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "ss3617586",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 1.0
+        },
+        {
+          "user": "sidosi",
+          "role": "commenter",
+          "score": 0.425,
+          "weight": 1.0
+        },
+        {
+          "user": "genie325",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 1.0
+        },
+        {
+          "user": "manchenlee",
+          "role": "commenter",
+          "score": 0.05,
+          "weight": 1.0
+        },
+        {
+          "user": "gdsword",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8333
+        },
+        {
+          "user": "a27588679",
+          "role": "commenter",
+          "score": 0.5875,
+          "weight": 0.8332
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8258
+        },
+        {
+          "user": "linm",
+          "role": "commenter",
+          "score": 0.575,
+          "weight": 0.8142
+        },
+        {
+          "user": "maye",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8073
+        },
+        {
+          "user": "a43164910",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7917
+        },
+        {
+          "user": "Barefoot24",
+          "role": "commenter",
+          "score": 0.15,
+          "weight": 0.7733
+        },
+        {
+          "user": "Din680",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.7481
+        },
+        {
+          "user": "c48074",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.6869
+        }
+      ],
+      "rep_positive": [
+        "蒜味真的沒理由不好吃的,賀呷",
+        "告五人害我破防...原本嫌貴 但這組合蒜控直接無法抗拒",
+        "蒜香+胡椒香完全是深夜犯罪等級"
+      ],
+      "rep_negative": [
+        "超難吃",
+        "原來這是網紅業配的組合,我看很快又要有第三篇,一日五食什麼鬼企劃,你這才一餐鈉就破3000不用一個月就去洗腎了,網紅業配信眾洗腎看了就好笑"
+      ],
+      "product_key": "全家:香蒜胡椒肉骨茶麵",
+      "score_mean": 0.5773,
+      "price": 79,
+      "category": "鹹食",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-05-24T21:59:49",
+      "review_excerpt": "湯頭認真的很濃郁，滿滿的蒜香跟胡椒香氣；胡椒的辛香跟蒜頭香氣融合得不錯，肉也很軟。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1779631192.A.AC3.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "泰式奶茶霜淇淋",
+      "fair_score": 57.3,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 52.11,
       "score_std": 0.152,
       "n_posts": 2,
       "n_comments": 58,
@@ -13405,12 +13688,6 @@
           "user": "wting",
           "role": "commenter",
           "score": 0.325,
-          "weight": 1.0
-        },
-        {
-          "user": "za755029",
-          "role": "commenter",
-          "score": 0.75,
           "weight": 1.0
         },
         {
@@ -13573,7 +13850,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.55,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "guanluvsquat",
@@ -13606,16 +13883,16 @@
           "weight": 0.763
         },
         {
+          "user": "za755029",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.7628
+        },
+        {
           "user": "Ralfchen0429",
           "role": "commenter",
           "score": 0.425,
           "weight": 0.7611
-        },
-        {
-          "user": "TCY0523",
-          "role": "commenter",
-          "score": 0.7375,
-          "weight": 0.7559
         },
         {
           "user": "ISbn94",
@@ -13628,6 +13905,12 @@
           "role": "commenter",
           "score": 0.625,
           "weight": 0.7511
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.7375,
+          "weight": 0.7418
         },
         {
           "user": "Everybody99",
@@ -13677,7 +13960,7 @@
         "根本不像泰奶,一入口就是木瓜牛奶味"
       ],
       "product_key": "全家:泰式奶茶霜淇淋",
-      "score_mean": 0.5757,
+      "score_mean": 0.5748,
       "price": 55,
       "category": "冰品",
       "competitor_mention_count": 3,
@@ -13691,203 +13974,6 @@
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1777784320.A.A01.html",
         "https://www.ptt.cc/bbs/CVS/M.1777896571.A.455.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "鮮蝦旬彩炊飯飯糰",
-      "fair_score": 57.4,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "n_eff": 4.92,
-      "score_std": 0.163,
-      "n_posts": 1,
-      "n_comments": 4,
-      "contributors": [
-        {
-          "user": "dus68",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "sw9834",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "steven183",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "idxxxx",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.772
-        },
-        {
-          "user": "TCY0523",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 0.7559
-        }
-      ],
-      "rep_positive": [],
-      "rep_negative": [
-        "這蝦是起到一個裝飾的作用嗎"
-      ],
-      "product_key": "全家:鮮蝦旬彩炊飯飯糰",
-      "score_mean": 0.5905,
-      "price": 39,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "latest_post_date": "2026-03-25T01:36:19",
-      "review_excerpt": "炊飯有牛蒡和昆布的味道，味道沒有很重，整體是鹹甜口、清爽的類型；不到40元有蝦子我覺得很棒。",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1774373781.A.22D.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "香蒜胡椒肉骨茶麵",
-      "fair_score": 57.3,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 16.75,
-      "score_std": 0.23,
-      "n_posts": 1,
-      "n_comments": 17,
-      "contributors": [
-        {
-          "user": "S09420330",
-          "role": "author",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "TeamFrotress",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 1.0
-        },
-        {
-          "user": "Yun9626",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "bamboo588",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "ss3617586",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "sidosi",
-          "role": "commenter",
-          "score": 0.425,
-          "weight": 1.0
-        },
-        {
-          "user": "genie325",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 1.0
-        },
-        {
-          "user": "manchenlee",
-          "role": "commenter",
-          "score": 0.05,
-          "weight": 1.0
-        },
-        {
-          "user": "gdsword",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8333
-        },
-        {
-          "user": "a27588679",
-          "role": "commenter",
-          "score": 0.5875,
-          "weight": 0.8332
-        },
-        {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8261
-        },
-        {
-          "user": "linm",
-          "role": "commenter",
-          "score": 0.575,
-          "weight": 0.8142
-        },
-        {
-          "user": "maye",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8073
-        },
-        {
-          "user": "a43164910",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7917
-        },
-        {
-          "user": "Barefoot24",
-          "role": "commenter",
-          "score": 0.15,
-          "weight": 0.7733
-        },
-        {
-          "user": "Din680",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 0.7481
-        },
-        {
-          "user": "c48074",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.6869
-        }
-      ],
-      "rep_positive": [
-        "蒜味真的沒理由不好吃的,賀呷",
-        "告五人害我破防...原本嫌貴 但這組合蒜控直接無法抗拒",
-        "蒜香+胡椒香完全是深夜犯罪等級"
-      ],
-      "rep_negative": [
-        "超難吃",
-        "原來這是網紅業配的組合,我看很快又要有第三篇,一日五食什麼鬼企劃,你這才一餐鈉就破3000不用一個月就去洗腎了,網紅業配信眾洗腎看了就好笑"
-      ],
-      "product_key": "全家:香蒜胡椒肉骨茶麵",
-      "score_mean": 0.5773,
-      "price": 79,
-      "category": "鹹食",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "latest_post_date": "2026-05-24T21:59:49",
-      "review_excerpt": "湯頭認真的很濃郁，滿滿的蒜香跟胡椒香氣；胡椒的辛香跟蒜頭香氣融合得不錯，肉也很軟。",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1779631192.A.AC3.html"
       ]
     },
     {
@@ -14258,7 +14344,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.6,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "scores",
@@ -14459,7 +14545,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.4,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "gg112",
@@ -14955,7 +15041,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5625,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "una283",
@@ -15316,7 +15402,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.4583,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "fgdf",
@@ -17095,7 +17181,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "a43164910",
@@ -17232,7 +17318,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "una283",
@@ -17268,7 +17354,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -17502,7 +17588,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Levesque",
@@ -17619,16 +17705,16 @@
           "weight": 0.8514
         },
         {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.8261
-        },
-        {
           "user": "ducamao",
           "role": "commenter",
           "score": 0.5,
           "weight": 0.826
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.8258
         },
         {
           "user": "xh96472",
@@ -18330,7 +18416,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.6,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "notea",
@@ -18444,7 +18530,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.55,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "chanifa",
@@ -18555,7 +18641,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.55,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "chanifa",
@@ -18666,7 +18752,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.55,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "chanifa",
@@ -18813,7 +18899,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Kazamatsuri",
@@ -18917,7 +19003,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.425,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "scores",
@@ -19104,7 +19190,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "una283",
@@ -19245,7 +19331,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "johnwu",
@@ -20215,7 +20301,7 @@
       "fair_score": 51.9,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 32.51,
+      "n_eff": 32.5,
       "score_std": 0.151,
       "n_posts": 1,
       "n_comments": 33,
@@ -20389,12 +20475,6 @@
           "weight": 0.7638
         },
         {
-          "user": "TCY0523",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7559
-        },
-        {
           "user": "Masterpiec",
           "role": "commenter",
           "score": 0.6,
@@ -20405,6 +20485,12 @@
           "role": "commenter",
           "score": 0.65,
           "weight": 0.7473
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7418
         },
         {
           "user": "king258811",
@@ -20611,7 +20697,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Levesque",
@@ -20996,7 +21082,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "guanluvsquat",
@@ -21329,16 +21415,16 @@
           "weight": 0.8299
         },
         {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 0.8261
-        },
-        {
           "user": "ducamao",
           "role": "commenter",
           "score": 0.25,
           "weight": 0.826
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 0.8258
         },
         {
           "user": "bear7977",
@@ -21639,7 +21725,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.4,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "kenryu",
@@ -22075,7 +22161,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.425,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "muzik",
@@ -22392,7 +22478,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.1,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "ISbn94",
@@ -22424,7 +22510,7 @@
         "打7折還是很貴 寧願拿去買雞排吃"
       ],
       "product_key": "全家:lotte生巧克力派法式濃巧",
-      "score_mean": 0.4956,
+      "score_mean": 0.4957,
       "price": 89,
       "category": "零食",
       "competitor_mention_count": 0,
@@ -22683,210 +22769,6 @@
     },
     {
       "brand": "全家",
-      "product_name": "霜淇淋起司咖啡",
-      "fair_score": 49.4,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 27.44,
-      "score_std": 0.149,
-      "n_posts": 1,
-      "n_comments": 30,
-      "contributors": [
-        {
-          "user": "m13579",
-          "role": "author",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "september279",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "tingding",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 1.0
-        },
-        {
-          "user": "asdasd",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "dong08111",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "justbefriend",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "ikok92819",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "ckvck",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 1.0
-        },
-        {
-          "user": "JJ138Wu",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 1.0
-        },
-        {
-          "user": "mei946",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "motw1999",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.88
-        },
-        {
-          "user": "handsomeYD",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.8679
-        },
-        {
-          "user": "w4",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.8597
-        },
-        {
-          "user": "windowdoor",
-          "role": "commenter",
-          "score": 0.45,
-          "weight": 0.8488
-        },
-        {
-          "user": "GeogeBye",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.836
-        },
-        {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8261
-        },
-        {
-          "user": "guanluvsquat",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.8025
-        },
-        {
-          "user": "liquidlyn",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8
-        },
-        {
-          "user": "Shanny17",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7822
-        },
-        {
-          "user": "salvador1988",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7728
-        },
-        {
-          "user": "lichung1243",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.766
-        },
-        {
-          "user": "a765432112",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.765
-        },
-        {
-          "user": "TCY0523",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.7559
-        },
-        {
-          "user": "bobby123",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.7511
-        },
-        {
-          "user": "ttyui",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.7307
-        },
-        {
-          "user": "miya000",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7188
-        },
-        {
-          "user": "oddman",
-          "role": "commenter",
-          "score": 0.45,
-          "weight": 0.6133
-        },
-        {
-          "user": "nagisay49529",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.6029
-        }
-      ],
-      "rep_positive": [
-        "喜歡起司+1 很濃口感很好",
-        "起司口味還不錯~蠻香濃的",
-        "我比較喜歡起司單口味"
-      ],
-      "rep_negative": [
-        "其實多擠也差一點 心情問題 只有小是還可以忍受 但是一開始下面就在滴真的很麻煩又噁心以前甚至昨天在同一家點蘭姆葡萄+咖啡 吃的都沒那麼誇張不過也一樣沒有很好吃 今天經過看到換起司像是嚐鮮看看結果就踩雷https://i.verb.tw/QowlJ11M.jpg",
-        "感謝滅火",
-        "咖啡的都擠很小 不知道是不好擠還是店員的問題"
-      ],
-      "product_key": "全家:霜淇淋起司咖啡",
-      "score_mean": 0.4933,
-      "price": null,
-      "category": "冰品",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "latest_post_date": "2026-04-18T18:46:12",
-      "review_excerpt": "吃起來沒有特別好吃，咖啡味比較重，沒什麼起司味；一開始就在滴水，尺寸偏小大扣分。",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1776509174.A.773.html"
-      ]
-    },
-    {
-      "brand": "全家",
       "product_name": "ce霜淇淋伊藤園抹茶焦糖蘇打",
       "fair_score": 49.4,
       "consensus": "褒貶不一",
@@ -23110,7 +22992,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.55,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "scores",
@@ -23230,6 +23112,210 @@
     },
     {
       "brand": "全家",
+      "product_name": "霜淇淋起司咖啡",
+      "fair_score": 49.3,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 27.43,
+      "score_std": 0.149,
+      "n_posts": 1,
+      "n_comments": 30,
+      "contributors": [
+        {
+          "user": "m13579",
+          "role": "author",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "september279",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "tingding",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 1.0
+        },
+        {
+          "user": "asdasd",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "dong08111",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "justbefriend",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "ikok92819",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "ckvck",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 1.0
+        },
+        {
+          "user": "JJ138Wu",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 1.0
+        },
+        {
+          "user": "mei946",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "motw1999",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.88
+        },
+        {
+          "user": "handsomeYD",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8679
+        },
+        {
+          "user": "w4",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8597
+        },
+        {
+          "user": "windowdoor",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 0.8488
+        },
+        {
+          "user": "GeogeBye",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.836
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8258
+        },
+        {
+          "user": "guanluvsquat",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.8025
+        },
+        {
+          "user": "liquidlyn",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8
+        },
+        {
+          "user": "Shanny17",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7822
+        },
+        {
+          "user": "salvador1988",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7728
+        },
+        {
+          "user": "lichung1243",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.766
+        },
+        {
+          "user": "a765432112",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.765
+        },
+        {
+          "user": "bobby123",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.7511
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.7418
+        },
+        {
+          "user": "ttyui",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.7307
+        },
+        {
+          "user": "miya000",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7188
+        },
+        {
+          "user": "oddman",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 0.6133
+        },
+        {
+          "user": "nagisay49529",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.6029
+        }
+      ],
+      "rep_positive": [
+        "喜歡起司+1 很濃口感很好",
+        "起司口味還不錯~蠻香濃的",
+        "我比較喜歡起司單口味"
+      ],
+      "rep_negative": [
+        "其實多擠也差一點 心情問題 只有小是還可以忍受 但是一開始下面就在滴真的很麻煩又噁心以前甚至昨天在同一家點蘭姆葡萄+咖啡 吃的都沒那麼誇張不過也一樣沒有很好吃 今天經過看到換起司像是嚐鮮看看結果就踩雷https://i.verb.tw/QowlJ11M.jpg",
+        "感謝滅火",
+        "咖啡的都擠很小 不知道是不好擠還是店員的問題"
+      ],
+      "product_key": "全家:霜淇淋起司咖啡",
+      "score_mean": 0.4931,
+      "price": null,
+      "category": "冰品",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-04-18T18:46:12",
+      "review_excerpt": "吃起來沒有特別好吃，咖啡味比較重，沒什麼起司味；一開始就在滴水，尺寸偏小大扣分。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1776509174.A.773.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "老酒花雕雞風味杯麵",
       "fair_score": 49.1,
       "consensus": "褒貶不一",
@@ -23285,7 +23371,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.35,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "ccc67",
@@ -23827,7 +23913,7 @@
       "fair_score": 48.6,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 12.75,
+      "n_eff": 12.74,
       "score_std": 0.182,
       "n_posts": 1,
       "n_comments": 17,
@@ -23878,7 +23964,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Kazamatsuri",
@@ -23902,7 +23988,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.7559
+          "weight": 0.7418
         },
         {
           "user": "grabbite",
@@ -24152,7 +24238,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "tomalex",
@@ -24186,117 +24272,6 @@
       "review_excerpt": "獅子頭則是推薦打折時買；兩顆獅子頭是很大顆的，其他就是玉米勾芡加上一點點紅蘿蔔切絲。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1773837263.A.D32.html"
-      ]
-    },
-    {
-      "brand": "7-11",
-      "product_name": "切達起司貝果",
-      "fair_score": 48.5,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 11.76,
-      "score_std": 0.2,
-      "n_posts": 1,
-      "n_comments": 22,
-      "contributors": [
-        {
-          "user": "minda",
-          "role": "commenter",
-          "score": 0.4,
-          "weight": 1.0
-        },
-        {
-          "user": "CUTTLEH",
-          "role": "commenter",
-          "score": 0.225,
-          "weight": 1.0
-        },
-        {
-          "user": "xinWu",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 1.0
-        },
-        {
-          "user": "za755029",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "pakery",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.8261
-        },
-        {
-          "user": "summerhsia",
-          "role": "commenter",
-          "score": 0.575,
-          "weight": 0.8229
-        },
-        {
-          "user": "weiike",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.8115
-        },
-        {
-          "user": "UCCUplz",
-          "role": "commenter",
-          "score": 0.425,
-          "weight": 0.7631
-        },
-        {
-          "user": "miniUU",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 0.7529
-        },
-        {
-          "user": "kt7rc",
-          "role": "commenter",
-          "score": 0.5417,
-          "weight": 0.6969
-        },
-        {
-          "user": "c48074",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.6869
-        }
-      ],
-      "rep_positive": [
-        "超商貝果這兩款最好吃",
-        "以前很常買耶 懷念的味道",
-        "藍莓我蠻常買的 比較難買不知道是進貨少還是比較熱賣"
-      ],
-      "rep_negative": [
-        "那天看到嚇到,直接放回去XD",
-        "派司一次漲30%更多",
-        "新感覺可可夾心30變39嚇死"
-      ],
-      "product_key": "7-11:切達起司貝果",
-      "score_mean": 0.4831,
-      "price": 28,
-      "category": "麵包",
-      "competitor_mention_count": 3,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "全家",
-        "其他"
-      ],
-      "latest_post_date": "2026-06-27T16:49:15",
-      "review_excerpt": "",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1782550157.A.0A3.html"
       ]
     },
     {
@@ -24441,7 +24416,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "bear7977",
@@ -24566,7 +24541,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Mafiosolo",
@@ -24610,6 +24585,117 @@
       "review_excerpt": "吃得出抹茶味，但整體偏苦，適合喜歡吃苦的人；千層本身正常發揮，不雷但也沒什麼特色。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1773719085.A.2D6.html"
+      ]
+    },
+    {
+      "brand": "7-11",
+      "product_name": "切達起司貝果",
+      "fair_score": 48.2,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 11.77,
+      "score_std": 0.202,
+      "n_posts": 1,
+      "n_comments": 22,
+      "contributors": [
+        {
+          "user": "minda",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 1.0
+        },
+        {
+          "user": "CUTTLEH",
+          "role": "commenter",
+          "score": 0.225,
+          "weight": 1.0
+        },
+        {
+          "user": "xinWu",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 1.0
+        },
+        {
+          "user": "pakery",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.8258
+        },
+        {
+          "user": "summerhsia",
+          "role": "commenter",
+          "score": 0.575,
+          "weight": 0.8229
+        },
+        {
+          "user": "weiike",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.8115
+        },
+        {
+          "user": "UCCUplz",
+          "role": "commenter",
+          "score": 0.425,
+          "weight": 0.7631
+        },
+        {
+          "user": "za755029",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 0.7628
+        },
+        {
+          "user": "miniUU",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.7529
+        },
+        {
+          "user": "kt7rc",
+          "role": "commenter",
+          "score": 0.5417,
+          "weight": 0.6969
+        },
+        {
+          "user": "c48074",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.6869
+        }
+      ],
+      "rep_positive": [
+        "超商貝果這兩款最好吃",
+        "以前很常買耶 懷念的味道",
+        "藍莓我蠻常買的 比較難買不知道是進貨少還是比較熱賣"
+      ],
+      "rep_negative": [
+        "那天看到嚇到,直接放回去XD",
+        "派司一次漲30%更多",
+        "新感覺可可夾心30變39嚇死"
+      ],
+      "product_key": "7-11:切達起司貝果",
+      "score_mean": 0.4804,
+      "price": 28,
+      "category": "麵包",
+      "competitor_mention_count": 3,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "全家",
+        "其他"
+      ],
+      "latest_post_date": "2026-06-27T16:49:15",
+      "review_excerpt": "",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1782550157.A.0A3.html"
       ]
     },
     {
@@ -24717,7 +24803,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.375,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "a43164910",
@@ -24999,7 +25085,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.45,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "lichung1243",
@@ -25570,7 +25656,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.6,
-          "weight": 0.7559
+          "weight": 0.7418
         },
         {
           "user": "nacheong17",
@@ -25922,8 +26008,8 @@
       "fair_score": 47.0,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 13.73,
-      "score_std": 0.255,
+      "n_eff": 13.72,
+      "score_std": 0.256,
       "n_posts": 1,
       "n_comments": 13,
       "contributors": [
@@ -25997,7 +26083,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.7559
+          "weight": 0.7418
         },
         {
           "user": "faint019",
@@ -26042,7 +26128,7 @@
       "fair_score": 46.3,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 16.85,
+      "n_eff": 16.84,
       "score_std": 0.149,
       "n_posts": 1,
       "n_comments": 19,
@@ -26147,7 +26233,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.675,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -26161,7 +26247,7 @@
         "狠飽系列好像都不是在強調好吃這件事,問題是份量也沒真的多到驚艷,只有價格很敢開"
       ],
       "product_key": "全家:x大埔鐵板燒爆炒雞丁飯",
-      "score_mean": 0.4608,
+      "score_mean": 0.4606,
       "price": 99,
       "category": "便當",
       "competitor_mention_count": 1,
@@ -26263,7 +26349,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.55,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "YL9212",
@@ -27179,7 +27265,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.45,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "UK5566",
@@ -27518,7 +27604,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         }
       ],
       "rep_positive": [],
@@ -27590,7 +27676,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.225,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "johnwu",
@@ -27746,7 +27832,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.3,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "kenryu",
@@ -27878,194 +27964,6 @@
       "review_excerpt": "萊爾富有活動，任2瓶69元，超級甜，沒什麼咖啡味。浪費錢了。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1780985749.A.DEF.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "布丁捲蛋糕",
-      "fair_score": 42.6,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 24.7,
-      "score_std": 0.213,
-      "n_posts": 1,
-      "n_comments": 30,
-      "contributors": [
-        {
-          "user": "y8321y",
-          "role": "author",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "csluling",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "wsxcdsvv",
-          "role": "commenter",
-          "score": 0.1,
-          "weight": 1.0
-        },
-        {
-          "user": "qscrgnyj",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "ibilsfish",
-          "role": "commenter",
-          "score": 0.1,
-          "weight": 1.0
-        },
-        {
-          "user": "li72716",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 1.0
-        },
-        {
-          "user": "jiun1135",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 1.0
-        },
-        {
-          "user": "aprilliu",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "mina322753",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "thiz1234",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "iloveannasui",
-          "role": "commenter",
-          "score": 0.15,
-          "weight": 1.0
-        },
-        {
-          "user": "lovevale",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.8675
-        },
-        {
-          "user": "fgh",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8625
-        },
-        {
-          "user": "MBAR",
-          "role": "commenter",
-          "score": 0.45,
-          "weight": 0.8514
-        },
-        {
-          "user": "a27588679",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 0.8332
-        },
-        {
-          "user": "pook0818",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.8308
-        },
-        {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8261
-        },
-        {
-          "user": "ducamao",
-          "role": "commenter",
-          "score": 0.4,
-          "weight": 0.826
-        },
-        {
-          "user": "mary92206",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8116
-        },
-        {
-          "user": "w2776803",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8006
-        },
-        {
-          "user": "pliu91",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.8
-        },
-        {
-          "user": "Barefoot24",
-          "role": "commenter",
-          "score": 0.1,
-          "weight": 0.7733
-        },
-        {
-          "user": "TCY0523",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.7559
-        },
-        {
-          "user": "lioucat",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.7551
-        },
-        {
-          "user": "papau",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.739
-        }
-      ],
-      "rep_positive": [
-        "昨天吃了,很愛。之前 的布丁上加蛋糕也 好吃。 蛋糕和奶油都好好吃,綿+甜+奶;布丁上面有一層透明的東西,第一口就是吃到那個,驚為天人。不過直接吃布丁有點苦,小口小口配蛋糕可能比較好,但這兩樣口感不同,完全沒想到要一起吃...附帶一提, 的抹茶甜點 太苦了,吃過一次就不買了",
-        "昨天有買~我還蠻喜歡蛋糕的部分 很綿軟",
-        "前2天吃不錯,焦糖微苦 布丁確實紮實 不是綿密感較可惜~蛋糕綿密+奶油的口感不錯"
-      ],
-      "rep_negative": [
-        "統一布丁一顆10元,瑞士捲那麼一小片也不用39吧,超盤",
-        "布丁系列都難吃",
-        "看到友善時光就被買了,真是不好吃"
-      ],
-      "product_key": "全家:布丁捲蛋糕",
-      "score_mean": 0.4222,
-      "price": 49,
-      "category": "甜點",
-      "competitor_mention_count": 1,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "7-11"
-      ],
-      "latest_post_date": "2026-04-12T00:06:53",
-      "review_excerpt": "味道上認真來說就是兩樣分開的東西；布丁的焦糖微苦，布丁本體偏硬實，蛋糕捲感覺濕濕的。",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1775923616.A.21D.html"
       ]
     },
     {
@@ -28206,6 +28104,194 @@
       "review_excerpt": "味道口感跟普通三角版一樣，捲起來跟攤開來吃基本沒區別，但是整袋48g份量小到笑。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1778688997.A.D89.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "布丁捲蛋糕",
+      "fair_score": 42.5,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 24.69,
+      "score_std": 0.213,
+      "n_posts": 1,
+      "n_comments": 30,
+      "contributors": [
+        {
+          "user": "y8321y",
+          "role": "author",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "csluling",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "wsxcdsvv",
+          "role": "commenter",
+          "score": 0.1,
+          "weight": 1.0
+        },
+        {
+          "user": "qscrgnyj",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "ibilsfish",
+          "role": "commenter",
+          "score": 0.1,
+          "weight": 1.0
+        },
+        {
+          "user": "li72716",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 1.0
+        },
+        {
+          "user": "jiun1135",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 1.0
+        },
+        {
+          "user": "aprilliu",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "mina322753",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "thiz1234",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "iloveannasui",
+          "role": "commenter",
+          "score": 0.15,
+          "weight": 1.0
+        },
+        {
+          "user": "lovevale",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.8675
+        },
+        {
+          "user": "fgh",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8625
+        },
+        {
+          "user": "MBAR",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 0.8514
+        },
+        {
+          "user": "a27588679",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 0.8332
+        },
+        {
+          "user": "pook0818",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8308
+        },
+        {
+          "user": "ducamao",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 0.826
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8258
+        },
+        {
+          "user": "mary92206",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8116
+        },
+        {
+          "user": "w2776803",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8006
+        },
+        {
+          "user": "pliu91",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8
+        },
+        {
+          "user": "Barefoot24",
+          "role": "commenter",
+          "score": 0.1,
+          "weight": 0.7733
+        },
+        {
+          "user": "lioucat",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.7551
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.7418
+        },
+        {
+          "user": "papau",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.739
+        }
+      ],
+      "rep_positive": [
+        "昨天吃了,很愛。之前 的布丁上加蛋糕也 好吃。 蛋糕和奶油都好好吃,綿+甜+奶;布丁上面有一層透明的東西,第一口就是吃到那個,驚為天人。不過直接吃布丁有點苦,小口小口配蛋糕可能比較好,但這兩樣口感不同,完全沒想到要一起吃...附帶一提, 的抹茶甜點 太苦了,吃過一次就不買了",
+        "昨天有買~我還蠻喜歡蛋糕的部分 很綿軟",
+        "前2天吃不錯,焦糖微苦 布丁確實紮實 不是綿密感較可惜~蛋糕綿密+奶油的口感不錯"
+      ],
+      "rep_negative": [
+        "統一布丁一顆10元,瑞士捲那麼一小片也不用39吧,超盤",
+        "布丁系列都難吃",
+        "看到友善時光就被買了,真是不好吃"
+      ],
+      "product_key": "全家:布丁捲蛋糕",
+      "score_mean": 0.4221,
+      "price": 49,
+      "category": "甜點",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "7-11"
+      ],
+      "latest_post_date": "2026-04-12T00:06:53",
+      "review_excerpt": "味道上認真來說就是兩樣分開的東西；布丁的焦糖微苦，布丁本體偏硬實，蛋糕捲感覺濕濕的。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1775923616.A.21D.html"
       ]
     },
     {
@@ -28452,7 +28538,7 @@
       "fair_score": 42.2,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "n_eff": 16.8,
+      "n_eff": 16.79,
       "score_std": 0.172,
       "n_posts": 1,
       "n_comments": 17,
@@ -28548,16 +28634,16 @@
           "weight": 0.7762
         },
         {
-          "user": "TCY0523",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.7559
-        },
-        {
           "user": "bobby123",
           "role": "commenter",
           "score": 0.5,
           "weight": 0.7511
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -28569,7 +28655,7 @@
         "跟樓上同感 一入口有些柚子香氣 喝下去後尾韻有像柑橘類香精的味道 跟雷達很像"
       ],
       "product_key": "全家:bbq韓式柚子冰茶",
-      "score_mean": 0.4174,
+      "score_mean": 0.4172,
       "price": 38,
       "category": "飲料",
       "competitor_mention_count": 0,
@@ -28627,7 +28713,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.7559
+          "weight": 0.7418
         },
         {
           "user": "sausageholic",
@@ -28648,7 +28734,7 @@
         "蜜桃比較好喝"
       ],
       "product_key": "全家:紅心芭樂",
-      "score_mean": 0.4112,
+      "score_mean": 0.411,
       "price": 38,
       "category": "飲料",
       "competitor_mention_count": 0,
@@ -28712,7 +28798,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.45,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "james4141989",
@@ -28828,7 +28914,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.225,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "johnwu",
@@ -29239,7 +29325,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.45,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "bear7977",
@@ -29477,7 +29563,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.4,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "mono1023",
@@ -29583,7 +29669,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.25,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Kazamatsuri",
@@ -29777,7 +29863,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.525,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "scores",
@@ -30909,7 +30995,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.425,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "ccc67",
@@ -30924,7 +31010,7 @@
         "西雅圖pass"
       ],
       "product_key": "7-11:西雅圖蜜香咖啡紅茶四季春拿鐵",
-      "score_mean": 0.3382,
+      "score_mean": 0.3381,
       "price": 150,
       "category": "飲料",
       "competitor_mention_count": 0,
@@ -31098,7 +31184,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.15,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "rex7788",
@@ -31524,7 +31610,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "bear7977",
@@ -31652,7 +31738,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.35,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "aids893001",
@@ -31915,7 +32001,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.325,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "weiike",
@@ -32693,6 +32779,48 @@
       ]
     },
     {
+      "brand": "全家",
+      "product_name": "KIRINiMUSE乳酸菌檸檬水",
+      "fair_score": 70.0,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "n_eff": 2.0,
+      "score_std": 0.0,
+      "n_posts": 1,
+      "n_comments": 1,
+      "contributors": [
+        {
+          "user": "CLisOM",
+          "role": "author",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "jjack11",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        }
+      ],
+      "rep_positive": [
+        "看到商標就醉了"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:kirinimuse乳酸菌檸檬水",
+      "score_mean": 0.8,
+      "price": 45,
+      "category": "飲料",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-07-02T21:27:36",
+      "review_excerpt": "跟午後紅茶同品牌,擺在一起 ,算是清爽,有股黃檸檬香氣 ,一直覺得味道挺熟悉,剛開 始想是多了檸檬味的fin,後 來才想起,跟同牌的午後檸檬 茶很像,但甜度較低,以前有 段時間很愛喝午後檸檬茶,不 過也許老了覺得太甜,又或者",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1782998858.A.5A3.html"
+      ]
+    },
+    {
       "brand": "7-11",
       "product_name": "焦糖布蕾馬卡龍",
       "fair_score": 69.3,
@@ -32786,11 +32914,11 @@
     {
       "brand": "全家",
       "product_name": "塔塔醬蝦排飯糰",
-      "fair_score": 66.2,
+      "fair_score": 66.3,
       "consensus": "資料不足",
       "confidence": "低",
-      "n_eff": 2.95,
-      "score_std": 0.149,
+      "n_eff": 2.94,
+      "score_std": 0.148,
       "n_posts": 1,
       "n_comments": 3,
       "contributors": [
@@ -32810,7 +32938,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -32818,7 +32946,7 @@
       ],
       "rep_negative": [],
       "product_key": "全家:塔塔醬蝦排飯糰",
-      "score_mean": 0.7262,
+      "score_mean": 0.7274,
       "price": 65,
       "category": "便當",
       "competitor_mention_count": 1,
@@ -32870,10 +32998,10 @@
     {
       "brand": "全家",
       "product_name": "韓式燒肉拌飯",
-      "fair_score": 62.5,
+      "fair_score": 62.4,
       "consensus": "資料不足",
       "confidence": "低",
-      "n_eff": 2.96,
+      "n_eff": 2.95,
       "score_std": 0.155,
       "n_posts": 1,
       "n_comments": 3,
@@ -32894,7 +33022,7 @@
           "user": "TCY0523",
           "role": "commenter",
           "score": 0.75,
-          "weight": 0.7559
+          "weight": 0.7418
         }
       ],
       "rep_positive": [
@@ -32902,7 +33030,7 @@
       ],
       "rep_negative": [],
       "product_key": "全家:韓式燒肉拌飯",
-      "score_mean": 0.673,
+      "score_mean": 0.6725,
       "price": 95,
       "category": "便當",
       "competitor_mention_count": 1,
@@ -33168,7 +33296,7 @@
           "user": "pippen2002",
           "role": "commenter",
           "score": 0.55,
-          "weight": 0.8261
+          "weight": 0.8258
         },
         {
           "user": "Lailungsheng",
@@ -33836,8 +33964,8 @@
           "avg_sentiment": -0.0632
         },
         "全家": {
-          "count": 50,
-          "avg_sentiment": -0.009
+          "count": 51,
+          "avg_sentiment": -0.0088
         },
         "萊爾富": {
           "count": 7,
@@ -33849,16 +33977,16 @@
         }
       },
       "lean_brand": "OK",
-      "suspicion_score": 0.1739,
+      "suspicion_score": 0.1742,
       "suspicion_features": {
-        "one_sided": 0.0216,
-        "single_brand": 0.5155,
+        "one_sided": 0.0215,
+        "single_brand": 0.5204,
         "extreme": 0.0,
-        "template_like": 0.2308,
-        "burst": 0.268
+        "template_like": 0.2283,
+        "burst": 0.2653
       },
-      "credibility": 0.8261,
-      "total_comments": 97
+      "credibility": 0.8258,
+      "total_comments": 98
     },
     {
       "user": "UCCUplz",
@@ -34163,8 +34291,8 @@
       "source": "PTT",
       "brand_stats": {
         "全家": {
-          "count": 1,
-          "avg_sentiment": -0.5
+          "count": 2,
+          "avg_sentiment": 0.05
         },
         "其他": {
           "count": 1,
@@ -34175,7 +34303,7 @@
       "suspicion_score": 0.0,
       "suspicion_features": {},
       "credibility": 1.0,
-      "total_comments": 2
+      "total_comments": 3
     },
     {
       "user": "monar",
@@ -35525,8 +35653,8 @@
       "source": "PTT",
       "brand_stats": {
         "全家": {
-          "count": 18,
-          "avg_sentiment": 0.3389
+          "count": 19,
+          "avg_sentiment": 0.3681
         },
         "7-11": {
           "count": 3,
@@ -35542,16 +35670,16 @@
         }
       },
       "lean_brand": "全家",
-      "suspicion_score": 0.2441,
+      "suspicion_score": 0.2582,
       "suspicion_features": {
-        "one_sided": 0.1694,
-        "single_brand": 0.7826,
-        "extreme": 0.0,
-        "template_like": 0.087,
-        "burst": 0.1304
+        "one_sided": 0.184,
+        "single_brand": 0.7917,
+        "extreme": 0.0417,
+        "template_like": 0.0833,
+        "burst": 0.125
       },
-      "credibility": 0.7559,
-      "total_comments": 23
+      "credibility": 0.7418,
+      "total_comments": 24
     },
     {
       "user": "bonani",
@@ -43405,15 +43533,15 @@
       "source": "PTT",
       "brand_stats": {
         "全家": {
-          "count": 2,
-          "avg_sentiment": 0.35
+          "count": 3,
+          "avg_sentiment": 0.4813
         }
       },
       "lean_brand": "全家",
       "suspicion_score": 0.0,
       "suspicion_features": {},
       "credibility": 1.0,
-      "total_comments": 2
+      "total_comments": 3
     },
     {
       "user": "miraai",
@@ -45604,8 +45732,8 @@
       "source": "PTT",
       "brand_stats": {
         "全家": {
-          "count": 1,
-          "avg_sentiment": 0.5
+          "count": 2,
+          "avg_sentiment": 0.67
         },
         "7-11": {
           "count": 3,
@@ -45613,10 +45741,16 @@
         }
       },
       "lean_brand": "全家",
-      "suspicion_score": 0.0,
-      "suspicion_features": {},
-      "credibility": 1.0,
-      "total_comments": 4
+      "suspicion_score": 0.2372,
+      "suspicion_features": {
+        "one_sided": 0.335,
+        "single_brand": 0.6,
+        "extreme": 0.0,
+        "template_like": 0.0,
+        "burst": 0.0
+      },
+      "credibility": 0.7628,
+      "total_comments": 5
     },
     {
       "user": "hecatewing",
@@ -60949,6 +61083,66 @@
       "suspicion_features": {},
       "credibility": 1.0,
       "total_comments": 3
+    },
+    {
+      "user": "cf904e18",
+      "source": "PTT",
+      "brand_stats": {
+        "全家": {
+          "count": 1,
+          "avg_sentiment": 0.6
+        }
+      },
+      "lean_brand": "全家",
+      "suspicion_score": 0.0,
+      "suspicion_features": {},
+      "credibility": 1.0,
+      "total_comments": 1
+    },
+    {
+      "user": "BroDians",
+      "source": "PTT",
+      "brand_stats": {
+        "全家": {
+          "count": 1,
+          "avg_sentiment": 0.6
+        }
+      },
+      "lean_brand": "全家",
+      "suspicion_score": 0.0,
+      "suspicion_features": {},
+      "credibility": 1.0,
+      "total_comments": 1
+    },
+    {
+      "user": "a556655a",
+      "source": "PTT",
+      "brand_stats": {
+        "全家": {
+          "count": 1,
+          "avg_sentiment": 0.6
+        }
+      },
+      "lean_brand": "全家",
+      "suspicion_score": 0.0,
+      "suspicion_features": {},
+      "credibility": 1.0,
+      "total_comments": 1
+    },
+    {
+      "user": "Kel",
+      "source": "PTT",
+      "brand_stats": {
+        "全家": {
+          "count": 1,
+          "avg_sentiment": 1.0
+        }
+      },
+      "lean_brand": "全家",
+      "suspicion_score": 0.0,
+      "suspicion_features": {},
+      "credibility": 1.0,
+      "total_comments": 1
     }
   ]
 }
