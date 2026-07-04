@@ -250,16 +250,18 @@ def _inject_css() -> None:
             --pro-ring: #F59E0B;
             --pro-card: #ffffff;
             --pro-blue: #2563eb;
-            --pro-shadow: rgba(15, 23, 42, 0.18);
-            --pro-hard-shadow: 5px 5px 0 #0F172A;
+            --pro-shadow: rgba(15, 23, 42, 0.12);
+            --pro-hard-shadow: 0 14px 34px rgba(15, 23, 42, 0.10), 0 2px 0 rgba(15, 23, 42, 0.08);
             --pro-radius: 8px;
         }
 
         .stApp {
             background:
-                linear-gradient(135deg, rgba(251, 191, 36, 0.16) 25%, transparent 25%) 0 0 / 52px 52px,
-                linear-gradient(135deg, transparent 75%, rgba(22, 163, 74, 0.10) 75%) 0 0 / 52px 52px,
-                linear-gradient(180deg, var(--pro-background) 0, #fff7d6 270px, #fffdf7 100%);
+                radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.035) 1px, transparent 0) 0 0 / 24px 24px,
+                radial-gradient(circle at 18% 8%, rgba(245, 158, 11, 0.14), transparent 32rem),
+                radial-gradient(circle at 86% 14%, rgba(22, 163, 74, 0.08), transparent 28rem),
+                linear-gradient(180deg, var(--pro-background) 0, #fff7e3 360px, #fffdf7 100%);
+            background-attachment: fixed;
             color: var(--pro-foreground);
             font-family: "Nunito Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
@@ -271,9 +273,9 @@ def _inject_css() -> None:
         }
 
         section[data-testid="stSidebar"] {
-            background: #fffefa;
-            border-right: 2px solid var(--pro-foreground);
-            box-shadow: 7px 0 0 rgba(15, 23, 42, 0.08);
+            background: rgba(255, 254, 250, 0.96);
+            border-right: 1px solid rgba(15, 23, 42, 0.14);
+            box-shadow: 10px 0 28px rgba(15, 23, 42, 0.06);
         }
 
         section[data-testid="stSidebar"] h1,
@@ -291,9 +293,9 @@ def _inject_css() -> None:
         }
 
         div[data-testid="stVerticalBlockBorderWrapper"] {
-            border: 2px solid var(--pro-foreground);
+            border: 1px solid rgba(15, 23, 42, 0.16);
             border-radius: var(--pro-radius);
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.94);
             box-shadow: var(--pro-hard-shadow);
         }
 
@@ -302,12 +304,12 @@ def _inject_css() -> None:
             align-items: stretch;
             justify-content: space-between;
             gap: 1.2rem;
-            padding: 1.18rem;
-            margin: 0 0 1.55rem;
-            border: 2px solid var(--pro-foreground);
+            padding: 1.38rem;
+            margin: 0 0 1.85rem;
+            border: 1px solid rgba(15, 23, 42, 0.22);
             border-radius: var(--pro-radius);
             background:
-                linear-gradient(90deg, rgba(245, 158, 11, 0.95), rgba(251, 191, 36, 0.78)),
+                linear-gradient(90deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.68)),
                 var(--pro-primary);
             box-shadow: var(--pro-hard-shadow);
         }
@@ -337,13 +339,13 @@ def _inject_css() -> None:
             padding: 0.66rem 0.82rem;
             border-radius: var(--pro-radius);
             background: var(--pro-accent);
-            border: 2px solid var(--pro-foreground);
+            border: 1px solid rgba(15, 23, 42, 0.22);
             color: #ffffff;
             font-family: "Rubik", sans-serif;
             font-size: 0.9rem;
             font-weight: 800;
             white-space: nowrap;
-            box-shadow: 3px 3px 0 var(--pro-foreground);
+            box-shadow: 0 8px 18px rgba(22, 163, 74, 0.22);
         }
 
         .filter-note,
@@ -361,11 +363,11 @@ def _inject_css() -> None:
             justify-content: space-between;
             gap: 1rem;
             margin: 2.1rem 0 1.05rem;
-            padding: 0.96rem 1.02rem;
-            background: #ffffff;
-            border: 2px solid var(--pro-foreground);
+            padding: 1.05rem 1.12rem;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(15, 23, 42, 0.16);
             border-radius: var(--pro-radius);
-            box-shadow: 4px 4px 0 var(--pro-secondary);
+            box-shadow: 0 12px 26px rgba(245, 158, 11, 0.10);
         }
 
         .context-main {
@@ -394,7 +396,7 @@ def _inject_css() -> None:
         .product-tile,
         .detail-card {
             background: var(--pro-card);
-            border: 2px solid var(--pro-foreground);
+            border: 1px solid rgba(15, 23, 42, 0.16);
             border-radius: var(--pro-radius);
             box-shadow: var(--pro-hard-shadow);
         }
@@ -420,13 +422,13 @@ def _inject_css() -> None:
             color: inherit;
             outline: none;
             transform: translate(-1px, -1px);
-            box-shadow: 6px 6px 0 var(--pro-foreground);
+            box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14), 0 2px 0 rgba(15, 23, 42, 0.10);
         }
 
         .product-tile.selected {
             border-color: var(--pro-primary);
             background: #fffbeb;
-            box-shadow: 5px 5px 0 var(--pro-primary);
+            box-shadow: 0 16px 32px rgba(245, 158, 11, 0.18), 0 2px 0 rgba(245, 158, 11, 0.30);
         }
 
         .tile-grid {
@@ -526,13 +528,13 @@ def _inject_css() -> None:
             min-width: 82px;
             padding: 0.38rem 0.48rem;
             border-radius: var(--pro-radius);
-            border: 2px solid var(--pro-foreground);
+            border: 1px solid rgba(15, 23, 42, 0.22);
             color: var(--pro-foreground);
             font-family: "Rubik", sans-serif;
             font-size: 1.55rem;
             line-height: 1;
             font-weight: 800;
-            box-shadow: 3px 3px 0 var(--pro-foreground);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
         }
 
         .score-number small {
@@ -690,7 +692,7 @@ def _inject_css() -> None:
             padding: 0.82rem;
             border-radius: var(--pro-radius);
             background: #fff7d6;
-            border: 2px solid var(--pro-foreground);
+            border: 1px solid rgba(15, 23, 42, 0.16);
             margin: 0.9rem 0 1rem;
         }
 
@@ -723,8 +725,8 @@ def _inject_css() -> None:
 
         .review-excerpt {
             background: #fffbeb;
-            border: 2px solid var(--pro-foreground);
-            border-left: 9px solid var(--pro-primary);
+            border: 1px solid rgba(15, 23, 42, 0.16);
+            border-left: 6px solid var(--pro-primary);
             margin: 0.82rem 0;
         }
 
@@ -770,7 +772,7 @@ def _inject_css() -> None:
 
         .competitor-box {
             background: #ffffff;
-            border: 2px solid var(--pro-foreground);
+            border: 1px solid rgba(15, 23, 42, 0.16);
             margin-top: 0.75rem;
         }
 
@@ -788,7 +790,7 @@ def _inject_css() -> None:
         [data-testid="stBaseButton-secondary"],
         [data-testid="stBaseButton-primary"] {
             border-radius: var(--pro-radius) !important;
-            border: 2px solid var(--pro-foreground) !important;
+            border: 1px solid rgba(15, 23, 42, 0.22) !important;
             font-family: "Rubik", sans-serif !important;
             font-weight: 800 !important;
             transition: transform 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
@@ -798,7 +800,7 @@ def _inject_css() -> None:
         [data-testid="stBaseButton-secondary"]:hover,
         [data-testid="stBaseButton-primary"]:hover {
             transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 var(--pro-foreground);
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.14);
         }
 
         [class*="st-key-shopper_shelf_list_"] {
@@ -820,7 +822,7 @@ def _inject_css() -> None:
             color: inherit;
             outline: none;
             transform: translate(-1px, -1px);
-            box-shadow: 6px 6px 0 var(--pro-foreground);
+            box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14), 0 2px 0 rgba(15, 23, 42, 0.10);
         }
 
         [class*="st-key-shopper_shelf_card_"] [data-testid="stElementContainer"]:has([data-testid="stButton"]) {
