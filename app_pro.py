@@ -886,9 +886,7 @@ def _render_header() -> None:
         <div class="shopper-header">
             <div>
                 <h1 class="shopper-title">CVS Radar 超商商品雷達</h1>
-                <div class="shopper-caption">站在架前先看這裡：分數、共識、聲量與真實心得，幫你判斷值不值得買。</div>
             </div>
-            <div class="header-chip">購買決策視圖</div>
         </div>
         """,
         unsafe_allow_html=True,
