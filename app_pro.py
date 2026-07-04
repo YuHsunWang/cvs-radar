@@ -238,16 +238,16 @@ def _inject_css() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&family=Rubik:wght@400;500;600;700;800&display=swap');
 
         :root {
-            --pro-primary: #F59E0B;
-            --pro-on-primary: #0F172A;
-            --pro-secondary: #FBBF24;
-            --pro-accent: #16A34A;
-            --pro-background: #FFFBEB;
-            --pro-foreground: #0F172A;
-            --pro-muted: #FCF6F0;
-            --pro-border: #FAEEE1;
+            --pro-primary: #EF5350;
+            --pro-on-primary: #ffffff;
+            --pro-secondary: #FF8A80;
+            --pro-accent: #F59E0B;
+            --pro-background: #FFF7F4;
+            --pro-foreground: #1F2933;
+            --pro-muted: #FCF1EE;
+            --pro-border: #F6E3DE;
             --pro-destructive: #DC2626;
-            --pro-ring: #F59E0B;
+            --pro-ring: #EF5350;
             --pro-card: #ffffff;
             --pro-blue: #2563eb;
             --pro-shadow: rgba(15, 23, 42, 0.12);
@@ -258,9 +258,9 @@ def _inject_css() -> None:
         .stApp {
             background:
                 radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.035) 1px, transparent 0) 0 0 / 24px 24px,
-                radial-gradient(circle at 18% 8%, rgba(245, 158, 11, 0.14), transparent 32rem),
-                radial-gradient(circle at 86% 14%, rgba(22, 163, 74, 0.08), transparent 28rem),
-                linear-gradient(180deg, var(--pro-background) 0, #fff7e3 360px, #fffdf7 100%);
+                radial-gradient(circle at 18% 8%, rgba(239, 83, 80, 0.13), transparent 32rem),
+                radial-gradient(circle at 86% 14%, rgba(245, 158, 11, 0.09), transparent 28rem),
+                linear-gradient(180deg, var(--pro-background) 0, #ffeee9 360px, #fffaf8 100%);
             background-attachment: fixed;
             color: var(--pro-foreground);
             font-family: "Nunito Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -309,7 +309,7 @@ def _inject_css() -> None:
             border: 1px solid rgba(15, 23, 42, 0.22);
             border-radius: var(--pro-radius);
             background:
-                linear-gradient(90deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.68)),
+                linear-gradient(90deg, rgba(239, 83, 80, 0.95), rgba(255, 138, 128, 0.72)),
                 var(--pro-primary);
             box-shadow: var(--pro-hard-shadow);
         }
@@ -885,7 +885,7 @@ def _render_header() -> None:
         """
         <div class="shopper-header">
             <div>
-                <h1 class="shopper-title">CVS Radar 超商商品雷達</h1>
+                <h1 class="shopper-title">CVS Radar</h1>
             </div>
         </div>
         """,
