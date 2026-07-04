@@ -63,6 +63,13 @@ VOLUME_SIGNALS = {
     "聲量不足": ("低聲量", "volume-low", 1),
 }
 
+VOLUME_FILTER_LEVELS = {
+    "低以上（全部）": 1,
+    "中以上": 2,
+    "高": 3,
+}
+REPORT_CONFIDENCE_LEVELS = {"高": 3, "中": 2, "低": 1}
+
 BRAND_BADGE_SPECS = {
     "7-11": {
         "text": "7-11",
@@ -404,8 +411,6 @@ def _inject_css() -> None:
         .shelf-card-list {
             display: grid;
             gap: 0.68rem;
-            max-height: 650px;
-            overflow-y: auto;
             padding: 0 0.42rem 0.42rem 0;
         }
 
@@ -661,7 +666,7 @@ def _inject_css() -> None:
             flex: 1 1 auto;
             min-height: 0;
             overflow-y: auto;
-            overscroll-behavior: contain;
+            overscroll-behavior: auto;
         }
 
         [data-testid="stDialog"] [role="dialog"] > button[aria-label="Close"] {
@@ -804,8 +809,6 @@ def _inject_css() -> None:
         }
 
         [class*="st-key-shopper_shelf_list_"] {
-            max-height: 650px;
-            overflow-y: auto;
             padding: 0 0.42rem 0.42rem 0;
         }
 
@@ -1003,6 +1006,39 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
     rows = _shopper_rows(result)
     if not rows:
         st.info("目前條件下沒有符合的商品。可以放寬品牌、分類或更多條件。")
+        return
+
+    widget_scope = _shopper_widget_scope(selection_key)
+    filter_cols = st.columns([1.05, 1.7, 0.72], vertical_alignment="bottom")
+    with filter_cols[0]:
+        hide_insufficient = st.toggle(
+            "隱藏資料不足",
+            value=False,
+            key=f"shopper_hide_insufficient_{widget_scope}",
+        )
+    with filter_cols[1]:
+        volume_threshold_label = st.radio(
+            "聲量門檻",
+            list(VOLUME_FILTER_LEVELS),
+            index=0,
+            horizontal=True,
+            key=f"shopper_volume_threshold_{widget_scope}",
+            help="依討論聲量累積篩選：低以上顯示全部，中以上顯示中與高，高只顯示高。",
+        )
+
+    volume_threshold = VOLUME_FILTER_LEVELS[volume_threshold_label]
+    filtered_pairs = [
+        (row, report)
+        for row, report in zip(rows, result.reports)
+        if (not hide_insufficient or report.consensus != "資料不足")
+        and REPORT_CONFIDENCE_LEVELS.get(report.confidence, 1) >= volume_threshold
+    ]
+    rows = [row for row, _report in filtered_pairs]
+    with filter_cols[2]:
+        st.markdown(f'<div class="filter-note">共 {len(rows)} 項</div>', unsafe_allow_html=True)
+
+    if not rows:
+        st.info("目前快速篩選下沒有符合的商品。可以關閉「隱藏資料不足」或降低聲量門檻。")
         return
 
     state_key = f"shopper_selected_idx::{selection_key}"
