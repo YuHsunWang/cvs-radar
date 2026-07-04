@@ -1011,17 +1011,18 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
     widget_scope = _shopper_widget_scope(selection_key)
     filter_cols = st.columns([1.05, 1.7, 0.72], vertical_alignment="bottom")
     with filter_cols[0]:
-        hide_insufficient = st.toggle(
-            "隱藏資料不足",
-            value=False,
+        insufficient_choice = st.select_slider(
+            "資料不足",
+            options=["顯示全部", "隱藏資料不足"],
+            value="顯示全部",
             key=f"shopper_hide_insufficient_{widget_scope}",
         )
+        hide_insufficient = insufficient_choice == "隱藏資料不足"
     with filter_cols[1]:
-        volume_threshold_label = st.radio(
+        volume_threshold_label = st.select_slider(
             "聲量門檻",
-            list(VOLUME_FILTER_LEVELS),
-            index=0,
-            horizontal=True,
+            options=list(VOLUME_FILTER_LEVELS),
+            value="低以上（全部）",
             key=f"shopper_volume_threshold_{widget_scope}",
             help="依討論聲量累積篩選：低以上顯示全部，中以上顯示中與高，高只顯示高。",
         )
