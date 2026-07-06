@@ -844,6 +844,23 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             ):
                 resolved_items = [(fallback_name, _primary_price_from_text(extraction_name))]
         valid_items = resolved_items
+        # Expand a bare product-form name (e.g. "霜淇淋" from a shorthand price line) to
+        # the title's more specific flavored name when the title ends with that form word
+        # (e.g. title 全家草莓優格x比利時巧克力霜淇淋 -> keep the flavor, not just "霜淇淋").
+        title_specific = _title_fallback_product_name(post)
+        if title_specific and not _is_junk_extracted_product_name(title_specific):
+            expanded_items = []
+            for name, price in valid_items:
+                if (
+                    _is_bare_form_name(name)
+                    and len(title_specific) > len(name)
+                    and title_specific != name
+                    and any(title_specific.endswith(form) for form in _matched_product_forms(name))
+                ):
+                    expanded_items.append((title_specific, price))
+                else:
+                    expanded_items.append((name, price))
+            valid_items = expanded_items
         if len(valid_items) > 1:
             routed_comments = _route_comments_by_product(
                 post.comments, [name for name, _ in valid_items]
@@ -1062,6 +1079,17 @@ def _matched_flavor_terms(text: str) -> frozenset[str]:
 
 def _matched_product_forms(text: str) -> frozenset[str]:
     return frozenset(term for term in _PRODUCT_FORM_TERMS if term in text)
+
+
+def _is_bare_form_name(name: str) -> bool:
+    """True when the name is only a product-form word (e.g. 霜淇淋) with no flavor."""
+    forms = _matched_product_forms(name)
+    if not forms:
+        return False
+    residual = name
+    for form in forms:
+        residual = residual.replace(form, "")
+    return len(residual.strip()) == 0
 
 
 def _both_ice_forms(left_forms: frozenset[str], right_forms: frozenset[str]) -> bool:

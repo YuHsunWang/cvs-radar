@@ -357,6 +357,15 @@ class ScoringTest(unittest.TestCase):
         self.assertTrue(any("牙寶寵物頭套" in (n or "") for n in names))
         self.assertTrue(any("安全帽" in (n or "") for n in names))
 
+    def test_bare_form_name_expands_to_title_flavor(self) -> None:
+        # A shorthand price line ("霜淇淋49/草莓大福45") loses the flavor; the title
+        # carries the full flavored name, which must be used instead of a bare "霜淇淋".
+        post = Post(id="p1", brand="全家", title="[商品] 全家草莓優格x比利時巧克力霜淇淋",
+                    product_name="：霜淇淋49/草莓大福45", author="a1", author_score=80)
+        names = [p.product_name for p in preprocess_posts([post])]
+        self.assertNotIn("霜淇淋", names)  # bare form replaced by the flavored title name
+        self.assertTrue(any("霜淇淋" in (n or "") and "巧克力" in (n or "") for n in names))
+
     def test_pipeline_caps_same_user_comments_and_excludes_self_push(self) -> None:
         post = Post(
             id="p1",
