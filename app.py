@@ -1321,22 +1321,9 @@ def _product_detail_html(row: dict[str, Any]) -> str:
     positive_comments = _split_comments(row.get("正向留言"))
     negative_comments = _split_comments(row.get("負向留言"))
     excerpt = str(row.get("心得節錄") or "").strip()
-    brand = str(row.get("品牌") or "其他")
     return f"""
     <div class="detail-card">
-        <div class="detail-top">
-            {_product_visual_html(row)}
-            <div>
-                <div class="detail-brand-row">
-                    <div class="detail-eyebrow">#{escape(str(row.get("排名", "-")))}</div>
-                    {_brand_chip_html(brand)}
-                </div>
-                <div class="detail-name">{escape(str(row.get("商品") or "-"))}</div>
-            </div>
-        </div>
         <div class="detail-meta">
-            <span class="pill price-pill">{escape(_format_price(row.get("價格")))}</span>
-            <span class="pill price-pill">{escape(str(row.get("分類") or "其他"))}</span>
             <span class="pill date-pill">最新發文 {escape(str(row.get("最新發文") or "未知"))}</span>
         </div>
         <div class="decision-band">
@@ -1346,7 +1333,6 @@ def _product_detail_html(row: dict[str, Any]) -> str:
                 <div class="decision-sub">{escape(_sample_count(row))}</div>
             </div>
         </div>
-        {_signals_html(row)}
         {_consensus_distribution_html(row)}
         {_volume_meter_html(row)}
         {_excerpt_html(excerpt)}
