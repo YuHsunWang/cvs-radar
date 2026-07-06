@@ -127,6 +127,7 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
                 "分類": report.category or "其他",
                 "fair_score": report.fair_score,
                 "consensus": report.consensus,
+                "共識分布": consensus_distribution(report),
                 "討論聲量": volume_label(report),
                 "競品提及": report.competitor_mention_count,
                 "偏好他牌": report.competitor_preference_count,
@@ -140,6 +141,40 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
             }
         )
     return rows
+
+
+POLARITY_NEUTRAL_BAND = 0.2
+
+
+def consensus_distribution(report: ProductReport) -> tuple[int, int, int] | None:
+    """Return weighted positive/neutral/negative contributor percentages."""
+    totals = {"positive": 0.0, "neutral": 0.0, "negative": 0.0}
+    for contributor in report.contributors:
+        weight = max(float(contributor.weight), 0.0)
+        if weight == 0:
+            continue
+        if contributor.score > POLARITY_NEUTRAL_BAND:
+            totals["positive"] += weight
+        elif contributor.score < -POLARITY_NEUTRAL_BAND:
+            totals["negative"] += weight
+        else:
+            totals["neutral"] += weight
+
+    total = sum(totals.values())
+    if total <= 0:
+        return None
+
+    raw = [
+        totals["positive"] / total * 100,
+        totals["neutral"] / total * 100,
+        totals["negative"] / total * 100,
+    ]
+    percentages = [int(value) for value in raw]
+    remainder = 100 - sum(percentages)
+    order = sorted(range(3), key=lambda idx: raw[idx] - percentages[idx], reverse=True)
+    for idx in order[:remainder]:
+        percentages[idx] += 1
+    return (percentages[0], percentages[1], percentages[2])
 
 
 _VOLUME_TIER = {"高": "充足", "中": "中等", "低": "不足"}

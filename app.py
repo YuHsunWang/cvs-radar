@@ -794,17 +794,14 @@ def _inject_css() -> None:
             overflow: hidden;
         }
 
-        .visual-glyph {
-            font-size: 0.78rem;
-            font-weight: 860;
-            opacity: 0.86;
-        }
-
-        .visual-initial {
-            font-size: 2.15rem;
+        .visual-brand {
+            padding: 0 0.35rem;
+            font-size: 1.08rem;
             line-height: 1;
             font-weight: 900;
             letter-spacing: 0;
+            text-align: center;
+            white-space: nowrap;
         }
 
         .row-main {
@@ -871,11 +868,15 @@ def _inject_css() -> None:
         }
 
         .row-actions div[data-testid="stButton"] > button {
+            width: 38px;
+            min-width: 38px;
             min-height: 38px;
             border-radius: 8px;
             color: var(--cvs-teal-dark);
             border-color: #9ed6cf;
             background: #f3fffc;
+            padding: 0;
+            font-size: 1.1rem;
             font-weight: 820;
         }
 
@@ -965,6 +966,15 @@ def _inject_css() -> None:
         .dist-labels span:nth-child(2) { color: #c57400; }
         .dist-labels span:nth-child(3) { color: #c33329; }
 
+        .distribution-empty {
+            color: var(--cvs-muted);
+            font-size: 0.86rem;
+            font-weight: 760;
+            padding: 0.58rem 0.66rem;
+            border-radius: 8px;
+            background: #f4f6f8;
+        }
+
         .volume-card {
             padding: 0.72rem 0 0;
             margin-top: 0.72rem;
@@ -984,6 +994,10 @@ def _inject_css() -> None:
             background: linear-gradient(90deg, #0f8f7a, #18a69b);
         }
 
+        .volume-meter.empty .volume-fill {
+            width: 0;
+        }
+
         .detail-action {
             display: block;
             margin-top: 0.78rem;
@@ -996,6 +1010,49 @@ def _inject_css() -> None:
             font-size: 1rem;
             font-weight: 860;
             box-shadow: 0 10px 20px rgba(8, 122, 116, 0.18);
+        }
+
+        .discussion-links {
+            margin-top: 0.78rem;
+            padding: 0.72rem 0.82rem;
+            border-radius: 8px;
+            border: 1px solid #d8e7e3;
+            background: #f7fffd;
+        }
+
+        .discussion-title {
+            color: var(--cvs-ink);
+            font-size: 0.92rem;
+            font-weight: 840;
+            margin-bottom: 0.45rem;
+        }
+
+        .discussion-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.42rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .discussion-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 32px;
+            padding: 0.28rem 0.62rem;
+            border-radius: 8px;
+            background: #0c8f84;
+            color: #ffffff !important;
+            text-decoration: none !important;
+            font-weight: 820;
+        }
+
+        .discussion-more {
+            margin-top: 0.42rem;
+            color: var(--cvs-muted);
+            font-size: 0.82rem;
+            font-weight: 760;
         }
 
         @media (max-width: 920px) {
@@ -1204,24 +1261,28 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
 
     state_key = f"shopper_open_idx::{selection_key}"
     if state_key not in st.session_state or int(st.session_state[state_key]) >= len(rows):
-        st.session_state[state_key] = 0
+        st.session_state[state_key] = -1
 
     st.markdown(
         """
         <div class="shelf-head">
             <p class="section-title">架上候選商品</p>
-            <span class="section-note">展開任一商品，單品判斷會直接出現在該列下方。</span>
+            <span class="section-note">點選箭頭後，單品判斷會直接出現在該列下方。</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
     for idx, row in enumerate(rows):
         is_open = int(st.session_state[state_key]) == idx
-        st.markdown(_product_row_html(row, expanded=is_open), unsafe_allow_html=True)
-        button_label = "收合" if is_open else "展開詳情"
-        if st.button(button_label, key=f"product_toggle::{selection_key}::{idx}", use_container_width=True):
-            st.session_state[state_key] = -1 if is_open else idx
-            st.rerun()
+        card_col, toggle_col = st.columns([12, 1], vertical_alignment="center")
+        with card_col:
+            st.markdown(_product_row_html(row), unsafe_allow_html=True)
+        with toggle_col:
+            st.markdown('<div class="row-actions">', unsafe_allow_html=True)
+            if st.button("⌃" if is_open else "⌄", key=f"product_toggle::{selection_key}::{idx}", help="切換單品判斷"):
+                st.session_state[state_key] = -1 if is_open else idx
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
         if is_open:
             st.markdown('<div class="inline-detail">', unsafe_allow_html=True)
             st.markdown(_product_detail_html(row), unsafe_allow_html=True)
@@ -1254,18 +1315,16 @@ def _brand_chip_html(brand: str) -> str:
     )
 
 
-def _product_row_html(row: dict[str, Any], *, expanded: bool) -> str:
+def _product_row_html(row: dict[str, Any]) -> str:
     consensus_label, consensus_class, _segments = _consensus_signal(str(row.get("consensus") or "資料不足"))
     volume_label, volume_class, _level = _volume_signal(str(row.get("討論聲量") or "聲量不足"))
-    open_text = "收合" if expanded else "展開"
     return f"""
     <div class="product-row">
         <div class="rank-mark">{escape(str(row.get("排名", "-")))}</div>
         {_product_visual_html(row)}
         <div class="row-main">
             <div class="row-top">
-                {_brand_chip_html(str(row.get("品牌") or "其他"))}
-                <span class="row-meta">{escape(open_text)}</span>
+                <span class="row-meta">{escape(_format_price(row.get("價格")))} · {escape(str(row.get("分類") or "其他"))}</span>
             </div>
             <div class="row-name">{escape(str(row.get("商品") or "-"))}</div>
             <div class="row-signals">
@@ -1273,7 +1332,6 @@ def _product_row_html(row: dict[str, Any], *, expanded: bool) -> str:
                 <div>
                     <span class="signal {consensus_class}"><span class="signal-value">{escape(consensus_label)}</span></span>
                     <span class="signal {volume_class}"><span class="signal-value">{escape(volume_label)}</span></span>
-                    <div class="row-meta">{escape(_format_price(row.get("價格")))} · {escape(str(row.get("分類") or "其他"))}</div>
                 </div>
             </div>
         </div>
@@ -1283,33 +1341,14 @@ def _product_row_html(row: dict[str, Any], *, expanded: bool) -> str:
 
 def _product_visual_html(row: dict[str, Any]) -> str:
     brand = str(row.get("品牌") or "其他")
-    product = str(row.get("商品") or "")
-    category = str(row.get("分類") or "其他")
     spec = BRAND_LOGO_SPECS.get(brand, BRAND_LOGO_SPECS["其他"])
-    glyph = _category_glyph(category)
-    initial = next((char for char in product.strip() if not char.isspace()), str(spec["text"])[0])
     return (
         '<div class="product-visual" '
         f'style="--tile-bg:{escape(str(spec["fg"]))};--tile-fg:{escape(str(spec["bg"]))};'
         f'--tile-border:{escape(str(spec["border"]))};">'
-        f'<div><div class="visual-glyph">{escape(glyph)}</div><div class="visual-initial">{escape(initial)}</div></div>'
+        f'<div class="visual-brand">{escape(str(spec["text"]))}</div>'
         "</div>"
     )
-
-
-def _category_glyph(category: str) -> str:
-    return {
-        "冰品": "冰",
-        "飲料": "飲",
-        "甜點": "甜",
-        "麵包": "包",
-        "便當": "飯",
-        "鹹食": "鹹",
-        "零食": "零",
-        "泡麵": "麵",
-        "乳品": "乳",
-        "周邊": "物",
-    }.get(category, "品")
 
 
 def _product_detail_html(row: dict[str, Any]) -> str:
@@ -1399,7 +1438,15 @@ def _heat_bar_html(level: int) -> str:
 
 
 def _consensus_distribution_html(row: dict[str, Any]) -> str:
-    positive, neutral, negative = _consensus_distribution(str(row.get("consensus") or "資料不足"))
+    distribution = row.get("共識分布")
+    if not _valid_distribution(distribution):
+        return (
+            '<div class="distribution-card">'
+            '<div class="distribution-title">共識分布</div>'
+            '<div class="distribution-empty">資料不足</div>'
+            "</div>"
+        )
+    positive, neutral, negative = distribution
     return (
         '<div class="distribution-card">'
         '<div class="distribution-title">共識分布</div>'
@@ -1415,26 +1462,21 @@ def _consensus_distribution_html(row: dict[str, Any]) -> str:
     )
 
 
-def _consensus_distribution(consensus: str) -> tuple[int, int, int]:
-    if consensus == "一致好評":
-        return (72, 18, 10)
-    if consensus == "褒貶不一":
-        return (48, 32, 20)
-    if consensus == "評價兩極":
-        return (44, 12, 44)
-    if consensus == "一致負評":
-        return (12, 18, 70)
-    return (0, 100, 0)
+def _valid_distribution(value: object) -> bool:
+    if not isinstance(value, (list, tuple)) or len(value) != 3:
+        return False
+    return all(isinstance(item, (int, float)) and item >= 0 for item in value)
 
 
 def _volume_meter_html(row: dict[str, Any]) -> str:
     volume = str(row.get("討論聲量") or "聲量不足")
-    volume_label, volume_class, level = _volume_signal(volume)
-    width = {3: 82, 2: 55, 1: 28}.get(level, 28)
+    volume_label, volume_class, _level = _volume_signal(volume)
+    width = _volume_meter_width(row)
+    meter_class = "volume-meter" if width > 0 else "volume-meter empty"
     return (
         '<div class="volume-card">'
         '<div class="volume-title">聲量指標</div>'
-        '<div class="volume-meter">'
+        f'<div class="{meter_class}">'
         f'<div class="volume-fill" style="width:{width}%"></div>'
         "</div>"
         '<div class="signal-row">'
@@ -1443,6 +1485,24 @@ def _volume_meter_html(row: dict[str, Any]) -> str:
         "</div>"
         "</div>"
     )
+
+
+def _volume_meter_width(row: dict[str, Any]) -> int:
+    count = _real_sample_size(row)
+    if count <= 0:
+        return 0
+    return min(100, max(12, round(count / 30 * 100)))
+
+
+def _real_sample_size(row: dict[str, Any]) -> float:
+    for key in ("留言數", "有效樣本", "貼文數"):
+        try:
+            value = float(row.get(key) or 0)
+        except (TypeError, ValueError):
+            value = 0
+        if value > 0:
+            return value
+    return 0
 
 
 def _excerpt_html(excerpt: str) -> str:
@@ -1501,15 +1561,37 @@ def _competitor_html(row: dict[str, Any]) -> str:
 
 
 def _review_action_html(row: dict[str, Any]) -> str:
-    links = row.get("貼文連結")
-    href = ""
-    if isinstance(links, (list, tuple)) and links:
-        href = str(links[0])
-    elif isinstance(links, str):
-        href = links
-    if href:
+    links = _post_links(row.get("貼文連結"))
+    if len(links) == 1:
+        href = links[0]
         return f'<a class="detail-action" href="{escape(href)}" target="_blank" rel="noopener noreferrer">查看心得</a>'
+    if links:
+        visible_links = links[:5]
+        items = "".join(
+            '<li>'
+            f'<a class="discussion-link" href="{escape(href)}" target="_blank" rel="noopener noreferrer">'
+            f"貼文{idx}</a>"
+            "</li>"
+            for idx, href in enumerate(visible_links, 1)
+        )
+        more = len(links) - len(visible_links)
+        more_html = f'<div class="discussion-more">還有 {more} 篇</div>' if more > 0 else ""
+        return (
+            '<div class="discussion-links">'
+            f'<div class="discussion-title">相關討論（{len(links)} 篇）</div>'
+            f'<ul class="discussion-list">{items}</ul>'
+            f"{more_html}"
+            "</div>"
+        )
     return '<span class="detail-action" aria-disabled="true">查看心得</span>'
+
+
+def _post_links(value: object) -> list[str]:
+    if isinstance(value, str):
+        value = [value]
+    if not isinstance(value, (list, tuple)):
+        return []
+    return [str(link).strip() for link in value if str(link).strip()]
 
 
 def _split_comments(value: object) -> list[str]:
