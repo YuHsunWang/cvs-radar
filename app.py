@@ -114,8 +114,12 @@ def main() -> None:
             st.error(f"資料載入失敗：{exc}")
             return
 
+    if source != "results" and posts is not None:
+        options = brand_options(posts)
+
     selected_category = _render_category_filter(reports)
-    filters = _render_filters(source, posts, options, selected_category=selected_category)
+    selected_brand = _render_brand_filter(options)
+    filters = _render_filters(source, posts, options, selected_category=selected_category, selected_brand=selected_brand)
     query = build_product_query(
         brand=filters["selected_brand"],
         start_date=filters["start_date"],
@@ -195,6 +199,19 @@ def _render_category_filter(reports: list[Any] | None) -> str:
         key="category_filter",
     )
     return str(selected or CATEGORY_ALL)
+
+
+def _render_brand_filter(options: list[str]) -> str:
+    brands = [option for option in options if option != ALL_BRANDS]
+    brand_options = [ALL_BRANDS, *brands]
+    selected = st.pills(
+        "品牌",
+        brand_options,
+        default=ALL_BRANDS,
+        selection_mode="single",
+        key="brand_filter",
+    )
+    return str(selected or ALL_BRANDS)
 
 
 def _load_results_or_none_cached() -> tuple[list, dict] | None:
@@ -797,13 +814,6 @@ def _inject_css() -> None:
             margin: -0.2rem 0 0.65rem;
         }
 
-        .brand-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            margin: 0.55rem 0 0.85rem;
-        }
-
         .context-bar {
             display: block;
             margin: 0.72rem 0 0.82rem;
@@ -878,22 +888,6 @@ def _inject_css() -> None:
             align-items: center;
             justify-content: space-between;
             gap: 0.42rem;
-        }
-
-        .brand-chip {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 28px;
-            padding: 0.22rem 0.62rem;
-            border-radius: 8px;
-            background: var(--brand-bg);
-            color: var(--brand-fg);
-            border: 1px solid var(--brand-border);
-            font-size: 0.84rem;
-            line-height: 1;
-            font-weight: 860;
-            white-space: nowrap;
         }
 
         .row-name {
@@ -986,10 +980,31 @@ def _inject_css() -> None:
         .row-consensus-seg.split { background: #d18700; }
         .row-consensus-seg.empty { background: #c8d1da; }
 
+        div[data-testid="stHorizontalBlock"]:has(.product-row) {
+            align-items: stretch;
+        }
+
+        div[data-testid="stHorizontalBlock"]:has(.product-row) div[data-testid="column"]:last-child {
+            display: flex;
+        }
+
+        .row-actions {
+            height: 100%;
+            min-height: 112px;
+            display: flex;
+            width: 100%;
+        }
+
+        .row-actions div[data-testid="stButton"] {
+            width: 100%;
+            height: 100%;
+        }
+
         .row-actions div[data-testid="stButton"] > button {
-            width: 38px;
-            min-width: 38px;
-            min-height: 38px;
+            width: 100%;
+            min-width: 48px;
+            min-height: 112px;
+            height: 100%;
             border-radius: 8px;
             color: var(--cvs-teal-dark);
             border-color: #9ed6cf;
@@ -1224,7 +1239,14 @@ def _render_sidebar() -> dict[str, object]:
     return {"source": "results", "crawl_pages": 5}
 
 
-def _render_filters(source: str, posts: object, options: list[str], *, selected_category: str) -> dict[str, object]:
+def _render_filters(
+    source: str,
+    posts: object,
+    options: list[str],
+    *,
+    selected_category: str,
+    selected_brand: str,
+) -> dict[str, object]:
     with st.expander("調整篩選", expanded=False):
         st.markdown('<div class="filter-title">縮小架上商品</div>', unsafe_allow_html=True)
         recent_days = None
@@ -1247,9 +1269,9 @@ def _render_filters(source: str, posts: object, options: list[str], *, selected_
                 end_date=end_date,
                 recent_days=recent_days,
             )
+            if selected_brand not in options:
+                selected_brand = ALL_BRANDS
 
-        st.markdown(_brand_preview_html(options), unsafe_allow_html=True)
-        selected_brand = st.selectbox("品牌", options, index=0)
         sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=0)
         limit = int(st.number_input("顯示", min_value=1, max_value=200, value=12, step=1))
         with st.popover("更多條件", use_container_width=True):
@@ -1354,12 +1376,12 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str, sear
     )
     for idx, row in enumerate(rows):
         is_open = int(st.session_state[state_key]) == idx
-        card_col, toggle_col = st.columns([12, 1], vertical_alignment="center")
+        card_col, toggle_col = st.columns([10, 2], vertical_alignment="center")
         with card_col:
             st.markdown(_product_row_html(row), unsafe_allow_html=True)
         with toggle_col:
             st.markdown('<div class="row-actions">', unsafe_allow_html=True)
-            if st.button("⌃" if is_open else "⌄", key=f"product_toggle::{selection_key}::{idx}", help="切換單品判斷"):
+            if st.button("收合" if is_open else "展開", key=f"product_toggle::{selection_key}::{idx}", help="切換單品判斷"):
                 st.session_state[state_key] = -1 if is_open else idx
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
@@ -1377,22 +1399,6 @@ def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
         row["有效樣本"] = report.n_eff
         row["信心"] = report.confidence
     return rows
-
-
-def _brand_preview_html(options: list[str]) -> str:
-    brands = [option for option in options if option != ALL_BRANDS] or ["7-11", "全家", "萊爾富", "OK", "美聯社", "其他"]
-    chips = "".join(_brand_chip_html(brand) for brand in brands[:6])
-    return f'<div class="brand-preview">{chips}</div>'
-
-
-def _brand_chip_html(brand: str) -> str:
-    spec = BRAND_LOGO_SPECS.get(brand, BRAND_LOGO_SPECS["其他"])
-    return (
-        '<span class="brand-chip" '
-        f'style="--brand-bg:{escape(str(spec["bg"]))};--brand-fg:{escape(str(spec["fg"]))};'
-        f'--brand-border:{escape(str(spec["border"]))};">'
-        f'{escape(str(spec["text"]))}</span>'
-    )
 
 
 def _product_row_html(row: dict[str, Any]) -> str:
