@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from html import escape
+from pathlib import Path
 from typing import Any
 
 import streamlit as st
@@ -18,6 +19,7 @@ from cvs_radar.app_helpers import (
     product_rows,
 )
 from cvs_radar.service import ProductQueryResult, brand_summaries_from_reports, filter_reports, query_products
+from cvs_radar.store import DEFAULT_RESULTS_PATH
 
 
 CONSENSUS_SIGNALS = {
@@ -86,7 +88,7 @@ def main() -> None:
     reports = None
     source = str(controls["source"])
     if source == "results":
-        loaded = load_results_or_none()
+        loaded = _load_results_or_none_cached()
         if loaded is None:
             st.warning("找不到預算結果，已改用離線示範資料。")
             source = "demo"
@@ -166,6 +168,23 @@ def _sort_reports(reports: list, sort_by: str) -> list:
     if sort_by == "討論最多":
         return sorted(reports, key=lambda r: r.n_posts + r.n_comments, reverse=True)
     return sorted(reports, key=lambda r: (r.fair_score is not None, r.fair_score or 0.0), reverse=True)
+
+
+def _load_results_or_none_cached() -> tuple[list, dict] | None:
+    results_path = Path(DEFAULT_RESULTS_PATH)
+    try:
+        stat = results_path.stat()
+        mtime_ns = stat.st_mtime_ns
+        size = stat.st_size
+    except FileNotFoundError:
+        mtime_ns = -1
+        size = -1
+    return _load_results_cached(str(results_path), mtime_ns, size)
+
+
+@st.cache_data(show_spinner=False)
+def _load_results_cached(path: str, mtime_ns: int, size: int) -> tuple[list, dict] | None:
+    return load_results_or_none()
 
 
 def _inject_css() -> None:

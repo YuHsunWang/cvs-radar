@@ -1182,6 +1182,28 @@ class AppHelperTest(unittest.TestCase):
         with patch("cvs_radar.store.load_results", return_value=([], {})):
             self.assertEqual(load_results_or_none(), ([], {}))
 
+    def test_streamlit_results_loader_cache_reuses_same_file_key(self) -> None:
+        import app
+
+        calls = 0
+
+        def fake_load_results_or_none() -> tuple[list, dict]:
+            nonlocal calls
+            calls += 1
+            return ([], {})
+
+        app._load_results_cached.clear()
+        try:
+            with patch.object(app, "load_results_or_none", side_effect=fake_load_results_or_none):
+                self.assertEqual(app._load_results_cached("data/results.json", 10, 100), ([], {}))
+                self.assertEqual(app._load_results_cached("data/results.json", 10, 100), ([], {}))
+                self.assertEqual(calls, 1)
+
+                self.assertEqual(app._load_results_cached("data/results.json", 11, 100), ([], {}))
+                self.assertEqual(calls, 2)
+        finally:
+            app._load_results_cached.clear()
+
     def test_app_helpers_use_service_query_shape(self) -> None:
         from datetime import datetime
         from cvs_radar.app_helpers import (
