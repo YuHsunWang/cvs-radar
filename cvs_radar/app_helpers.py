@@ -6,7 +6,7 @@ scoring, and ranking stays in ``cvs_radar.service``.
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any, Literal
 
 from .models import Post, ProductReport
@@ -190,6 +190,24 @@ def _search_target_matches(target: str, query: str, compact_query: str) -> bool:
 
 def _compact_search_text(text: str) -> str:
     return "".join(text.split())
+
+
+def filter_reports_by_recent_days(
+    reports: list[ProductReport],
+    recent_days: int | None,
+    now: datetime | None = None,
+) -> list[ProductReport]:
+    """Keep reports whose latest post is within the last ``recent_days`` days.
+
+    ``recent_days`` of ``None`` (or non-positive) means no date filtering. Reports
+    without a known ``latest_post_date`` are dropped when a window is active.
+    """
+
+    if not recent_days or recent_days <= 0:
+        return list(reports)
+
+    cutoff = (now or datetime.now()) - timedelta(days=recent_days)
+    return [r for r in reports if r.latest_post_date is not None and r.latest_post_date >= cutoff]
 
 
 POLARITY_NEUTRAL_BAND = 0.2

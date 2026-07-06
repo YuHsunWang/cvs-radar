@@ -15,6 +15,7 @@ from cvs_radar.app_helpers import (
     ALL_BRANDS,
     brand_options,
     build_product_query,
+    filter_reports_by_recent_days,
     filter_reports_by_search,
     load_results_or_none,
     load_posts,
@@ -81,6 +82,16 @@ BRAND_LOGO_SPECS = {
 CATEGORY_ALL = "全部分類"
 CATEGORY_OTHER = "其他"
 CATEGORY_FALLBACK_ORDER = ["冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊"]
+BRAND_OTHER = "其他"
+BRAND_DISPLAY_ORDER = ["7-11", "全家", "萊爾富", "OK", "美聯社"]
+DATE_RANGE_ALL = "全部"
+DATE_RANGE_OPTIONS: dict[str, int | None] = {
+    DATE_RANGE_ALL: None,
+    "近7天": 7,
+    "近30天": 30,
+    "近90天": 90,
+    "近半年": 180,
+}
 PAGE_SIZE_STEP = 12
 POSTS_PATH = Path("data/posts.jsonl")
 
@@ -153,7 +164,8 @@ def main() -> None:
             reports=[r for r in result.reports if (r.category or CATEGORY_OTHER) == filters["selected_category"]],
         )
 
-    searched_reports = filter_reports_by_search(result.reports, search_query)
+    dated_reports = filter_reports_by_recent_days(result.reports, filters["recent_days"])
+    searched_reports = filter_reports_by_search(dated_reports, search_query)
     sorted_reports = _sort_reports(searched_reports, str(filters["sort_by"]))
     result_filters = dict(result.filters)
     result_filters["limit"] = None
@@ -164,7 +176,6 @@ def main() -> None:
         reports=sorted_reports,
     )
 
-    _render_context_bar(result, selected_brand=str(filters["selected_brand"]), sort_by=str(filters["sort_by"]), source=source)
     selection_key = "|".join(
         str(filters[k])
         for k in ("selected_brand", "selected_category", "sort_by", "start_date", "end_date", "recent_days")
@@ -204,9 +215,23 @@ def _render_category_filter(reports: list[Any] | None) -> str:
     return str(selected or CATEGORY_ALL)
 
 
-def _render_brand_filter(options: list[str]) -> str:
+def _order_brand_options(options: list[str]) -> list[str]:
+    """Order brands as 7-11, 全家, 萊爾富, OK, 美聯社, others, then 其他 last."""
+
     brands = [option for option in options if option != ALL_BRANDS]
-    brand_options = [ALL_BRANDS, *brands]
+
+    def rank(brand: str) -> tuple[int, int, str]:
+        if brand == BRAND_OTHER:
+            return (2, 0, brand)
+        if brand in BRAND_DISPLAY_ORDER:
+            return (0, BRAND_DISPLAY_ORDER.index(brand), brand)
+        return (1, 0, brand)
+
+    return [ALL_BRANDS, *sorted(brands, key=rank)]
+
+
+def _render_brand_filter(options: list[str]) -> str:
+    brand_options = _order_brand_options(options)
     selected = st.pills(
         "品牌",
         brand_options,
@@ -215,6 +240,18 @@ def _render_brand_filter(options: list[str]) -> str:
         key="brand_filter",
     )
     return str(selected or ALL_BRANDS)
+
+
+def _render_date_range_filter() -> str:
+    labels = list(DATE_RANGE_OPTIONS.keys())
+    selected = st.pills(
+        "發文區間",
+        labels,
+        default=DATE_RANGE_ALL,
+        selection_mode="single",
+        key="date_range_filter",
+    )
+    return str(selected or DATE_RANGE_ALL)
 
 
 def _load_results_or_none_cached() -> tuple[list, dict] | None:
@@ -411,31 +448,10 @@ def _inject_css() -> None:
         }
 
         .filter-note,
-        .context-note,
         .section-note {
             color: var(--cvs-muted);
             font-size: 0.86rem;
             line-height: 1.5;
-        }
-
-        .context-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin: 0.95rem 0 0.82rem;
-            padding: 0.86rem 1rem;
-            background: var(--cvs-panel-soft);
-            border: 1px solid var(--cvs-line);
-            border-radius: 8px;
-            box-shadow: 0 10px 28px rgba(42, 36, 25, 0.06);
-            backdrop-filter: blur(10px);
-        }
-
-        .context-main {
-            color: var(--cvs-ink);
-            font-size: 1.02rem;
-            font-weight: 820;
         }
 
         .shelf-head {
@@ -847,18 +863,6 @@ def _inject_css() -> None:
             margin: -0.2rem 0 0.65rem;
         }
 
-        .context-bar {
-            display: block;
-            margin: 0.72rem 0 0.82rem;
-            padding: 0.7rem 0.78rem;
-            border-color: #bfd8b8;
-            background: #fbfff7;
-        }
-
-        .context-main {
-            font-size: 0.95rem;
-        }
-
         .shelf-head {
             margin: 0.78rem 0 0.5rem;
             padding-top: 0.1rem;
@@ -1015,6 +1019,7 @@ def _inject_css() -> None:
 
         div[data-testid="stHorizontalBlock"]:has(.product-row) {
             align-items: stretch;
+            gap: 0.5rem;
         }
 
         div[data-testid="stHorizontalBlock"]:has(.product-row) div[data-testid="column"]:last-child {
@@ -1023,7 +1028,8 @@ def _inject_css() -> None:
 
         .row-actions {
             height: 100%;
-            min-height: 112px;
+            min-height: 44px;
+            margin-top: 0.48rem;
             display: flex;
             width: 100%;
         }
@@ -1036,7 +1042,7 @@ def _inject_css() -> None:
         .row-actions div[data-testid="stButton"] > button {
             width: 100%;
             min-width: 48px;
-            min-height: 112px;
+            min-height: 44px;
             height: 100%;
             border-radius: 8px;
             color: var(--cvs-teal-dark);
@@ -1223,7 +1229,6 @@ def _inject_css() -> None:
         }
 
         @media (max-width: 920px) {
-            .context-bar,
             .shelf-head {
                 display: block;
             }
@@ -1280,45 +1285,46 @@ def _render_filters(
     selected_category: str,
     selected_brand: str,
 ) -> dict[str, object]:
-    with st.expander("調整篩選", expanded=False):
-        st.markdown('<div class="filter-title">縮小架上商品</div>', unsafe_allow_html=True)
-        recent_days = None
-        start_date = None
-        end_date = None
+    recent_days = None
+    start_date = None
+    end_date = None
 
-        if source != "results":
-            time_mode = st.radio("時間", ["近 N 天", "起訖日期"], horizontal=True)
-            if time_mode == "近 N 天":
-                recent_days = int(st.number_input("近 N 天", min_value=0, max_value=3650, value=30, step=1))
-            else:
-                today = datetime.now().date()
-                default_start = today - timedelta(days=30)
-                start_date = st.date_input("起始日期", value=default_start)
-                end_date = st.date_input("結束日期", value=today)
+    if source != "results":
+        time_mode = st.radio("時間", ["近 N 天", "起訖日期"], horizontal=True)
+        if time_mode == "近 N 天":
+            recent_days = int(st.number_input("近 N 天", min_value=0, max_value=3650, value=30, step=1))
+        else:
+            today = datetime.now().date()
+            default_start = today - timedelta(days=30)
+            start_date = st.date_input("起始日期", value=default_start)
+            end_date = st.date_input("結束日期", value=today)
 
-            options = brand_options(
-                posts,
-                start_date=start_date,
-                end_date=end_date,
-                recent_days=recent_days,
-            )
-            if selected_brand not in options:
-                selected_brand = ALL_BRANDS
-
+        options = brand_options(
+            posts,
+            start_date=start_date,
+            end_date=end_date,
+            recent_days=recent_days,
+        )
+        if selected_brand not in options:
+            selected_brand = ALL_BRANDS
         sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=0)
-        with st.popover("更多條件", use_container_width=True):
-            use_min_score = st.checkbox("最低分數", value=False)
-            min_score = None
-            if use_min_score:
-                min_score = float(st.number_input("分數至少", min_value=0.0, max_value=100.0, value=60.0, step=1.0))
+    else:
+        sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=0)
+        recent_days = DATE_RANGE_OPTIONS.get(_render_date_range_filter())
 
-            use_min_n_eff = st.checkbox("最低有效樣本", value=False)
-            min_n_eff = None
-            if use_min_n_eff:
-                min_n_eff = float(st.number_input("有效樣本至少", min_value=0.0, value=1.0, step=0.5))
+    with st.popover("更多條件", use_container_width=True):
+        use_min_score = st.checkbox("最低分數", value=False)
+        min_score = None
+        if use_min_score:
+            min_score = float(st.number_input("分數至少", min_value=0.0, max_value=100.0, value=60.0, step=1.0))
 
-            min_posts = int(st.number_input("最少貼文", min_value=0, value=0, step=1))
-            min_comments = int(st.number_input("最少留言", min_value=0, value=0, step=1))
+        use_min_n_eff = st.checkbox("最低有效樣本", value=False)
+        min_n_eff = None
+        if use_min_n_eff:
+            min_n_eff = float(st.number_input("有效樣本至少", min_value=0.0, value=1.0, step=0.5))
+
+        min_posts = int(st.number_input("最少貼文", min_value=0, value=0, step=1))
+        min_comments = int(st.number_input("最少留言", min_value=0, value=0, step=1))
 
     return {
         "selected_brand": selected_brand,
@@ -1359,27 +1365,6 @@ def _query_precomputed_reports(reports, query) -> ProductQueryResult:
         },
         brands=brand_summaries_from_reports(filtered),
         reports=filtered,
-    )
-
-
-def _render_context_bar(result: ProductQueryResult, *, selected_brand: str, sort_by: str, source: str) -> None:
-    count = len(result.reports)
-    brand_label = selected_brand if selected_brand != ALL_BRANDS else "全部品牌"
-    if count:
-        best = result.reports[0]
-        best_text = f"目前最值得先看：{best.product_name}（{_format_score(best.fair_score)} 分）"
-    else:
-        best_text = "目前沒有符合條件的商品"
-    st.markdown(
-        f"""
-        <div class="context-bar">
-            <div>
-                <div class="context-main">{escape(best_text)}</div>
-                <div class="context-note">找到 {count:,} 項商品，品牌：{escape(brand_label)}，排序：{escape(sort_by)}。</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
     )
 
 

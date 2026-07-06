@@ -1269,6 +1269,42 @@ class AppHelperTest(unittest.TestCase):
         self.assertEqual(relative_date_label("2026-06-01", now=datetime(2026, 6, 15)), "2 週前")
         self.assertEqual(relative_date_label("2026-05-01", now=datetime(2026, 6, 15)), "1 個月前")
 
+    def test_filter_reports_by_recent_days(self) -> None:
+        from datetime import datetime
+        from cvs_radar.app_helpers import filter_reports_by_recent_days
+
+        now = datetime(2026, 7, 7, 12, 0)
+        recent = ProductReport(
+            brand="7-11", product_name="新品", fair_score=80, consensus="一致好評",
+            confidence="高", n_eff=3, score_std=0.1, n_posts=1, n_comments=2,
+            latest_post_date=datetime(2026, 7, 5),
+        )
+        old = ProductReport(
+            brand="全家", product_name="舊品", fair_score=70, consensus="褒貶不一",
+            confidence="中", n_eff=2, score_std=0.2, n_posts=1, n_comments=1,
+            latest_post_date=datetime(2026, 1, 1),
+        )
+        undated = ProductReport(
+            brand="OK", product_name="無日期", fair_score=60, consensus="褒貶不一",
+            confidence="低", n_eff=1, score_std=0.3, n_posts=1, n_comments=0,
+            latest_post_date=None,
+        )
+        reports = [recent, old, undated]
+        # None / non-positive window means no date filtering.
+        self.assertEqual(filter_reports_by_recent_days(reports, None), reports)
+        self.assertEqual(filter_reports_by_recent_days(reports, 0), reports)
+        # A 30-day window keeps only the recent report; undated is dropped.
+        self.assertEqual(filter_reports_by_recent_days(reports, 30, now=now), [recent])
+
+    def test_order_brand_options(self) -> None:
+        import app
+
+        ordered = app._order_brand_options(["全部", "OK", "其他", "全家", "7-11", "萊爾富"])
+        self.assertEqual(ordered, ["全部", "7-11", "全家", "萊爾富", "OK", "其他"])
+        # An unknown brand sorts after the known order but before 其他.
+        ordered2 = app._order_brand_options(["全部", "其他", "美廉社", "7-11"])
+        self.assertEqual(ordered2, ["全部", "7-11", "美廉社", "其他"])
+
 
 class AppProductRowTest(unittest.TestCase):
     def _row(self, **overrides: object) -> dict[str, object]:
