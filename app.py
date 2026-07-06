@@ -873,10 +873,29 @@ def _inject_css() -> None:
         }
 
         .row-score {
-            color: var(--cvs-teal-dark);
             font-size: 2rem;
             line-height: 1;
             font-weight: 900;
+        }
+
+        .row-score.score-good {
+            background: transparent;
+            color: #13865f;
+        }
+
+        .row-score.score-ok {
+            background: transparent;
+            color: #d18700;
+        }
+
+        .row-score.score-bad {
+            background: transparent;
+            color: #c33329;
+        }
+
+        .row-score.score-empty {
+            background: transparent;
+            color: #7b8794;
         }
 
         .row-score small {
@@ -890,6 +909,41 @@ def _inject_css() -> None:
             font-size: 0.8rem;
             font-weight: 720;
         }
+
+        .row-consensus {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.38rem;
+            min-height: 31px;
+            padding: 0.28rem 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #dce4ec;
+            background: #ffffff;
+            color: var(--cvs-ink);
+            font-size: 0.88rem;
+            line-height: 1;
+            font-weight: 820;
+            white-space: nowrap;
+        }
+
+        .row-consensus-segments {
+            display: inline-grid;
+            grid-auto-flow: column;
+            gap: 0.12rem;
+            align-items: center;
+        }
+
+        .row-consensus-seg {
+            width: 0.48rem;
+            height: 0.48rem;
+            border-radius: 999px;
+            background: #d7dee6;
+        }
+
+        .row-consensus-seg.pos { background: #13865f; }
+        .row-consensus-seg.neg { background: #c33329; }
+        .row-consensus-seg.split { background: #d18700; }
+        .row-consensus-seg.empty { background: #c8d1da; }
 
         .row-actions div[data-testid="stButton"] > button {
             width: 38px;
@@ -1303,21 +1357,22 @@ def _brand_chip_html(brand: str) -> str:
 
 
 def _product_row_html(row: dict[str, Any]) -> str:
-    consensus_label, consensus_class, _segments = _consensus_signal(str(row.get("consensus") or "資料不足"))
+    consensus_label, consensus_class, segments = _consensus_signal(str(row.get("consensus") or "資料不足"))
     volume_label, volume_class, _level = _volume_signal(str(row.get("討論聲量") or "聲量不足"))
+    score_class = _score_class(row.get("fair_score"))
     return f"""
     <div class="product-row">
         <div class="rank-mark">{escape(str(row.get("排名", "-")))}</div>
         {_product_visual_html(row)}
         <div class="row-main">
             <div class="row-top">
-                <span class="row-meta">{escape(_format_price(row.get("價格")))} · {escape(str(row.get("分類") or "其他"))}</span>
+                <span class="row-meta">{escape(_format_price(row.get("價格")))} · {escape(str(row.get("分類") or "其他"))} · {escape(_row_sample_hint(row))}</span>
             </div>
             <div class="row-name">{escape(str(row.get("商品") or "-"))}</div>
             <div class="row-signals">
-                <div class="row-score">{escape(_format_score(row.get("fair_score")))}<small>/100</small></div>
+                <div class="row-score {score_class}">{escape(_format_score(row.get("fair_score")))}<small>/100</small></div>
                 <div>
-                    <span class="signal {consensus_class}"><span class="signal-value">{escape(consensus_label)}</span></span>
+                    {_row_consensus_signal_html(row, consensus_label, consensus_class, segments)}
                     <span class="signal {volume_class}"><span class="signal-value">{escape(volume_label)}</span></span>
                 </div>
             </div>
@@ -1370,6 +1425,45 @@ def _product_detail_html(row: dict[str, Any]) -> str:
 
 def _consensus_signal(consensus: str) -> tuple[str, str, tuple[str, ...]]:
     return CONSENSUS_SIGNALS.get(consensus, CONSENSUS_SIGNALS["資料不足"])
+
+
+def _row_consensus_signal_html(
+    row: dict[str, Any],
+    fallback_label: str,
+    fallback_class: str,
+    segments: tuple[str, ...],
+) -> str:
+    distribution = row.get("共識分布")
+    if not _valid_distribution(distribution):
+        return f'<span class="signal {fallback_class}"><span class="signal-value">{escape(fallback_label)}</span></span>'
+
+    positive = round(float(distribution[0]))
+    segment_html = "".join(
+        f'<span class="row-consensus-seg {escape(segment)}" aria-hidden="true"></span>' for segment in segments
+    )
+    return (
+        f'<span class="row-consensus" aria-label="正向 {positive}%">'
+        f'<span class="row-consensus-segments">{segment_html}</span>'
+        f"<span>正向 {positive}%</span>"
+        "</span>"
+    )
+
+
+def _row_sample_hint(row: dict[str, Any]) -> str:
+    comments = _positive_int(row.get("留言數"))
+    posts = _positive_int(row.get("貼文數"))
+    if comments > 0:
+        return f"{comments:,} 則評價"
+    if posts > 0:
+        return f"{posts:,} 篇心得"
+    return "樣本不足"
+
+
+def _positive_int(value: object) -> int:
+    try:
+        return max(0, int(value or 0))
+    except (TypeError, ValueError):
+        return 0
 
 
 def _volume_signal(volume: str) -> tuple[str, str, int]:
