@@ -5,7 +5,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from html import escape
 from typing import Any
-from urllib.parse import quote
 
 import streamlit as st
 
@@ -40,48 +39,42 @@ BRAND_LOGO_SPECS = {
         "bg": "#ffffff",
         "fg": "#0c6b3c",
         "border": "#0c6b3c",
-        "bars": ("#0c8f48", "#f58220", "#d71920"),
     },
     "全家": {
         "text": "全家",
         "bg": "#ffffff",
         "fg": "#005bac",
         "border": "#00a650",
-        "bars": ("#005bac", "#00a650", "#005bac"),
     },
     "萊爾富": {
         "text": "HiLife",
         "bg": "#fff7f5",
         "fg": "#d71920",
         "border": "#d71920",
-        "bars": ("#d71920", "#f15a24", "#d71920"),
     },
     "OK": {
         "text": "OK",
         "bg": "#fff8df",
         "fg": "#c45f00",
         "border": "#f4a300",
-        "bars": ("#f4a300", "#ef7d00", "#c45f00"),
     },
     "美聯社": {
         "text": "美聯",
         "bg": "#f7f1ff",
         "fg": "#6d2ea0",
         "border": "#7a3db8",
-        "bars": ("#7a3db8", "#2e9d57", "#7a3db8"),
     },
     "其他": {
         "text": "店",
         "bg": "#f4f6f8",
         "fg": "#536170",
         "border": "#a7b2bf",
-        "bars": ("#a7b2bf", "#c7d0d9", "#a7b2bf"),
     },
 }
 
 
 def main() -> None:
-    st.set_page_config(page_title="CVS Radar", page_icon="🛒", layout="wide")
+    st.set_page_config(page_title="CVS Radar", page_icon="🛒", layout="centered")
     _inject_css()
     _render_header()
 
@@ -175,74 +168,131 @@ def _inject_css() -> None:
         """
         <style>
         :root {
-            --cvs-ink: #18232f;
-            --cvs-muted: #657384;
-            --cvs-line: #dde5ed;
+            --cvs-ink: #172033;
+            --cvs-muted: #6f7b8a;
+            --cvs-soft: #f7f3ea;
+            --cvs-line: #e4ded3;
             --cvs-panel: #ffffff;
-            --cvs-warm: #fff8ed;
-            --cvs-green: #12805c;
-            --cvs-green-bg: #e8f6ef;
-            --cvs-amber: #a86200;
-            --cvs-amber-bg: #fff3d5;
-            --cvs-red: #b42318;
+            --cvs-panel-soft: rgba(255, 255, 255, 0.82);
+            --cvs-teal: #0f8f7a;
+            --cvs-teal-dark: #006b63;
+            --cvs-green: #188657;
+            --cvs-green-bg: #edf8f1;
+            --cvs-amber: #c46f00;
+            --cvs-amber-bg: #fff6df;
+            --cvs-red: #c43d36;
             --cvs-red-bg: #fff0ed;
-            --cvs-blue: #245fba;
-            --cvs-blue-bg: #edf5ff;
+            --cvs-blue-bg: #eef7fb;
+            --cvs-shadow: 0 18px 45px rgba(42, 36, 25, 0.08);
         }
 
         .stApp {
             background:
-                linear-gradient(180deg, #fff8ed 0, #f8fbfd 235px, #f8fbfd 100%);
+                radial-gradient(circle at 18% 0%, rgba(15, 143, 122, 0.12), transparent 30rem),
+                linear-gradient(180deg, #fbf8f1 0, var(--cvs-soft) 360px, #f6f3ec 100%);
             color: var(--cvs-ink);
         }
 
         .block-container {
             max-width: 1320px;
-            padding-top: 1.35rem;
+            padding-top: 1.05rem;
             padding-bottom: 3rem;
         }
 
         section[data-testid="stSidebar"] {
-            background: #fffdf8;
-            border-right: 1px solid #eadfca;
+            background: linear-gradient(180deg, #fffcf6 0%, #f5efe3 100%);
+            border-right: 1px solid #ded4c4;
+            box-shadow: 8px 0 30px rgba(42, 36, 25, 0.06);
+        }
+
+        section[data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+            padding-top: 1.25rem;
+        }
+
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3 {
+            color: var(--cvs-ink);
+            letter-spacing: 0;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"] {
+            border-color: var(--cvs-line) !important;
+            border-radius: 8px !important;
+            background: rgba(255, 255, 255, 0.72) !important;
+            box-shadow: var(--cvs-shadow);
         }
 
         .shopper-header {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: space-between;
-            gap: 1rem;
-            padding: 0.25rem 0 0.9rem;
-            border-bottom: 1px solid rgba(101, 115, 132, 0.22);
-            margin-bottom: 0.95rem;
+            gap: 1.2rem;
+            padding: 1.05rem 1.15rem;
+            margin: 0.1rem 0 1rem;
+            background: rgba(255, 255, 255, 0.68);
+            border: 1px solid rgba(228, 222, 211, 0.86);
+            border-radius: 8px;
+            box-shadow: var(--cvs-shadow);
+            backdrop-filter: blur(12px);
+        }
+
+        .brand-lockup {
+            display: flex;
+            align-items: center;
+            gap: 0.95rem;
+            min-width: 0;
+        }
+
+        .radar-mark {
+            width: 58px;
+            height: 58px;
+            flex: 0 0 auto;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            color: var(--cvs-teal-dark);
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.95) 0 34%, transparent 35%),
+                conic-gradient(from 320deg, #68b9a8 0 72%, #d9eee9 72% 100%);
+            box-shadow: inset 0 0 0 6px rgba(15, 143, 122, 0.18);
+            font-size: 1.7rem;
+            font-weight: 900;
         }
 
         .shopper-title {
             margin: 0;
             color: var(--cvs-ink);
-            font-size: 2rem;
+            font-size: clamp(1.82rem, 3vw, 2.5rem);
             line-height: 1.12;
-            font-weight: 780;
-            letter-spacing: 0;
+            font-weight: 860;
+            letter-spacing: 0.01em;
         }
 
         .shopper-caption {
-            margin-top: 0.42rem;
+            margin-top: 0.38rem;
             color: var(--cvs-muted);
-            font-size: 0.98rem;
+            font-size: 1rem;
             line-height: 1.5;
         }
 
         .header-chip {
             flex: 0 0 auto;
-            padding: 0.44rem 0.72rem;
+            padding: 0.62rem 0.92rem;
             border-radius: 999px;
-            background: #ffffff;
-            border: 1px solid #e2d6bf;
-            color: #75501b;
-            font-size: 0.86rem;
-            font-weight: 760;
+            background: linear-gradient(180deg, #14a58e, #08776f);
+            border: 1px solid rgba(0, 107, 99, 0.24);
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 820;
             white-space: nowrap;
+            box-shadow: 0 10px 22px rgba(0, 107, 99, 0.2);
+        }
+
+        .filter-title {
+            margin: 0 0 0.25rem;
+            color: var(--cvs-ink);
+            font-size: 1.05rem;
+            font-weight: 830;
         }
 
         .filter-note,
@@ -258,17 +308,19 @@ def _inject_css() -> None:
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
-            margin: 0.9rem 0 0.75rem;
-            padding: 0.74rem 0.9rem;
-            background: rgba(255, 255, 255, 0.78);
+            margin: 0.95rem 0 0.82rem;
+            padding: 0.86rem 1rem;
+            background: var(--cvs-panel-soft);
             border: 1px solid var(--cvs-line);
             border-radius: 8px;
+            box-shadow: 0 10px 28px rgba(42, 36, 25, 0.06);
+            backdrop-filter: blur(10px);
         }
 
         .context-main {
             color: var(--cvs-ink);
-            font-size: 1rem;
-            font-weight: 760;
+            font-size: 1.02rem;
+            font-weight: 820;
         }
 
         .shelf-head {
@@ -282,8 +334,8 @@ def _inject_css() -> None:
         .section-title {
             margin: 0;
             color: var(--cvs-ink);
-            font-size: 1.04rem;
-            font-weight: 780;
+            font-size: 1.08rem;
+            font-weight: 840;
         }
 
         .product-tile,
@@ -291,7 +343,7 @@ def _inject_css() -> None:
             background: var(--cvs-panel);
             border: 1px solid var(--cvs-line);
             border-radius: 8px;
-            box-shadow: 0 10px 26px rgba(26, 35, 47, 0.07);
+            box-shadow: var(--cvs-shadow);
         }
 
         .product-tile {
@@ -302,18 +354,6 @@ def _inject_css() -> None:
         .product-tile.selected {
             border-color: #f0b45f;
             box-shadow: 0 0 0 2px rgba(240, 180, 95, 0.25), 0 10px 26px rgba(26, 35, 47, 0.08);
-        }
-
-        /*
-         * The shopper shelf uses st.dataframe as a navigational grid: logo
-         * images need ImageColumn, and any selected cell should switch the
-         * right-side product detail. Suppress glide's read-only edit overlay.
-         */
-        div[class*="gdg-d19meir1"],
-        div.gdg-style:has(.gdg-clip-region) {
-            display: none !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
         }
 
         .tile-grid {
@@ -355,11 +395,11 @@ def _inject_css() -> None:
             display: inline-flex;
             align-items: center;
             min-height: 27px;
-            padding: 0.2rem 0.54rem;
+            padding: 0.22rem 0.58rem;
             border-radius: 999px;
             border: 1px solid transparent;
             font-size: 0.78rem;
-            font-weight: 740;
+            font-weight: 780;
             white-space: nowrap;
         }
 
@@ -372,6 +412,17 @@ def _inject_css() -> None:
 
         .price-pill { background: #f9fbfd; color: var(--cvs-ink); border-color: #e4ebf2; }
         .date-pill { background: #f7fafc; color: var(--cvs-muted); border-color: #e4ebf2; }
+
+        div[data-testid="stDataFrame"] {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--cvs-line);
+            box-shadow: var(--cvs-shadow);
+        }
+
+        div[data-testid="stDataFrame"] [role="grid"] {
+            background: #ffffff;
+        }
 
         .score-block {
             min-width: 92px;
@@ -401,7 +452,7 @@ def _inject_css() -> None:
         .score-good { background: #13865f; }
         .score-ok { background: #d18700; }
         .score-bad { background: #c33329; }
-        .score-empty { background: #7b8794; }
+        .score-empty { background: #7b8794; color: #ffffff; }
 
         .score-caption {
             margin-top: 0.32rem;
@@ -419,10 +470,10 @@ def _inject_css() -> None:
             align-items: center;
             gap: 0.34rem;
             min-height: 31px;
-            padding: 0.22rem 0.54rem;
+            padding: 0.28rem 0.62rem;
             border-radius: 8px;
             border: 1px solid transparent;
-            font-weight: 760;
+            font-weight: 800;
         }
 
         .signal-label {
@@ -438,7 +489,7 @@ def _inject_css() -> None:
             white-space: nowrap;
         }
 
-        .signal-good { background: var(--cvs-green-bg); border-color: #bee8d3; color: var(--cvs-green); }
+        .signal-good { background: var(--cvs-green-bg); border-color: #bfebd2; color: var(--cvs-green); }
         .signal-mixed { background: var(--cvs-amber-bg); border-color: #ffe0a0; color: var(--cvs-amber); }
         .signal-polar { background: #fff0df; border-color: #ffd1a8; color: #9a4a00; }
         .signal-bad { background: var(--cvs-red-bg); border-color: #ffd1cb; color: var(--cvs-red); }
@@ -488,6 +539,14 @@ def _inject_css() -> None:
             padding: 1.05rem;
         }
 
+        .detail-top {
+            display: grid;
+            grid-template-columns: 76px minmax(0, 1fr);
+            gap: 0.82rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
         .detail-eyebrow {
             color: var(--cvs-muted);
             font-size: 0.78rem;
@@ -495,7 +554,7 @@ def _inject_css() -> None:
         }
 
         .detail-name {
-            margin: 0.18rem 0 0.7rem;
+            margin: 0.18rem 0 0.2rem;
             color: var(--cvs-ink);
             font-size: 1.38rem;
             line-height: 1.28;
@@ -510,8 +569,8 @@ def _inject_css() -> None:
             align-items: center;
             padding: 0.82rem;
             border-radius: 8px;
-            background: #f8fafc;
-            border: 1px solid #e4ebf2;
+            background: linear-gradient(180deg, #fbfdfc, #f3f8f5);
+            border: 1px solid #d9e8df;
             margin: 0.72rem 0 0.88rem;
         }
 
@@ -542,9 +601,9 @@ def _inject_css() -> None:
         }
 
         .review-excerpt {
-            background: #fffdf8;
-            border: 1px solid #eadfca;
-            border-left: 4px solid #f0b45f;
+            background: #fbfdff;
+            border: 1px solid #dbe8ee;
+            border-left: 4px solid #77b7c9;
             margin: 0.82rem 0;
         }
 
@@ -588,8 +647,8 @@ def _inject_css() -> None:
         }
 
         .competitor-box {
-            background: #f8fafc;
-            border: 1px solid #e4ebf2;
+            background: #fffdf8;
+            border: 1px solid #eadfca;
             margin-top: 0.75rem;
         }
 
@@ -603,8 +662,343 @@ def _inject_css() -> None:
         .compare-win { background: var(--cvs-green-bg); color: var(--cvs-green); border-color: #bee8d3; }
         .compare-lose { background: var(--cvs-red-bg); color: var(--cvs-red); border-color: #ffd1cb; }
 
+        .block-container {
+            max-width: 430px;
+            padding: 0 0.72rem 2.2rem;
+        }
+
+        header[data-testid="stHeader"] {
+            background: rgba(255, 252, 246, 0.9);
+            backdrop-filter: blur(12px);
+        }
+
+        section[data-testid="stSidebar"] {
+            display: none;
+        }
+
+        .shopper-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            margin: 0 -0.72rem 0.8rem;
+            padding: 0.68rem 0.86rem;
+            border-width: 0 0 1px;
+            border-radius: 0;
+            box-shadow: 0 6px 18px rgba(26, 35, 47, 0.08);
+        }
+
+        .radar-mark {
+            width: 38px;
+            height: 38px;
+            font-size: 1.15rem;
+            box-shadow: inset 0 0 0 4px rgba(15, 143, 122, 0.16);
+        }
+
+        .brand-lockup {
+            gap: 0.68rem;
+        }
+
+        .shopper-title {
+            font-size: 1.38rem;
+            line-height: 1.08;
+        }
+
+        .shopper-caption {
+            margin-top: 0.18rem;
+            font-size: 0.82rem;
+            line-height: 1.25;
+        }
+
+        .header-chip {
+            display: none;
+        }
+
+        div[data-testid="stExpander"] {
+            border: 1px solid var(--cvs-line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.84);
+            box-shadow: 0 8px 24px rgba(42, 36, 25, 0.06);
+            overflow: hidden;
+        }
+
+        div[data-testid="stExpander"] details summary {
+            min-height: 46px;
+        }
+
+        .filter-drawer-copy {
+            color: var(--cvs-muted);
+            font-size: 0.82rem;
+            line-height: 1.45;
+            margin: -0.2rem 0 0.65rem;
+        }
+
+        .brand-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin: 0.55rem 0 0.85rem;
+        }
+
+        .context-bar {
+            display: block;
+            margin: 0.72rem 0 0.82rem;
+            padding: 0.7rem 0.78rem;
+            border-color: #bfd8b8;
+            background: #fbfff7;
+        }
+
+        .context-main {
+            font-size: 0.95rem;
+        }
+
+        .shelf-head {
+            margin: 0.78rem 0 0.5rem;
+            padding-top: 0.1rem;
+        }
+
+        .section-title {
+            font-size: 1.12rem;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: 34px 74px minmax(0, 1fr);
+            gap: 0.66rem;
+            align-items: center;
+            padding: 0.72rem;
+            margin-top: 0.48rem;
+            background: var(--cvs-panel);
+            border: 1px solid var(--cvs-line);
+            border-radius: 8px;
+            box-shadow: 0 8px 22px rgba(42, 36, 25, 0.07);
+        }
+
+        .rank-mark {
+            color: var(--cvs-ink);
+            font-size: 1.42rem;
+            line-height: 1;
+            font-weight: 840;
+            text-align: center;
+        }
+
+        .product-visual {
+            width: 74px;
+            height: 74px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            color: var(--tile-fg, #ffffff);
+            background: var(--tile-bg, #0f8f7a);
+            border: 1px solid var(--tile-border, rgba(0,0,0,0.1));
+            box-shadow: inset 0 -18px 0 rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .visual-glyph {
+            font-size: 0.78rem;
+            font-weight: 860;
+            opacity: 0.86;
+        }
+
+        .visual-initial {
+            font-size: 2.15rem;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+
+        .row-main {
+            min-width: 0;
+        }
+
+        .row-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.42rem;
+        }
+
+        .brand-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 28px;
+            padding: 0.22rem 0.62rem;
+            border-radius: 8px;
+            background: var(--brand-bg);
+            color: var(--brand-fg);
+            border: 1px solid var(--brand-border);
+            font-size: 0.84rem;
+            line-height: 1;
+            font-weight: 860;
+            white-space: nowrap;
+        }
+
+        .row-name {
+            margin-top: 0.38rem;
+            color: var(--cvs-ink);
+            font-size: 1rem;
+            line-height: 1.32;
+            font-weight: 820;
+            overflow-wrap: anywhere;
+        }
+
+        .row-signals {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.32rem 0.5rem;
+            align-items: center;
+            margin-top: 0.42rem;
+        }
+
+        .row-score {
+            color: var(--cvs-teal-dark);
+            font-size: 2rem;
+            line-height: 1;
+            font-weight: 900;
+        }
+
+        .row-score small {
+            color: var(--cvs-muted);
+            font-size: 0.86rem;
+            font-weight: 760;
+        }
+
+        .row-meta {
+            color: var(--cvs-muted);
+            font-size: 0.8rem;
+            font-weight: 720;
+        }
+
+        .row-actions div[data-testid="stButton"] > button {
+            min-height: 38px;
+            border-radius: 8px;
+            color: var(--cvs-teal-dark);
+            border-color: #9ed6cf;
+            background: #f3fffc;
+            font-weight: 820;
+        }
+
+        .inline-detail {
+            margin: 0.42rem 0 0.72rem;
+        }
+
+        .detail-card {
+            padding: 0.82rem;
+            box-shadow: 0 8px 22px rgba(42, 36, 25, 0.08);
+        }
+
+        .detail-top {
+            grid-template-columns: 70px minmax(0, 1fr);
+            gap: 0.72rem;
+        }
+
+        .detail-name {
+            font-size: 1.12rem;
+        }
+
+        .detail-brand-row {
+            display: flex;
+            align-items: center;
+            gap: 0.42rem;
+            flex-wrap: wrap;
+        }
+
+        .decision-band {
+            grid-template-columns: 94px minmax(0, 1fr);
+            padding: 0.72rem;
+        }
+
+        .decision-band .score-number {
+            min-width: 86px;
+            min-height: 58px;
+            font-size: 2rem;
+        }
+
+        .distribution-card {
+            padding: 0.72rem;
+            margin-top: 0.7rem;
+            border: 1px solid #e3e8dd;
+            border-radius: 8px;
+            background: #fffefa;
+        }
+
+        .distribution-title,
+        .volume-title {
+            color: var(--cvs-ink);
+            font-size: 0.9rem;
+            font-weight: 820;
+            margin-bottom: 0.42rem;
+        }
+
+        .dist-bar {
+            display: flex;
+            overflow: hidden;
+            height: 32px;
+            border-radius: 8px;
+            background: #edf1ef;
+        }
+
+        .dist-seg {
+            display: grid;
+            place-items: center;
+            min-width: 2.1rem;
+            color: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 840;
+        }
+
+        .dist-pos { background: #3d963f; }
+        .dist-neu { background: #f0a11a; }
+        .dist-neg { background: #df3b35; }
+
+        .dist-labels {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.35rem;
+            margin-top: 0.38rem;
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .dist-labels span:nth-child(1) { color: #2c7d31; }
+        .dist-labels span:nth-child(2) { color: #c57400; }
+        .dist-labels span:nth-child(3) { color: #c33329; }
+
+        .volume-card {
+            padding: 0.72rem 0 0;
+            margin-top: 0.72rem;
+            border-top: 1px solid var(--cvs-line);
+        }
+
+        .volume-meter {
+            height: 14px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #edf0ec;
+        }
+
+        .volume-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #0f8f7a, #18a69b);
+        }
+
+        .detail-action {
+            display: block;
+            margin-top: 0.78rem;
+            padding: 0.72rem 0.9rem;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #0ca095, #087a74);
+            color: #ffffff !important;
+            text-align: center;
+            text-decoration: none !important;
+            font-size: 1rem;
+            font-weight: 860;
+            box-shadow: 0 10px 20px rgba(8, 122, 116, 0.18);
+        }
+
         @media (max-width: 920px) {
-            .shopper-header,
             .context-bar,
             .shelf-head {
                 display: block;
@@ -616,7 +1010,6 @@ def _inject_css() -> None:
             }
 
             .tile-grid,
-            .decision-band,
             .comment-grid {
                 grid-template-columns: 1fr;
             }
@@ -635,9 +1028,12 @@ def _render_header() -> None:
     st.markdown(
         """
         <div class="shopper-header">
-            <div>
-                <h1 class="shopper-title">CVS Radar 超商商品雷達</h1>
-                <div class="shopper-caption">站在架前先看這裡：分數、共識、聲量與真實心得，幫你判斷值不值得買。</div>
+            <div class="brand-lockup">
+                <div class="radar-mark" aria-hidden="true">◎</div>
+                <div>
+                    <h1 class="shopper-title">CVS Radar 超商商品雷達</h1>
+                    <div class="shopper-caption">站在架前先看這裡：分數、共識、聲量與真實心得，幫你判斷值不值得買。</div>
+                </div>
             </div>
             <div class="header-chip">購買決策視圖</div>
         </div>
@@ -647,8 +1043,8 @@ def _render_header() -> None:
 
 
 def _render_sidebar() -> dict[str, object]:
-    with st.sidebar:
-        st.header("今天想找什麼？")
+    st.markdown('<div class="filter-drawer-copy">先看推薦結果；需要改品牌、分類、排序或資料來源時再展開。</div>', unsafe_allow_html=True)
+    with st.expander("資料來源設定", expanded=False):
         st.caption("預設使用已計算好的 results 快照；開發或驗證時才切換其他來源。")
 
         labels = {
@@ -659,37 +1055,36 @@ def _render_sidebar() -> dict[str, object]:
         }
         default_source = "results" if load_results_or_none() is not None else "demo"
         crawl_pages = 5
-        with st.expander("資料來源設定", expanded=False):
-            source = st.selectbox(
-                "資料來源",
-                options=list(labels),
-                index=list(labels).index(default_source),
-                format_func=lambda value: labels[str(value)],
-            )
-            if source == "results":
-                loaded = load_results_or_none()
-                if loaded is not None:
-                    loaded_reports, loaded_profiles = loaded
-                    st.caption(f"{len(loaded_reports):,} 項商品結果，{len(loaded_profiles):,} 個帳號輪廓")
-                else:
-                    st.warning("目前沒有 results，主畫面會改用 demo。")
-            elif source == "stored":
-                from cvs_radar.store import store_stats
-
-                stats = store_stats()
-                st.caption(f"{stats['post_count']:,} 篇文，{stats['comment_count']:,} 則留言")
-            elif source == "crawl":
-                st.warning("crawl 會連線到 PTT。")
-                crawl_pages = int(st.number_input("PTT 頁數", min_value=1, max_value=50, value=5, step=1))
+        source = st.selectbox(
+            "資料來源",
+            options=list(labels),
+            index=list(labels).index(default_source),
+            format_func=lambda value: labels[str(value)],
+        )
+        if source == "results":
+            loaded = load_results_or_none()
+            if loaded is not None:
+                loaded_reports, loaded_profiles = loaded
+                st.caption(f"{len(loaded_reports):,} 項商品結果，{len(loaded_profiles):,} 個帳號輪廓")
             else:
-                st.caption("demo 不連網，適合快速預覽。")
+                st.warning("目前沒有 results，主畫面會改用 demo。")
+        elif source == "stored":
+            from cvs_radar.store import store_stats
+
+            stats = store_stats()
+            st.caption(f"{stats['post_count']:,} 篇文，{stats['comment_count']:,} 則留言")
+        elif source == "crawl":
+            st.warning("crawl 會連線到 PTT。")
+            crawl_pages = int(st.number_input("PTT 頁數", min_value=1, max_value=50, value=5, step=1))
+        else:
+            st.caption("demo 不連網，適合快速預覽。")
 
     return {"source": str(source), "crawl_pages": crawl_pages}
 
 
 def _render_filters(source: str, posts: object, options: list[str]) -> dict[str, object]:
-    with st.container(border=True):
-        st.markdown("##### 縮小架上商品")
+    with st.expander("調整篩選", expanded=False):
+        st.markdown('<div class="filter-title">縮小架上商品</div>', unsafe_allow_html=True)
         recent_days = None
         start_date = None
         end_date = None
@@ -700,20 +1095,14 @@ def _render_filters(source: str, posts: object, options: list[str]) -> dict[str,
                 unsafe_allow_html=True,
             )
         else:
-            time_mode_col, time_value_col = st.columns([1, 2])
-            with time_mode_col:
-                time_mode = st.radio("時間", ["近 N 天", "起訖日期"], horizontal=True)
-            with time_value_col:
-                if time_mode == "近 N 天":
-                    recent_days = int(st.number_input("近 N 天", min_value=0, max_value=3650, value=30, step=1))
-                else:
-                    today = datetime.now().date()
-                    default_start = today - timedelta(days=30)
-                    date_cols = st.columns(2)
-                    with date_cols[0]:
-                        start_date = st.date_input("起始日期", value=default_start)
-                    with date_cols[1]:
-                        end_date = st.date_input("結束日期", value=today)
+            time_mode = st.radio("時間", ["近 N 天", "起訖日期"], horizontal=True)
+            if time_mode == "近 N 天":
+                recent_days = int(st.number_input("近 N 天", min_value=0, max_value=3650, value=30, step=1))
+            else:
+                today = datetime.now().date()
+                default_start = today - timedelta(days=30)
+                start_date = st.date_input("起始日期", value=default_start)
+                end_date = st.date_input("結束日期", value=today)
 
             options = brand_options(
                 posts,
@@ -723,29 +1112,24 @@ def _render_filters(source: str, posts: object, options: list[str]) -> dict[str,
             )
 
         cat_options = ["全部分類", "冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊", "其他"]
-        filter_cols = st.columns([1.25, 1.05, 1.05, 0.8, 0.8])
-        with filter_cols[0]:
-            selected_brand = st.selectbox("品牌", options, index=0)
-        with filter_cols[1]:
-            selected_category = st.selectbox("分類", cat_options, index=0)
-        with filter_cols[2]:
-            sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=0)
-        with filter_cols[3]:
-            limit = int(st.number_input("顯示", min_value=1, max_value=200, value=12, step=1))
-        with filter_cols[4]:
-            with st.popover("更多條件", use_container_width=True):
-                use_min_score = st.checkbox("最低分數", value=False)
-                min_score = None
-                if use_min_score:
-                    min_score = float(st.number_input("分數至少", min_value=0.0, max_value=100.0, value=60.0, step=1.0))
+        st.markdown(_brand_preview_html(options), unsafe_allow_html=True)
+        selected_brand = st.selectbox("品牌", options, index=0)
+        selected_category = st.selectbox("分類", cat_options, index=0)
+        sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=0)
+        limit = int(st.number_input("顯示", min_value=1, max_value=200, value=12, step=1))
+        with st.popover("更多條件", use_container_width=True):
+            use_min_score = st.checkbox("最低分數", value=False)
+            min_score = None
+            if use_min_score:
+                min_score = float(st.number_input("分數至少", min_value=0.0, max_value=100.0, value=60.0, step=1.0))
 
-                use_min_n_eff = st.checkbox("最低有效樣本", value=False)
-                min_n_eff = None
-                if use_min_n_eff:
-                    min_n_eff = float(st.number_input("有效樣本至少", min_value=0.0, value=1.0, step=0.5))
+            use_min_n_eff = st.checkbox("最低有效樣本", value=False)
+            min_n_eff = None
+            if use_min_n_eff:
+                min_n_eff = float(st.number_input("有效樣本至少", min_value=0.0, value=1.0, step=0.5))
 
-                min_posts = int(st.number_input("最少貼文", min_value=0, value=0, step=1))
-                min_comments = int(st.number_input("最少留言", min_value=0, value=0, step=1))
+            min_posts = int(st.number_input("最少貼文", min_value=0, value=0, step=1))
+            min_comments = int(st.number_input("最少留言", min_value=0, value=0, step=1))
 
     return {
         "selected_brand": selected_brand,
@@ -818,64 +1202,30 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> N
         st.info("目前條件下沒有符合的商品。可以放寬品牌、分類或更多條件。")
         return
 
-    state_key = f"shopper_selected_idx::{selection_key}"
-    table_key = f"shopper_table::{selection_key}"
+    state_key = f"shopper_open_idx::{selection_key}"
     if state_key not in st.session_state or int(st.session_state[state_key]) >= len(rows):
         st.session_state[state_key] = 0
-    selected_idx = _selected_idx_from_dataframe_state(
-        st.session_state.get(table_key),
-        fallback_idx=min(int(st.session_state[state_key]), len(rows) - 1),
-        row_count=len(rows),
+
+    st.markdown(
+        """
+        <div class="shelf-head">
+            <p class="section-title">架上候選商品</p>
+            <span class="section-note">展開任一商品，單品判斷會直接出現在該列下方。</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    st.session_state[state_key] = selected_idx
-
-    shelf_col, detail_col = st.columns([1.08, 0.92], gap="large")
-    with shelf_col:
-        st.markdown(
-            """
-            <div class="shelf-head">
-                <p class="section-title">架上候選商品</p>
-                <span class="section-note">點任一列的任一格，右側就會顯示完整心得。</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        event = st.dataframe(
-            _shopper_table_rows(rows, selected_idx=selected_idx),
-            hide_index=True,
-            use_container_width=True,
-            on_select="rerun",
-            selection_mode="single-cell",
-            key=table_key,
-            row_height=54,
-            height=min(54 * (len(rows) + 1) + 8, 650),
-            column_order=["選取", "商標", "品牌", "商品", "分數", "共識", "聲量", "價格"],
-            column_config={
-                "選取": st.column_config.TextColumn("選取", width="small"),
-                "商標": st.column_config.ImageColumn("商標", width="small"),
-                "品牌": st.column_config.TextColumn("品牌", width="small"),
-                "商品": st.column_config.TextColumn("商品"),
-                "分數": st.column_config.NumberColumn("分數", format="%.0f", width="small"),
-                "共識": st.column_config.TextColumn("共識", width="small"),
-                "聲量": st.column_config.TextColumn("聲量", width="small"),
-                "價格": st.column_config.TextColumn("價格", width="small"),
-            },
-        )
-        selected_idx = _selected_idx_from_dataframe_state(event, fallback_idx=selected_idx, row_count=len(rows))
-        st.session_state[state_key] = selected_idx
-
-    selected_idx = int(st.session_state[state_key])
-    with detail_col:
-        st.markdown(
-            """
-            <div class="shelf-head">
-                <p class="section-title">單品判斷</p>
-                <span class="section-note">把商品拿在手上時，看這張就夠。</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown(_product_detail_html(rows[selected_idx]), unsafe_allow_html=True)
+    for idx, row in enumerate(rows):
+        is_open = int(st.session_state[state_key]) == idx
+        st.markdown(_product_row_html(row, expanded=is_open), unsafe_allow_html=True)
+        button_label = "收合" if is_open else "展開詳情"
+        if st.button(button_label, key=f"product_toggle::{selection_key}::{idx}", use_container_width=True):
+            st.session_state[state_key] = -1 if is_open else idx
+            st.rerun()
+        if is_open:
+            st.markdown('<div class="inline-detail">', unsafe_allow_html=True)
+            st.markdown(_product_detail_html(row), unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
 
 def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
@@ -888,86 +1238,78 @@ def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     return rows
 
 
-def _shopper_table_rows(rows: list[dict[str, Any]], *, selected_idx: int) -> list[dict[str, Any]]:
-    table_rows = []
-    for idx, row in enumerate(rows):
-        consensus = str(row.get("consensus") or "資料不足")
-        volume = str(row.get("討論聲量") or "聲量不足")
-        table_rows.append(
-            {
-                "選取": "目前" if idx == selected_idx else "",
-                "商標": _brand_logo_data_uri(str(row.get("品牌") or "其他")),
-                "品牌": str(row.get("品牌") or "-"),
-                "商品": str(row.get("商品") or "-"),
-                "分數": _score_value(row.get("fair_score")),
-                "共識": _consensus_signal(consensus)[0],
-                "聲量": _volume_signal(volume)[0],
-                "價格": _format_price(row.get("價格")),
-            }
-        )
-    return table_rows
+def _brand_preview_html(options: list[str]) -> str:
+    brands = [option for option in options if option != ALL_BRANDS] or ["7-11", "全家", "萊爾富", "OK", "美聯社", "其他"]
+    chips = "".join(_brand_chip_html(brand) for brand in brands[:6])
+    return f'<div class="brand-preview">{chips}</div>'
 
 
-def _brand_logo_data_uri(brand: str) -> str:
+def _brand_chip_html(brand: str) -> str:
     spec = BRAND_LOGO_SPECS.get(brand, BRAND_LOGO_SPECS["其他"])
-    bars = "".join(
-        f'<rect x="{8 + i * 24}" y="6" width="18" height="4" rx="2" fill="{color}"/>'
-        for i, color in enumerate(spec["bars"])
+    return (
+        '<span class="brand-chip" '
+        f'style="--brand-bg:{escape(str(spec["bg"]))};--brand-fg:{escape(str(spec["fg"]))};'
+        f'--brand-border:{escape(str(spec["border"]))};">'
+        f'{escape(str(spec["text"]))}</span>'
     )
-    svg = f"""
-    <svg xmlns="http://www.w3.org/2000/svg" width="88" height="36" viewBox="0 0 88 36" role="img" aria-label="{escape(brand)}">
-      <rect x="1" y="1" width="86" height="34" rx="7" fill="{spec["bg"]}" stroke="{spec["border"]}" stroke-width="2"/>
-      {bars}
-      <text x="44" y="25" text-anchor="middle" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="14" font-weight="800" fill="{spec["fg"]}">{escape(str(spec["text"]))}</text>
-    </svg>
+
+
+def _product_row_html(row: dict[str, Any], *, expanded: bool) -> str:
+    consensus_label, consensus_class, _segments = _consensus_signal(str(row.get("consensus") or "資料不足"))
+    volume_label, volume_class, _level = _volume_signal(str(row.get("討論聲量") or "聲量不足"))
+    open_text = "收合" if expanded else "展開"
+    return f"""
+    <div class="product-row">
+        <div class="rank-mark">{escape(str(row.get("排名", "-")))}</div>
+        {_product_visual_html(row)}
+        <div class="row-main">
+            <div class="row-top">
+                {_brand_chip_html(str(row.get("品牌") or "其他"))}
+                <span class="row-meta">{escape(open_text)}</span>
+            </div>
+            <div class="row-name">{escape(str(row.get("商品") or "-"))}</div>
+            <div class="row-signals">
+                <div class="row-score">{escape(_format_score(row.get("fair_score")))}<small>/100</small></div>
+                <div>
+                    <span class="signal {consensus_class}"><span class="signal-value">{escape(consensus_label)}</span></span>
+                    <span class="signal {volume_class}"><span class="signal-value">{escape(volume_label)}</span></span>
+                    <div class="row-meta">{escape(_format_price(row.get("價格")))} · {escape(str(row.get("分類") or "其他"))}</div>
+                </div>
+            </div>
+        </div>
+    </div>
     """
-    return "data:image/svg+xml;utf8," + quote(" ".join(svg.split()))
 
 
-def _score_value(score: object) -> float | None:
-    if score is None:
-        return None
-    try:
-        return float(score)
-    except (TypeError, ValueError):
-        return None
+def _product_visual_html(row: dict[str, Any]) -> str:
+    brand = str(row.get("品牌") or "其他")
+    product = str(row.get("商品") or "")
+    category = str(row.get("分類") or "其他")
+    spec = BRAND_LOGO_SPECS.get(brand, BRAND_LOGO_SPECS["其他"])
+    glyph = _category_glyph(category)
+    initial = next((char for char in product.strip() if not char.isspace()), str(spec["text"])[0])
+    return (
+        '<div class="product-visual" '
+        f'style="--tile-bg:{escape(str(spec["fg"]))};--tile-fg:{escape(str(spec["bg"]))};'
+        f'--tile-border:{escape(str(spec["border"]))};">'
+        f'<div><div class="visual-glyph">{escape(glyph)}</div><div class="visual-initial">{escape(initial)}</div></div>'
+        "</div>"
+    )
 
 
-def _selected_idx_from_dataframe_state(event: Any, *, fallback_idx: int, row_count: int) -> int:
-    if not event:
-        return fallback_idx
-    selection = getattr(event, "selection", None)
-    if not selection and isinstance(event, dict):
-        selection = event.get("selection")
-    if not selection:
-        return fallback_idx
-
-    cells = _selection_values(selection, "cells")
-    if cells:
-        first_cell = cells[0]
-        try:
-            selected_idx = int(first_cell[0])
-        except (TypeError, ValueError, IndexError):
-            return fallback_idx
-        if 0 <= selected_idx < row_count:
-            return selected_idx
-
-    selected_rows = _selection_values(selection, "rows")
-    if selected_rows:
-        try:
-            selected_idx = int(selected_rows[0])
-        except (TypeError, ValueError):
-            return fallback_idx
-        if 0 <= selected_idx < row_count:
-            return selected_idx
-
-    return fallback_idx
-
-
-def _selection_values(selection: Any, key: str) -> list:
-    if isinstance(selection, dict):
-        return list(selection.get(key) or [])
-    return list(getattr(selection, key, []) or [])
+def _category_glyph(category: str) -> str:
+    return {
+        "冰品": "冰",
+        "飲料": "飲",
+        "甜點": "甜",
+        "麵包": "包",
+        "便當": "飯",
+        "鹹食": "鹹",
+        "零食": "零",
+        "泡麵": "麵",
+        "乳品": "乳",
+        "周邊": "物",
+    }.get(category, "品")
 
 
 def _product_detail_html(row: dict[str, Any]) -> str:
@@ -975,10 +1317,19 @@ def _product_detail_html(row: dict[str, Any]) -> str:
     positive_comments = _split_comments(row.get("正向留言"))
     negative_comments = _split_comments(row.get("負向留言"))
     excerpt = str(row.get("心得節錄") or "").strip()
+    brand = str(row.get("品牌") or "其他")
     return f"""
     <div class="detail-card">
-        <div class="detail-eyebrow">#{escape(str(row.get("排名", "-")))} · {escape(str(row.get("品牌") or "-"))}</div>
-        <div class="detail-name">{escape(str(row.get("商品") or "-"))}</div>
+        <div class="detail-top">
+            {_product_visual_html(row)}
+            <div>
+                <div class="detail-brand-row">
+                    <div class="detail-eyebrow">#{escape(str(row.get("排名", "-")))}</div>
+                    {_brand_chip_html(brand)}
+                </div>
+                <div class="detail-name">{escape(str(row.get("商品") or "-"))}</div>
+            </div>
+        </div>
         <div class="detail-meta">
             <span class="pill price-pill">{escape(_format_price(row.get("價格")))}</span>
             <span class="pill price-pill">{escape(str(row.get("分類") or "其他"))}</span>
@@ -992,12 +1343,15 @@ def _product_detail_html(row: dict[str, Any]) -> str:
             </div>
         </div>
         {_signals_html(row)}
+        {_consensus_distribution_html(row)}
+        {_volume_meter_html(row)}
         {_excerpt_html(excerpt)}
         <div class="comment-grid">
             {_comment_box("大家喜歡的點", positive_comments, "positive")}
             {_comment_box("需要留意的點", negative_comments, "negative")}
         </div>
         {_competitor_html(row)}
+        {_review_action_html(row)}
     </div>
     """
 
@@ -1042,6 +1396,53 @@ def _heat_bar_html(level: int) -> str:
         for idx in range(3)
     )
     return f'<span class="heat-bar" aria-hidden="true">{bars}</span>'
+
+
+def _consensus_distribution_html(row: dict[str, Any]) -> str:
+    positive, neutral, negative = _consensus_distribution(str(row.get("consensus") or "資料不足"))
+    return (
+        '<div class="distribution-card">'
+        '<div class="distribution-title">共識分布</div>'
+        '<div class="dist-bar">'
+        f'<span class="dist-seg dist-pos" style="width:{positive}%">{positive}%</span>'
+        f'<span class="dist-seg dist-neu" style="width:{neutral}%">{neutral}%</span>'
+        f'<span class="dist-seg dist-neg" style="width:{negative}%">{negative}%</span>'
+        "</div>"
+        '<div class="dist-labels">'
+        f"<span>正向 {positive}%</span><span>中立 {neutral}%</span><span>負向 {negative}%</span>"
+        "</div>"
+        "</div>"
+    )
+
+
+def _consensus_distribution(consensus: str) -> tuple[int, int, int]:
+    if consensus == "一致好評":
+        return (72, 18, 10)
+    if consensus == "褒貶不一":
+        return (48, 32, 20)
+    if consensus == "評價兩極":
+        return (44, 12, 44)
+    if consensus == "一致負評":
+        return (12, 18, 70)
+    return (0, 100, 0)
+
+
+def _volume_meter_html(row: dict[str, Any]) -> str:
+    volume = str(row.get("討論聲量") or "聲量不足")
+    volume_label, volume_class, level = _volume_signal(volume)
+    width = {3: 82, 2: 55, 1: 28}.get(level, 28)
+    return (
+        '<div class="volume-card">'
+        '<div class="volume-title">聲量指標</div>'
+        '<div class="volume-meter">'
+        f'<div class="volume-fill" style="width:{width}%"></div>'
+        "</div>"
+        '<div class="signal-row">'
+        f'<span class="signal {volume_class}"><span class="signal-value">{escape(volume_label)}</span></span>'
+        f'<span class="sample-count">{escape(_sample_count(row))}</span>'
+        "</div>"
+        "</div>"
+    )
 
 
 def _excerpt_html(excerpt: str) -> str:
@@ -1097,6 +1498,18 @@ def _competitor_html(row: dict[str, Any]) -> str:
         "</div>"
         "</div>"
     )
+
+
+def _review_action_html(row: dict[str, Any]) -> str:
+    links = row.get("貼文連結")
+    href = ""
+    if isinstance(links, (list, tuple)) and links:
+        href = str(links[0])
+    elif isinstance(links, str):
+        href = links
+    if href:
+        return f'<a class="detail-action" href="{escape(href)}" target="_blank" rel="noopener noreferrer">查看心得</a>'
+    return '<span class="detail-action" aria-disabled="true">查看心得</span>'
 
 
 def _split_comments(value: object) -> list[str]:
