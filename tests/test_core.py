@@ -1184,12 +1184,42 @@ class AppHelperTest(unittest.TestCase):
 
     def test_app_helpers_use_service_query_shape(self) -> None:
         from datetime import datetime
-        from cvs_radar.app_helpers import ALL_BRANDS, brand_options, build_product_query, product_rows
+        from cvs_radar.app_helpers import (
+            ALL_BRANDS,
+            brand_options,
+            build_product_query,
+            filter_reports_by_search,
+            product_rows,
+        )
         from cvs_radar.sample_data import load_sample
         from cvs_radar.service import query_products
 
         now = datetime(2026, 6, 15, 12, 0)
         posts = load_sample()
+        reports = [
+            ProductReport(
+                brand="7-11",
+                product_name="伯爵 紅茶拿鐵",
+                fair_score=82,
+                consensus="一致好評",
+                confidence="高",
+                n_eff=3,
+                score_std=0.1,
+                n_posts=1,
+                n_comments=2,
+            ),
+            ProductReport(
+                brand="FamilyMart",
+                product_name="香蕉優格",
+                fair_score=70,
+                consensus="褒貶不一",
+                confidence="中",
+                n_eff=2,
+                score_std=0.2,
+                n_posts=1,
+                n_comments=1,
+            ),
+        ]
 
         options = brand_options(posts, recent_days=30, now=now)
         query = build_product_query(
@@ -1209,6 +1239,9 @@ class AppHelperTest(unittest.TestCase):
         self.assertIn("fair_score", rows[0])
         self.assertIn("正向留言", rows[0])
         self.assertIn("討論聲量", rows[0])
+        self.assertEqual(filter_reports_by_search(reports, "紅茶拿鐵"), [reports[0]])
+        self.assertEqual(filter_reports_by_search(reports, "family"), [reports[1]])
+        self.assertEqual(filter_reports_by_search(reports, "優 格"), [reports[1]])
 
 
 class ReportingTest(unittest.TestCase):

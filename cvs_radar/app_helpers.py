@@ -143,6 +143,31 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     return rows
 
 
+def filter_reports_by_search(reports: list[ProductReport], query: str) -> list[ProductReport]:
+    """Filter reports by product name or brand with shelf-friendly matching."""
+
+    normalized_query = query.strip().casefold()
+    compact_query = _compact_search_text(normalized_query)
+    if not normalized_query:
+        return list(reports)
+
+    matched = []
+    for report in reports:
+        targets = (report.product_name, report.brand)
+        if any(_search_target_matches(target, normalized_query, compact_query) for target in targets):
+            matched.append(report)
+    return matched
+
+
+def _search_target_matches(target: str, query: str, compact_query: str) -> bool:
+    normalized_target = target.casefold()
+    return query in normalized_target or compact_query in _compact_search_text(normalized_target)
+
+
+def _compact_search_text(text: str) -> str:
+    return "".join(text.split())
+
+
 POLARITY_NEUTRAL_BAND = 0.2
 
 

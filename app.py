@@ -12,6 +12,7 @@ from cvs_radar.app_helpers import (
     ALL_BRANDS,
     brand_options,
     build_product_query,
+    filter_reports_by_search,
     load_results_or_none,
     load_posts,
     product_rows,
@@ -78,6 +79,7 @@ def main() -> None:
     _inject_css()
     _render_header()
 
+    search_query = st.text_input("搜尋商品或品牌", placeholder="搜尋商品或品牌…")
     controls = _render_sidebar()
 
     posts = None
@@ -135,10 +137,12 @@ def main() -> None:
             reports=[r for r in result.reports if (r.category or "其他") == filters["selected_category"]],
         )
 
-    sorted_reports = _sort_reports(result.reports, str(filters["sort_by"]))
+    searched_reports = filter_reports_by_search(result.reports, search_query)
+    sorted_reports = _sort_reports(searched_reports, str(filters["sort_by"]))
     sorted_reports = sorted_reports[: int(filters["limit"])]
     result_filters = dict(result.filters)
     result_filters["limit"] = filters["limit"]
+    result_filters["search_query"] = search_query
     result = ProductQueryResult(
         filters=result_filters,
         brands=brand_summaries_from_reports(sorted_reports),
@@ -150,7 +154,8 @@ def main() -> None:
         str(filters[k])
         for k in ("selected_brand", "selected_category", "sort_by", "limit", "start_date", "end_date", "recent_days")
     )
-    _render_shopper_view(result, selection_key=selection_key)
+    selection_key = f"{selection_key}|{search_query}"
+    _render_shopper_view(result, selection_key=selection_key, search_query=search_query)
 
 
 def _sort_reports(reports: list, sort_by: str) -> list:
@@ -1213,9 +1218,12 @@ def _render_context_bar(result: ProductQueryResult, *, selected_brand: str, sort
     )
 
 
-def _render_shopper_view(result: ProductQueryResult, *, selection_key: str) -> None:
+def _render_shopper_view(result: ProductQueryResult, *, selection_key: str, search_query: str = "") -> None:
     rows = _shopper_rows(result)
     if not rows:
+        if search_query.strip():
+            st.info("目前條件下沒有符合的商品。可以清除搜尋字串，或放寬品牌、分類或更多條件。")
+            return
         st.info("目前條件下沒有符合的商品。可以放寬品牌、分類或更多條件。")
         return
 
