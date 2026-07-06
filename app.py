@@ -1100,43 +1100,9 @@ def _render_header() -> None:
 
 
 def _render_sidebar() -> dict[str, object]:
-    st.markdown('<div class="filter-drawer-copy">先看推薦結果；需要改品牌、分類、排序或資料來源時再展開。</div>', unsafe_allow_html=True)
-    with st.expander("資料來源設定", expanded=False):
-        st.caption("預設使用已計算好的 results 快照；開發或驗證時才切換其他來源。")
-
-        labels = {
-            "results": "最新 results 快照",
-            "demo": "離線示範資料",
-            "stored": "本機已爬資料",
-            "crawl": "即時爬 PTT CVS",
-        }
-        default_source = "results" if load_results_or_none() is not None else "demo"
-        crawl_pages = 5
-        source = st.selectbox(
-            "資料來源",
-            options=list(labels),
-            index=list(labels).index(default_source),
-            format_func=lambda value: labels[str(value)],
-        )
-        if source == "results":
-            loaded = load_results_or_none()
-            if loaded is not None:
-                loaded_reports, loaded_profiles = loaded
-                st.caption(f"{len(loaded_reports):,} 項商品結果，{len(loaded_profiles):,} 個帳號輪廓")
-            else:
-                st.warning("目前沒有 results，主畫面會改用 demo。")
-        elif source == "stored":
-            from cvs_radar.store import store_stats
-
-            stats = store_stats()
-            st.caption(f"{stats['post_count']:,} 篇文，{stats['comment_count']:,} 則留言")
-        elif source == "crawl":
-            st.warning("crawl 會連線到 PTT。")
-            crawl_pages = int(st.number_input("PTT 頁數", min_value=1, max_value=50, value=5, step=1))
-        else:
-            st.caption("demo 不連網，適合快速預覽。")
-
-    return {"source": str(source), "crawl_pages": crawl_pages}
+    # Data source is fixed to the local precomputed results (built from the
+    # crawled posts.jsonl). No user-facing source picker — shoppers never choose.
+    return {"source": "results", "crawl_pages": 5}
 
 
 def _render_filters(source: str, posts: object, options: list[str]) -> dict[str, object]:
@@ -1246,7 +1212,6 @@ def _render_context_bar(result: ProductQueryResult, *, selected_brand: str, sort
                 <div class="context-main">{escape(best_text)}</div>
                 <div class="context-note">找到 {count:,} 項商品，品牌：{escape(brand_label)}，排序：{escape(sort_by)}。</div>
             </div>
-            <div class="context-note">source={escape(source)}</div>
         </div>
         """,
         unsafe_allow_html=True,
