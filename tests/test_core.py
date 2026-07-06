@@ -1212,6 +1212,7 @@ class AppHelperTest(unittest.TestCase):
             build_product_query,
             filter_reports_by_search,
             product_rows,
+            relative_date_label,
         )
         from cvs_radar.sample_data import load_sample
         from cvs_radar.service import query_products
@@ -1264,6 +1265,9 @@ class AppHelperTest(unittest.TestCase):
         self.assertEqual(filter_reports_by_search(reports, "紅茶拿鐵"), [reports[0]])
         self.assertEqual(filter_reports_by_search(reports, "family"), [reports[1]])
         self.assertEqual(filter_reports_by_search(reports, "優 格"), [reports[1]])
+        self.assertEqual(relative_date_label("2026-06-12", now=datetime(2026, 6, 15, 12, 0)), "3 天前")
+        self.assertEqual(relative_date_label("2026-06-01", now=datetime(2026, 6, 15)), "2 週前")
+        self.assertEqual(relative_date_label("2026-05-01", now=datetime(2026, 6, 15)), "1 個月前")
 
 
 class AppProductRowTest(unittest.TestCase):

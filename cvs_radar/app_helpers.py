@@ -143,6 +143,30 @@ def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     return rows
 
 
+def relative_date_label(date_str: str, now: date | datetime | None = None) -> str:
+    """Format a YYYY-MM-DD date as a shopper-facing relative age label."""
+
+    text = str(date_str or "").strip()
+    if not text:
+        return ""
+    try:
+        target = datetime.strptime(text, "%Y-%m-%d").date()
+    except ValueError:
+        return ""
+
+    today = datetime.now().date() if now is None else (now.date() if isinstance(now, datetime) else now)
+    days = max(0, (today - target).days)
+    if days == 0:
+        return "今天"
+    if days < 7:
+        return f"{days} 天前"
+    if days < 30:
+        return f"{days // 7} 週前"
+    if days < 365:
+        return f"{days // 30} 個月前"
+    return f"{days // 365} 年前"
+
+
 def filter_reports_by_search(reports: list[ProductReport], query: str) -> list[ProductReport]:
     """Filter reports by product name or brand with shelf-friendly matching."""
 

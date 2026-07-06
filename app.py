@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import datetime, timedelta
 from html import escape
+import json
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +19,7 @@ from cvs_radar.app_helpers import (
     load_results_or_none,
     load_posts,
     product_rows,
+    relative_date_label,
 )
 from cvs_radar.service import ProductQueryResult, brand_summaries_from_reports, filter_reports, query_products
 from cvs_radar.store import DEFAULT_RESULTS_PATH
@@ -79,6 +81,8 @@ BRAND_LOGO_SPECS = {
 CATEGORY_ALL = "全部分類"
 CATEGORY_OTHER = "其他"
 CATEGORY_FALLBACK_ORDER = ["冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊"]
+PAGE_SIZE_STEP = 12
+POSTS_PATH = Path("data/posts.jsonl")
 
 
 def main() -> None:
@@ -151,9 +155,8 @@ def main() -> None:
 
     searched_reports = filter_reports_by_search(result.reports, search_query)
     sorted_reports = _sort_reports(searched_reports, str(filters["sort_by"]))
-    sorted_reports = sorted_reports[: int(filters["limit"])]
     result_filters = dict(result.filters)
-    result_filters["limit"] = filters["limit"]
+    result_filters["limit"] = None
     result_filters["search_query"] = search_query
     result = ProductQueryResult(
         filters=result_filters,
@@ -164,7 +167,7 @@ def main() -> None:
     _render_context_bar(result, selected_brand=str(filters["selected_brand"]), sort_by=str(filters["sort_by"]), source=source)
     selection_key = "|".join(
         str(filters[k])
-        for k in ("selected_brand", "selected_category", "sort_by", "limit", "start_date", "end_date", "recent_days")
+        for k in ("selected_brand", "selected_category", "sort_by", "start_date", "end_date", "recent_days")
     )
     selection_key = f"{selection_key}|{search_query}"
     _render_shopper_view(result, selection_key=selection_key, search_query=search_query)
@@ -229,6 +232,36 @@ def _load_results_or_none_cached() -> tuple[list, dict] | None:
 @st.cache_data(show_spinner=False)
 def _load_results_cached(path: str, mtime_ns: int, size: int) -> tuple[list, dict] | None:
     return load_results_or_none()
+
+
+def _load_post_metadata() -> dict[str, dict[str, str]]:
+    try:
+        stat = POSTS_PATH.stat()
+    except FileNotFoundError:
+        return {}
+    return _load_post_metadata_cached(str(POSTS_PATH), stat.st_mtime_ns, stat.st_size)
+
+
+@st.cache_data(show_spinner=False)
+def _load_post_metadata_cached(path: str, mtime_ns: int, size: int) -> dict[str, dict[str, str]]:
+    metadata: dict[str, dict[str, str]] = {}
+    with Path(path).open(encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            try:
+                post = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            url = str(post.get("url") or "").strip()
+            if not url:
+                continue
+            posted_at = str(post.get("posted_at") or "").strip()
+            metadata[url] = {
+                "title": str(post.get("title") or "").strip(),
+                "date": posted_at[:10] if len(posted_at) >= 10 else "",
+            }
+    return metadata
 
 
 def _inject_css() -> None:
@@ -1083,9 +1116,9 @@ def _inject_css() -> None:
             font-weight: 840;
         }
 
-        .dist-pos { background: #3d963f; }
-        .dist-neu { background: #f0a11a; }
-        .dist-neg { background: #df3b35; }
+        .dist-pos { background: #2e7d32; }
+        .dist-neu { background: #8a5a00; }
+        .dist-neg { background: #c62828; }
 
         .dist-labels {
             display: flex;
@@ -1273,7 +1306,6 @@ def _render_filters(
                 selected_brand = ALL_BRANDS
 
         sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=0)
-        limit = int(st.number_input("顯示", min_value=1, max_value=200, value=12, step=1))
         with st.popover("更多條件", use_container_width=True):
             use_min_score = st.checkbox("最低分數", value=False)
             min_score = None
@@ -1298,7 +1330,6 @@ def _render_filters(
         "min_n_eff": min_n_eff,
         "min_posts": min_posts,
         "min_comments": min_comments,
-        "limit": limit,
         "sort_by": sort_by,
     }
 
@@ -1365,6 +1396,11 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str, sear
     if state_key not in st.session_state or int(st.session_state[state_key]) >= len(rows):
         st.session_state[state_key] = -1
 
+    page_size_key = f"shopper_page_size::{selection_key}"
+    if page_size_key not in st.session_state:
+        st.session_state[page_size_key] = PAGE_SIZE_STEP
+    page_size = min(int(st.session_state[page_size_key]), len(rows))
+
     st.markdown(
         """
         <div class="shelf-head">
@@ -1374,7 +1410,7 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str, sear
         """,
         unsafe_allow_html=True,
     )
-    for idx, row in enumerate(rows):
+    for idx, row in enumerate(rows[:page_size]):
         is_open = int(st.session_state[state_key]) == idx
         card_col, toggle_col = st.columns([10, 2], vertical_alignment="center")
         with card_col:
@@ -1390,14 +1426,22 @@ def _render_shopper_view(result: ProductQueryResult, *, selection_key: str, sear
             st.markdown(_product_detail_html(row), unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
+    if page_size < len(rows):
+        remaining = len(rows) - page_size
+        if st.button(f"顯示更多（還有 {remaining:,} 項）", key=f"show_more::{selection_key}", use_container_width=True):
+            st.session_state[page_size_key] = page_size + PAGE_SIZE_STEP
+            st.rerun()
+
 
 def _shopper_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
     rows = product_rows(result)
+    post_metadata = _load_post_metadata()
     for row, report in zip(rows, result.reports):
         row["貼文數"] = report.n_posts
         row["留言數"] = report.n_comments
         row["有效樣本"] = report.n_eff
         row["信心"] = report.confidence
+        row["貼文資訊"] = [_post_link_info(url, post_metadata) for url in row.get("貼文連結", [])]
     return rows
 
 
@@ -1411,7 +1455,7 @@ def _product_row_html(row: dict[str, Any]) -> str:
         {_product_visual_html(row)}
         <div class="row-main">
             <div class="row-top">
-                <span class="row-meta">{escape(_format_price(row.get("價格")))} · {escape(str(row.get("分類") or "其他"))} · {escape(_row_sample_hint(row))}</span>
+                <span class="row-meta">{_row_meta_html(row)}</span>
             </div>
             <div class="row-name">{escape(str(row.get("商品") or "-"))}</div>
             <div class="row-signals">
@@ -1445,27 +1489,42 @@ def _product_detail_html(row: dict[str, Any]) -> str:
     excerpt = str(row.get("心得節錄") or "").strip()
     return f"""
     <div class="detail-card">
-        <div class="detail-meta">
-            <span class="pill date-pill">最新發文 {escape(str(row.get("最新發文") or "未知"))}</span>
-        </div>
         <div class="decision-band">
             <div class="score-number {_score_class(score)}">{escape(_format_score(score))}<small>/100</small></div>
             <div>
                 <div class="decision-text">{escape(_decision_text(score))}</div>
                 <div class="decision-sub">{escape(_sample_count(row))}</div>
+                <div class="detail-meta">
+                    <span class="pill date-pill">最新發文 {escape(str(row.get("最新發文") or "未知"))}</span>
+                </div>
             </div>
         </div>
-        {_consensus_distribution_html(row)}
-        {_volume_meter_html(row)}
-        {_excerpt_html(excerpt)}
         <div class="comment-grid">
             {_comment_box("大家喜歡的點", positive_comments, "positive")}
             {_comment_box("需要留意的點", negative_comments, "negative")}
         </div>
+        {_excerpt_html(excerpt)}
+        {_consensus_distribution_html(row)}
+        {_volume_meter_html(row)}
         {_competitor_html(row)}
         {_review_action_html(row)}
     </div>
     """
+
+
+def _row_meta_html(row: dict[str, Any]) -> str:
+    price = _format_price(row.get("價格"))
+    parts = []
+    if price != "價格未明":
+        parts.append(price)
+    parts.extend([
+        str(row.get("分類") or "其他"),
+        _row_sample_hint(row),
+    ])
+    latest = relative_date_label(str(row.get("最新發文") or ""))
+    if latest:
+        parts.append(latest)
+    return escape(" · ".join(parts))
 
 
 def _consensus_signal(consensus: str) -> tuple[str, str, tuple[str, ...]]:
@@ -1645,10 +1704,11 @@ def _review_action_html(row: dict[str, Any]) -> str:
         return f'<a class="detail-action" href="{escape(href)}" target="_blank" rel="noopener noreferrer">查看心得</a>'
     if links:
         visible_links = links[:5]
+        post_info = row.get("貼文資訊")
         items = "".join(
             '<li>'
             f'<a class="discussion-link" href="{escape(href)}" target="_blank" rel="noopener noreferrer">'
-            f"貼文{idx}</a>"
+            f"{escape(_post_link_label(post_info, idx, href))}</a>"
             "</li>"
             for idx, href in enumerate(visible_links, 1)
         )
@@ -1670,6 +1730,41 @@ def _post_links(value: object) -> list[str]:
     if not isinstance(value, (list, tuple)):
         return []
     return [str(link).strip() for link in value if str(link).strip()]
+
+
+def _post_link_info(url: object, metadata: dict[str, dict[str, str]]) -> dict[str, str]:
+    href = str(url or "").strip()
+    info = metadata.get(href, {})
+    return {
+        "url": href,
+        "title": _title_excerpt(info.get("title", "")),
+        "date": str(info.get("date") or "").strip(),
+    }
+
+
+def _post_link_label(post_info: object, idx: int, href: str) -> str:
+    info: dict[str, str] = {}
+    if isinstance(post_info, list) and idx - 1 < len(post_info) and isinstance(post_info[idx - 1], dict):
+        candidate = post_info[idx - 1]
+        if str(candidate.get("url") or "").strip() == href:
+            info = {str(key): str(value) for key, value in candidate.items()}
+
+    title = str(info.get("title") or "").strip()
+    date_text = str(info.get("date") or "").strip()
+    if title and date_text:
+        return f"{title} · {date_text}"
+    if title:
+        return title
+    if date_text:
+        return f"貼文{idx} · {date_text}"
+    return f"貼文{idx}"
+
+
+def _title_excerpt(title: str, max_chars: int = 18) -> str:
+    text = " ".join(str(title or "").split())
+    if len(text) <= max_chars:
+        return text
+    return f"{text[:max_chars]}..."
 
 
 def _split_comments(value: object) -> list[str]:
