@@ -1346,46 +1346,12 @@ def _product_detail_html(row: dict[str, Any]) -> str:
     """
 
 
-def _signals_html(row: dict[str, Any]) -> str:
-    consensus = str(row.get("consensus") or "資料不足")
-    volume = str(row.get("討論聲量") or "聲量不足")
-    consensus_label, consensus_class, consensus_segments = _consensus_signal(consensus)
-    volume_label, volume_class, volume_level = _volume_signal(volume)
-    return (
-        '<div class="signal-row">'
-        f'<span class="signal {consensus_class}" title="共識：{escape(consensus)}">'
-        '<span class="signal-label">共識</span>'
-        f'<span class="signal-value">{escape(consensus_label)}</span>'
-        f'{_signal_bar_html(consensus_segments)}'
-        "</span>"
-        f'<span class="signal {volume_class}" title="討論聲量：{escape(volume)}">'
-        '<span class="signal-label">聲量</span>'
-        f'<span class="signal-value">{escape(volume_label)}</span>'
-        f'{_heat_bar_html(volume_level)}'
-        "</span>"
-        "</div>"
-    )
-
-
 def _consensus_signal(consensus: str) -> tuple[str, str, tuple[str, ...]]:
     return CONSENSUS_SIGNALS.get(consensus, CONSENSUS_SIGNALS["資料不足"])
 
 
 def _volume_signal(volume: str) -> tuple[str, str, int]:
     return VOLUME_SIGNALS.get(volume, VOLUME_SIGNALS["聲量不足"])
-
-
-def _signal_bar_html(segments: tuple[str, ...]) -> str:
-    bars = "".join(f'<span class="signal-seg {escape(segment)}"></span>' for segment in segments)
-    return f'<span class="signal-bar" aria-hidden="true">{bars}</span>'
-
-
-def _heat_bar_html(level: int) -> str:
-    bars = "".join(
-        f'<span class="heat-seg{" on" if idx < level else ""}"></span>'
-        for idx in range(3)
-    )
-    return f'<span class="heat-bar" aria-hidden="true">{bars}</span>'
 
 
 def _consensus_distribution_html(row: dict[str, Any]) -> str:
