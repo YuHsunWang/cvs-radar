@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from datetime import datetime, timedelta
 from html import escape
 from pathlib import Path
@@ -75,6 +76,10 @@ BRAND_LOGO_SPECS = {
     },
 }
 
+CATEGORY_ALL = "全部分類"
+CATEGORY_OTHER = "其他"
+CATEGORY_FALLBACK_ORDER = ["冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊"]
+
 
 def main() -> None:
     st.set_page_config(page_title="CVS Radar", page_icon="🛒", layout="centered")
@@ -109,7 +114,8 @@ def main() -> None:
             st.error(f"資料載入失敗：{exc}")
             return
 
-    filters = _render_filters(source, posts, options)
+    selected_category = _render_category_filter(reports)
+    filters = _render_filters(source, posts, options, selected_category=selected_category)
     query = build_product_query(
         brand=filters["selected_brand"],
         start_date=filters["start_date"],
@@ -132,11 +138,11 @@ def main() -> None:
         st.error(str(exc))
         return
 
-    if filters["selected_category"] != "全部分類":
+    if filters["selected_category"] != CATEGORY_ALL:
         result = ProductQueryResult(
             filters=result.filters,
             brands=result.brands,
-            reports=[r for r in result.reports if (r.category or "其他") == filters["selected_category"]],
+            reports=[r for r in result.reports if (r.category or CATEGORY_OTHER) == filters["selected_category"]],
         )
 
     searched_reports = filter_reports_by_search(result.reports, search_query)
@@ -168,6 +174,27 @@ def _sort_reports(reports: list, sort_by: str) -> list:
     if sort_by == "討論最多":
         return sorted(reports, key=lambda r: r.n_posts + r.n_comments, reverse=True)
     return sorted(reports, key=lambda r: (r.fair_score is not None, r.fair_score or 0.0), reverse=True)
+
+
+def _category_options_from_reports(reports: list[Any] | None) -> list[str]:
+    if not reports:
+        return [CATEGORY_ALL, *CATEGORY_FALLBACK_ORDER, CATEGORY_OTHER]
+
+    counts = Counter((getattr(report, "category", None) or CATEGORY_OTHER) for report in reports)
+    categories = [category for category, _count in counts.most_common() if category != CATEGORY_OTHER]
+    return [CATEGORY_ALL, *categories, CATEGORY_OTHER]
+
+
+def _render_category_filter(reports: list[Any] | None) -> str:
+    options = _category_options_from_reports(reports)
+    selected = st.pills(
+        "分類",
+        options,
+        default=CATEGORY_ALL,
+        selection_mode="single",
+        key="category_filter",
+    )
+    return str(selected or CATEGORY_ALL)
 
 
 def _load_results_or_none_cached() -> tuple[list, dict] | None:
@@ -317,6 +344,20 @@ def _inject_css() -> None:
             color: var(--cvs-ink);
             font-size: 1.05rem;
             font-weight: 830;
+        }
+
+        div[data-testid="stPills"] {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 0.16rem;
+            scrollbar-width: thin;
+        }
+
+        div[data-testid="stPills"] [role="radiogroup"] {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 0.4rem;
+            min-width: max-content;
         }
 
         .filter-note,
@@ -1183,7 +1224,7 @@ def _render_sidebar() -> dict[str, object]:
     return {"source": "results", "crawl_pages": 5}
 
 
-def _render_filters(source: str, posts: object, options: list[str]) -> dict[str, object]:
+def _render_filters(source: str, posts: object, options: list[str], *, selected_category: str) -> dict[str, object]:
     with st.expander("調整篩選", expanded=False):
         st.markdown('<div class="filter-title">縮小架上商品</div>', unsafe_allow_html=True)
         recent_days = None
@@ -1207,10 +1248,8 @@ def _render_filters(source: str, posts: object, options: list[str]) -> dict[str,
                 recent_days=recent_days,
             )
 
-        cat_options = ["全部分類", "冰品", "飲料", "甜點", "麵包", "便當", "鹹食", "零食", "泡麵", "乳品", "周邊", "其他"]
         st.markdown(_brand_preview_html(options), unsafe_allow_html=True)
         selected_brand = st.selectbox("品牌", options, index=0)
-        selected_category = st.selectbox("分類", cat_options, index=0)
         sort_by = st.selectbox("排序", ["評分最高", "討論最多", "最新發文", "評分最低"], index=0)
         limit = int(st.number_input("顯示", min_value=1, max_value=200, value=12, step=1))
         with st.popover("更多條件", use_container_width=True):
