@@ -342,6 +342,21 @@ class ScoringTest(unittest.TestCase):
         self.assertTrue(_same_combo_flavor_product("麻辣起司飯糰", "起司麻辣飯糰"))
         self.assertTrue(_same_product("7-11", "麻辣起司飯糰", "起司麻辣飯糰"))
 
+    def test_junk_product_name_falls_back_to_title_not_unknown(self) -> None:
+        # The 商品名稱 field is promo junk that canonicalizes to "unknown"; the real
+        # name lives in the title. Unrelated posts must not collapse under "unknown".
+        posts = [
+            Post(id="p1", brand="全家", title="[商品] 全家 牙寶寵物頭套",
+                 product_name="：加價購169元", author="a1", author_score=80),
+            Post(id="p2", brand="7-11", title="[商品] 7-11 動物方城市安全帽",
+                 product_name="：\n599預購加點數", author="a2", author_score=82),
+        ]
+        processed = preprocess_posts(posts)
+        names = [p.product_name for p in processed]
+        self.assertNotIn("unknown", names)
+        self.assertTrue(any("牙寶寵物頭套" in (n or "") for n in names))
+        self.assertTrue(any("安全帽" in (n or "") for n in names))
+
     def test_pipeline_caps_same_user_comments_and_excludes_self_push(self) -> None:
         post = Post(
             id="p1",

@@ -827,6 +827,23 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             fallback_price = _primary_price_from_text(extraction_name)
             if fallback_name and len(fallback_name) >= 2:
                 valid_items = [(fallback_name, fallback_price)]
+        # Drop items that still canonicalize to "unknown" (promo/fragment tokens such
+        # as 加價購169元 / 嚐鮮價 that slip past junk detection); if that empties the
+        # list, fall back to the post title so unrelated posts don't merge under "unknown".
+        resolved_items = [
+            (name, price)
+            for name, price in valid_items
+            if canonical_product_name(post.brand, name) != "unknown"
+        ]
+        if not resolved_items:
+            fallback_name = _title_fallback_product_name(post)
+            if (
+                fallback_name
+                and len(fallback_name) >= 2
+                and canonical_product_name(post.brand, fallback_name) != "unknown"
+            ):
+                resolved_items = [(fallback_name, _primary_price_from_text(extraction_name))]
+        valid_items = resolved_items
         if len(valid_items) > 1:
             routed_comments = _route_comments_by_product(
                 post.comments, [name for name, _ in valid_items]
