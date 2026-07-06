@@ -718,7 +718,7 @@ def _inject_css() -> None:
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.84);
             box-shadow: 0 8px 24px rgba(42, 36, 25, 0.06);
-            overflow: hidden;
+            overflow: visible;
         }
 
         div[data-testid="stExpander"] details summary {
@@ -1112,12 +1112,7 @@ def _render_filters(source: str, posts: object, options: list[str]) -> dict[str,
         start_date = None
         end_date = None
 
-        if source == "results":
-            st.markdown(
-                '<div class="filter-note">results 是預先計算快照；這裡調整品牌、分類、排序與樣本門檻。</div>',
-                unsafe_allow_html=True,
-            )
-        else:
+        if source != "results":
             time_mode = st.radio("時間", ["近 N 天", "起訖日期"], horizontal=True)
             if time_mode == "近 N 天":
                 recent_days = int(st.number_input("近 N 天", min_value=0, max_value=3650, value=30, step=1))
