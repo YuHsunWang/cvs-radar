@@ -914,7 +914,7 @@ def _same_combo_flavor_product(left: str, right: str) -> bool:
         return False
     left_forms = _matched_product_forms(left)
     right_forms = _matched_product_forms(right)
-    return not left_forms or not right_forms or bool(left_forms & right_forms) or _both_ice_forms(left_forms, right_forms)
+    return bool(left_forms & right_forms) or _both_ice_forms(left_forms, right_forms)
 
 
 def _matched_flavor_terms(text: str) -> frozenset[str]:

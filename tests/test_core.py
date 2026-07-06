@@ -23,6 +23,8 @@ from cvs_radar.parser import (
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
 from cvs_radar.scoring import (
+    _same_combo_flavor_product,
+    _same_product,
     canonical_product_name,
     categorize_product,
     extract_products_and_prices,
@@ -331,6 +333,14 @@ class ScoringTest(unittest.TestCase):
         ]
         reports, _ = run_pipeline(posts)
         self.assertEqual(len(reports), 2)
+
+    def test_product_grouping_does_not_merge_shared_flavor_without_product_form(self) -> None:
+        self.assertFalse(_same_combo_flavor_product("鹽烤麻辣雞心", "麻辣奶油鮮蝦義大利麵"))
+        self.assertFalse(_same_product("7-11", "鹽烤麻辣雞心", "麻辣奶油鮮蝦義大利麵"))
+
+    def test_product_grouping_keeps_combo_flavor_shortcut_with_shared_product_form(self) -> None:
+        self.assertTrue(_same_combo_flavor_product("麻辣起司飯糰", "起司麻辣飯糰"))
+        self.assertTrue(_same_product("7-11", "麻辣起司飯糰", "起司麻辣飯糰"))
 
     def test_pipeline_caps_same_user_comments_and_excludes_self_push(self) -> None:
         post = Post(
