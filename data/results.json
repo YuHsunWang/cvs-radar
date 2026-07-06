@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-06 11:42:22",
+  "generated_at": "2026-07-06 13:20:40",
   "reports": [
     {
       "brand": "全家",
@@ -4202,6 +4202,76 @@
       "review_excerpt": "晚上不知道要吃些什麼上完有氧課之後去逛一下,發現這個麵包 。 可可是我的最愛 吃起來是 鬆鬆軟軟 的,上面的可可很有提味的效果。 吃完不會有甜膩的感覺,單吃也很 不錯。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1756819312.A.247.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "焦糖海鹽麵包",
+      "fair_score": 76.7,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "n_eff": 5.72,
+      "score_std": 0.083,
+      "n_posts": 1,
+      "n_comments": 5,
+      "contributors": [
+        {
+          "user": "s0831720",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "wooin16",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "summerhsia",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.7045
+        },
+        {
+          "user": "mudshove",
+          "role": "commenter",
+          "score": 1.0,
+          "weight": 0.6425
+        },
+        {
+          "user": "miniuser",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.6275
+        },
+        {
+          "user": "santian",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.6065
+        }
+      ],
+      "rep_positive": [
+        "焦糖捲蛋糕那個好吃",
+        "純推 東南西北洽北北",
+        "東南西北好勾回憶Xd"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:焦糖海鹽麵包",
+      "score_mean": 0.8253,
+      "price": 39,
+      "category": "麵包",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 1,
+      "competitor_brands": [
+        "7-11"
+      ],
+      "latest_post_date": "2025-08-12T13:07:34",
+      "review_excerpt": "太愛喝可樂奶 先嚐鮮綜合口味 搭牛奶有點像是香草可樂的fu 甜度對我來說剛好 不會越吃越渴或很膩 同系列聯名的麵包也不錯 很像是牛奶餐包那種口感 焦糖內餡吃起來有微微鹹味 剛好可以中和焦糖的甜 形狀也蠻可愛的",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1754975256.A.D0A.html"
       ]
     },
     {
@@ -11005,6 +11075,159 @@
       ]
     },
     {
+      "brand": "全家",
+      "product_name": "草莓厚奶雲餡泡芙",
+      "fair_score": 71.7,
+      "consensus": "一致好評",
+      "confidence": "高",
+      "n_eff": 19.53,
+      "score_std": 0.156,
+      "n_posts": 2,
+      "n_comments": 20,
+      "contributors": [
+        {
+          "user": "ally826",
+          "role": "author",
+          "score": 0.88,
+          "weight": 1.0
+        },
+        {
+          "user": "weeafterwork",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "betty30304",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 1.0
+        },
+        {
+          "user": "kimmy2134",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "diball",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 1.0
+        },
+        {
+          "user": "kastane",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 1.0
+        },
+        {
+          "user": "betty1001",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 1.0
+        },
+        {
+          "user": "edr3310",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 1.0
+        },
+        {
+          "user": "JaneJJ",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 1.0
+        },
+        {
+          "user": "Sensibility",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8348
+        },
+        {
+          "user": "firetim",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8333
+        },
+        {
+          "user": "Momochuee21",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8053
+        },
+        {
+          "user": "mmmmmmO",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 0.8004
+        },
+        {
+          "user": "shouqing2",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.7929
+        },
+        {
+          "user": "Shanny17",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.772
+        },
+        {
+          "user": "rrosy",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7047
+        },
+        {
+          "user": "EricTao",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.69
+        },
+        {
+          "user": "shao4",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.6863
+        },
+        {
+          "user": "smalldolphin",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.6792
+        },
+        {
+          "user": "Nadialove",
+          "role": "commenter",
+          "score": 0.8625,
+          "weight": 0.6501
+        }
+      ],
+      "rep_positive": [
+        "友善撿了好幾個 超好吃",
+        "昨天吃 泡芙內餡是好吃的 下次會再回購",
+        "餡真的多 喜歡 泡芙"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:草莓厚奶雲餡泡芙",
+      "score_mean": 0.7294,
+      "price": 49,
+      "category": "甜點",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-01-08T18:44:13",
+      "review_excerpt": "先說結論,賣相很不錯 阿莎咪米超可愛加分 全家草莓泡芙很值得吃! 裡面的內餡是莓果奶酪+草莓卡士達, 量蠻多的,咬下去會從另外一邊炸出來 味道很濃郁不會膩 口感就是滑滑順順的,然後草莓味夠明顯不會有化學感~ 阿莎咪米杯塞看到最後兩個",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1767767419.A.F4D.html",
+        "https://www.ptt.cc/bbs/CVS/M.1767869058.A.5C0.html"
+      ]
+    },
+    {
       "brand": "7-11",
       "product_name": "Myprotein經典奶茶高蛋白飲",
       "fair_score": 71.7,
@@ -11715,6 +11938,282 @@
     },
     {
       "brand": "全家",
+      "product_name": "草莓甜心Q堤",
+      "fair_score": 71.5,
+      "consensus": "一致好評",
+      "confidence": "高",
+      "n_eff": 38.63,
+      "score_std": 0.149,
+      "n_posts": 2,
+      "n_comments": 45,
+      "contributors": [
+        {
+          "user": "misky1990",
+          "role": "author",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "franceswen",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "chuink",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "S890127",
+          "role": "commenter",
+          "score": 0.72,
+          "weight": 1.0
+        },
+        {
+          "user": "pipipa",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "redhuang",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "k123894",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "LingHsieh",
+          "role": "commenter",
+          "score": 0.64,
+          "weight": 1.0
+        },
+        {
+          "user": "DL815",
+          "role": "commenter",
+          "score": 0.89,
+          "weight": 1.0
+        },
+        {
+          "user": "Misako",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 1.0
+        },
+        {
+          "user": "EPIRB406",
+          "role": "commenter",
+          "score": 1.0,
+          "weight": 1.0
+        },
+        {
+          "user": "peacekingdom",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "gsc283",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "punkband573",
+          "role": "commenter",
+          "score": 0.52,
+          "weight": 1.0
+        },
+        {
+          "user": "sodajudy",
+          "role": "commenter",
+          "score": 0.98,
+          "weight": 1.0
+        },
+        {
+          "user": "mygreenair",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "c79143014",
+          "role": "commenter",
+          "score": 0.62,
+          "weight": 1.0
+        },
+        {
+          "user": "CuTeHebe",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "chuusan",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8538
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8093
+        },
+        {
+          "user": "wi22900",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 0.7969
+        },
+        {
+          "user": "SCLPAL",
+          "role": "commenter",
+          "score": 0.73,
+          "weight": 0.7881
+        },
+        {
+          "user": "w4",
+          "role": "commenter",
+          "score": 0.572,
+          "weight": 0.7757
+        },
+        {
+          "user": "teikfvtfiem",
+          "role": "commenter",
+          "score": 0.66,
+          "weight": 0.7704
+        },
+        {
+          "user": "racheel",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.7644
+        },
+        {
+          "user": "catuncle1",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.755
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.86,
+          "weight": 0.7429
+        },
+        {
+          "user": "jajoy",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7344
+        },
+        {
+          "user": "pupu456",
+          "role": "commenter",
+          "score": 0.62,
+          "weight": 0.7257
+        },
+        {
+          "user": "lelehappy",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.719
+        },
+        {
+          "user": "una283",
+          "role": "commenter",
+          "score": 0.68,
+          "weight": 0.7153
+        },
+        {
+          "user": "mina322753",
+          "role": "commenter",
+          "score": 0.72,
+          "weight": 0.7125
+        },
+        {
+          "user": "ssss87109",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.7083
+        },
+        {
+          "user": "cucutina",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.6963
+        },
+        {
+          "user": "Masterpiec",
+          "role": "commenter",
+          "score": 0.516,
+          "weight": 0.6865
+        },
+        {
+          "user": "smalldolphin",
+          "role": "commenter",
+          "score": 0.79,
+          "weight": 0.6792
+        },
+        {
+          "user": "altcd",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.6692
+        },
+        {
+          "user": "styyu1281",
+          "role": "commenter",
+          "score": 1.0,
+          "weight": 0.6533
+        },
+        {
+          "user": "darianchiu",
+          "role": "commenter",
+          "score": 0.96,
+          "weight": 0.5785
+        },
+        {
+          "user": "kuriko",
+          "role": "commenter",
+          "score": 0.7867,
+          "weight": 0.3686
+        }
+      ],
+      "rep_positive": [
+        "論好吃應該大部分的人都秒選Mister Donut",
+        "用點數+1元換的蠻好吃的,不過太甜",
+        "切一顆一顆好讚XD"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:草莓甜心q堤",
+      "score_mean": 0.7217,
+      "price": 39,
+      "category": "其他",
+      "competitor_mention_count": 2,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "7-11",
+        "其他"
+      ],
+      "latest_post_date": "2025-09-01T22:25:23",
+      "review_excerpt": "前陣子網路上蠻多人分享全家的甜甜圈 所以也買了mister donut的來比比看 首先是草莓口味 從外表看,全家的比較大 草莓醬也比較多 Mister的切面 全家的切面 口味跟口感的部分 Mister的波堤麵體比較香",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1755656335.A.4F9.html",
+        "https://www.ptt.cc/bbs/CVS/M.1756736725.A.336.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "香蕉牛奶酷繽沙",
       "fair_score": 71.5,
       "consensus": "一致好評",
@@ -12310,6 +12809,441 @@
       "review_excerpt": "太可愛啦!!! 結帳看到我愛的小兔又出新商品 這次是鑰匙圈+糖果 放在結帳區 立馬購入 糖果小小的長這樣(很騙錢 喜歡小兔的人可以衝~~~",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1754485993.A.AD7.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "草莓大福",
+      "fair_score": 71.1,
+      "consensus": "一致好評",
+      "confidence": "高",
+      "n_eff": 64.3,
+      "score_std": 0.185,
+      "n_posts": 2,
+      "n_comments": 71,
+      "contributors": [
+        {
+          "user": "ga86041",
+          "role": "author",
+          "score": 0.95,
+          "weight": 1.0
+        },
+        {
+          "user": "byechu5566",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "lovedls",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "trama",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 1.0
+        },
+        {
+          "user": "RanceTsai",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 1.0
+        },
+        {
+          "user": "Oct5566",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "ggyy8787",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 1.0
+        },
+        {
+          "user": "elieta",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 1.0
+        },
+        {
+          "user": "DarkAngelX1",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "cake2246",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 1.0
+        },
+        {
+          "user": "pp18637",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 1.0
+        },
+        {
+          "user": "taka0725",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "archer9081",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 1.0
+        },
+        {
+          "user": "miniwin",
+          "role": "commenter",
+          "score": 0.525,
+          "weight": 1.0
+        },
+        {
+          "user": "zlin65",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "bbs1216",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "info1994",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "Ryoma",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 1.0
+        },
+        {
+          "user": "Provance",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 1.0
+        },
+        {
+          "user": "rabbitcake",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 1.0
+        },
+        {
+          "user": "abellya",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "a103852",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "kennethfws32",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "chiayigo",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 1.0
+        },
+        {
+          "user": "dmnohftaw",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 1.0
+        },
+        {
+          "user": "s880162tina",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 1.0
+        },
+        {
+          "user": "pensiero",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 1.0
+        },
+        {
+          "user": "sanfaren",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "marosky",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "Goog1e",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8606
+        },
+        {
+          "user": "girafa",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.8581
+        },
+        {
+          "user": "prkfcpr",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.8299
+        },
+        {
+          "user": "pink0518",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 0.8271
+        },
+        {
+          "user": "wen555",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.8264
+        },
+        {
+          "user": "yjlee0829",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.8171
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8093
+        },
+        {
+          "user": "Momochuee21",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.8053
+        },
+        {
+          "user": "teresa0625",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.7977
+        },
+        {
+          "user": "lluunnaa",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7951
+        },
+        {
+          "user": "tinabjqs",
+          "role": "commenter",
+          "score": 0.6625,
+          "weight": 0.7927
+        },
+        {
+          "user": "abc0312",
+          "role": "commenter",
+          "score": 0.7083,
+          "weight": 0.7837
+        },
+        {
+          "user": "john0628",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7673
+        },
+        {
+          "user": "AZBTPATONY",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.7666
+        },
+        {
+          "user": "pliu91",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.7562
+        },
+        {
+          "user": "fototw",
+          "role": "commenter",
+          "score": 0.3083,
+          "weight": 0.7559
+        },
+        {
+          "user": "laa325770",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.7548
+        },
+        {
+          "user": "conychiwa",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 0.7535
+        },
+        {
+          "user": "handsomeYD",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.7526
+        },
+        {
+          "user": "sh9129",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7472
+        },
+        {
+          "user": "phoinixa",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 0.741
+        },
+        {
+          "user": "k1245963",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 0.74
+        },
+        {
+          "user": "roman80010",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.7365
+        },
+        {
+          "user": "tio2catalyst",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 0.73
+        },
+        {
+          "user": "ttyui",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.7125
+        },
+        {
+          "user": "spse6f6t6h6",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.7099
+        },
+        {
+          "user": "oceanfishwu",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.7077
+        },
+        {
+          "user": "tnl0716",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.7047
+        },
+        {
+          "user": "c48074",
+          "role": "commenter",
+          "score": 0.575,
+          "weight": 0.703
+        },
+        {
+          "user": "beetlebum",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.6878
+        },
+        {
+          "user": "ck326",
+          "role": "commenter",
+          "score": 0.2,
+          "weight": 0.6714
+        },
+        {
+          "user": "Nadialove",
+          "role": "commenter",
+          "score": 0.95,
+          "weight": 0.6501
+        },
+        {
+          "user": "mudshove",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 0.6425
+        },
+        {
+          "user": "horchata",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 0.6211
+        },
+        {
+          "user": "u1988926",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.6094
+        },
+        {
+          "user": "nagisay49529",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.5971
+        },
+        {
+          "user": "heavensake",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.5931
+        }
+      ],
+      "rep_positive": [
+        "超好吃",
+        "我給99分 太貴扣1分",
+        "的草莓、藍莓、綠葡萄大福都不錯,其中草莓大福 最讚"
+      ],
+      "rep_negative": [
+        "我買了兩顆 明天再吃另一顆看看 真的是完全沒有草莓香氣也不酸 感覺不如就吃紅豆大福就好 除非是突然嘴饞求快跟方便才買 不然真的不推耶好市多就是一大盒吃不完 不然他一顆算下來才30多塊",
+        "最近新甜點都挺難吃的",
+        "很普耶 還好是即期買的 可能草莓不可能給太好的關係主要都是皮跟紅豆泥的味道而且去年42今年漲3塊"
+      ],
+      "product_key": "全家:草莓大福",
+      "score_mean": 0.7144,
+      "price": 45,
+      "category": "甜點",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "其他"
+      ],
+      "latest_post_date": "2026-01-17T04:13:54",
+      "review_excerpt": "外觀看起來很不起眼 但一口咬下去以後 大福皮Q嫩 紅豆餡夠甜 草莓提供香噴噴又多汁的滋味 完全不會酸 好甜好好吃 螞蟻人都去買來吃啊!! 同場加映我在外面買的草莓大福(85元) 賣相非常漂亮 草莓也很大顆 一切都很不錯",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1767858756.A.41B.html",
+        "https://www.ptt.cc/bbs/CVS/M.1768594443.A.A87.html"
       ]
     },
     {
@@ -16871,877 +17805,151 @@
       ]
     },
     {
-      "brand": "全家",
-      "product_name": "草莓厚奶雲餡泡芙",
+      "brand": "7-11",
+      "product_name": "大湖草莓乖乖",
       "fair_score": 69.2,
-      "consensus": "褒貶不一",
+      "consensus": "一致好評",
       "confidence": "高",
-      "n_eff": 134.33,
-      "score_std": 0.182,
-      "n_posts": 8,
-      "n_comments": 157,
+      "n_eff": 18.6,
+      "score_std": 0.143,
+      "n_posts": 1,
+      "n_comments": 21,
       "contributors": [
         {
-          "user": "dressingfrad",
-          "role": "author",
-          "score": 0.81,
-          "weight": 1.0
-        },
-        {
-          "user": "ga86041",
-          "role": "author",
-          "score": 0.95,
-          "weight": 1.0
-        },
-        {
-          "user": "ga86041",
-          "role": "author",
-          "score": 0.7,
-          "weight": 1.0
-        },
-        {
-          "user": "byechu5566",
+          "user": "Wowova",
           "role": "author",
           "score": 0.85,
           "weight": 1.0
         },
         {
-          "user": "ally826",
-          "role": "author",
-          "score": 0.88,
-          "weight": 1.0
-        },
-        {
-          "user": "weeafterwork",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "misky1990",
-          "role": "author",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "franceswen",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "lovedls",
-          "role": "commenter",
-          "score": 0.5125,
-          "weight": 1.0
-        },
-        {
-          "user": "trama",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "RanceTsai",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 1.0
-        },
-        {
-          "user": "Oct5566",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "ggyy8787",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 1.0
-        },
-        {
-          "user": "elieta",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 1.0
-        },
-        {
-          "user": "DarkAngelX1",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "cake2246",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 1.0
-        },
-        {
-          "user": "pp18637",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "taka0725",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "archer9081",
-          "role": "commenter",
-          "score": 0.5125,
-          "weight": 1.0
-        },
-        {
-          "user": "miniwin",
-          "role": "commenter",
-          "score": 0.525,
-          "weight": 1.0
-        },
-        {
-          "user": "zlin65",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "bbs1216",
+          "user": "scotul",
           "role": "commenter",
           "score": 0.9,
           "weight": 1.0
         },
         {
-          "user": "info1994",
+          "user": "pinzlemon",
           "role": "commenter",
-          "score": 0.5,
+          "score": 0.8,
           "weight": 1.0
         },
         {
-          "user": "Ryoma",
+          "user": "mico861405",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 1.0
+        },
+        {
+          "user": "ckvck",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "pandasan",
           "role": "commenter",
           "score": 0.725,
           "weight": 1.0
         },
         {
-          "user": "Provance",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "rabbitcake",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 1.0
-        },
-        {
-          "user": "abellya",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "a103852",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "kennethfws32",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "chiayigo",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 1.0
-        },
-        {
-          "user": "dmnohftaw",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 1.0
-        },
-        {
-          "user": "s880162tina",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 1.0
-        },
-        {
-          "user": "pensiero",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 1.0
-        },
-        {
-          "user": "sanfaren",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "ru888999",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "youchzbaby",
-          "role": "commenter",
-          "score": 0.475,
-          "weight": 1.0
-        },
-        {
-          "user": "a1982120210",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "marosky",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "betty30304",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 1.0
-        },
-        {
-          "user": "kimmy2134",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "diball",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 1.0
-        },
-        {
-          "user": "kastane",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 1.0
-        },
-        {
-          "user": "betty1001",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "edr3310",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 1.0
-        },
-        {
-          "user": "JaneJJ",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 1.0
-        },
-        {
-          "user": "chuink",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "S890127",
-          "role": "commenter",
-          "score": 0.72,
-          "weight": 1.0
-        },
-        {
-          "user": "pipipa",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "redhuang",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "k123894",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "LingHsieh",
-          "role": "commenter",
-          "score": 0.64,
-          "weight": 1.0
-        },
-        {
-          "user": "DL815",
-          "role": "commenter",
-          "score": 0.89,
-          "weight": 1.0
-        },
-        {
-          "user": "Misako",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "EPIRB406",
-          "role": "commenter",
-          "score": 1.0,
-          "weight": 1.0
-        },
-        {
-          "user": "peacekingdom",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "gsc283",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "punkband573",
-          "role": "commenter",
-          "score": 0.52,
-          "weight": 1.0
-        },
-        {
-          "user": "sodajudy",
-          "role": "commenter",
-          "score": 0.98,
-          "weight": 1.0
-        },
-        {
-          "user": "mygreenair",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "c79143014",
-          "role": "commenter",
-          "score": 0.62,
-          "weight": 1.0
-        },
-        {
-          "user": "CuTeHebe",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "Goog1e",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8606
-        },
-        {
-          "user": "girafa",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.8581
-        },
-        {
-          "user": "chuusan",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8538
-        },
-        {
-          "user": "Failove5566",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.8385
-        },
-        {
-          "user": "Sensibility",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8348
-        },
-        {
-          "user": "firetim",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8333
-        },
-        {
-          "user": "prkfcpr",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 0.8299
-        },
-        {
-          "user": "pink0518",
+          "user": "Angelhuang",
           "role": "commenter",
           "score": 0.625,
-          "weight": 0.8271
+          "weight": 1.0
         },
         {
-          "user": "wen555",
+          "user": "christinachi",
           "role": "commenter",
           "score": 0.775,
-          "weight": 0.8264
+          "weight": 1.0
         },
         {
-          "user": "GeogeBye",
+          "user": "sophia748596",
           "role": "commenter",
-          "score": 0.325,
-          "weight": 0.8238
+          "score": 0.625,
+          "weight": 1.0
         },
         {
-          "user": "yjlee0829",
+          "user": "necrophilia",
           "role": "commenter",
-          "score": 0.325,
-          "weight": 0.8171
+          "score": 0.775,
+          "weight": 1.0
         },
         {
-          "user": "mickey4545",
+          "user": "jiap",
           "role": "commenter",
-          "score": 0.7,
-          "weight": 0.81
+          "score": 0.725,
+          "weight": 1.0
         },
         {
           "user": "pippen2002",
           "role": "commenter",
-          "score": 0.5,
+          "score": 0.55,
           "weight": 0.8093
         },
         {
-          "user": "Momochuee21",
+          "user": "toro077",
           "role": "commenter",
-          "score": 0.7125,
-          "weight": 0.8053
+          "score": 0.65,
+          "weight": 0.7997
         },
         {
-          "user": "mmmmmmO",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 0.8004
-        },
-        {
-          "user": "teresa0625",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.7977
-        },
-        {
-          "user": "wi22900",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 0.7969
-        },
-        {
-          "user": "lluunnaa",
+          "user": "ISbn94",
           "role": "commenter",
           "score": 0.5,
-          "weight": 0.7951
+          "weight": 0.7974
         },
         {
-          "user": "shouqing2",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.7929
-        },
-        {
-          "user": "tinabjqs",
-          "role": "commenter",
-          "score": 0.6625,
-          "weight": 0.7927
-        },
-        {
-          "user": "m13579",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7924
-        },
-        {
-          "user": "SCLPAL",
-          "role": "commenter",
-          "score": 0.73,
-          "weight": 0.7881
-        },
-        {
-          "user": "abc0312",
-          "role": "commenter",
-          "score": 0.7083,
-          "weight": 0.7837
-        },
-        {
-          "user": "w4",
-          "role": "commenter",
-          "score": 0.572,
-          "weight": 0.7757
-        },
-        {
-          "user": "Shanny17",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.772
-        },
-        {
-          "user": "teikfvtfiem",
-          "role": "commenter",
-          "score": 0.66,
-          "weight": 0.7704
-        },
-        {
-          "user": "bailan",
-          "role": "commenter",
-          "score": 0.45,
-          "weight": 0.7685
-        },
-        {
-          "user": "john0628",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7673
-        },
-        {
-          "user": "AZBTPATONY",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.7666
-        },
-        {
-          "user": "ys254290",
+          "user": "thouloveme",
           "role": "commenter",
           "score": 0.275,
-          "weight": 0.765
+          "weight": 0.7973
         },
         {
-          "user": "racheel",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.7644
-        },
-        {
-          "user": "z690320",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.7612
-        },
-        {
-          "user": "addy7533967",
-          "role": "commenter",
-          "score": 0.375,
-          "weight": 0.7583
-        },
-        {
-          "user": "pliu91",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.7562
-        },
-        {
-          "user": "fototw",
-          "role": "commenter",
-          "score": 0.3563,
-          "weight": 0.7559
-        },
-        {
-          "user": "catuncle1",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.755
-        },
-        {
-          "user": "laa325770",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.7548
-        },
-        {
-          "user": "conychiwa",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 0.7535
-        },
-        {
-          "user": "cashko",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.7531
-        },
-        {
-          "user": "handsomeYD",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 0.7526
-        },
-        {
-          "user": "sh9129",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7472
-        },
-        {
-          "user": "Mafiosolo",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 0.7431
-        },
-        {
-          "user": "TCY0523",
-          "role": "commenter",
-          "score": 0.6175,
-          "weight": 0.7429
-        },
-        {
-          "user": "phoinixa",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 0.741
-        },
-        {
-          "user": "k1245963",
+          "user": "misky1990",
           "role": "commenter",
           "score": 0.625,
-          "weight": 0.74
+          "weight": 0.7572
         },
         {
-          "user": "roman80010",
+          "user": "chenchen520",
           "role": "commenter",
           "score": 0.9,
-          "weight": 0.7365
-        },
-        {
-          "user": "jajoy",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7344
-        },
-        {
-          "user": "tio2catalyst",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 0.73
-        },
-        {
-          "user": "QQmouse",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 0.7294
-        },
-        {
-          "user": "pupu456",
-          "role": "commenter",
-          "score": 0.62,
-          "weight": 0.7257
-        },
-        {
-          "user": "lelehappy",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.719
-        },
-        {
-          "user": "una283",
-          "role": "commenter",
-          "score": 0.68,
-          "weight": 0.7153
-        },
-        {
-          "user": "ttyui",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.7125
-        },
-        {
-          "user": "mina322753",
-          "role": "commenter",
-          "score": 0.72,
-          "weight": 0.7125
-        },
-        {
-          "user": "spse6f6t6h6",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.7099
-        },
-        {
-          "user": "ssss87109",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.7083
-        },
-        {
-          "user": "oceanfishwu",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.7077
-        },
-        {
-          "user": "tnl0716",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.7047
-        },
-        {
-          "user": "rrosy",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7047
-        },
-        {
-          "user": "c48074",
-          "role": "commenter",
-          "score": 0.5125,
-          "weight": 0.703
-        },
-        {
-          "user": "cucutina",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.6963
-        },
-        {
-          "user": "EricTao",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.69
-        },
-        {
-          "user": "beetlebum",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.6878
-        },
-        {
-          "user": "Masterpiec",
-          "role": "commenter",
-          "score": 0.516,
-          "weight": 0.6865
-        },
-        {
-          "user": "shao4",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.6863
+          "weight": 0.6885
         },
         {
           "user": "smalldolphin",
           "role": "commenter",
-          "score": 0.785,
+          "score": 0.85,
           "weight": 0.6792
         },
         {
-          "user": "ck326",
+          "user": "c8664",
           "role": "commenter",
-          "score": 0.2,
-          "weight": 0.6714
-        },
-        {
-          "user": "altcd",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.6692
-        },
-        {
-          "user": "styyu1281",
-          "role": "commenter",
-          "score": 1.0,
-          "weight": 0.6533
-        },
-        {
-          "user": "Nadialove",
-          "role": "commenter",
-          "score": 0.8917,
-          "weight": 0.6501
-        },
-        {
-          "user": "mudshove",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 0.6425
-        },
-        {
-          "user": "horchata",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 0.6211
-        },
-        {
-          "user": "u1988926",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.6094
-        },
-        {
-          "user": "nagisay49529",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.5971
-        },
-        {
-          "user": "heavensake",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.5931
-        },
-        {
-          "user": "darianchiu",
-          "role": "commenter",
-          "score": 0.96,
-          "weight": 0.5785
-        },
-        {
-          "user": "kuriko",
-          "role": "commenter",
-          "score": 0.7867,
-          "weight": 0.3686
+          "score": 0.725,
+          "weight": 0.6537
         }
       ],
       "rep_positive": [
-        "論好吃應該大部分的人都秒選Mister Donut",
-        "用點數+1元換的蠻好吃的,不過太甜",
-        "切一顆一顆好讚XD"
+        "我也喜歡 好吃",
+        "好吃",
+        "o好吃"
       ],
       "rep_negative": [
-        "我買了兩顆 明天再吃另一顆看看 真的是完全沒有草莓香氣也不酸 感覺不如就吃紅豆大福就好 除非是突然嘴饞求快跟方便才買 不然真的不推耶好市多就是一大盒吃不完 不然他一顆算下來才30多塊",
-        "最近新甜點都挺難吃的",
-        "很普耶 還好是即期買的 可能草莓不可能給太好的關係主要都是皮跟紅豆泥的味道而且去年42今年漲3塊"
+        "打開一聞 草莓味道很強烈 超香 但是第一口吃下去反差超大 不怎麼香"
       ],
-      "product_key": "全家:草莓厚奶雲餡泡芙",
-      "score_mean": 0.6935,
-      "price": 30,
-      "category": "甜點",
-      "competitor_mention_count": 4,
-      "competitor_preference_count": 1,
+      "product_key": "7-11:大湖草莓乖乖",
+      "score_mean": 0.7038,
+      "price": 39,
+      "category": "零食",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
       "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "其他",
-        "7-11"
-      ],
-      "latest_post_date": "2026-02-23T17:05:15",
-      "review_excerpt": "前陣子網路上蠻多人分享全家的甜甜圈 所以也買了mister donut的來比比看 首先是草莓口味 從外表看,全家的比較大 草莓醬也比較多 Mister的切面 全家的切面 口味跟口感的部分 Mister的波堤麵體比較香",
+      "competitor_brands": [],
+      "latest_post_date": "2026-01-13T17:33:35",
+      "review_excerpt": "每年草莓季乖乖一定會出的口味 今年包裝還蠻可愛的 (圖1) 打開包裝後草莓味非常濃,吃起來基本跟他的包裝一樣,超級草莓!XD 酸酸甜甜的不會膩 (圖2) 整體來說草莓控應該都會滿愛 也是目前草莓季的零食裡我吃到最喜歡的一款",
       "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1755656335.A.4F9.html",
-        "https://www.ptt.cc/bbs/CVS/M.1756736725.A.336.html",
-        "https://www.ptt.cc/bbs/CVS/M.1767767419.A.F4D.html",
-        "https://www.ptt.cc/bbs/CVS/M.1767858756.A.41B.html",
-        "https://www.ptt.cc/bbs/CVS/M.1767869058.A.5C0.html",
-        "https://www.ptt.cc/bbs/CVS/M.1768593671.A.87F.html",
-        "https://www.ptt.cc/bbs/CVS/M.1768594443.A.A87.html",
-        "https://www.ptt.cc/bbs/CVS/M.1771837518.A.E2E.html"
+        "https://www.ptt.cc/bbs/CVS/M.1768296818.A.7E8.html"
       ]
     },
     {
@@ -18539,6 +18747,555 @@
       "review_excerpt": "聞起來有淡淡的甜味 但不是水蜜桃的香氣 不知道是不是放比較久的關係(我這瓶12月底到期) 感覺比較沒有氣 甜味算明顯 可樂味被蓋掉不少 但不是刺鼻香精味 滿OK的不會難喝 但也沒多好喝 整體來說有點像加味氣泡水",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1755962472.A.AF0.html"
+      ]
+    },
+    {
+      "brand": "7-11",
+      "product_name": "鹽烤麻辣雞心",
+      "fair_score": 68.8,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 43.19,
+      "score_std": 0.157,
+      "n_posts": 1,
+      "n_comments": 56,
+      "contributors": [
+        {
+          "user": "virfish",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "shiuan0405",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "kmkr122719",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "sookie125",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 1.0
+        },
+        {
+          "user": "raikkon41",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 1.0
+        },
+        {
+          "user": "mw221c",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 1.0
+        },
+        {
+          "user": "roseritter",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "s61222s",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 1.0
+        },
+        {
+          "user": "zerotea",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 1.0
+        },
+        {
+          "user": "Mrazs",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "Bokaka",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "LyonLeo",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 1.0
+        },
+        {
+          "user": "a126963138",
+          "role": "commenter",
+          "score": 0.95,
+          "weight": 1.0
+        },
+        {
+          "user": "frank123ya",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 1.0
+        },
+        {
+          "user": "yc484600",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 1.0
+        },
+        {
+          "user": "Myyan",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "Sunpayus",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "tch987123456",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.8373
+        },
+        {
+          "user": "uco330",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.8361
+        },
+        {
+          "user": "Sensibility",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.8348
+        },
+        {
+          "user": "Lailungsheng",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8341
+        },
+        {
+          "user": "good11126",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.8304
+        },
+        {
+          "user": "chanifa",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.8298
+        },
+        {
+          "user": "dus68",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.8212
+        },
+        {
+          "user": "marah",
+          "role": "commenter",
+          "score": 0.55,
+          "weight": 0.81
+        },
+        {
+          "user": "thomaschion",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 0.8074
+        },
+        {
+          "user": "maye",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 0.8048
+        },
+        {
+          "user": "james4141989",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.8025
+        },
+        {
+          "user": "toro077",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.7997
+        },
+        {
+          "user": "lluunnaa",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.7951
+        },
+        {
+          "user": "idxxxx",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.7893
+        },
+        {
+          "user": "kt7rc",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 0.7745
+        },
+        {
+          "user": "ruby0922",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.7684
+        },
+        {
+          "user": "Everybody99",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.7517
+        },
+        {
+          "user": "k1245963",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.74
+        },
+        {
+          "user": "a43164910",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.7387
+        },
+        {
+          "user": "weeafterwork",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.736
+        },
+        {
+          "user": "cuterabbit",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.735
+        },
+        {
+          "user": "l90289312",
+          "role": "commenter",
+          "score": 0.05,
+          "weight": 0.7322
+        },
+        {
+          "user": "awin519",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7273
+        },
+        {
+          "user": "littenVenus",
+          "role": "commenter",
+          "score": 0.7125,
+          "weight": 0.7245
+        },
+        {
+          "user": "frlair",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.7037
+        },
+        {
+          "user": "TeamFrotress",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.6775
+        },
+        {
+          "user": "nbaworf",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.6287
+        }
+      ],
+      "rep_positive": [
+        "超好吃,而且超多顆,別跟我搶",
+        "價格驚人便宜還非常好吃,完全不可能是CVS販售的商品",
+        "我之前不太敢吃雞心,但 讓我連吃好幾天,量也給不少"
+      ],
+      "rep_negative": [
+        "難吃又嫌,灌了快兩瓶水鹹",
+        "我吃起來超級鹹欸 大家都這麼重口味嗎"
+      ],
+      "product_key": "7-11:鹽烤麻辣雞心",
+      "score_mean": 0.693,
+      "price": 55,
+      "category": "鹹食",
+      "competitor_mention_count": 6,
+      "competitor_preference_count": 2,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "全家",
+        "萊爾富",
+        "OK"
+      ],
+      "latest_post_date": "2026-05-05T16:25:36",
+      "review_excerpt": "這包目測大約20顆，而且雞心算大顆的!!肥美Juicy；雖然名叫麻辣，辣度大概0.1/10。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1777969538.A.D38.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "巧克力牛奶雪糕",
+      "fair_score": 68.8,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 34.17,
+      "score_std": 0.257,
+      "n_posts": 1,
+      "n_comments": 34,
+      "contributors": [
+        {
+          "user": "PLEASE974853",
+          "role": "author",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "ITEegg",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "wooin16",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "s83106",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "nextbit",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 1.0
+        },
+        {
+          "user": "fulongb210f",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 1.0
+        },
+        {
+          "user": "CR007",
+          "role": "commenter",
+          "score": 0.55,
+          "weight": 1.0
+        },
+        {
+          "user": "mah0919",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 1.0
+        },
+        {
+          "user": "liannie1102",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "roytenpura",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "RamenOwl",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 1.0
+        },
+        {
+          "user": "kasim65",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 1.0
+        },
+        {
+          "user": "info1994",
+          "role": "commenter",
+          "score": 0.05,
+          "weight": 1.0
+        },
+        {
+          "user": "role5901",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 1.0
+        },
+        {
+          "user": "xjay01233",
+          "role": "commenter",
+          "score": 0.95,
+          "weight": 1.0
+        },
+        {
+          "user": "ktakara",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 1.0
+        },
+        {
+          "user": "chuchuning",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 1.0
+        },
+        {
+          "user": "joexnozomi",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.841
+        },
+        {
+          "user": "windowdoor",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.8336
+        },
+        {
+          "user": "GeogeBye",
+          "role": "commenter",
+          "score": 0.95,
+          "weight": 0.8238
+        },
+        {
+          "user": "sabrinaycz",
+          "role": "commenter",
+          "score": 0.55,
+          "weight": 0.8233
+        },
+        {
+          "user": "WINKAO",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 0.8186
+        },
+        {
+          "user": "idealman",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.8068
+        },
+        {
+          "user": "teresa0625",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.7977
+        },
+        {
+          "user": "oddman",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7584
+        },
+        {
+          "user": "lovevale",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7577
+        },
+        {
+          "user": "nikkaJP",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.7475
+        },
+        {
+          "user": "Obama19",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.7388
+        },
+        {
+          "user": "itsok741223",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 0.7295
+        },
+        {
+          "user": "mkie0",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.729
+        },
+        {
+          "user": "chinni",
+          "role": "commenter",
+          "score": 0.175,
+          "weight": 0.7055
+        },
+        {
+          "user": "smalldolphin",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.6792
+        },
+        {
+          "user": "papau",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.6735
+        },
+        {
+          "user": "liquidlyn",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.6317
+        },
+        {
+          "user": "darianchiu",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.5785
+        }
+      ],
+      "rep_positive": [
+        "可以100分",
+        "好吃到上次連吃兩隻",
+        "他們家雪糕都超好吃"
+      ],
+      "rep_negative": [
+        "超噁心 有夠鹹的冰棒",
+        "這系列的雪糕不好吃 口感粉粉的",
+        "吃過哈蜜瓜口味,人工感太重"
+      ],
+      "product_key": "全家:巧克力牛奶雪糕",
+      "score_mean": 0.6945,
+      "price": 40,
+      "category": "冰品",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2025-11-07T19:28:11",
+      "review_excerpt": "所有人都喝過 非常單純的巧克力牛奶味道 還原程度100% 牛奶味明顯 不會和某些巧克力雪糕一樣過甜過膩 好吃又大支 買一送一的話很推 適合這個一點都不冷的立冬",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1762514904.A.DD4.html"
       ]
     },
     {
@@ -24746,295 +25503,6 @@
       ]
     },
     {
-      "brand": "全家",
-      "product_name": "Spacewalkers小熊造型軟糖夾餡牛奶巧克力",
-      "fair_score": 66.3,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 41.09,
-      "score_std": 0.249,
-      "n_posts": 2,
-      "n_comments": 41,
-      "contributors": [
-        {
-          "user": "PLEASE974853",
-          "role": "author",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "sara3636tw",
-          "role": "author",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "ITEegg",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "wooin16",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "s83106",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "nextbit",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 1.0
-        },
-        {
-          "user": "fulongb210f",
-          "role": "commenter",
-          "score": 0.375,
-          "weight": 1.0
-        },
-        {
-          "user": "CR007",
-          "role": "commenter",
-          "score": 0.55,
-          "weight": 1.0
-        },
-        {
-          "user": "mah0919",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 1.0
-        },
-        {
-          "user": "liannie1102",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "roytenpura",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "RamenOwl",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 1.0
-        },
-        {
-          "user": "kasim65",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 1.0
-        },
-        {
-          "user": "info1994",
-          "role": "commenter",
-          "score": 0.05,
-          "weight": 1.0
-        },
-        {
-          "user": "role5901",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "xjay01233",
-          "role": "commenter",
-          "score": 0.95,
-          "weight": 1.0
-        },
-        {
-          "user": "ktakara",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 1.0
-        },
-        {
-          "user": "chuchuning",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 1.0
-        },
-        {
-          "user": "AMPM",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "juice9",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "john11894324",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8448
-        },
-        {
-          "user": "joexnozomi",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.841
-        },
-        {
-          "user": "windowdoor",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.8336
-        },
-        {
-          "user": "firetim",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8333
-        },
-        {
-          "user": "GeogeBye",
-          "role": "commenter",
-          "score": 0.95,
-          "weight": 0.8238
-        },
-        {
-          "user": "C4F6",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.8236
-        },
-        {
-          "user": "sabrinaycz",
-          "role": "commenter",
-          "score": 0.55,
-          "weight": 0.8233
-        },
-        {
-          "user": "WINKAO",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 0.8186
-        },
-        {
-          "user": "idealman",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.8068
-        },
-        {
-          "user": "teresa0625",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.7977
-        },
-        {
-          "user": "PG0123",
-          "role": "commenter",
-          "score": 0.45,
-          "weight": 0.77
-        },
-        {
-          "user": "oddman",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7584
-        },
-        {
-          "user": "lovevale",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7577
-        },
-        {
-          "user": "nikkaJP",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.7475
-        },
-        {
-          "user": "Obama19",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 0.7388
-        },
-        {
-          "user": "itsok741223",
-          "role": "commenter",
-          "score": 0.7625,
-          "weight": 0.7295
-        },
-        {
-          "user": "mkie0",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.729
-        },
-        {
-          "user": "chinni",
-          "role": "commenter",
-          "score": 0.175,
-          "weight": 0.7055
-        },
-        {
-          "user": "smalldolphin",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.6792
-        },
-        {
-          "user": "papau",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 0.6735
-        },
-        {
-          "user": "liquidlyn",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.6317
-        },
-        {
-          "user": "darianchiu",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.5785
-        }
-      ],
-      "rep_positive": [
-        "可以100分",
-        "好吃到上次連吃兩隻",
-        "他們家雪糕都超好吃"
-      ],
-      "rep_negative": [
-        "超噁心 有夠鹹的冰棒",
-        "這系列的雪糕不好吃 口感粉粉的",
-        "吃過哈蜜瓜口味,人工感太重"
-      ],
-      "product_key": "全家:spacewalkers小熊造型軟糖夾餡牛奶巧克力",
-      "score_mean": 0.6671,
-      "price": 40,
-      "category": "零食",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "latest_post_date": "2025-11-07T19:28:11",
-      "review_excerpt": "接近萬聖節真的不能帶兒童去超商 好多稀奇古怪的糖果都在這時候冒出來 媽媽自己先被討糖吃XD 選了沒吃過的小熊軟糖+巧克力 小熊被包覆的手足無措 看不出原來的形狀 兒童1號的吃法:巧克力外衣脫光光 兒童2號的吃法:解救熊頭",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1761743660.A.390.html",
-        "https://www.ptt.cc/bbs/CVS/M.1762514904.A.DD4.html"
-      ]
-    },
-    {
       "brand": "7-11",
       "product_name": "熔岩起司燻培根厚土司95配",
       "fair_score": 66.2,
@@ -25963,123 +26431,6 @@
       "review_excerpt": "在全家看到乖乖又跟土然巧克力聯名的商品 這次加上檸檬感覺很新鮮,就順手帶了一包 一打開包裝,聞到的不是那種死甜的巧克力味 反而先聞到一股蠻明顯的檸檬皮香氣 這點跟傳統的巧克力乖乖很不一樣 第一印象蠻特別的",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1764841700.A.546.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "VANS海鹽焦糖千層蛋糕友善",
-      "fair_score": 65.7,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 12.64,
-      "score_std": 0.231,
-      "n_posts": 2,
-      "n_comments": 12,
-      "contributors": [
-        {
-          "user": "w8426321",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "s0831720",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "wooin16",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "mikap",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 0.8412
-        },
-        {
-          "user": "GeogeBye",
-          "role": "commenter",
-          "score": 0.5625,
-          "weight": 0.8238
-        },
-        {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.8093
-        },
-        {
-          "user": "skery3188",
-          "role": "commenter",
-          "score": 0.375,
-          "weight": 0.7855
-        },
-        {
-          "user": "a43164910",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.7387
-        },
-        {
-          "user": "lelehappy",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.719
-        },
-        {
-          "user": "summerhsia",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.7045
-        },
-        {
-          "user": "mudshove",
-          "role": "commenter",
-          "score": 1.0,
-          "weight": 0.6425
-        },
-        {
-          "user": "miniuser",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 0.6275
-        },
-        {
-          "user": "santian",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 0.6065
-        }
-      ],
-      "rep_positive": [
-        "焦糖捲蛋糕那個好吃",
-        "超級好吃",
-        "純推 東南西北洽北北"
-      ],
-      "rep_negative": [
-        "完食垃圾?重點呢",
-        "說超級好吃的有吃過別家的千層蛋糕嗎",
-        "焦糖很甜 海鹽無感"
-      ],
-      "product_key": "全家:vans海鹽焦糖千層蛋糕友善",
-      "score_mean": 0.6726,
-      "price": 41,
-      "category": "甜點",
-      "competitor_mention_count": 1,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 1,
-      "competitor_brands": [
-        "7-11"
-      ],
-      "latest_post_date": "2025-09-12T00:42:42",
-      "review_excerpt": "太愛喝可樂奶 先嚐鮮綜合口味 搭牛奶有點像是香草可樂的fu 甜度對我來說剛好 不會越吃越渴或很膩 同系列聯名的麵包也不錯 很像是牛奶餐包那種口感 焦糖內餡吃起來有微微鹹味 剛好可以中和焦糖的甜 形狀也蠻可愛的",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1754975256.A.D0A.html",
-        "https://www.ptt.cc/bbs/CVS/M.1757608964.A.C3A.html"
       ]
     },
     {
@@ -27860,6 +28211,254 @@
     },
     {
       "brand": "全家",
+      "product_name": "UCC炭燒咖啡莊園牛奶",
+      "fair_score": 65.1,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 33.9,
+      "score_std": 0.201,
+      "n_posts": 1,
+      "n_comments": 37,
+      "contributors": [
+        {
+          "user": "ruby0922",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "a100213",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "EaCi",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 1.0
+        },
+        {
+          "user": "mean07",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "jetergo0901",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "Rilak",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "zmcef",
+          "role": "commenter",
+          "score": 0.55,
+          "weight": 1.0
+        },
+        {
+          "user": "utsunomiya",
+          "role": "commenter",
+          "score": 0.95,
+          "weight": 1.0
+        },
+        {
+          "user": "haue0425",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 1.0
+        },
+        {
+          "user": "lonely235711",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 1.0
+        },
+        {
+          "user": "smwang",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 1.0
+        },
+        {
+          "user": "AzzwuiS3",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 1.0
+        },
+        {
+          "user": "starsunny",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "Eamonn",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "firetim",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.8333
+        },
+        {
+          "user": "GeogeBye",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8238
+        },
+        {
+          "user": "C4F6",
+          "role": "commenter",
+          "score": 0.55,
+          "weight": 0.8236
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8093
+        },
+        {
+          "user": "Bowseroo",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8056
+        },
+        {
+          "user": "hsupaijay",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 0.8028
+        },
+        {
+          "user": "z5876268",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.7925
+        },
+        {
+          "user": "calculus9",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7771
+        },
+        {
+          "user": "salvador1988",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.7576
+        },
+        {
+          "user": "on2",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.7192
+        },
+        {
+          "user": "sugar327",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.716
+        },
+        {
+          "user": "kill0934",
+          "role": "commenter",
+          "score": 0.95,
+          "weight": 0.7131
+        },
+        {
+          "user": "a80371",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.7115
+        },
+        {
+          "user": "Agneta",
+          "role": "commenter",
+          "score": 0.2,
+          "weight": 0.694
+        },
+        {
+          "user": "ck326",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.6714
+        },
+        {
+          "user": "richyun1030",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.6654
+        },
+        {
+          "user": "memory940",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.6385
+        },
+        {
+          "user": "jejeje",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.6246
+        },
+        {
+          "user": "horchata",
+          "role": "commenter",
+          "score": 0.55,
+          "weight": 0.6211
+        },
+        {
+          "user": "santian",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.6065
+        },
+        {
+          "user": "Laurettane",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.5556
+        }
+      ],
+      "rep_positive": [
+        "大推,好吃",
+        "真的比想像來得更好吃,咖啡風味夠,個人喜好甚至大於之前的抹茶口味",
+        "推~ 的好吃"
+      ],
+      "rep_negative": [
+        "今年的莊園牛奶吃起來都有油膩的感覺 黏在舌頭上不太舒服",
+        "是雪酪的口感,個人沒那麼喜歡",
+        "是雪酪的口感?! 我以為是冰淇淋的口感耶~~原本還挺想試試看的,但也不愛雪酪的口感~可惜"
+      ],
+      "product_key": "全家:ucc炭燒咖啡莊園牛奶",
+      "score_mean": 0.6564,
+      "price": 49,
+      "category": "飲料",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "7-11"
+      ],
+      "latest_post_date": "2025-10-08T10:06:26",
+      "review_excerpt": "微苦, 咖啡味很濃郁 綜合配牛奶很好吃 跟之前出過的經典拿鐵口味有點像 只是這次的咖啡味更濃還有點炭燒味 好吃可買!",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1759889188.A.8B3.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "泰式奶茶起司蛋糕霜淇淋",
       "fair_score": 65.0,
       "consensus": "褒貶不一",
@@ -27966,334 +28565,6 @@
       "review_excerpt": "單口味偏甜會膩，像加了很多糖的立頓奶茶；吃綜合的加上起司蛋糕甜鹹口感，可以中和泰奶的甜味。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1777893021.A.2B4.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "UCC經典炭燒咖啡莊園牛奶霜淇淋",
-      "fair_score": 65.0,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 46.58,
-      "score_std": 0.196,
-      "n_posts": 2,
-      "n_comments": 57,
-      "contributors": [
-        {
-          "user": "st3333333",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "ruby0922",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "lucky466",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 1.0
-        },
-        {
-          "user": "blithy",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "a100213",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "EaCi",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 1.0
-        },
-        {
-          "user": "mean07",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "jetergo0901",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "Rilak",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "zmcef",
-          "role": "commenter",
-          "score": 0.55,
-          "weight": 1.0
-        },
-        {
-          "user": "utsunomiya",
-          "role": "commenter",
-          "score": 0.95,
-          "weight": 1.0
-        },
-        {
-          "user": "haue0425",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 1.0
-        },
-        {
-          "user": "lonely235711",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "smwang",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "AzzwuiS3",
-          "role": "commenter",
-          "score": 0.45,
-          "weight": 1.0
-        },
-        {
-          "user": "starsunny",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "Eamonn",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "motw1999",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 0.8385
-        },
-        {
-          "user": "windowdoor",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.8336
-        },
-        {
-          "user": "firetim",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.8333
-        },
-        {
-          "user": "skalt",
-          "role": "commenter",
-          "score": 0.55,
-          "weight": 0.8276
-        },
-        {
-          "user": "GeogeBye",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8238
-        },
-        {
-          "user": "C4F6",
-          "role": "commenter",
-          "score": 0.55,
-          "weight": 0.8236
-        },
-        {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.475,
-          "weight": 0.8093
-        },
-        {
-          "user": "thomaschion",
-          "role": "commenter",
-          "score": 0.475,
-          "weight": 0.8074
-        },
-        {
-          "user": "Bowseroo",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.8056
-        },
-        {
-          "user": "hsupaijay",
-          "role": "commenter",
-          "score": 0.45,
-          "weight": 0.8028
-        },
-        {
-          "user": "ISbn94",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 0.7974
-        },
-        {
-          "user": "tinabjqs",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.7927
-        },
-        {
-          "user": "z5876268",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.7925
-        },
-        {
-          "user": "calculus9",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7771
-        },
-        {
-          "user": "salvador1988",
-          "role": "commenter",
-          "score": 0.7375,
-          "weight": 0.7576
-        },
-        {
-          "user": "q210216",
-          "role": "commenter",
-          "score": 0.4,
-          "weight": 0.7444
-        },
-        {
-          "user": "on2",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.7192
-        },
-        {
-          "user": "sugar327",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.716
-        },
-        {
-          "user": "kill0934",
-          "role": "commenter",
-          "score": 0.95,
-          "weight": 0.7131
-        },
-        {
-          "user": "a80371",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.7115
-        },
-        {
-          "user": "Agneta",
-          "role": "commenter",
-          "score": 0.2,
-          "weight": 0.694
-        },
-        {
-          "user": "shao4",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 0.6863
-        },
-        {
-          "user": "ck326",
-          "role": "commenter",
-          "score": 0.3375,
-          "weight": 0.6714
-        },
-        {
-          "user": "richyun1030",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.6654
-        },
-        {
-          "user": "memory940",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.6385
-        },
-        {
-          "user": "liquidlyn",
-          "role": "commenter",
-          "score": 0.175,
-          "weight": 0.6317
-        },
-        {
-          "user": "jejeje",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.6246
-        },
-        {
-          "user": "horchata",
-          "role": "commenter",
-          "score": 0.55,
-          "weight": 0.6211
-        },
-        {
-          "user": "santian",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.6065
-        },
-        {
-          "user": "heavensake",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.5931
-        },
-        {
-          "user": "Laurettane",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.5556
-        }
-      ],
-      "rep_positive": [
-        "大推,好吃",
-        "真的比想像來得更好吃,咖啡風味夠,個人喜好甚至大於之前的抹茶口味",
-        "推~ 的好吃"
-      ],
-      "rep_negative": [
-        "以前的咖啡起司雖然味道很淡但至少還有咖啡味,這期 完全沒有咖啡味只有炭燒味,喜歡隔壁鹹蛋黃已囤貨",
-        "難吃還怕人連一次都不試才不知道用意何在 嘖嘖",
-        "全難吃7好吃當然就踩全捧7,不然全難吃還要捧高高好棒棒"
-      ],
-      "product_key": "全家:ucc經典炭燒咖啡莊園牛奶霜淇淋",
-      "score_mean": 0.6535,
-      "price": 49,
-      "category": "冰品",
-      "competitor_mention_count": 4,
-      "competitor_preference_count": 1,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "7-11",
-        "OK"
-      ],
-      "latest_post_date": "2025-10-17T22:24:41",
-      "review_excerpt": "微苦, 咖啡味很濃郁 綜合配牛奶很好吃 跟之前出過的經典拿鐵口味有點像 只是這次的咖啡味更濃還有點炭燒味 好吃可買!",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1759889188.A.8B3.html",
-        "https://www.ptt.cc/bbs/CVS/M.1760711084.A.693.html"
       ]
     },
     {
@@ -30442,6 +30713,128 @@
     },
     {
       "brand": "全家",
+      "product_name": "剝皮辣椒雞奶油細扁麵",
+      "fair_score": 64.6,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 13.59,
+      "score_std": 0.218,
+      "n_posts": 1,
+      "n_comments": 15,
+      "contributors": [
+        {
+          "user": "moda852",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "yc861129",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 1.0
+        },
+        {
+          "user": "wen555",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.8264
+        },
+        {
+          "user": "qooccc",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.7717
+        },
+        {
+          "user": "lovevale",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.7577
+        },
+        {
+          "user": "lelehappy",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.719
+        },
+        {
+          "user": "chenchen520",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 0.6885
+        },
+        {
+          "user": "richyun1030",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 0.6654
+        },
+        {
+          "user": "weiweilucy",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 0.6617
+        },
+        {
+          "user": "Imcathy",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 0.6541
+        },
+        {
+          "user": "lucicarr",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.6517
+        },
+        {
+          "user": "dengzhe",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 0.6434
+        },
+        {
+          "user": "takomom",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 0.6396
+        },
+        {
+          "user": "Laurettane",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.5556
+        }
+      ],
+      "rep_positive": [
+        "好吃 辣度很合我 超涮嘴的",
+        "很喜歡 麵的口感 真的有辣但調味很不錯",
+        "麵很好吃 但真的蠻辣的 肉也很嫩"
+      ],
+      "rep_negative": [
+        "太辣了",
+        "我不太能吃辣 不要吃辣椒就還好 但是每次還是會試個幾口 沒有不辣的xd不過麵 還好 最近的麵感覺沒有前陣子好吃@@",
+        "蜂蜜芥末雞堡超好吃?還好吧"
+      ],
+      "product_key": "全家:剝皮辣椒雞奶油細扁麵",
+      "score_mean": 0.6603,
+      "price": 99,
+      "category": "其他",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "7-11"
+      ],
+      "latest_post_date": "2025-12-03T11:56:48",
+      "review_excerpt": "之前吃過聯名出的蜂蜜芥末雞堡~ 超好吃 對金色三麥的聯名算蠻有信心的 中餐想說試試聯名的細扁麵 有辣,搭著白醬的奶味 吃起來是很溫和的辣感 麵是屬於偏硬有麵芯感那種 硬麵派表示喜歡 雞肉超嫩而且很入味 剝皮辣椒也好吃而且認真有辣",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1764734210.A.2D6.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "妮妮家漢堡排飯",
       "fair_score": 64.6,
       "consensus": "褒貶不一",
@@ -32260,6 +32653,61 @@
       "review_excerpt": "青醬燉飯記得要攪拌均勻，燉飯分量真的滿多；巴利魚排口感像多利魚，份量也還不錯。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1777091929.A.D2A.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "果漾草莓麵包",
+      "fair_score": 64.3,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "n_eff": 3.95,
+      "score_std": 0.113,
+      "n_posts": 1,
+      "n_comments": 3,
+      "contributors": [
+        {
+          "user": "dressingfrad",
+          "role": "author",
+          "score": 0.81,
+          "weight": 1.0
+        },
+        {
+          "user": "mickey4545",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.81
+        },
+        {
+          "user": "m13579",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7924
+        },
+        {
+          "user": "Mafiosolo",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.7431
+        }
+      ],
+      "rep_positive": [
+        "還不錯餒",
+        "果醬看起來蠻多的~好像不錯"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:果漾草莓麵包",
+      "score_mean": 0.6855,
+      "price": 30,
+      "category": "麵包",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-02-23T17:05:15",
+      "review_excerpt": "果醬還真的滿多的；雖然是很傳統的基本款，但是意外的滿足度頗高。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1771837518.A.E2E.html"
       ]
     },
     {
@@ -35364,6 +35812,124 @@
       "review_excerpt": "還蠻常吃全家義大利麵的 推薦幾款比較常回購的,白、紅、青醬和清炒各一 <義式蕃茄起司義大利麵> 醬汁很濃郁,蕃茄味偏重,吃得到蕃茄塊跟一些肉末 加熱好起司跟肉醬拌起來很香 算是今天推的四款中最常回購的,基本款的安全牌",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1766043291.A.A7B.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "阿甘剝皮辣椒蒸蛋",
+      "fair_score": 62.9,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 13.67,
+      "score_std": 0.176,
+      "n_posts": 1,
+      "n_comments": 15,
+      "contributors": [
+        {
+          "user": "misky1990",
+          "role": "author",
+          "score": 0.88,
+          "weight": 1.0
+        },
+        {
+          "user": "qoo2244167",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 1.0
+        },
+        {
+          "user": "mentine",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 1.0
+        },
+        {
+          "user": "tonyo",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "Nitsuta",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "silo",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "nionio0329",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "yamiao",
+          "role": "commenter",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "Failove5566",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.8385
+        },
+        {
+          "user": "firetim",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8333
+        },
+        {
+          "user": "W8845",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.7586
+        },
+        {
+          "user": "leelisarita",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.756
+        },
+        {
+          "user": "q210216",
+          "role": "commenter",
+          "score": 0.475,
+          "weight": 0.7444
+        },
+        {
+          "user": "PiDaiShuei",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.5574
+        }
+      ],
+      "rep_positive": [
+        "好吃",
+        "第一次看到這種吃法,好適合當宵夜",
+        "感覺好像不錯"
+      ],
+      "rep_negative": [
+        "樓下推鈉含量驚人"
+      ],
+      "product_key": "全家:阿甘剝皮辣椒蒸蛋",
+      "score_mean": 0.6391,
+      "price": 55,
+      "category": "其他",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2025-12-19T19:24:44",
+      "review_excerpt": "雙月的愛恨交織麵真的好吃 有新出的蒸蛋,也買來吃吃看 打開後,中間有一坨碎肉 翻了一下,辣椒還蠻多的 基本上每一湯匙都可以吃到 味道調味的很好,有鹹又不會過鹹 吃了一點後把白飯加進去攪拌均勻 雖然看起來蠻噁的 但真的很好吃 我同事說",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1766143488.A.E0B.html"
       ]
     },
     {
@@ -38818,6 +39384,141 @@
     },
     {
       "brand": "全家",
+      "product_name": "UCC經典炭燒咖啡莊園牛奶霜淇淋",
+      "fair_score": 61.5,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 15.65,
+      "score_std": 0.185,
+      "n_posts": 1,
+      "n_comments": 20,
+      "contributors": [
+        {
+          "user": "st3333333",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "lucky466",
+          "role": "commenter",
+          "score": 0.875,
+          "weight": 1.0
+        },
+        {
+          "user": "blithy",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "motw1999",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 0.8385
+        },
+        {
+          "user": "windowdoor",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.8336
+        },
+        {
+          "user": "skalt",
+          "role": "commenter",
+          "score": 0.55,
+          "weight": 0.8276
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 0.8093
+        },
+        {
+          "user": "thomaschion",
+          "role": "commenter",
+          "score": 0.475,
+          "weight": 0.8074
+        },
+        {
+          "user": "ISbn94",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 0.7974
+        },
+        {
+          "user": "tinabjqs",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.7927
+        },
+        {
+          "user": "salvador1988",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 0.7576
+        },
+        {
+          "user": "q210216",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 0.7444
+        },
+        {
+          "user": "shao4",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 0.6863
+        },
+        {
+          "user": "ck326",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.6714
+        },
+        {
+          "user": "liquidlyn",
+          "role": "commenter",
+          "score": 0.175,
+          "weight": 0.6317
+        },
+        {
+          "user": "heavensake",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.5931
+        }
+      ],
+      "rep_positive": [
+        "好吃,80分",
+        "我單吃咖啡也 好吃 平衡一下 不然每篇都有人踩全捧7怕有人看下來就連一次 咖啡都不自己試一次",
+        "今天試了 味道還不錯"
+      ],
+      "rep_negative": [
+        "以前的咖啡起司雖然味道很淡但至少還有咖啡味,這期 完全沒有咖啡味只有炭燒味,喜歡隔壁鹹蛋黃已囤貨",
+        "難吃還怕人連一次都不試才不知道用意何在 嘖嘖",
+        "全難吃7好吃當然就踩全捧7,不然全難吃還要捧高高好棒棒"
+      ],
+      "product_key": "全家:ucc經典炭燒咖啡莊園牛奶霜淇淋",
+      "score_mean": 0.6238,
+      "price": null,
+      "category": "冰品",
+      "competitor_mention_count": 3,
+      "competitor_preference_count": 1,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "7-11",
+        "OK"
+      ],
+      "latest_post_date": "2025-10-17T22:24:41",
+      "review_excerpt": "咖啡味道濃郁 微苦 搭配牛奶偏甜但不膩 可以中和苦味 其實還蠻好吃的 10/17-10/19霜淇淋買一送一",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1760711084.A.693.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "度小月擔仔炊粉湯友善時光",
       "fair_score": 61.5,
       "consensus": "褒貶不一",
@@ -39415,6 +40116,126 @@
       ]
     },
     {
+      "brand": "7-11",
+      "product_name": "吉伊卡哇草莓卡士達麻糬泡芙",
+      "fair_score": 61.3,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 13.88,
+      "score_std": 0.229,
+      "n_posts": 1,
+      "n_comments": 13,
+      "contributors": [
+        {
+          "user": "AB3805",
+          "role": "author",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "ohhh21",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 1.0
+        },
+        {
+          "user": "Yyttt",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 1.0
+        },
+        {
+          "user": "lgyoyoyo2005",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "bbmelonchumi",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 1.0
+        },
+        {
+          "user": "billt0523",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "lsryu",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "userkka",
+          "role": "commenter",
+          "score": 0.775,
+          "weight": 1.0
+        },
+        {
+          "user": "gottsuan",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "Gwaygo",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.8344
+        },
+        {
+          "user": "firetim",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8333
+        },
+        {
+          "user": "erilinda",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 0.821
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.8093
+        },
+        {
+          "user": "h120968",
+          "role": "commenter",
+          "score": 0.125,
+          "weight": 0.7881
+        }
+      ],
+      "rep_positive": [
+        "原味好吃+1",
+        "原味好吃+1 反而貼紙送人XD",
+        "我喜歡"
+      ],
+      "rep_negative": [
+        "吃起來沒什麼感覺 味道太淡 要酸沒酸要甜沒甜上次奶油的比較好吃",
+        "原味大勝",
+        "原味比較好吃"
+      ],
+      "product_key": "7-11:吉伊卡哇草莓卡士達麻糬泡芙",
+      "score_mean": 0.6212,
+      "price": 55,
+      "category": "甜點",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2025-12-25T20:58:39",
+      "review_excerpt": ":跟上次的泡芙類似,只是口味變成草莓的, 覺得太甜可以拿去冷凍當作吃冰, 貼紙一樣有六款,這次是三小隻+小桃古本栗子。 唧唧唧唧唧唧...... << ひぐらしの く頃に >> _▁▁_______",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1766667525.A.A90.html"
+      ]
+    },
+    {
       "brand": "全家",
       "product_name": "香料咖哩炸雞烤飯糰",
       "fair_score": 61.3,
@@ -39856,274 +40677,6 @@
       "review_excerpt": "特濃拿鐵喝起來咖啡香氣有比較明顯，整體味道會比較濃郁，但奶味相對比較淡。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1779441216.A.F2D.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "剝皮辣椒雞奶油細扁麵",
-      "fair_score": 61.2,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 36.81,
-      "score_std": 0.206,
-      "n_posts": 3,
-      "n_comments": 41,
-      "contributors": [
-        {
-          "user": "bubble1990",
-          "role": "author",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "misky1990",
-          "role": "author",
-          "score": 0.88,
-          "weight": 1.0
-        },
-        {
-          "user": "moda852",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "mos",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 1.0
-        },
-        {
-          "user": "Luluyi22",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 1.0
-        },
-        {
-          "user": "sinje1988229",
-          "role": "commenter",
-          "score": 0.4,
-          "weight": 1.0
-        },
-        {
-          "user": "s8960046",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "qoo2244167",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 1.0
-        },
-        {
-          "user": "mentine",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 1.0
-        },
-        {
-          "user": "tonyo",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "Nitsuta",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "silo",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "nionio0329",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "yamiao",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "yc861129",
-          "role": "commenter",
-          "score": 0.375,
-          "weight": 1.0
-        },
-        {
-          "user": "Goog1e",
-          "role": "commenter",
-          "score": 0.225,
-          "weight": 0.8606
-        },
-        {
-          "user": "Failove5566",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.8385
-        },
-        {
-          "user": "firetim",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8333
-        },
-        {
-          "user": "wen555",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.8264
-        },
-        {
-          "user": "pook0818",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.8106
-        },
-        {
-          "user": "medycyna",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.8075
-        },
-        {
-          "user": "qooccc",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.7717
-        },
-        {
-          "user": "td00168680",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 0.7706
-        },
-        {
-          "user": "W8845",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.7586
-        },
-        {
-          "user": "lovevale",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.7577
-        },
-        {
-          "user": "leelisarita",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 0.756
-        },
-        {
-          "user": "q210216",
-          "role": "commenter",
-          "score": 0.425,
-          "weight": 0.7444
-        },
-        {
-          "user": "lelehappy",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.719
-        },
-        {
-          "user": "faint019",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 0.7074
-        },
-        {
-          "user": "chenchen520",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.6885
-        },
-        {
-          "user": "richyun1030",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 0.6654
-        },
-        {
-          "user": "weiweilucy",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 0.6617
-        },
-        {
-          "user": "Imcathy",
-          "role": "commenter",
-          "score": 0.375,
-          "weight": 0.6541
-        },
-        {
-          "user": "lucicarr",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.6517
-        },
-        {
-          "user": "dengzhe",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 0.6434
-        },
-        {
-          "user": "takomom",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 0.6396
-        },
-        {
-          "user": "PiDaiShuei",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.5574
-        },
-        {
-          "user": "Laurettane",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 0.5556
-        }
-      ],
-      "rep_positive": [
-        "好吃",
-        "好吃 辣度很合我 超涮嘴的",
-        "很喜歡 麵的口感 真的有辣但調味很不錯"
-      ],
-      "rep_negative": [
-        "包裝跟實物差好多",
-        "太辣了",
-        "有點貴"
-      ],
-      "product_key": "全家:剝皮辣椒雞奶油細扁麵",
-      "score_mean": 0.6158,
-      "price": 55,
-      "category": "其他",
-      "competitor_mention_count": 1,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "7-11"
-      ],
-      "latest_post_date": "2025-12-30T13:51:31",
-      "review_excerpt": "之前吃過聯名出的蜂蜜芥末雞堡~ 超好吃 對金色三麥的聯名算蠻有信心的 中餐想說試試聯名的細扁麵 有辣,搭著白醬的奶味 吃起來是很溫和的辣感 麵是屬於偏硬有麵芯感那種 硬麵派表示喜歡 雞肉超嫩而且很入味 剝皮辣椒也好吃而且認真有辣",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1764734210.A.2D6.html",
-        "https://www.ptt.cc/bbs/CVS/M.1766143488.A.E0B.html",
-        "https://www.ptt.cc/bbs/CVS/M.1767073893.A.BCB.html"
       ]
     },
     {
@@ -43031,6 +43584,124 @@
       ]
     },
     {
+      "brand": "7-11",
+      "product_name": "甘王草莓卡士達雪淋霜",
+      "fair_score": 59.9,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 13.73,
+      "score_std": 0.153,
+      "n_posts": 1,
+      "n_comments": 14,
+      "contributors": [
+        {
+          "user": "YingWenTsai",
+          "role": "author",
+          "score": 1.0,
+          "weight": 1.0
+        },
+        {
+          "user": "jaiyenyen",
+          "role": "commenter",
+          "score": 0.6125,
+          "weight": 1.0
+        },
+        {
+          "user": "fe3q7u7z",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 1.0
+        },
+        {
+          "user": "calmness26",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 1.0
+        },
+        {
+          "user": "x710466",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "duck520",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 1.0
+        },
+        {
+          "user": "winni10",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 1.0
+        },
+        {
+          "user": "ctcofe",
+          "role": "commenter",
+          "score": 0.475,
+          "weight": 0.8373
+        },
+        {
+          "user": "PLEASE974853",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8253
+        },
+        {
+          "user": "GeogeBye",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8238
+        },
+        {
+          "user": "mmmmmmO",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 0.8004
+        },
+        {
+          "user": "brokeback",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.7768
+        },
+        {
+          "user": "aimez13je",
+          "role": "commenter",
+          "score": 0.475,
+          "weight": 0.7265
+        },
+        {
+          "user": "therookie",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.6269
+        }
+      ],
+      "rep_positive": [
+        "酸甜想吃",
+        "草莓巴斯克蠻好吃的,期待今年的",
+        "感覺不錯吃"
+      ],
+      "rep_negative": [
+        "沒有買一送一我可是不吃的喔"
+      ],
+      "product_key": "7-11:甘王草莓卡士達雪淋霜",
+      "score_mean": 0.6073,
+      "price": 49,
+      "category": "其他",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-01-04T16:25:41",
+      "review_excerpt": "一月份新口味 好像之前出過 跟亞尼克聯名 味道是酸甜 有點優格的感覺 草莓牛奶的感覺 吃完一隻沒問題不會負擔",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1767515145.A.2FB.html"
+      ]
+    },
+    {
       "brand": "全家",
       "product_name": "布丁夾心蛋糕",
       "fair_score": 59.9,
@@ -44273,624 +44944,6 @@
       "review_excerpt": "",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1761570935.A.EF5.html"
-      ]
-    },
-    {
-      "brand": "7-11",
-      "product_name": "麻辣奶油鮮蝦義大利麵",
-      "fair_score": 59.5,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 94.1,
-      "score_std": 0.198,
-      "n_posts": 3,
-      "n_comments": 123,
-      "contributors": [
-        {
-          "user": "virfish",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "YL9212",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "ppmaker",
-          "role": "author",
-          "score": 0.4,
-          "weight": 1.0
-        },
-        {
-          "user": "shiuan0405",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "kmkr122719",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "sookie125",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 1.0
-        },
-        {
-          "user": "raikkon41",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 1.0
-        },
-        {
-          "user": "mw221c",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 1.0
-        },
-        {
-          "user": "roseritter",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "s61222s",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "zerotea",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 1.0
-        },
-        {
-          "user": "Mrazs",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "Bokaka",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "LyonLeo",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "a126963138",
-          "role": "commenter",
-          "score": 0.95,
-          "weight": 1.0
-        },
-        {
-          "user": "frank123ya",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 1.0
-        },
-        {
-          "user": "yc484600",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "Myyan",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "Sunpayus",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "fzdm",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "Serenity7136",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "ken10272",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "Marjun",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "CLSyang",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "MATOI",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "jint484",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "rainhyuk",
-          "role": "commenter",
-          "score": 0.175,
-          "weight": 1.0
-        },
-        {
-          "user": "MasonBoling",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "willow",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 1.0
-        },
-        {
-          "user": "add7788",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 1.0
-        },
-        {
-          "user": "cyching",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 1.0
-        },
-        {
-          "user": "kong221024",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "awyw",
-          "role": "commenter",
-          "score": 0.525,
-          "weight": 1.0
-        },
-        {
-          "user": "Druid",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "mermaid1111",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 1.0
-        },
-        {
-          "user": "snownow",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 1.0
-        },
-        {
-          "user": "W9693U",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "yipingjoy",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 1.0
-        },
-        {
-          "user": "summer773",
-          "role": "commenter",
-          "score": 0.2,
-          "weight": 1.0
-        },
-        {
-          "user": "robotcl",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "YammyShu",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "Harionago",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "heiyan730",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "yunyuno",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 1.0
-        },
-        {
-          "user": "l711470",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "hester90333",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 1.0
-        },
-        {
-          "user": "sos14422",
-          "role": "commenter",
-          "score": 0.95,
-          "weight": 1.0
-        },
-        {
-          "user": "guezt",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8965
-        },
-        {
-          "user": "chiu",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.867
-        },
-        {
-          "user": "q2520q",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.8606
-        },
-        {
-          "user": "UK5566",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8538
-        },
-        {
-          "user": "yenyi666",
-          "role": "commenter",
-          "score": 0.4,
-          "weight": 0.8427
-        },
-        {
-          "user": "tch987123456",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 0.8373
-        },
-        {
-          "user": "uco330",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.8361
-        },
-        {
-          "user": "Sensibility",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 0.8348
-        },
-        {
-          "user": "Lailungsheng",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8341
-        },
-        {
-          "user": "firetim",
-          "role": "commenter",
-          "score": 0.2438,
-          "weight": 0.8333
-        },
-        {
-          "user": "good11126",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.8304
-        },
-        {
-          "user": "chanifa",
-          "role": "commenter",
-          "score": 0.6375,
-          "weight": 0.8298
-        },
-        {
-          "user": "pink0518",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 0.8271
-        },
-        {
-          "user": "scores",
-          "role": "commenter",
-          "score": 0.4375,
-          "weight": 0.8219
-        },
-        {
-          "user": "dus68",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.8212
-        },
-        {
-          "user": "marah",
-          "role": "commenter",
-          "score": 0.55,
-          "weight": 0.81
-        },
-        {
-          "user": "thomaschion",
-          "role": "commenter",
-          "score": 0.4875,
-          "weight": 0.8074
-        },
-        {
-          "user": "maye",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 0.8048
-        },
-        {
-          "user": "james4141989",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.8025
-        },
-        {
-          "user": "toro077",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.7997
-        },
-        {
-          "user": "lluunnaa",
-          "role": "commenter",
-          "score": 0.575,
-          "weight": 0.7951
-        },
-        {
-          "user": "linm",
-          "role": "commenter",
-          "score": 0.525,
-          "weight": 0.7923
-        },
-        {
-          "user": "idxxxx",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.7893
-        },
-        {
-          "user": "brokeback",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7768
-        },
-        {
-          "user": "kt7rc",
-          "role": "commenter",
-          "score": 0.875,
-          "weight": 0.7745
-        },
-        {
-          "user": "ruby0922",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.7684
-        },
-        {
-          "user": "jayleeabc",
-          "role": "commenter",
-          "score": 0.475,
-          "weight": 0.7546
-        },
-        {
-          "user": "Everybody99",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.7517
-        },
-        {
-          "user": "q210216",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7444
-        },
-        {
-          "user": "k1245963",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.74
-        },
-        {
-          "user": "a43164910",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.7387
-        },
-        {
-          "user": "weeafterwork",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.736
-        },
-        {
-          "user": "cuterabbit",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.735
-        },
-        {
-          "user": "flgg30211",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 0.735
-        },
-        {
-          "user": "jajoy",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7344
-        },
-        {
-          "user": "za755029",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.7327
-        },
-        {
-          "user": "l90289312",
-          "role": "commenter",
-          "score": 0.05,
-          "weight": 0.7322
-        },
-        {
-          "user": "vito88364",
-          "role": "commenter",
-          "score": 0.225,
-          "weight": 0.7278
-        },
-        {
-          "user": "awin519",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7273
-        },
-        {
-          "user": "littenVenus",
-          "role": "commenter",
-          "score": 0.7125,
-          "weight": 0.7245
-        },
-        {
-          "user": "s860382",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7223
-        },
-        {
-          "user": "xh96472",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.7124
-        },
-        {
-          "user": "frlair",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.7037
-        },
-        {
-          "user": "Ikvena",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.6912
-        },
-        {
-          "user": "TeamFrotress",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.6775
-        },
-        {
-          "user": "padi",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.6535
-        },
-        {
-          "user": "nbaworf",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.6287
-        },
-        {
-          "user": "joe940146",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.625
-        },
-        {
-          "user": "haggis",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.5762
-        }
-      ],
-      "rep_positive": [
-        "超好吃,而且超多顆,別跟我搶",
-        "價格驚人便宜還非常好吃,完全不可能是CVS販售的商品",
-        "超好吃"
-      ],
-      "rep_negative": [
-        "笑死 我昨天吃第一個吃完就想吐了...你還買10個番茄醬味又有黃蘿蔔味,咀嚼在一起超像嘔吐味",
-        "我以為我味覺壞掉,不是因為子瑜的話我根本不會買。 都靠子瑜,但主食及飯糰都比銀赫&東海那次難吃......連那炸雞飯味道都沒很好......原本以為炸雞應該比較容易救......這盤麵真的只有蝦子能吃",
-        "難吃又嫌,灌了快兩瓶水鹹"
-      ],
-      "product_key": "7-11:麻辣奶油鮮蝦義大利麵",
-      "score_mean": 0.5956,
-      "price": 55,
-      "category": "便當",
-      "competitor_mention_count": 6,
-      "competitor_preference_count": 2,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "全家",
-        "萊爾富",
-        "OK"
-      ],
-      "latest_post_date": "2026-05-05T16:25:36",
-      "review_excerpt": "調味其實還不錯，雖然沒什麼辣度，吃起來有點偏鹹甜；奶油吃完意外不會膩。",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1773768495.A.CA4.html",
-        "https://www.ptt.cc/bbs/CVS/M.1774112122.A.263.html",
-        "https://www.ptt.cc/bbs/CVS/M.1777969538.A.D38.html"
       ]
     },
     {
@@ -53082,6 +53135,74 @@
     },
     {
       "brand": "7-11",
+      "product_name": "草莓夾心麵包",
+      "fair_score": 56.9,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "n_eff": 5.92,
+      "score_std": 0.117,
+      "n_posts": 1,
+      "n_comments": 9,
+      "contributors": [
+        {
+          "user": "qqaas00",
+          "role": "author",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "meih484",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "sandwich02",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "yiyi5566",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "UCCUplz",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7786
+        },
+        {
+          "user": "zj765523",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7602
+        }
+      ],
+      "rep_positive": [
+        "花朵造型蠻可愛的"
+      ],
+      "rep_negative": [],
+      "product_key": "7-11:草莓夾心麵包",
+      "score_mean": 0.5812,
+      "price": 25,
+      "category": "麵包",
+      "competitor_mention_count": 4,
+      "competitor_preference_count": 1,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "全家"
+      ],
+      "latest_post_date": "2026-05-09T10:50:09",
+      "review_excerpt": "7-11麵包偏紮實，草莓醬甜度中等，帶一點點微酸；整體吃起來差異不大，看口感或包裝喜好選就好。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1778295011.A.501.html"
+      ]
+    },
+    {
+      "brand": "7-11",
       "product_name": "晨光巧克力生土司",
       "fair_score": 56.9,
       "consensus": "褒貶不一",
@@ -58562,6 +58683,87 @@
     },
     {
       "brand": "全家",
+      "product_name": "Spacewalkers小熊造型軟糖夾餡牛奶巧克力",
+      "fair_score": 55.1,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "n_eff": 7.89,
+      "score_std": 0.164,
+      "n_posts": 1,
+      "n_comments": 7,
+      "contributors": [
+        {
+          "user": "sara3636tw",
+          "role": "author",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "AMPM",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 1.0
+        },
+        {
+          "user": "juice9",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "john11894324",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8448
+        },
+        {
+          "user": "firetim",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8333
+        },
+        {
+          "user": "C4F6",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.8236
+        },
+        {
+          "user": "PG0123",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 0.77
+        },
+        {
+          "user": "itsok741223",
+          "role": "commenter",
+          "score": 0.85,
+          "weight": 0.7295
+        }
+      ],
+      "rep_positive": [
+        "好有趣的形容,可愛極了!XD",
+        "硬軟糖 是指軟糖很Q嗎?我最喜歡QQ的口感,不喜太軟綿綿的"
+      ],
+      "rep_negative": [
+        "不喜歡小熊軟糖的硬度"
+      ],
+      "product_key": "全家:spacewalkers小熊造型軟糖夾餡牛奶巧克力",
+      "score_mean": 0.5581,
+      "price": null,
+      "category": "零食",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2025-10-29T21:14:18",
+      "review_excerpt": "接近萬聖節真的不能帶兒童去超商 好多稀奇古怪的糖果都在這時候冒出來 媽媽自己先被討糖吃XD 選了沒吃過的小熊軟糖+巧克力 小熊被包覆的手足無措 看不出原來的形狀 兒童1號的吃法:巧克力外衣脫光光 兒童2號的吃法:解救熊頭",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1761743660.A.390.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "愛恨蔥蔥麵",
       "fair_score": 55.0,
       "consensus": "褒貶不一",
@@ -59659,6 +59861,83 @@
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1765265196.A.E08.html",
         "https://www.ptt.cc/bbs/CVS/M.1766723621.A.62A.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "VANS海鹽焦糖千層蛋糕友善",
+      "fair_score": 54.3,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "n_eff": 6.92,
+      "score_std": 0.238,
+      "n_posts": 1,
+      "n_comments": 7,
+      "contributors": [
+        {
+          "user": "w8426321",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "mikap",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.8412
+        },
+        {
+          "user": "GeogeBye",
+          "role": "commenter",
+          "score": 0.5625,
+          "weight": 0.8238
+        },
+        {
+          "user": "pippen2002",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.8093
+        },
+        {
+          "user": "skery3188",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 0.7855
+        },
+        {
+          "user": "a43164910",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.7387
+        },
+        {
+          "user": "lelehappy",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.719
+        }
+      ],
+      "rep_positive": [
+        "超級好吃",
+        "味道不錯 皮就那樣"
+      ],
+      "rep_negative": [
+        "完食垃圾?重點呢",
+        "說超級好吃的有吃過別家的千層蛋糕嗎",
+        "焦糖很甜 海鹽無感"
+      ],
+      "product_key": "全家:vans海鹽焦糖千層蛋糕友善",
+      "score_mean": 0.5504,
+      "price": 41,
+      "category": "甜點",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2025-09-12T00:42:42",
+      "review_excerpt": "CVS首PO 晚上游泳完逛全家看到乞丐價買來吃看看 下手前在板上找不到心得猶豫了一陣子 其實對超商蛋糕早已不抱期待 一吃驚艷 口感滑順 甜中帶苦 味道有層次 可能是體力消耗太多 吃起來沒覺得太甜還停不下來 直到配仙草茶發現喝起來像無糖XD",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1757608964.A.C3A.html"
       ]
     },
     {
@@ -66080,6 +66359,373 @@
     },
     {
       "brand": "7-11",
+      "product_name": "麻辣奶油鮮蝦義大利麵",
+      "fair_score": 51.9,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 53.92,
+      "score_std": 0.194,
+      "n_posts": 2,
+      "n_comments": 67,
+      "contributors": [
+        {
+          "user": "YL9212",
+          "role": "author",
+          "score": 0.85,
+          "weight": 1.0
+        },
+        {
+          "user": "ppmaker",
+          "role": "author",
+          "score": 0.4,
+          "weight": 1.0
+        },
+        {
+          "user": "fzdm",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "Serenity7136",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "ken10272",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "Marjun",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "CLSyang",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "MATOI",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "jint484",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "rainhyuk",
+          "role": "commenter",
+          "score": 0.175,
+          "weight": 1.0
+        },
+        {
+          "user": "MasonBoling",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "willow",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 1.0
+        },
+        {
+          "user": "add7788",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 1.0
+        },
+        {
+          "user": "cyching",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 1.0
+        },
+        {
+          "user": "kong221024",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "awyw",
+          "role": "commenter",
+          "score": 0.525,
+          "weight": 1.0
+        },
+        {
+          "user": "Druid",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "mermaid1111",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 1.0
+        },
+        {
+          "user": "snownow",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 1.0
+        },
+        {
+          "user": "W9693U",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "yipingjoy",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 1.0
+        },
+        {
+          "user": "summer773",
+          "role": "commenter",
+          "score": 0.2,
+          "weight": 1.0
+        },
+        {
+          "user": "robotcl",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 1.0
+        },
+        {
+          "user": "YammyShu",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "Harionago",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "heiyan730",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "yunyuno",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "l711470",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "hester90333",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 1.0
+        },
+        {
+          "user": "sos14422",
+          "role": "commenter",
+          "score": 0.95,
+          "weight": 1.0
+        },
+        {
+          "user": "guezt",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8965
+        },
+        {
+          "user": "chiu",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.867
+        },
+        {
+          "user": "q2520q",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.8606
+        },
+        {
+          "user": "UK5566",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8538
+        },
+        {
+          "user": "yenyi666",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 0.8427
+        },
+        {
+          "user": "firetim",
+          "role": "commenter",
+          "score": 0.2438,
+          "weight": 0.8333
+        },
+        {
+          "user": "chanifa",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8298
+        },
+        {
+          "user": "pink0518",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.8271
+        },
+        {
+          "user": "scores",
+          "role": "commenter",
+          "score": 0.4375,
+          "weight": 0.8219
+        },
+        {
+          "user": "thomaschion",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8074
+        },
+        {
+          "user": "lluunnaa",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7951
+        },
+        {
+          "user": "linm",
+          "role": "commenter",
+          "score": 0.525,
+          "weight": 0.7923
+        },
+        {
+          "user": "brokeback",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7768
+        },
+        {
+          "user": "jayleeabc",
+          "role": "commenter",
+          "score": 0.475,
+          "weight": 0.7546
+        },
+        {
+          "user": "q210216",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7444
+        },
+        {
+          "user": "flgg30211",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 0.735
+        },
+        {
+          "user": "jajoy",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7344
+        },
+        {
+          "user": "za755029",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.7327
+        },
+        {
+          "user": "vito88364",
+          "role": "commenter",
+          "score": 0.225,
+          "weight": 0.7278
+        },
+        {
+          "user": "s860382",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7223
+        },
+        {
+          "user": "xh96472",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.7124
+        },
+        {
+          "user": "Ikvena",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.6912
+        },
+        {
+          "user": "padi",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.6535
+        },
+        {
+          "user": "joe940146",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.625
+        },
+        {
+          "user": "haggis",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.5762
+        }
+      ],
+      "rep_positive": [
+        "超好吃",
+        "今天買了,這醬調味真的好吃",
+        "麵好吃耶,我不吃辣但還是 好吃子瑜很美小卡超讚"
+      ],
+      "rep_negative": [
+        "笑死 我昨天吃第一個吃完就想吐了...你還買10個番茄醬味又有黃蘿蔔味,咀嚼在一起超像嘔吐味",
+        "我以為我味覺壞掉,不是因為子瑜的話我根本不會買。 都靠子瑜,但主食及飯糰都比銀赫&東海那次難吃......連那炸雞飯味道都沒很好......原本以為炸雞應該比較容易救......這盤麵真的只有蝦子能吃",
+        "自己是 不好吃,或者不對我的口味。再來沒子瑜小卡應該i珍食會變多,因為也不能集點又相對貴,想試的人等就行了"
+      ],
+      "product_key": "7-11:麻辣奶油鮮蝦義大利麵",
+      "score_mean": 0.5193,
+      "price": 149,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2026-03-22T00:55:18",
+      "review_excerpt": "調味其實還不錯，雖然沒什麼辣度，吃起來有點偏鹹甜；奶油吃完意外不會膩。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1773768495.A.CA4.html",
+        "https://www.ptt.cc/bbs/CVS/M.1774112122.A.263.html"
+      ]
+    },
+    {
+      "brand": "7-11",
       "product_name": "雞燴飯",
       "fair_score": 51.9,
       "consensus": "褒貶不一",
@@ -66378,6 +67024,108 @@
       "review_excerpt": "聞起來芥末味比較重，吃起來反而還好；如果是兩片都自己吃大概無法。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1775024240.A.A09.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "剝皮辣椒鮮肉包",
+      "fair_score": 51.8,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 10.82,
+      "score_std": 0.206,
+      "n_posts": 1,
+      "n_comments": 11,
+      "contributors": [
+        {
+          "user": "bubble1990",
+          "role": "author",
+          "score": 0.75,
+          "weight": 1.0
+        },
+        {
+          "user": "mos",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 1.0
+        },
+        {
+          "user": "Luluyi22",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 1.0
+        },
+        {
+          "user": "sinje1988229",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 1.0
+        },
+        {
+          "user": "s8960046",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "Goog1e",
+          "role": "commenter",
+          "score": 0.225,
+          "weight": 0.8606
+        },
+        {
+          "user": "pook0818",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.8106
+        },
+        {
+          "user": "medycyna",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8075
+        },
+        {
+          "user": "td00168680",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 0.7706
+        },
+        {
+          "user": "q210216",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.7444
+        },
+        {
+          "user": "faint019",
+          "role": "commenter",
+          "score": 0.625,
+          "weight": 0.7074
+        }
+      ],
+      "rep_positive": [
+        "千千出的都不錯吃",
+        "千千的大部分都還不錯吃",
+        "感覺可以吃吃看"
+      ],
+      "rep_negative": [
+        "包裝跟實物差好多",
+        "有點貴",
+        "肉包只有藍色襯紙的筍肉包可以"
+      ],
+      "product_key": "全家:剝皮辣椒鮮肉包",
+      "score_mean": 0.5204,
+      "price": null,
+      "category": "鹹食",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "latest_post_date": "2025-12-30T13:51:31",
+      "review_excerpt": "這款調味還不錯,整體偏微辣 肉餡帶點肥肉,但餡量料算紮實, 早上起來電鍋蒸一顆~暖呼呼! 不過有點好奇,這內餡跟雙月的剝皮辣椒蒸肉餅味道相比,不知如何? 補充一下:包子可線下支付,能把快到期的紅利金跟剩餘的全家點數扣一扣",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1767073893.A.BCB.html"
       ]
     },
     {
@@ -70062,6 +70810,103 @@
       "review_excerpt": "肉丸是重組肉，吃起來口感很難形容(泥泥的?)，我不喜歡這口感；肉醬更甜，吃過一次不會再買。",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1781174988.A.014.html"
+      ]
+    },
+    {
+      "brand": "7-11",
+      "product_name": "韓式辣起司年糕",
+      "fair_score": 50.8,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 9.85,
+      "score_std": 0.189,
+      "n_posts": 1,
+      "n_comments": 10,
+      "contributors": [
+        {
+          "user": "leelisarita",
+          "role": "author",
+          "score": 0.88,
+          "weight": 1.0
+        },
+        {
+          "user": "xwu162",
+          "role": "commenter",
+          "score": 0.65,
+          "weight": 1.0
+        },
+        {
+          "user": "lime1207",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.8512
+        },
+        {
+          "user": "YL9212",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 0.8035
+        },
+        {
+          "user": "gg112",
+          "role": "commenter",
+          "score": 0.675,
+          "weight": 0.7919
+        },
+        {
+          "user": "skery3188",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.7855
+        },
+        {
+          "user": "hantulee",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.7685
+        },
+        {
+          "user": "Ralfchen0429",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7658
+        },
+        {
+          "user": "Everybody99",
+          "role": "commenter",
+          "score": 0.425,
+          "weight": 0.7517
+        },
+        {
+          "user": "bubble1990",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.6759
+        }
+      ],
+      "rep_positive": [
+        "沒吃過 但喜歡這種澱粉配澱粉的感覺",
+        "看到是熱壓吐司的時候 很酷,下次找機會試試看"
+      ],
+      "rep_negative": [
+        "味道普 起士太少",
+        "韓式包子我直接問店長能否買冷凍,直接買一袋六顆,本來要用點數加價購,結果兌換券搞錯,少抵了四張,白白浪費",
+        "吐司還夾年糕。澱粉加澱粉"
+      ],
+      "product_key": "7-11:韓式辣起司年糕",
+      "score_mean": 0.5087,
+      "price": 70,
+      "category": "乳品",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "其他"
+      ],
+      "latest_post_date": "2025-12-28T18:19:39",
+      "review_excerpt": "被FB社團燒到的白種元系列商品 一直都覺得小七熱壓系列都蠻好吃的 聯名產品首選就挑熱壓來吃 年糕還蠻Q的魚板也不軟爛 韓式辣醬小辣且帶有一點甜味 雖然不是那麼道地的韓味 但更符合台灣人的口味 這款很可以回購",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1766917183.A.F59.html"
       ]
     },
     {
@@ -80578,6 +81423,145 @@
     },
     {
       "brand": "全家",
+      "product_name": "草莓貓貓塔",
+      "fair_score": 46.1,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 16.68,
+      "score_std": 0.151,
+      "n_posts": 1,
+      "n_comments": 18,
+      "contributors": [
+        {
+          "user": "ga86041",
+          "role": "author",
+          "score": 0.7,
+          "weight": 1.0
+        },
+        {
+          "user": "lovedls",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 1.0
+        },
+        {
+          "user": "ru888999",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "youchzbaby",
+          "role": "commenter",
+          "score": 0.475,
+          "weight": 1.0
+        },
+        {
+          "user": "a1982120210",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "archer9081",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 1.0
+        },
+        {
+          "user": "Failove5566",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.8385
+        },
+        {
+          "user": "GeogeBye",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.8238
+        },
+        {
+          "user": "bailan",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 0.7685
+        },
+        {
+          "user": "ys254290",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.765
+        },
+        {
+          "user": "z690320",
+          "role": "commenter",
+          "score": 0.725,
+          "weight": 0.7612
+        },
+        {
+          "user": "addy7533967",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 0.7583
+        },
+        {
+          "user": "fototw",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7559
+        },
+        {
+          "user": "cashko",
+          "role": "commenter",
+          "score": 0.8,
+          "weight": 0.7531
+        },
+        {
+          "user": "TCY0523",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 0.7429
+        },
+        {
+          "user": "QQmouse",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 0.7294
+        },
+        {
+          "user": "c48074",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 0.703
+        }
+      ],
+      "rep_positive": [
+        "不錯吃",
+        "剛剛吃了還不錯"
+      ],
+      "rep_negative": [
+        "只有貼貓耳朵 失望",
+        "看起來很草莓化學味",
+        "看起來色素加很多不是很好吃"
+      ],
+      "product_key": "全家:草莓貓貓塔",
+      "score_mean": 0.4582,
+      "price": 49,
+      "category": "甜點",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 1,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "其他"
+      ],
+      "latest_post_date": "2026-01-17T04:01:05",
+      "review_excerpt": "逛全家甜點櫃的時候 被這個可愛的包裝蒙蔽了雙眼 有貓貓就是買 以為甜點本體也會有可愛表情 但只是貼個三角形意思一下 打開的時候好香 有一股塔殼烘烤後的香味 粉紅色:薄薄一層果膠 白色:介於布丁和奶酪之間 紫色:慕斯口感 最下面有一層草莓果醬",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1768593671.A.87F.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "屯京拉麵東京豚骨",
       "fair_score": 46.0,
       "consensus": "褒貶不一",
@@ -80938,619 +81922,6 @@
       "review_excerpt": "簡單說明一下 究餡麵包是萊爾富推出這種大份量餐包的品牌名稱 以往口味也是比較常見的 例如花生醬或果醬 卡士達奶油之類 今天在萊爾富發現到這個新口味...香菜花生 看起來也稍微想跟一下香菜熱度",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1764110541.A.FA6.html"
-      ]
-    },
-    {
-      "brand": "7-11",
-      "product_name": "吉伊卡哇草莓卡士達麻糬泡芙",
-      "fair_score": 45.8,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 93.31,
-      "score_std": 0.263,
-      "n_posts": 5,
-      "n_comments": 103,
-      "contributors": [
-        {
-          "user": "qqaas00",
-          "role": "author",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "Wowova",
-          "role": "author",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "YingWenTsai",
-          "role": "author",
-          "score": 1.0,
-          "weight": 1.0
-        },
-        {
-          "user": "AB3805",
-          "role": "author",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "guanluvsquat",
-          "role": "author",
-          "score": 0.0,
-          "weight": 1.0
-        },
-        {
-          "user": "meih484",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "sandwich02",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "yiyi5566",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "scotul",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "pinzlemon",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "mico861405",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "ckvck",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "pandasan",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 1.0
-        },
-        {
-          "user": "Angelhuang",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "christinachi",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "sophia748596",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "necrophilia",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "jiap",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 1.0
-        },
-        {
-          "user": "jaiyenyen",
-          "role": "commenter",
-          "score": 0.6125,
-          "weight": 1.0
-        },
-        {
-          "user": "fe3q7u7z",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 1.0
-        },
-        {
-          "user": "calmness26",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "x710466",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "duck520",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "winni10",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 1.0
-        },
-        {
-          "user": "ohhh21",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 1.0
-        },
-        {
-          "user": "Yyttt",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 1.0
-        },
-        {
-          "user": "lgyoyoyo2005",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "bbmelonchumi",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 1.0
-        },
-        {
-          "user": "billt0523",
-          "role": "commenter",
-          "score": 0.8,
-          "weight": 1.0
-        },
-        {
-          "user": "lsryu",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 1.0
-        },
-        {
-          "user": "userkka",
-          "role": "commenter",
-          "score": 0.775,
-          "weight": 1.0
-        },
-        {
-          "user": "gottsuan",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "hou0211",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 1.0
-        },
-        {
-          "user": "nioo3784",
-          "role": "commenter",
-          "score": 0.2,
-          "weight": 1.0
-        },
-        {
-          "user": "potatowine",
-          "role": "commenter",
-          "score": 0.4,
-          "weight": 1.0
-        },
-        {
-          "user": "mentalatc",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "ckymark",
-          "role": "commenter",
-          "score": 0.15,
-          "weight": 1.0
-        },
-        {
-          "user": "KARLEO",
-          "role": "commenter",
-          "score": 0.225,
-          "weight": 1.0
-        },
-        {
-          "user": "Takhisis",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 1.0
-        },
-        {
-          "user": "SAMON5566",
-          "role": "commenter",
-          "score": 0.125,
-          "weight": 1.0
-        },
-        {
-          "user": "clausewitz",
-          "role": "commenter",
-          "score": 0.075,
-          "weight": 1.0
-        },
-        {
-          "user": "PTThan2",
-          "role": "commenter",
-          "score": 0.225,
-          "weight": 1.0
-        },
-        {
-          "user": "gn0111",
-          "role": "commenter",
-          "score": 0.2,
-          "weight": 1.0
-        },
-        {
-          "user": "seed1114",
-          "role": "commenter",
-          "score": 0.2,
-          "weight": 1.0
-        },
-        {
-          "user": "PrinceAlex",
-          "role": "commenter",
-          "score": 0.525,
-          "weight": 1.0
-        },
-        {
-          "user": "Vram",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 1.0
-        },
-        {
-          "user": "good968574",
-          "role": "commenter",
-          "score": 0.2,
-          "weight": 1.0
-        },
-        {
-          "user": "iop982002",
-          "role": "commenter",
-          "score": 0.175,
-          "weight": 1.0
-        },
-        {
-          "user": "ben196888",
-          "role": "commenter",
-          "score": 0.075,
-          "weight": 1.0
-        },
-        {
-          "user": "s540421",
-          "role": "commenter",
-          "score": 0.1,
-          "weight": 1.0
-        },
-        {
-          "user": "stu85209",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.8486
-        },
-        {
-          "user": "tommy123310",
-          "role": "commenter",
-          "score": 0.375,
-          "weight": 0.8421
-        },
-        {
-          "user": "ctcofe",
-          "role": "commenter",
-          "score": 0.2625,
-          "weight": 0.8373
-        },
-        {
-          "user": "wen0727",
-          "role": "commenter",
-          "score": 0.1,
-          "weight": 0.837
-        },
-        {
-          "user": "Bausis",
-          "role": "commenter",
-          "score": 0.225,
-          "weight": 0.8362
-        },
-        {
-          "user": "Sensibility",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.8348
-        },
-        {
-          "user": "Gwaygo",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.8344
-        },
-        {
-          "user": "firetim",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.8333
-        },
-        {
-          "user": "Solosea",
-          "role": "commenter",
-          "score": 0.1,
-          "weight": 0.8279
-        },
-        {
-          "user": "Tsuyoi",
-          "role": "commenter",
-          "score": 0.225,
-          "weight": 0.8261
-        },
-        {
-          "user": "PLEASE974853",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8253
-        },
-        {
-          "user": "GeogeBye",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8238
-        },
-        {
-          "user": "fireguard119",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.8238
-        },
-        {
-          "user": "adlazyyy",
-          "role": "commenter",
-          "score": 0.125,
-          "weight": 0.8231
-        },
-        {
-          "user": "erilinda",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 0.821
-        },
-        {
-          "user": "yanluan",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 0.8166
-        },
-        {
-          "user": "pippen2002",
-          "role": "commenter",
-          "score": 0.6375,
-          "weight": 0.8093
-        },
-        {
-          "user": "NEWOLD",
-          "role": "commenter",
-          "score": 0.175,
-          "weight": 0.8082
-        },
-        {
-          "user": "tim111444",
-          "role": "commenter",
-          "score": 0.225,
-          "weight": 0.8063
-        },
-        {
-          "user": "mmmmmmO",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.8004
-        },
-        {
-          "user": "toro077",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 0.7997
-        },
-        {
-          "user": "ISbn94",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7974
-        },
-        {
-          "user": "thouloveme",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.7973
-        },
-        {
-          "user": "h120968",
-          "role": "commenter",
-          "score": 0.125,
-          "weight": 0.7881
-        },
-        {
-          "user": "abc0312",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7837
-        },
-        {
-          "user": "UCCUplz",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7786
-        },
-        {
-          "user": "brokeback",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 0.7768
-        },
-        {
-          "user": "aki1987",
-          "role": "commenter",
-          "score": 0.125,
-          "weight": 0.7727
-        },
-        {
-          "user": "UD305",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.7633
-        },
-        {
-          "user": "zj765523",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7602
-        },
-        {
-          "user": "d9123155",
-          "role": "commenter",
-          "score": 0.175,
-          "weight": 0.7585
-        },
-        {
-          "user": "sun0183",
-          "role": "commenter",
-          "score": 0.15,
-          "weight": 0.7574
-        },
-        {
-          "user": "misky1990",
-          "role": "commenter",
-          "score": 0.625,
-          "weight": 0.7572
-        },
-        {
-          "user": "habodaha",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.7527
-        },
-        {
-          "user": "q210216",
-          "role": "commenter",
-          "score": 0.075,
-          "weight": 0.7444
-        },
-        {
-          "user": "aimez13je",
-          "role": "commenter",
-          "score": 0.475,
-          "weight": 0.7265
-        },
-        {
-          "user": "s860382",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7223
-        },
-        {
-          "user": "spse6f6t6h6",
-          "role": "commenter",
-          "score": 0.025,
-          "weight": 0.7099
-        },
-        {
-          "user": "debris",
-          "role": "commenter",
-          "score": 0.825,
-          "weight": 0.6997
-        },
-        {
-          "user": "chenchen520",
-          "role": "commenter",
-          "score": 0.9,
-          "weight": 0.6885
-        },
-        {
-          "user": "smalldolphin",
-          "role": "commenter",
-          "score": 0.85,
-          "weight": 0.6792
-        },
-        {
-          "user": "ck326",
-          "role": "commenter",
-          "score": 0.175,
-          "weight": 0.6714
-        },
-        {
-          "user": "c8664",
-          "role": "commenter",
-          "score": 0.725,
-          "weight": 0.6537
-        },
-        {
-          "user": "therookie",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.6269
-        },
-        {
-          "user": "ruby02162000",
-          "role": "commenter",
-          "score": 0.025,
-          "weight": 0.5891
-        }
-      ],
-      "rep_positive": [
-        "我也喜歡 好吃",
-        "好吃",
-        "o好吃"
-      ],
-      "rep_negative": [
-        "這超難吃 很油",
-        "小小一顆都化工原料,賣 價錢,然後還很難吃xd",
-        "這系列就算是i珍食價我也不 ,味道對不起價格"
-      ],
-      "product_key": "7-11:吉伊卡哇草莓卡士達麻糬泡芙",
-      "score_mean": 0.4578,
-      "price": 25,
-      "category": "甜點",
-      "competitor_mention_count": 5,
-      "competitor_preference_count": 2,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "全家",
-        "OK"
-      ],
-      "latest_post_date": "2026-05-09T10:50:09",
-      "review_excerpt": ":跟上次的泡芙類似,只是口味變成草莓的, 覺得太甜可以拿去冷凍當作吃冰, 貼紙一樣有六款,這次是三小隻+小桃古本栗子。 唧唧唧唧唧唧...... << ひぐらしの く頃に >> _▁▁_______",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1760520353.A.B15.html",
-        "https://www.ptt.cc/bbs/CVS/M.1766667525.A.A90.html",
-        "https://www.ptt.cc/bbs/CVS/M.1767515145.A.2FB.html",
-        "https://www.ptt.cc/bbs/CVS/M.1768296818.A.7E8.html",
-        "https://www.ptt.cc/bbs/CVS/M.1778295011.A.501.html"
       ]
     },
     {
@@ -82090,365 +82461,6 @@
       "review_excerpt": "",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1763953671.A.764.html"
-      ]
-    },
-    {
-      "brand": "7-11",
-      "product_name": "白種元韓式辣醬起司洋芋燒",
-      "fair_score": 45.3,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 52.1,
-      "score_std": 0.196,
-      "n_posts": 3,
-      "n_comments": 61,
-      "contributors": [
-        {
-          "user": "kevinlee2001",
-          "role": "author",
-          "score": 0.9,
-          "weight": 1.0
-        },
-        {
-          "user": "nionio0329",
-          "role": "author",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "leelisarita",
-          "role": "author",
-          "score": 0.88,
-          "weight": 1.0
-        },
-        {
-          "user": "swanc",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 1.0
-        },
-        {
-          "user": "s55777",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 1.0
-        },
-        {
-          "user": "yuyemoon",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 1.0
-        },
-        {
-          "user": "p0916336248",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 1.0
-        },
-        {
-          "user": "cixiani",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 1.0
-        },
-        {
-          "user": "f12345678900",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "shrug",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 1.0
-        },
-        {
-          "user": "kmkr122719",
-          "role": "commenter",
-          "score": 0.45,
-          "weight": 1.0
-        },
-        {
-          "user": "villagemen",
-          "role": "commenter",
-          "score": 0.15,
-          "weight": 1.0
-        },
-        {
-          "user": "greg90326",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 1.0
-        },
-        {
-          "user": "xwu162",
-          "role": "commenter",
-          "score": 0.65,
-          "weight": 1.0
-        },
-        {
-          "user": "moonpaper",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8927
-        },
-        {
-          "user": "Goog1e",
-          "role": "commenter",
-          "score": 0.3875,
-          "weight": 0.8606
-        },
-        {
-          "user": "DonnyDon",
-          "role": "commenter",
-          "score": 0.75,
-          "weight": 0.8573
-        },
-        {
-          "user": "lime1207",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 0.8512
-        },
-        {
-          "user": "windowdoor",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8336
-        },
-        {
-          "user": "firetim",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 0.8333
-        },
-        {
-          "user": "mytoychiu",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.8326
-        },
-        {
-          "user": "s8510785107",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8266
-        },
-        {
-          "user": "hcastray",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 0.8254
-        },
-        {
-          "user": "hf0932964541",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 0.8142
-        },
-        {
-          "user": "NEWOLD",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.8082
-        },
-        {
-          "user": "ting015",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.8065
-        },
-        {
-          "user": "Smallsh",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 0.8043
-        },
-        {
-          "user": "YL9212",
-          "role": "commenter",
-          "score": 0.4,
-          "weight": 0.8035
-        },
-        {
-          "user": "toro077",
-          "role": "commenter",
-          "score": 0.6,
-          "weight": 0.7997
-        },
-        {
-          "user": "fi",
-          "role": "commenter",
-          "score": 0.4,
-          "weight": 0.7962
-        },
-        {
-          "user": "gg112",
-          "role": "commenter",
-          "score": 0.675,
-          "weight": 0.7919
-        },
-        {
-          "user": "idxxxx",
-          "role": "commenter",
-          "score": 0.325,
-          "weight": 0.7893
-        },
-        {
-          "user": "wu449789",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 0.7893
-        },
-        {
-          "user": "skery3188",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.7855
-        },
-        {
-          "user": "prince780105",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 0.7817
-        },
-        {
-          "user": "pcfox",
-          "role": "commenter",
-          "score": 0.375,
-          "weight": 0.7778
-        },
-        {
-          "user": "hantulee",
-          "role": "commenter",
-          "score": 0.3187,
-          "weight": 0.7685
-        },
-        {
-          "user": "Ralfchen0429",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7658
-        },
-        {
-          "user": "leelisarita",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.756
-        },
-        {
-          "user": "catuncle1",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.755
-        },
-        {
-          "user": "jayleeabc",
-          "role": "commenter",
-          "score": 0.25,
-          "weight": 0.7546
-        },
-        {
-          "user": "s7598261",
-          "role": "commenter",
-          "score": 0.1,
-          "weight": 0.7525
-        },
-        {
-          "user": "Everybody99",
-          "role": "commenter",
-          "score": 0.425,
-          "weight": 0.7517
-        },
-        {
-          "user": "OZ7574",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.7466
-        },
-        {
-          "user": "q210216",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7444
-        },
-        {
-          "user": "za755029",
-          "role": "commenter",
-          "score": 0.3,
-          "weight": 0.7327
-        },
-        {
-          "user": "jie89210",
-          "role": "commenter",
-          "score": 0.7,
-          "weight": 0.7299
-        },
-        {
-          "user": "susanmo15",
-          "role": "commenter",
-          "score": 0.925,
-          "weight": 0.7257
-        },
-        {
-          "user": "s860382",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.7223
-        },
-        {
-          "user": "mesreves",
-          "role": "commenter",
-          "score": 0.275,
-          "weight": 0.6796
-        },
-        {
-          "user": "bubble1990",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.6759
-        },
-        {
-          "user": "eric5604",
-          "role": "commenter",
-          "score": 0.35,
-          "weight": 0.6594
-        },
-        {
-          "user": "aries1985",
-          "role": "commenter",
-          "score": 0.5,
-          "weight": 0.6162
-        }
-      ],
-      "rep_positive": [
-        "燉蛋真的很好吃",
-        "很好吃",
-        "白聯名這系列還不錯吧 麵那款友善時光的話會買"
-      ],
-      "rep_negative": [
-        "聯名中的飯糰不太建議購買,根本是吃醬,裡頭配料少少的,剛剛去換了肉包,以為兌換券是點一次就全帶入,結果一次五張是得每一個都勾選,白白浪費四張還多付$12元",
-        "真的沒下限...這種咖還敢找",
-        "不好吃 配菜也很不對 竟然放玉米 辣度我是 還好但一定有人不行"
-      ],
-      "product_key": "7-11:白種元韓式辣醬起司洋芋燒",
-      "score_mean": 0.4524,
-      "price": 65,
-      "category": "便當",
-      "competitor_mention_count": 2,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "OK",
-        "其他"
-      ],
-      "latest_post_date": "2026-02-08T00:35:14",
-      "review_excerpt": "不好不壞,可以想像到的味道,除了起司馬鈴薯,還有吃到一點點火腿、玉米、高麗菜, 份量蠻小,吃起來微辣。 因為白種元聯名想吃的可以不用特別吃除非打折,不然太貴了! 聯名系列的韓式醬燉蛋我倒是覺得很好吃,但也是偏貴,兩顆溏心蛋要59。",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1766632077.A.D92.html",
-        "https://www.ptt.cc/bbs/CVS/M.1766917183.A.F59.html",
-        "https://www.ptt.cc/bbs/CVS/M.1770482117.A.0D6.html"
       ]
     },
     {
@@ -84417,6 +84429,309 @@
       "review_excerpt": "今天剛好看到新品上架、買來嚐鮮看看、 但咬下後感覺黑糖味不明顯、 且核桃乳酪餡在後半段才咬到、 雖然味道濃厚、但不是很愛、 納含量也偏高、想要要嚐鮮的請留意. (圖文內容 請務必圖文獨立 不可單獨貼網址或單獨文字內容) 與板工打勾勾約定:",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1758077911.A.837.html"
+      ]
+    },
+    {
+      "brand": "7-11",
+      "product_name": "白種元韓式辣醬起司洋芋燒",
+      "fair_score": 43.9,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 43.24,
+      "score_std": 0.194,
+      "n_posts": 2,
+      "n_comments": 51,
+      "contributors": [
+        {
+          "user": "kevinlee2001",
+          "role": "author",
+          "score": 0.9,
+          "weight": 1.0
+        },
+        {
+          "user": "nionio0329",
+          "role": "author",
+          "score": 0.6,
+          "weight": 1.0
+        },
+        {
+          "user": "swanc",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "s55777",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 1.0
+        },
+        {
+          "user": "yuyemoon",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 1.0
+        },
+        {
+          "user": "p0916336248",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 1.0
+        },
+        {
+          "user": "cixiani",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 1.0
+        },
+        {
+          "user": "f12345678900",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "shrug",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 1.0
+        },
+        {
+          "user": "kmkr122719",
+          "role": "commenter",
+          "score": 0.45,
+          "weight": 1.0
+        },
+        {
+          "user": "villagemen",
+          "role": "commenter",
+          "score": 0.15,
+          "weight": 1.0
+        },
+        {
+          "user": "greg90326",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 1.0
+        },
+        {
+          "user": "moonpaper",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8927
+        },
+        {
+          "user": "Goog1e",
+          "role": "commenter",
+          "score": 0.3875,
+          "weight": 0.8606
+        },
+        {
+          "user": "DonnyDon",
+          "role": "commenter",
+          "score": 0.75,
+          "weight": 0.8573
+        },
+        {
+          "user": "windowdoor",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8336
+        },
+        {
+          "user": "firetim",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.8333
+        },
+        {
+          "user": "mytoychiu",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.8326
+        },
+        {
+          "user": "s8510785107",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8266
+        },
+        {
+          "user": "hcastray",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.8254
+        },
+        {
+          "user": "hf0932964541",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 0.8142
+        },
+        {
+          "user": "NEWOLD",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.8082
+        },
+        {
+          "user": "ting015",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.8065
+        },
+        {
+          "user": "Smallsh",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 0.8043
+        },
+        {
+          "user": "toro077",
+          "role": "commenter",
+          "score": 0.6,
+          "weight": 0.7997
+        },
+        {
+          "user": "fi",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 0.7962
+        },
+        {
+          "user": "idxxxx",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 0.7893
+        },
+        {
+          "user": "wu449789",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 0.7893
+        },
+        {
+          "user": "prince780105",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 0.7817
+        },
+        {
+          "user": "pcfox",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 0.7778
+        },
+        {
+          "user": "hantulee",
+          "role": "commenter",
+          "score": 0.3167,
+          "weight": 0.7685
+        },
+        {
+          "user": "leelisarita",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.756
+        },
+        {
+          "user": "catuncle1",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.755
+        },
+        {
+          "user": "jayleeabc",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 0.7546
+        },
+        {
+          "user": "s7598261",
+          "role": "commenter",
+          "score": 0.1,
+          "weight": 0.7525
+        },
+        {
+          "user": "OZ7574",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.7466
+        },
+        {
+          "user": "q210216",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7444
+        },
+        {
+          "user": "za755029",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 0.7327
+        },
+        {
+          "user": "jie89210",
+          "role": "commenter",
+          "score": 0.7,
+          "weight": 0.7299
+        },
+        {
+          "user": "susanmo15",
+          "role": "commenter",
+          "score": 0.925,
+          "weight": 0.7257
+        },
+        {
+          "user": "s860382",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7223
+        },
+        {
+          "user": "mesreves",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.6796
+        },
+        {
+          "user": "eric5604",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.6594
+        },
+        {
+          "user": "aries1985",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.6162
+        }
+      ],
+      "rep_positive": [
+        "燉蛋真的很好吃",
+        "很好吃",
+        "白聯名這系列還不錯吧 麵那款友善時光的話會買"
+      ],
+      "rep_negative": [
+        "聯名中的飯糰不太建議購買,根本是吃醬,裡頭配料少少的,剛剛去換了肉包,以為兌換券是點一次就全帶入,結果一次五張是得每一個都勾選,白白浪費四張還多付$12元",
+        "真的沒下限...這種咖還敢找",
+        "不好吃 配菜也很不對 竟然放玉米 辣度我是 還好但一定有人不行"
+      ],
+      "product_key": "7-11:白種元韓式辣醬起司洋芋燒",
+      "score_mean": 0.4372,
+      "price": 65,
+      "category": "便當",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "OK"
+      ],
+      "latest_post_date": "2026-02-08T00:35:14",
+      "review_excerpt": "不好不壞,可以想像到的味道,除了起司馬鈴薯,還有吃到一點點火腿、玉米、高麗菜, 份量蠻小,吃起來微辣。 因為白種元聯名想吃的可以不用特別吃除非打折,不然太貴了! 聯名系列的韓式醬燉蛋我倒是覺得很好吃,但也是偏貴,兩顆溏心蛋要59。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1766632077.A.D92.html",
+        "https://www.ptt.cc/bbs/CVS/M.1770482117.A.0D6.html"
       ]
     },
     {
@@ -101225,6 +101540,306 @@
       "review_excerpt": "料超少,飯超多, 調味不怎麼樣,沒有啥記憶感 吃完超級空虛 包裝沒拍到下面這張是網路圖片 打開還沒攪拌之前的料 我到底為什麼會買這個啊,而且還是原價買的,簡直鬼遮眼 很柴的雞肉 用原價買 20分 的意思 嘿 速的 那個麻婆豆腐麵有想吃",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1763461541.A.983.html"
+      ]
+    },
+    {
+      "brand": "7-11",
+      "product_name": "韓國延世大學草莓生乳包",
+      "fair_score": 23.4,
+      "consensus": "一致負評",
+      "confidence": "高",
+      "n_eff": 43.2,
+      "score_std": 0.148,
+      "n_posts": 1,
+      "n_comments": 46,
+      "contributors": [
+        {
+          "user": "guanluvsquat",
+          "role": "author",
+          "score": 0.0,
+          "weight": 1.0
+        },
+        {
+          "user": "hou0211",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 1.0
+        },
+        {
+          "user": "nioo3784",
+          "role": "commenter",
+          "score": 0.2,
+          "weight": 1.0
+        },
+        {
+          "user": "potatowine",
+          "role": "commenter",
+          "score": 0.4,
+          "weight": 1.0
+        },
+        {
+          "user": "mentalatc",
+          "role": "commenter",
+          "score": 0.3,
+          "weight": 1.0
+        },
+        {
+          "user": "ckymark",
+          "role": "commenter",
+          "score": 0.15,
+          "weight": 1.0
+        },
+        {
+          "user": "KARLEO",
+          "role": "commenter",
+          "score": 0.225,
+          "weight": 1.0
+        },
+        {
+          "user": "Takhisis",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 1.0
+        },
+        {
+          "user": "SAMON5566",
+          "role": "commenter",
+          "score": 0.125,
+          "weight": 1.0
+        },
+        {
+          "user": "clausewitz",
+          "role": "commenter",
+          "score": 0.075,
+          "weight": 1.0
+        },
+        {
+          "user": "PTThan2",
+          "role": "commenter",
+          "score": 0.225,
+          "weight": 1.0
+        },
+        {
+          "user": "gn0111",
+          "role": "commenter",
+          "score": 0.2,
+          "weight": 1.0
+        },
+        {
+          "user": "seed1114",
+          "role": "commenter",
+          "score": 0.2,
+          "weight": 1.0
+        },
+        {
+          "user": "PrinceAlex",
+          "role": "commenter",
+          "score": 0.525,
+          "weight": 1.0
+        },
+        {
+          "user": "Vram",
+          "role": "commenter",
+          "score": 0.325,
+          "weight": 1.0
+        },
+        {
+          "user": "good968574",
+          "role": "commenter",
+          "score": 0.2,
+          "weight": 1.0
+        },
+        {
+          "user": "iop982002",
+          "role": "commenter",
+          "score": 0.175,
+          "weight": 1.0
+        },
+        {
+          "user": "ben196888",
+          "role": "commenter",
+          "score": 0.075,
+          "weight": 1.0
+        },
+        {
+          "user": "s540421",
+          "role": "commenter",
+          "score": 0.1,
+          "weight": 1.0
+        },
+        {
+          "user": "stu85209",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.8486
+        },
+        {
+          "user": "tommy123310",
+          "role": "commenter",
+          "score": 0.375,
+          "weight": 0.8421
+        },
+        {
+          "user": "ctcofe",
+          "role": "commenter",
+          "score": 0.05,
+          "weight": 0.8373
+        },
+        {
+          "user": "wen0727",
+          "role": "commenter",
+          "score": 0.1,
+          "weight": 0.837
+        },
+        {
+          "user": "Bausis",
+          "role": "commenter",
+          "score": 0.225,
+          "weight": 0.8362
+        },
+        {
+          "user": "Sensibility",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.8348
+        },
+        {
+          "user": "Solosea",
+          "role": "commenter",
+          "score": 0.1,
+          "weight": 0.8279
+        },
+        {
+          "user": "Tsuyoi",
+          "role": "commenter",
+          "score": 0.225,
+          "weight": 0.8261
+        },
+        {
+          "user": "fireguard119",
+          "role": "commenter",
+          "score": 0.35,
+          "weight": 0.8238
+        },
+        {
+          "user": "adlazyyy",
+          "role": "commenter",
+          "score": 0.125,
+          "weight": 0.8231
+        },
+        {
+          "user": "yanluan",
+          "role": "commenter",
+          "score": 0.25,
+          "weight": 0.8166
+        },
+        {
+          "user": "NEWOLD",
+          "role": "commenter",
+          "score": 0.175,
+          "weight": 0.8082
+        },
+        {
+          "user": "tim111444",
+          "role": "commenter",
+          "score": 0.225,
+          "weight": 0.8063
+        },
+        {
+          "user": "abc0312",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7837
+        },
+        {
+          "user": "aki1987",
+          "role": "commenter",
+          "score": 0.125,
+          "weight": 0.7727
+        },
+        {
+          "user": "UD305",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.7633
+        },
+        {
+          "user": "d9123155",
+          "role": "commenter",
+          "score": 0.175,
+          "weight": 0.7585
+        },
+        {
+          "user": "sun0183",
+          "role": "commenter",
+          "score": 0.15,
+          "weight": 0.7574
+        },
+        {
+          "user": "habodaha",
+          "role": "commenter",
+          "score": 0.275,
+          "weight": 0.7527
+        },
+        {
+          "user": "q210216",
+          "role": "commenter",
+          "score": 0.075,
+          "weight": 0.7444
+        },
+        {
+          "user": "s860382",
+          "role": "commenter",
+          "score": 0.5,
+          "weight": 0.7223
+        },
+        {
+          "user": "spse6f6t6h6",
+          "role": "commenter",
+          "score": 0.025,
+          "weight": 0.7099
+        },
+        {
+          "user": "debris",
+          "role": "commenter",
+          "score": 0.825,
+          "weight": 0.6997
+        },
+        {
+          "user": "ck326",
+          "role": "commenter",
+          "score": 0.175,
+          "weight": 0.6714
+        },
+        {
+          "user": "ruby02162000",
+          "role": "commenter",
+          "score": 0.025,
+          "weight": 0.5891
+        }
+      ],
+      "rep_positive": [
+        "在韓國本地吃過好吃"
+      ],
+      "rep_negative": [
+        "這超難吃 很油",
+        "小小一顆都化工原料,賣 價錢,然後還很難吃xd",
+        "這系列就算是i珍食價我也不 ,味道對不起價格"
+      ],
+      "product_key": "7-11:韓國延世大學草莓生乳包",
+      "score_mean": 0.2274,
+      "price": 135,
+      "category": "其他",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 1,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "OK"
+      ],
+      "latest_post_date": "2025-10-15T17:25:50",
+      "review_excerpt": "在甜點那一櫃看見這玩意,沒拿起來看價錢,只看到櫃上的價卡(也沒仔細看品名)寫35。 沒想到刷下去是135,但算了。 草莓味就是早餐店抹吐司的便宜草莓果醬,味道又壓過生乳味,我寧願去跟超商團購的生乳捲。 上好美盤.jpg",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1760520353.A.B15.html"
       ]
     },
     {
