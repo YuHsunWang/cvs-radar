@@ -26,6 +26,7 @@ from .config import (
     SHILL_DETECTION,
 )
 from .models import Comment, Contributor, Post, ProductReport
+from .parser import _title_product_name
 from .preference import AccountProfile
 from .sentiment import POSITIVE_WORDS
 
@@ -595,13 +596,21 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
 
 
 def _best_price_from_text(text: str) -> int | None:
+    return _price_from_text(text, prefer_first=False, max_price=_MAX_PRICE)
+
+
+def _primary_price_from_text(text: str) -> int | None:
+    return _price_from_text(text, prefer_first=True, max_price=999)
+
+
+def _price_from_text(text: str, *, prefer_first: bool, max_price: int) -> int | None:
     bundle_spans: list[tuple[int, int]] = []
     bundle_prices: list[int] = []
     for match in _BUNDLE_PRICE_RE.finditer(text):
         count = int(match.group("count"))
         total = int(match.group("total"))
         unit_price = int((total / count) + 0.5)
-        if _MIN_PRICE <= unit_price <= _MAX_PRICE:
+        if _MIN_PRICE <= unit_price <= max_price:
             bundle_prices.append(unit_price)
             bundle_spans.append(match.span("total"))
 
@@ -611,11 +620,13 @@ def _best_price_from_text(text: str) -> int | None:
         if any(start <= span[0] and span[1] <= end for start, end in bundle_spans):
             continue
         price = int(match.group(1))
-        if _MIN_PRICE <= price <= _MAX_PRICE:
+        if _MIN_PRICE <= price <= max_price:
             prices.append(price)
     if prices:
-        return prices[-1]
-    return bundle_prices[-1] if bundle_prices else None
+        return prices[0] if prefer_first else prices[-1]
+    if not bundle_prices:
+        return None
+    return bundle_prices[0] if prefer_first else bundle_prices[-1]
 
 
 def _is_price_context_line(line: str) -> bool:
@@ -624,6 +635,27 @@ def _is_price_context_line(line: str) -> bool:
 
 def _is_price_label_name(name: str) -> bool:
     return bool(re.fullmatch(r"(價格|售價|價錢|原價|特價|目前特價|活動價|台幣)+", name))
+
+
+def _is_junk_extracted_product_name(name: str) -> bool:
+    text = unicodedata.normalize("NFKC", name or "").strip()
+    if not text:
+        return True
+    compact = re.sub(r"\s+", "", text)
+    if _is_price_label_name(compact):
+        return True
+    if re.fullmatch(r"(?:\d{1,3}|元|價格|售價|原價|會員|目前|特價|優惠|預購|加點數|點數)+", compact):
+        return True
+    promo_chars = sum(len(token) for token in re.findall(r"預購|加點數|點數|會員|特價|優惠|原價|售價|目前|元", compact))
+    return promo_chars >= 2 and promo_chars / max(len(compact), 1) >= 0.5
+
+
+def _title_fallback_product_name(post: Post) -> str:
+    title_name = _title_product_name(post.title)
+    cleaned = _clean_extracted_product_name(title_name, post.brand)
+    if len(cleaned) >= 2 and not _is_junk_extracted_product_name(cleaned):
+        return cleaned
+    return title_name.strip()
 
 
 def _normalize_marketing_text(text: str) -> str:
@@ -735,8 +767,19 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             continue
         valid_items = [
             (name, price) for name, price in items
-            if not _GARBAGE_NAME_RE.match(name) and len(name) >= 2
+            if not _GARBAGE_NAME_RE.match(name)
+            and not _is_junk_extracted_product_name(name)
+            and len(name) >= 2
         ]
+        junk_items = [
+            (name, price) for name, price in items
+            if len(name) >= 2 and _is_junk_extracted_product_name(name)
+        ]
+        if not valid_items and junk_items:
+            fallback_name = _title_fallback_product_name(post)
+            fallback_price = _primary_price_from_text(extraction_name)
+            if fallback_name and len(fallback_name) >= 2:
+                valid_items = [(fallback_name, fallback_price)]
         if len(valid_items) > 1:
             routed_comments = _route_comments_by_product(
                 post.comments, [name for name, _ in valid_items]

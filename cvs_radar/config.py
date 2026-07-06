@@ -127,6 +127,7 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         "周邊": [
             "捏捏球", "吊飾", "積木", "置物箱", "春聯袋", "盲盒",
             "杯組", "招牌", "公仔", "玩具", "文具", "週邊", "襪套",
+            "安全帽",
         ],
         "冰品": [
             "酷聖霜", "霜淇淋", "雪糕", "冰棒", "冰淇淋", "雪餅", "冰沙", "冰品",
@@ -203,7 +204,19 @@ def _load_config() -> dict[str, Any]:
 
     config = deepcopy(_DEFAULT_CONFIG)
     config.update(loaded)
+    _merge_product_category_defaults(config)
     return config
+
+
+def _merge_product_category_defaults(config: dict[str, Any]) -> None:
+    categories = config.get("PRODUCT_CATEGORIES")
+    if not isinstance(categories, dict):
+        return
+    for category, default_keywords in _DEFAULT_CONFIG["PRODUCT_CATEGORIES"].items():
+        keywords = categories.setdefault(category, [])
+        for keyword in default_keywords:
+            if keyword not in keywords:
+                keywords.append(keyword)
 
 
 def _confidence_bands_as_tuples(value: list[list[Any]] | list[tuple[Any, ...]]) -> list[tuple[Any, ...]]:

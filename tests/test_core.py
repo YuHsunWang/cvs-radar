@@ -643,6 +643,38 @@ class ExtractionRegressionTest(unittest.TestCase):
         self.assertNotIn("ipass", result[0][0].lower())
         self.assertNotIn("聯邦卡付款", result[0][0])
 
+    def test_price_only_product_field_falls_back_to_title_name_and_primary_price(self) -> None:
+        post = Post(
+            id="M.1765785731.A.F72",
+            title="[商品] 全家 惡魔乳酪生義大利麵",
+            brand="全家",
+            product_name="：99 目前會員特價88\n(區域型商品請註明 試吃試用品請標示價格0元)",
+            price="：99 目前會員特價88",
+        )
+
+        processed = preprocess_posts([post])
+
+        self.assertEqual(len(processed), 1)
+        self.assertEqual(processed[0].product_name, "惡魔乳酪生義大利麵")
+        self.assertEqual(processed[0].price, "99")
+        self.assertEqual(categorize_product(processed[0].product_name), "便當")
+
+    def test_preorder_points_field_falls_back_to_title_name_and_price(self) -> None:
+        post = Post(
+            id="M.1765708866.A.59B",
+            title="[商品] 7-11聯名動物方城市安全帽",
+            brand="7-11",
+            product_name="：\n599預購加點數",
+            price="：\n599預購加點數",
+        )
+
+        processed = preprocess_posts([post])
+
+        self.assertEqual(len(processed), 1)
+        self.assertEqual(processed[0].product_name, "動物方城市安全帽")
+        self.assertEqual(processed[0].price, "599")
+        self.assertEqual(categorize_product(processed[0].product_name), "周邊")
+
 
 class CategoryRegressionTest(unittest.TestCase):
     def test_categorize_product_cases(self) -> None:
@@ -653,6 +685,7 @@ class CategoryRegressionTest(unittest.TestCase):
             ("可頌", "麵包"),
             ("捏捏球", "周邊"),
             ("吊飾", "周邊"),
+            ("動物方城市安全帽", "周邊"),
             ("雞排", "鹹食"),
             ("unknown_product_xyz", "其他"),
         ]
