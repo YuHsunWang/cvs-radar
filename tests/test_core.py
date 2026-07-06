@@ -675,6 +675,57 @@ class ExtractionRegressionTest(unittest.TestCase):
         self.assertEqual(processed[0].price, "599")
         self.assertEqual(categorize_product(processed[0].product_name), "周邊")
 
+    def test_digit_promo_fragment_falls_back_to_title_name(self) -> None:
+        post = Post(
+            id="M.1761067990.A.125",
+            title="[商品] 7-11 明太子雞肉溏心蛋三明治",
+            brand="7-11",
+            product_name="：85套餐\n(區域型商品請註明 試吃試用品請標示價格0元)",
+            price="：85套餐",
+        )
+
+        processed = preprocess_posts([post])
+
+        self.assertEqual(len(processed), 1)
+        self.assertEqual(processed[0].product_name, "明太子雞肉溏心蛋三明治")
+        self.assertEqual(processed[0].price, "85")
+
+    def test_trailing_points_exchange_suffix_is_stripped(self) -> None:
+        post = Post(
+            id="M.1767279405.A.5B1",
+            title="[商品] 全家 SOMA 荔枝烏龍鮮果凍",
+            brand="全家",
+            product_name="SOMA 荔枝烏龍鮮果凍點數兌換",
+        )
+
+        processed = preprocess_posts([post])
+
+        self.assertEqual(len(processed), 1)
+        self.assertEqual(processed[0].product_name, "SOMA荔枝烏龍鮮果凍")
+
+    def test_real_digit_product_names_are_not_replaced_by_title(self) -> None:
+        posts = [
+            Post(
+                id="digit-chocolate",
+                title="[商品] 7-11 77乳加星球含餡巧克力",
+                brand="7-11",
+                product_name="77乳加星球含餡巧克力",
+            ),
+            Post(
+                id="digit-coffee",
+                title="[商品] 全家 5minx膽大黨茶包式咖啡",
+                brand="全家",
+                product_name="5minx膽大黨茶包式咖啡",
+            ),
+        ]
+
+        processed = preprocess_posts(posts)
+
+        self.assertEqual(
+            [post.product_name for post in processed],
+            ["77乳加星球含餡巧克力", "5minx膽大黨茶包式咖啡"],
+        )
+
 
 class CategoryRegressionTest(unittest.TestCase):
     def test_categorize_product_cases(self) -> None:

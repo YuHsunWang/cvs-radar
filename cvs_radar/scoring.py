@@ -75,6 +75,9 @@ _PRICE_BEFORE_PROMO_RE = re.compile(
 _PROMO_TAIL_RE = re.compile(
     r"(隨買|跨店|取件|搭配|好康|活動|優惠|加購|半價|滿額).*$"
 )
+_PROMO_SUFFIX_RE = re.compile(
+    r"(?:點數兌換|免費兌換的?|兌換|預購加點數|會員特價.*|會員優惠.*|任選.*|打折.*)$"
+)
 _PAYMENT_ASIDE_PATTERN = (
     r"付款|支付|刷卡|信用卡|金融卡|聯邦卡|國泰卡|中信卡|玉山卡|台新卡|"
     r"悠遊卡|一卡通|icash|ipass|i\s*pass|line\s*pay|linepay|街口|全支付|全盈|"
@@ -107,6 +110,27 @@ _PRICE_CONTEXT_RE = re.compile(
     r"^\s*(?:價格|售價|價錢|原價|特價|目前|活動價|NT\$?|\$|\d+\s*(?:ML|毫升|G|公克|克))",
     re.IGNORECASE,
 )
+_FRAGMENT_PRODUCT_NAMES = {
+    "今日",
+    "會員",
+    "軟歐",
+    "搭配",
+    "奶茶",
+    "單瓶",
+    "前者",
+    "後者",
+    "打折",
+    "元",
+    "任選",
+    "購入",
+    "友善",
+    "雞排",
+    "油雞",
+    "全家",
+    "全品項",
+    "買兩個",
+    "元新品",
+}
 _MIN_PRICE = 15
 _MAX_PRICE = 400
 _SYNONYM_MAP = {
@@ -588,6 +612,7 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
     s = _NOISE_RE.sub(" ", s)
     s = _OPTIONAL_RE.sub(" ", s)
     s = _PROMO_RE.sub(" ", s)
+    s = _PROMO_SUFFIX_RE.sub(" ", s)
     s = _PROMO_TAIL_RE.sub(" ", s)
     s = _QUANTITY_SUFFIX_RE.sub("", s).strip()
     s = re.sub(r"\s+", "", s)
@@ -644,7 +669,16 @@ def _is_junk_extracted_product_name(name: str) -> bool:
     compact = re.sub(r"\s+", "", text)
     if _is_price_label_name(compact):
         return True
+    if compact in _FRAGMENT_PRODUCT_NAMES:
+        return True
+    if re.fullmatch(r"(?:今日|會員|搭配|友善|購入)(?:價|\d+折|一)?", compact):
+        return True
     if re.fullmatch(r"(?:\d{1,3}|元|價格|售價|原價|會員|目前|特價|優惠|預購|加點數|點數)+", compact):
+        return True
+    if re.fullmatch(r"(?:\d+|元|塊|套餐|打折|點數|換|的話|會員|特價|優惠|任選)+", compact):
+        return True
+    digits = sum(ch.isdigit() for ch in compact)
+    if digits >= 2 and digits / max(len(compact), 1) >= 0.35 and re.search(r"(塊|套餐|打折|點數|換)", compact):
         return True
     promo_chars = sum(len(token) for token in re.findall(r"預購|加點數|點數|會員|特價|優惠|原價|售價|目前|元", compact))
     return promo_chars >= 2 and promo_chars / max(len(compact), 1) >= 0.5
@@ -762,17 +796,30 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             else post.product_name
         )
         items = extract_products_and_prices(extraction_name, post.brand)
+        cleaned_items = [_strip_product_item_promo_suffix(name, price) for name, price in items]
         if len(items) == 1 and items[0][0] == extraction_name and items[0][1] is None:
+            cleaned_name = _strip_product_name_promo_suffix(extraction_name)
+            if len(cleaned_name) >= 2 and not _is_junk_extracted_product_name(cleaned_name):
+                if cleaned_name == post.product_name:
+                    result.append(post)
+                else:
+                    result.append(_replace_post_product(post, cleaned_name, None))
+                continue
+            if _is_junk_extracted_product_name(extraction_name):
+                fallback_name = _title_fallback_product_name(post)
+                if fallback_name and len(fallback_name) >= 2:
+                    result.append(_replace_post_product(post, fallback_name, _primary_price_from_text(extraction_name)))
+                    continue
             result.append(post)
             continue
         valid_items = [
-            (name, price) for name, price in items
+            (name, price) for name, price in cleaned_items
             if not _GARBAGE_NAME_RE.match(name)
             and not _is_junk_extracted_product_name(name)
             and len(name) >= 2
         ]
         junk_items = [
-            (name, price) for name, price in items
+            (name, price) for name, price in cleaned_items
             if len(name) >= 2 and _is_junk_extracted_product_name(name)
         ]
         if not valid_items and junk_items:
@@ -807,6 +854,38 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             )
             result.append(new_post)
     return result
+
+
+def _strip_product_item_promo_suffix(name: str, price: int | None) -> tuple[str, int | None]:
+    return _strip_product_name_promo_suffix(name), price
+
+
+def _strip_product_name_promo_suffix(name: str) -> str:
+    text = unicodedata.normalize("NFKC", name or "").strip()
+    stripped = _PROMO_SUFFIX_RE.sub("", text).strip()
+    stripped = re.sub(r"\s+", "", stripped)
+    return stripped or text
+
+
+def _replace_post_product(post: Post, name: str, price: int | None) -> Post:
+    return Post(
+        id=post.id,
+        source=post.source,
+        board=post.board,
+        url=post.url,
+        title=post.title,
+        brand=post.brand,
+        product_name=name,
+        price=str(price) if price is not None else post.price,
+        author=post.author,
+        author_score=post.author_score,
+        review_text=post.review_text,
+        posted_at=post.posted_at,
+        is_reply=post.is_reply,
+        push_count=post.push_count,
+        comments=post.comments,
+        raw=post.raw,
+    )
 
 
 def normalize_product(brand: str, name: str) -> str:
