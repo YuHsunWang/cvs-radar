@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.pytest_cache/
+*.zip
+
+# Raw crawl output & local caches (never commit real PTT data)
+data/posts.jsonl
+.cvs_radar_seen.json
+data/labels/*draft*.csv

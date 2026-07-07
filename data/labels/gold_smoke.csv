@@ -1,0 +1,9 @@
+comment_id,source,board,post_id,post_url,post_title,post_brand,product_name,price,post_tag,comment_user,comment_tag,comment_text,comment_posted_at,context,sentiment,target_brand,is_comparative,favored_brand,notes
+sample-711-fuhang#000,PTT,CVS,sample-711-fuhang,https://www.ptt.cc/bbs/CVS/M.sample.html,[商品] 711 阜杭豆漿饅頭夾豬排蛋,7-11,阜杭豆漿饅頭夾豬排蛋,65,商品,alice,推,"好吃,饅頭很香",2026-06-01T12:10:00,貼文品牌=7-11; 商品=阜杭豆漿饅頭夾豬排蛋; tag=商品,正,本牌,否,不明,
+sample-711-fuhang#004,PTT,CVS,sample-711-fuhang,https://www.ptt.cc/bbs/CVS/M.sample.html,[商品] 711 阜杭豆漿饅頭夾豬排蛋,7-11,阜杭豆漿饅頭夾豬排蛋,65,商品,erin,噓,"太乾,踩雷",2026-06-01T12:14:00,貼文品牌=7-11; 商品=阜杭豆漿饅頭夾豬排蛋; tag=商品,負,本牌,否,不明,
+sample-family-salad#002,PTT,CVS,sample-family-salad,https://www.ptt.cc/bbs/CVS/M.sample2.html,[商品] 全家 健身G肉餐盒,全家,健身G肉餐盒,99,商品,erin,噓,"太貴,飯很乾",2026-06-05T18:07:00,貼文品牌=全家; 商品=健身G肉餐盒; tag=商品,負,本牌,否,不明,
+sample-family-salad#003,PTT,CVS,sample-family-salad,https://www.ptt.cc/bbs/CVS/M.sample2.html,[商品] 全家 健身G肉餐盒,全家,健身G肉餐盒,99,商品,marketer,推,全家這款超好吃推薦,2026-06-05T18:08:00,貼文品牌=全家; 商品=健身G肉餐盒; tag=商品,正,本牌,否,不明,
+gold-compare-own,PTT,CVS,gold-compare-own,,[商品] 全家 健身G肉餐盒,全家,健身G肉餐盒,99,商品,u1,推,雖然貴但比小7好吃,,貼文品牌=全家; 商品=健身G肉餐盒; tag=商品,正,本牌,是,本牌,轉折後本牌勝
+gold-compare-other,PTT,CVS,gold-compare-other,,[商品] 全家 健身G肉餐盒,全家,健身G肉餐盒,99,商品,u2,推,小7比全家便宜好吃,,貼文品牌=全家; 商品=健身G肉餐盒; tag=商品,正,他牌:7-11,是,他牌,他牌勝
+gold-mention-other,PTT,CVS,gold-mention-other,,[商品] 全家 健身G肉餐盒,全家,健身G肉餐盒,99,商品,u3,→,小7也有賣,,貼文品牌=全家; 商品=健身G肉餐盒; tag=商品,中性,他牌:7-11,否,不明,提到他牌但非比較
+gold-tie,PTT,CVS,gold-tie,,[商品] 全家 健身G肉餐盒,全家,健身G肉餐盒,99,商品,u4,→,全家跟小7差不多,,貼文品牌=全家; 商品=健身G肉餐盒; tag=商品,中性,無,是,平手,平手邊界案例
