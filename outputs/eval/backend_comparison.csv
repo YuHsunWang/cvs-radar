@@ -1,0 +1,3 @@
+dataset,backend,n_rows,sentiment_polarity_accuracy,meets_80pct_target,sample_caveat
+gold_smoke.csv,lexicon,8,1.0,true,gold_smoke has only 8 rows; statistically insufficient for representative validation
+gold_smoke.csv,snownlp,8,1.0,true,gold_smoke has only 8 rows; statistically insufficient for representative validation
