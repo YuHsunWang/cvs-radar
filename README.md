@@ -8,7 +8,8 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
-**[Live Demo](https://yuhsunwang.github.io/cvs-radar/)** ·
+**[Live Demo](https://cvs-radar.vercel.app/)** ·
+**[GitHub Pages Mirror](https://yuhsunwang.github.io/cvs-radar/)** ·
 **[評分決策](docs/DECISIONS.md)** ·
 **[標註規範](docs/labeling_guideline.md)**
 
@@ -158,6 +159,10 @@ Every push to `main` runs `.github/workflows/pages.yml`:
 4. deploy to `https://yuhsunwang.github.io/cvs-radar/`.
 
 CI runs backend and frontend checks independently through `.github/workflows/ci.yml`.
+
+The primary portfolio deployment is <https://cvs-radar.vercel.app/>. Vercel is
+connected to this repository with `web/` as its Root Directory; pushes to
+`main` create a new production deployment. GitHub Pages remains a static mirror.
 
 ## Limitations and Next Steps
 
