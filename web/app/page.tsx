@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { ChevronDown, FileText, X } from 'lucide-react'
+import { ChevronDown, ExternalLink, FileText, X } from 'lucide-react'
 import BrandChips from '@/components/BrandChips'
 import CategoryChips from '@/components/CategoryChips'
 import FilterSheet from '@/components/FilterSheet'
@@ -214,6 +214,30 @@ export default function HomePage() {
             </div>
           )}
         </div>
+
+        <footer className="border-t border-slate-200 px-4 py-5 text-xs font-semibold leading-5 text-slate-500">
+          <p>資料來自公開使用者內容，僅供選購參考；CVS Radar 並非 PTT 或便利商店品牌的官方評鑑。</p>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+            <a
+              href="https://github.com/YuHsunWang/cvs-radar"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[#0F7C7C] underline underline-offset-4"
+            >
+              GitHub
+              <ExternalLink size={13} aria-hidden="true" />
+            </a>
+            <a
+              href="https://yuhsunwang.github.io/knowledge-base-pages/projects/cvs-radar/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[#0F7C7C] underline underline-offset-4"
+            >
+              完整案例
+              <ExternalLink size={13} aria-hidden="true" />
+            </a>
+          </div>
+        </footer>
       </div>
 
       <FilterSheet
