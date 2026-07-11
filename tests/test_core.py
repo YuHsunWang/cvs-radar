@@ -23,6 +23,8 @@ from cvs_radar.parser import (
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
 from cvs_radar.scoring import (
+    _review_excerpt,
+    _review_sentences,
     _same_combo_flavor_product,
     _same_product,
     canonical_product_name,
@@ -587,6 +589,100 @@ class ScoringTest(unittest.TestCase):
         self.assertIn("firsthand", {c.user for c in report.contributors})
         self.assertNotIn("原來這麼雷", report.rep_negative)
         self.assertIn("我吃過真的難吃", report.rep_negative)
+
+
+class ReviewExcerptTest(unittest.TestCase):
+    def test_selects_purchase_relevant_sentences_in_source_order(self) -> None:
+        post = Post(
+            id="review",
+            review_text=(
+                "今天路過全家看到新品就買了\n"
+                "奶香很明顯，甜度不高\n"
+                "口感滑順但份量有點少\n"
+                "整體耐吃，應該會再回購！"
+            ),
+        )
+
+        excerpt = _review_excerpt([post])
+
+        self.assertEqual(
+            excerpt,
+            "奶香很明顯，甜度不高。 口感滑順但份量有點少。 整體耐吃，應該會再回購。",
+        )
+        self.assertNotIn("路過", excerpt)
+
+    def test_uses_distinct_evidence_across_multiple_posts(self) -> None:
+        posts = [
+            Post(id="taste", review_text="茶味很濃，尾韻帶一點苦味。", posted_at=datetime(2026, 6, 1)),
+            Post(id="value", review_text="份量足夠，這個價位算划算。", posted_at=datetime(2026, 6, 2)),
+        ]
+
+        excerpt = _review_excerpt(posts)
+
+        self.assertIn("茶味很濃", excerpt)
+        self.assertIn("份量足夠", excerpt)
+
+    def test_stops_at_signature_and_dedupes_near_identical_sentences(self) -> None:
+        posts = [
+            Post(id="one", review_text="口感很滑順，奶味也很香。\n--\n推文說價格太貴"),
+            Post(id="two", review_text="口感滑順，奶味很香。"),
+        ]
+
+        excerpt = _review_excerpt(posts)
+
+        self.assertNotIn("推文", excerpt)
+        self.assertEqual(excerpt.count("奶味"), 1)
+
+    def test_reconstructs_fixed_width_ptt_line_wraps(self) -> None:
+        post = Post(
+            id="wrapped",
+            review_text=(
+                "之前吃過一款桃我開心塔是\n\n"
+                "半顆杏桃搭配硬塔皮，這款\n\n"
+                "則是杏桃片搭配奶霜蛋糕，\n\n"
+                "切片後罐頭水蜜桃感降低，\n\n"
+                "加上柔軟奶霜蛋糕整體很順\n\n"
+                "口，有點像在吃迷你生日蛋\n\n"
+                "糕的感覺(?)\n\n--"
+            ),
+        )
+
+        excerpt = _review_excerpt([post])
+
+        self.assertIn("順口", excerpt)
+        self.assertNotIn("這款。", excerpt)
+        self.assertNotIn("生日蛋。", excerpt)
+        self.assertNotIn("(。", excerpt)
+
+    def test_respects_length_limit_without_cutting_a_sentence(self) -> None:
+        post = Post(id="short", review_text="茶味濃而且不會太甜。\n口感滑順，喝起來很清爽。")
+
+        excerpt = _review_excerpt([post], max_len=18)
+
+        self.assertLessEqual(len(excerpt), 18)
+        self.assertTrue(excerpt.endswith("。"))
+
+    def test_parenthetical_note_does_not_merge_with_next_opinion(self) -> None:
+        sentences = _review_sentences(
+            "（但補充一下因為還沒烤過之前就吃光了，所以不知道烤過會如何）\n"
+            "我覺得黑糖味道很濃郁而且不會太甜"
+        )
+
+        self.assertTrue(any(sentence.startswith("我覺得") for sentence in sentences))
+        self.assertTrue(all(")我覺得" not in sentence for sentence in sentences))
+
+    def test_removes_unmatched_parentheses_without_dropping_review_text(self) -> None:
+        posts = [
+            Post(id="open", review_text="奶味很香，是整體唯一救贖(。"),
+            Post(id="close", review_text=")口感偏硬，我不會再買。"),
+        ]
+
+        excerpt = _review_excerpt(posts)
+
+        self.assertNotIn("(", excerpt)
+        self.assertNotIn(")", excerpt)
+        self.assertIn("唯一救贖", excerpt)
+        self.assertIn("不會再買", excerpt)
 
 
 class ExtractionRegressionTest(unittest.TestCase):
@@ -1176,6 +1272,29 @@ class TimeAndServiceTest(unittest.TestCase):
 
 
 class AppHelperTest(unittest.TestCase):
+    def test_consensus_distribution_uses_zero_to_one_contributor_scores(self) -> None:
+        from cvs_radar.app_helpers import consensus_distribution
+        from cvs_radar.models import Contributor
+
+        report = ProductReport(
+            brand="7-11",
+            product_name="測試商品",
+            fair_score=60,
+            consensus="褒貶不一",
+            confidence="高",
+            n_eff=6,
+            score_std=0.3,
+            n_posts=1,
+            n_comments=3,
+            contributors=[
+                Contributor("positive", "commenter", 0.8, 3),
+                Contributor("neutral", "commenter", 0.5, 2),
+                Contributor("negative", "commenter", 0.2, 1),
+            ],
+        )
+
+        self.assertEqual(consensus_distribution(report), (50, 33, 17))
+
     def test_load_results_or_none_delegates_to_store_loader(self) -> None:
         from cvs_radar.app_helpers import load_results_or_none
 

@@ -1,202 +1,171 @@
-# CVS Radar — 超商食物評價雷達 (v0)
+# CVS Radar
 
-從 PTT `CVS` 板蒐集超商食物評價,做情感分析與可信度加權,為每個商品產出
-**公正分數**與**評價共識**(一致好評 / 評價兩極 …),幫你在超商現場快速避雷。
+> 把分散在 PTT CVS 板的超商商品心得，整理成站在貨架前也能快速理解的推薦依據。
 
-前端是一支手機優先的 shopper App:把分數、共識與真實心得整理成站在貨架前十秒能看懂的樣子。
+[![CI](https://github.com/YuHsunWang/cvs-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/YuHsunWang/cvs-radar/actions/workflows/ci.yml)
+[![GitHub Pages](https://github.com/YuHsunWang/cvs-radar/actions/workflows/pages.yml/badge.svg)](https://github.com/YuHsunWang/cvs-radar/actions/workflows/pages.yml)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
-本 v0 依 `CVS-Radar-PRD-v0.2.md` 實作。三項關鍵決議已內建:
-1. 作者自評分 + 推文 **合併成單一評分**。
-2. 可疑帳號 **只做內部降權,對外不公開個別標籤**。
-3. 作者與留言依 `cvs_radar.config.SCORING["role_weight"]` 加權,並套用貝氏收斂與信度下限。
+**[Live Demo](https://yuhsunwang.github.io/cvs-radar/)** ·
+**[評分決策](docs/DECISIONS.md)** ·
+**[標註規範](docs/labeling_guideline.md)**
 
-## 安裝
+CVS Radar 是一個端到端的 NLP 與資料產品專案。系統從公開討論中辨識商品、整合作者評價與留言情緒、降低可疑或重複訊號的影響，再以手機優先的介面呈現推薦分、共識、聲量與原文證據。公開網站使用去識別化的靜態資料，不包含帳號層級分析。
+
+## Product Preview
+
+<p align="center">
+  <img src="docs/screenshots/app-overview.png" width="360" alt="CVS Radar 商品搜尋、分類、品牌篩選與推薦排行" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/product-detail.png" width="334" alt="CVS Radar 商品推薦分、共識分布、作者評價與留言評價" />
+</p>
+
+## 使用者問題
+
+超商新品討論通常散落在不同文章與推文中。單看一篇心得容易受到作者偏好影響，直接看推文又必須自行判斷反諷、離題回覆與樣本數。CVS Radar 將這些訊號整理成可比較的商品層級資訊：
+
+- **今天想吃什麼？** 以正餐、甜點、冰品、飲料、麵包、零食快速縮小選擇。
+- **值得買嗎？** 收合卡片直接顯示推薦分、共識、聲量、日期與價格。
+- **大家為什麼喜歡或不喜歡？** 展開後依序閱讀作者評價、留言評價與原文。
+- **這個分數可靠嗎？** 低樣本商品不顯示推薦分或百分比分布，避免過度解讀。
+
+目前公開快照包含 **772 項商品**，支援 7-11、全家、萊爾富、OK、美聯社及其他通路。
+
+## 核心功能
+
+- NFKC 正規化即時搜尋，支援商品名稱與品牌。
+- 使用者意圖分類與品牌 chips，可交叉篩選。
+- 發文時間、討論聲量、推薦分皆可雙向排序。
+- 最低推薦分與發文日期區間篩選。
+- 手機優先的卡片式排行與 inline 詳情展開。
+- 作者評價萃取：保留口味、口感、份量、價格、回購意圖等完整句。
+- 留言正向／中立／負向共識分布與代表性優缺點。
+- 原文連結與清楚的資料不足狀態。
+- 純靜態 Next.js export，載入後所有查詢都在瀏覽器本地完成。
+
+## How It Works
+
+```mermaid
+flowchart LR
+    A[PTT CVS 公開文章] --> B[Crawler + Parser]
+    B --> C[商品辨識與名稱正規化]
+    C --> D[作者評分 + 留言情緒]
+    D --> E[每人每商品折一票]
+    E --> F[可信度權重 + 貝氏收斂]
+    F --> G[公平分數 / 共識 / 信心度]
+    G --> H[去識別化 results.json]
+    H --> I[Next.js 靜態網站]
+```
+
+### 評分與可信度
+
+1. 作者自評與留言情緒先轉為一致的 0–1 尺度。
+2. 同一帳號對同一商品折成一個立場，避免洗版放大影響。
+3. 作者自推、離題反應與純附和留言不納入計分。
+4. 可疑訊號只降低內部權重，不公開標記或指控個別帳號。
+5. 公平分數使用 50 分先驗做貝氏收斂，降低小樣本暴衝。
+6. 使用固定錨點將公平分數轉為穩定的推薦分；新增其他商品不會改變既有商品分數。
+7. 有效樣本不足時，前端只呈現「樣本少」，不顯示看似精確的推薦分與百分比。
+
+### 作者評價萃取
+
+萃取流程會跨同商品文章選擇最多三句與購買決策相關的完整句，兼顧味道、口感、份量、價格、食用方式與回購意圖。處理過程會移除網址、站台簽名、模板文字、近似重複內容與破損括號，但不以生成模型改寫作者意思。
+
 ```bash
-pip install -r requirements.txt
+python scripts/rebuild_review_excerpts.py --posts data/posts.jsonl
 ```
 
-## 使用
-```bash
-python run.py --demo               # 用離線樣本跑(無需網路)
-python run.py --demo --internal    # 額外顯示貢獻者與可疑分(維運用)
-python run.py --crawl --pages 5    # 實際爬 PTT(需網路)
-python run.py --demo --json out.json
-python run.py --demo --brand 7-11 --min-score 60 --limit 10
-```
-> 注意:開發沙箱擋掉 `ptt.cc`,`--crawl` 需在你自己有網路的機器執行。
-> `--demo` 使用 `cvs_radar/sample_data.py` 的離線範例貼文(仿真情境、非真實帳號)以驗證分析邏輯。
+## Privacy by Design
 
-## 架構
-```
-PTT → crawler → parser → [Post]
-                            │  sentiment(推噓先驗+詞典)
-                            ▼
-                     preference(帳號偏好 + 可疑分)
-                            │  → 信度權重
-                            ▼
-                     scoring(50/50 合併 + 貝氏收斂 + 每人折一票)
-                            │
-                            ▼
-                     consensus(一致/兩極/資料不足) → reporting(去識別化)
-```
+- 公開前端只讀取商品層級的 `web/public/data.json`。
+- 帳號 profile、contributors 與可疑分數不會輸出到網站。
+- 公開資料保留原文連結以便查證，但不建立公開個人評分檔案。
+- 可疑偵測被視為降權用弱訊號，而不是對真實使用者的判定。
 
-| 檔案 | 職責 |
+## Tech Stack
+
+| Layer | Technology |
 |---|---|
-| `cvs_radar/config.py` | 品牌表 + 所有可調參數(PRD §14) |
-| `cvs_radar/models.py` | 資料模型 |
-| `cvs_radar/crawler.py` | PTT 爬取(速率限制、重試、增量快取) |
-| `cvs_radar/parser.py` | 解析文章欄位 + 推文(含邊界情況) |
-| `cvs_radar/sentiment.py` | 留言情感(推噓標籤 + 中文詞典,可插拔) |
-| `cvs_radar/preference.py` | 帳號品牌偏好 + 可疑訊號 |
-| `cvs_radar/scoring.py` | 商品識別 + 公正分數 + 共識分類 |
-| `cvs_radar/pipeline.py` | 串接主線 |
-| `cvs_radar/reporting.py` | 文字 / JSON 輸出(對外去識別化) |
-| `cvs_radar/sample_data.py` | 離線樣本(含 PRD 端到端情境商品) |
-| `scoring.py` | 舊路徑相容匯出 |
+| Data collection | Python, Requests, Beautiful Soup |
+| NLP / scoring | Rule-based sentiment, SnowNLP adapter, Bayesian shrinkage |
+| Service layer | Framework-independent query API, FastAPI adapter |
+| Web | Next.js 15, React 19, TypeScript, Tailwind CSS, Lucide |
+| Quality | Pytest, Vitest, Ruff, TypeScript / Next.js production build |
+| Deployment | GitHub Actions, GitHub Pages static export |
 
-## 設計重點
-- **推噓標籤為情感主訊號**:PTT 短留言反諷多,純文字模型誤判率高;推/噓是作者明確表態,最可靠。詞典只做微調。後端可換 SnowNLP / LLM。
-- **貝氏收斂**:低樣本商品不會因一兩則極端留言爆衝;向先驗 μ0 收斂並回報信心度。
-- **每人每商品折一票 + 作者自推排除**:避免單一帳號洗版主導。
-- **可疑帳號降權而非過濾**:保留資訊、降低操作影響,且可解釋;低於活動量門檻不評分。
+## Repository Structure
 
-## 測試
-```bash
-python -m unittest discover -s tests
+```text
+cvs_radar/                 parsing, sentiment, scoring, service and reporting
+scripts/                   audit, labeling and excerpt rebuild utilities
+tests/                     backend and data-build regression tests
+web/
+  app/                     Next.js App Router entry
+  components/              filters, product cards and detail views
+  lib/                     typed search, filter and sort logic
+  public/data.json         de-identified browser payload
+data/results.json          precomputed product-level snapshot
+docs/screenshots/          portfolio screenshots generated from production build
+.github/workflows/         CI and GitHub Pages deployment
 ```
 
-測試涵蓋 PTT 欄位解析、分數邊界格式、商品正規化、同帳號折票、作者自推排除、公開 JSON 去識別化。
+## Run Locally
 
-## 已知限制(詳見 PRD §11)
-- 可疑偵測是**啟發式弱訊號**,真實品牌粉與工讀生難以區分 → 故僅內部降權、不公開指控。
-- 情感詞典為種子版,反諷/迷因仍會誤判。
-- 商品識別 v0 以品牌+正規化名,名稱變體可能誤分(模糊比對列為後續)。
-
-## 後續(v1)
-接 Dcard(`Source` 介面已預留)、情感換 LLM、簡易查詢介面 / Web dashboard。
-## 更多用法
-
-## CLI
+### Web app
 
 ```bash
-# 列出目前資料中的品牌
-python run.py --demo --list-brands
-
-# 指定日期區間，只用該區間內的貼文/留言重新評分
-python run.py --demo --start-date 2026-06-01 --end-date 2026-06-07
-
-# 近 N 天篩選
-python run.py --demo --recent-days 14
-
-# 指定品牌後輸出該品牌商品排名，並套用最低分與樣本條件
-python run.py --demo --brand 7-11 --min-score 50 --min-n-eff 1 --min-comments 1 --limit 10
-
-# 爬 PTT 後套用同樣條件
-python run.py --crawl --pages 5 --recent-days 30 --brand 7-11
+cd web
+npm ci
+npm run build:data
+npm test
+npm run dev
 ```
 
-## 服務層 API
+Open `http://localhost:3000`.
 
-前端或 HTTP handler 可直接呼叫 `cvs_radar.service`：
-
-```python
-from cvs_radar.sample_data import load_sample
-from cvs_radar.service import ProductQuery, list_brands, query_products, select_reviews
-
-posts = load_sample()
-selected = select_reviews(posts, start_date="2026-06-01", end_date="2026-06-07")
-brands = list_brands(posts)
-result = query_products(posts, ProductQuery(brand="7-11", min_score=50, recent_days=30))
-payload = result.to_dict()
-```
-
-時間篩選會同時約束貼文與留言；若舊貼文下有落在區間內的新留言，系統會保留商品脈絡與該留言，但不使用舊貼文作者評分。
-
-## Streamlit shopper App（手機優先）
-
-安裝依賴並啟動：
+### Data pipeline and API
 
 ```bash
-pip install -r requirements.txt
-streamlit run app.py
-# 若 streamlit 指令不在 PATH，可改用：
-python -m streamlit run app.py
-```
-
-介面是為「站在超商貨架前快速挑選」設計的手機單欄版面。資料一律用本地預算結果（`data/results.json`），不連網，也沒有資料來源選單。公開版的 `data/results.json` 已去識別化，僅保留商品層級的公正分數與共識，不含任何帳號或逐帳號剖繪。
-
-列表上方常駐這些篩選：
-
-- 搜尋框：直接打商品名或品牌，即時縮小清單。
-- 分類、品牌 chips：一點就切換（品牌順序 7-11 / 全家 / 萊爾富 / OK / 其他）。
-- 發文區間 chips：全部 / 近 7 天 / 近 30 天 / 近 90 天 / 近半年。
-- 更多條件：最低分、最低有效樣本、最少貼文與留言收在這顆按鈕裡。
-
-每一列用顏色標出綜合分數（綠 / 黃 / 紅）、實際正向比例，以及這則判斷是幾則留言算來的。點任一列，該商品的單品判斷（喜歡的點、要留意的點、聲量、原PO心得節錄、討論連結）就地展開。UI 只負責輸入與呈現，查詢與排名走 `cvs_radar.service`；預算結果的載入用 `st.cache_data` 快取，避免每次互動重讀。
-
-## FastAPI JSON 端點
-
-啟動 API：
-
-```bash
-uvicorn cvs_radar.api:app --reload
-# 若 uvicorn 指令不在 PATH，可改用：
+python -m pip install -r requirements.txt
+python run.py --demo
 python -m uvicorn cvs_radar.api:app --reload
 ```
 
-常用端點：
+The demo source is offline and uses synthetic sample posts. Crawling requires network access and should respect the source site's rate limits and terms.
+
+## Verification
 
 ```bash
-curl "http://127.0.0.1:8000/health"
-curl "http://127.0.0.1:8000/brands?source=demo&recent_days=30"
-curl "http://127.0.0.1:8000/products?source=demo&brand=7-11&min_score=50&limit=10"
+python -m pytest -q
+ruff check cvs_radar scripts tests web/build_data.py
+
+cd web
+npm test
+npm run build
 ```
 
-API 預設使用 demo 離線資料；只有明確傳入 `source=crawl` 時才會嘗試連線抓取。
+The current suite covers parsing edge cases, product normalization, sentiment attribution, one-user caps, consensus distribution, author excerpt extraction, score calibration, search, category and brand filtering, date boundaries, six sort modes and static production export.
 
-## 人工標註與離線評測
+## GitHub Pages
 
-這套流程用來建立 gold labels，之後比較現有規則與 LLM/fine-tune 模型。預設只使用 `cvs_radar.sample_data`，不需要網路或 API key。
+Every push to `main` runs `.github/workflows/pages.yml`:
 
-### 1. 產生待標 CSV
+1. rebuild the de-identified frontend payload;
+2. build the Next.js static export with the `/cvs-radar` base path;
+3. upload `web/out` as a Pages artifact;
+4. deploy to `https://yuhsunwang.github.io/cvs-radar/`.
 
-```bash
-python -m cvs_radar.labeling --source demo --output data/labels/to_label.csv --limit 50
-```
+CI runs backend and frontend checks independently through `.github/workflows/ci.yml`.
 
-欄位包含留言文字、貼文品牌、商品、tag、context，以及空白標註欄：
-`sentiment`, `target_brand`, `is_comparative`, `favored_brand`, `notes`。
+## Limitations and Next Steps
 
-若未來要改用 crawl 來源：
+- Rule-based sentiment still has difficulty with sarcasm, memes and implicit comparisons.
+- Product grouping relies on normalized names and may split or merge unusual naming variants.
+- The current public site is a precomputed snapshot rather than a real-time feed.
+- Future work: larger manually labeled gold set, calibrated model comparison, additional public sources and scheduled snapshot refresh.
 
-```bash
-python -m cvs_radar.labeling --source crawl --pages 5 --output data/labels/to_label.csv
-```
+## Disclaimer
 
-### 2. 人工標註
-
-請依照 `docs/labeling_guideline.md` 填寫：
-
-- `sentiment`: `正` / `負` / `中性`
-- `target_brand`: `本牌` / `他牌:<品牌>` / `無`
-- `is_comparative`: `是` / `否`
-- `favored_brand`: `本牌` / `他牌` / `平手` / `不明`
-
-### 3. 跑規則 baseline 評測
-
-repo 內建 smoke gold：
-
-```bash
-python -m cvs_radar.evaluation --gold data/labels/gold_smoke.csv
-python -m cvs_radar.evaluation --gold data/labels/gold_smoke.csv --json data/labels/rules_report.json
-```
-
-評測會輸出：
-
-- `sentiment_polarity`: 情感三分類 accuracy / macro precision / macro recall / macro F1
-- `comparative_detection`: 是否比較句的 binary accuracy / precision / recall / F1
-- `competitor_preference_detection`: 是否判為他牌勝出的 binary metrics
-- `favored_direction`: 僅在 gold 比較句上評估 `本牌` / `他牌` / `平手` / `不明`
-- `target_brand`: `本牌` / `他牌` / `無` 的輔助評估
-
-`cvs_radar.evaluation.Predictor` 是預留介面；目前可用 `RuleBasedPredictor`，之後可接 LLM predictor，但規則 baseline 不依賴網路。
+This is an independent portfolio project and is not affiliated with PTT or any convenience-store brand. Product opinions are derived from public user-generated content and should be treated as decision support, not objective product quality claims.

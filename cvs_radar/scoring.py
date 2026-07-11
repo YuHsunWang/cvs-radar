@@ -28,7 +28,7 @@ from .config import (
 from .models import Comment, Contributor, Post, ProductReport
 from .parser import _title_product_name
 from .preference import AccountProfile
-from .sentiment import POSITIVE_WORDS
+from .sentiment import NEGATIVE_WORDS, POSITIVE_WORDS
 
 
 _BRACKET_RE = re.compile(r"[\[\(（【].*?[\]\)）】]")
@@ -1579,6 +1579,32 @@ _EXCERPT_DROP_RE = re.compile(
     r"^\s*(?:https?://|[（(]?區域型商品|試吃試用品|[-—─＝=]{2,}|※|◎|●|▲|Sent from|發信站|文章網址|批踢踢|˙|·)"
 )
 _EXCERPT_LABEL_RE = re.compile(r"^\s*[【\[]?\s*(?:心得|商品名稱|商品|便利商店|廠商名稱|價格|評分|分數|口味)\s*[】\]]?\s*[:：]")
+_EXCERPT_SENTENCE_RE = re.compile(r"[^。！？!?；;\n]+[。！？!?；;]?")
+_EXCERPT_SIGNATURE_RE = re.compile(r"^\s*(?:--+|Sent from|※\s*發信站|發信站|文章網址)", re.IGNORECASE)
+_EXCERPT_INTRO_RE = re.compile(r"(今天|昨天|之前|記得|原本|剛剛|下班|路過|逛到|看到|買來|入手|開箱|分享|先上圖)")
+_EXCERPT_FIRST_HAND_RE = re.compile(r"(我|自己|吃起來|喝起來|入口|咬下|回購|再買|不會再買)")
+_EXCERPT_SENTENCE_START_RE = re.compile(
+    r"^(?:味道|口感|整體|價格|價位|份量|吃起來|喝起來|我自己|我覺得|建議|另外|而且|重要的是)"
+)
+_EXCERPT_DECISION_TERMS = (
+    "回購",
+    "再買",
+    "不會再買",
+    "推薦",
+    "不推",
+    "值得",
+    "可以試",
+    "不值得",
+    "耐吃",
+)
+_EXCERPT_ASPECT_TERMS: dict[str, tuple[str, ...]] = {
+    "taste": ("味道", "口味", "甜", "鹹", "酸", "苦", "辣", "香", "濃", "淡", "膩", "奶味", "茶味", "咖啡味"),
+    "texture": ("口感", "軟", "硬", "脆", "酥", "滑順", "綿密", "濕潤", "乾", "柴", "嫩", "Q彈", "嚼勁"),
+    "portion": ("份量", "內容量", "大小", "飽足", "吃不飽", "給得多", "給的多", "太少"),
+    "value": ("價格", "價位", "划算", "便宜", "偏貴", "太貴", "CP值", "cp值"),
+    "preparation": ("加熱", "微波", "冷藏", "退冰", "融化", "冰過", "熱熱吃", "冷冷吃"),
+    "comparison": ("比較像", "比起", "不如", "勝過", "還原度", "類似", "更好吃", "比較好"),
+}
 
 DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH = "data/labels/review_excerpt_batch_scored.csv"
 
@@ -1599,34 +1625,221 @@ def _load_review_excerpt_overrides(path: str = DEFAULT_REVIEW_EXCERPT_OVERRIDES_
     return overrides
 
 
-def _review_excerpt(posts: list[Post], max_len: int = 120) -> str:
-    """從發文者的心得內文擷取重點句，供選購參考（原文節錄，不改寫）。"""
-    best = max(posts, key=lambda p: len(p.review_text or ""), default=None)
-    if best is None or not (best.review_text or "").strip():
-        return ""
-    text = unicodedata.normalize("NFKC", best.review_text)
-    lines: list[str] = []
+@dataclass(frozen=True, slots=True)
+class _ReviewCandidate:
+    text: str
+    score: float
+    aspects: frozenset[str]
+    post_index: int
+    sentence_index: int
+
+
+def _review_excerpt(posts: list[Post], max_len: int = 180, max_sentences: int = 3) -> str:
+    """Select diverse, purchase-relevant sentences from every author review."""
+
+    candidates = _review_candidates(posts)
+    selected: list[_ReviewCandidate] = []
+    covered_aspects: set[str] = set()
+
+    while candidates and len(selected) < max_sentences:
+        ranked = sorted(
+            candidates,
+            key=lambda item: (
+                -(item.score + 2.0 * len(item.aspects - covered_aspects)),
+                item.post_index,
+                item.sentence_index,
+                item.text,
+            ),
+        )
+        chosen = None
+        for candidate in ranked:
+            if any(_review_sentences_similar(candidate.text, item.text) for item in selected):
+                continue
+            rendered = _render_review_sentences([*selected, candidate])
+            if len(rendered) <= max_len:
+                chosen = candidate
+                break
+        if chosen is None:
+            break
+        selected.append(chosen)
+        covered_aspects.update(chosen.aspects)
+        candidates.remove(chosen)
+
+    return _render_review_sentences(selected)
+
+
+def _review_candidates(posts: list[Post]) -> list[_ReviewCandidate]:
+    candidates: list[_ReviewCandidate] = []
+    ordered_posts = sorted(
+        posts,
+        key=lambda post: (post.posted_at.isoformat() if post.posted_at else "", post.id),
+        reverse=True,
+    )
+
+    for post_index, post in enumerate(ordered_posts):
+        for sentence_index, sentence in enumerate(_review_sentences(post.review_text)):
+            compact = re.sub(r"\s+", "", sentence).casefold()
+            aspects = frozenset(
+                aspect
+                for aspect, terms in _EXCERPT_ASPECT_TERMS.items()
+                if any(term.casefold() in compact for term in terms)
+            )
+            decision_hits = sum(term.casefold() in compact for term in _EXCERPT_DECISION_TERMS)
+            sentiment_hits = sum(
+                term.casefold() in compact
+                for term in {*POSITIVE_WORDS, *NEGATIVE_WORDS}
+                if len(term) >= 2
+            )
+            if not aspects and not decision_hits and not sentiment_hits:
+                continue
+
+            score = 3.0 * len(aspects) + 2.5 * min(decision_hits, 2) + 1.25 * min(sentiment_hits, 3)
+            if 12 <= len(sentence) <= 80:
+                score += 1.0
+            if _EXCERPT_FIRST_HAND_RE.search(sentence):
+                score += 0.75
+            if _EXCERPT_INTRO_RE.search(sentence):
+                score -= 2.5
+            if post.author_score is not None:
+                score += min(abs(post.author_score - 50) / 50, 1.0)
+            score += min(sentence_index, 10) * 0.05
+            candidates.append(
+                _ReviewCandidate(
+                    text=sentence,
+                    score=score,
+                    aspects=aspects,
+                    post_index=post_index,
+                    sentence_index=sentence_index,
+                )
+            )
+    return candidates
+
+
+def _review_sentences(review_text: str) -> list[str]:
+    sentences: list[str] = []
+    text = unicodedata.normalize("NFKC", review_text or "")
+    blocks: list[list[str]] = []
+    block: list[str] = []
+
+    def flush_block() -> None:
+        if block:
+            blocks.append(block.copy())
+            block.clear()
+
     for raw_line in text.splitlines():
         line = raw_line.strip()
-        if len(line) < 4:
+        if _EXCERPT_SIGNATURE_RE.search(line):
+            flush_block()
+            break
+        if not line:
             continue
         if _URL_RE.search(line) or _EXCERPT_DROP_RE.search(line):
+            flush_block()
             continue
         line = _EXCERPT_LABEL_RE.sub("", line).strip()
-        if len(line) < 4:
-            continue
-        lines.append(line)
+        line = re.sub(r"\(\s*[?!？]?\s*\)", "", line)
+        if len(line) >= 4:
+            block.append(line)
+    flush_block()
+
+    for lines in blocks:
+        sources = ["".join(lines)] if _looks_hard_wrapped(lines) else _merge_wrapped_review_lines(lines)
+        for source in sources:
+            for match in _EXCERPT_SENTENCE_RE.finditer(source):
+                fragment = re.sub(r"\s+", " ", match.group(0)).strip(" ：:、-—─")
+                for sentence in _chunk_review_fragment(fragment):
+                    if 6 <= len(sentence) <= 140:
+                        sentences.append(sentence)
+    return sentences
+
+
+def _looks_hard_wrapped(lines: list[str]) -> bool:
+    if len(lines) < 4:
+        return False
+    common_length, count = Counter(len(line) for line in lines).most_common(1)[0]
+    return common_length >= 10 and count >= 3 and count / len(lines) >= 0.5
+
+
+def _merge_wrapped_review_lines(lines: list[str]) -> list[str]:
     if not lines:
-        return ""
-    excerpt = ""
-    for line in lines:
-        candidate = f"{excerpt} {line}".strip() if excerpt else line
-        if len(candidate) > max_len:
-            if not excerpt:
-                excerpt = line[:max_len].rstrip()
-            break
-        excerpt = candidate
-    return excerpt
+        return []
+    merged: list[str] = []
+    current = lines[0]
+    previous = lines[0]
+    for line in lines[1:]:
+        continues = previous.endswith((",", "，", "、", ":", "：")) or (
+            len(previous) >= 28 and not re.search(r"[。！？!?；;)）]$", previous)
+        )
+        if continues:
+            separator = "。" if _EXCERPT_SENTENCE_START_RE.search(line) else ""
+            current += separator + line
+        else:
+            merged.append(current)
+            current = line
+        previous = line
+    merged.append(current)
+    return merged
+
+
+def _chunk_review_fragment(fragment: str, target_len: int = 70) -> list[str]:
+    if len(fragment) <= target_len:
+        return [fragment]
+
+    clauses = [clause.strip() for clause in re.split(r"[,，]", fragment) if clause.strip()]
+    if len(clauses) <= 1:
+        return [fragment]
+    if len(clauses) >= 3 and _EXCERPT_INTRO_RE.search(clauses[0]):
+        clauses = clauses[1:]
+
+    chunks: list[str] = []
+    current = ""
+    for clause in clauses:
+        candidate = f"{current},{clause}" if current else clause
+        if current and len(candidate) > target_len and len(current) >= 18:
+            chunks.append(current)
+            current = clause
+        else:
+            current = candidate
+    if current:
+        chunks.append(current)
+    return chunks
+
+
+def _review_sentences_similar(left: str, right: str) -> bool:
+    left_key = re.sub(r"[^\w\u4e00-\u9fff]+", "", left).casefold()
+    right_key = re.sub(r"[^\w\u4e00-\u9fff]+", "", right).casefold()
+    if not left_key or not right_key:
+        return False
+    if left_key in right_key or right_key in left_key:
+        return True
+    return SequenceMatcher(None, left_key, right_key).ratio() >= 0.78
+
+
+def _remove_unmatched_parentheses(text: str) -> str:
+    """Drop stray parentheses while preserving the review text around them."""
+
+    open_indexes: list[int] = []
+    remove_indexes: set[int] = set()
+    for index, char in enumerate(text):
+        if char == "(":
+            open_indexes.append(index)
+        elif char == ")":
+            if open_indexes:
+                open_indexes.pop()
+            else:
+                remove_indexes.add(index)
+    remove_indexes.update(open_indexes)
+    return "".join(char for index, char in enumerate(text) if index not in remove_indexes)
+
+
+def _render_review_sentences(candidates: list[_ReviewCandidate]) -> str:
+    rendered = []
+    for candidate in sorted(candidates, key=lambda item: (item.post_index, item.sentence_index)):
+        sentence = _remove_unmatched_parentheses(candidate.text)
+        sentence = sentence.replace(",", "，").strip("。！？!?；; ，")
+        if sentence:
+            rendered.append(f"{sentence}。")
+    return " ".join(rendered)
 
 
 def _rep_comments(posts: list[Post], k: int = 3) -> tuple[list[str], list[str]]:
