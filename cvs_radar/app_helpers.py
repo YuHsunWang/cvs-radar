@@ -220,9 +220,10 @@ def consensus_distribution(report: ProductReport) -> tuple[int, int, int] | None
         weight = max(float(contributor.weight), 0.0)
         if weight == 0:
             continue
-        if contributor.score > POLARITY_NEUTRAL_BAND:
+        centered_score = 2 * float(contributor.score) - 1
+        if centered_score > POLARITY_NEUTRAL_BAND:
             totals["positive"] += weight
-        elif contributor.score < -POLARITY_NEUTRAL_BAND:
+        elif centered_score < -POLARITY_NEUTRAL_BAND:
             totals["negative"] += weight
         else:
             totals["neutral"] += weight
