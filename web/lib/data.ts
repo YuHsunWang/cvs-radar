@@ -53,15 +53,6 @@ export const categoryGroups = {
 export type CategoryKey = keyof typeof categoryGroups
 export const categoryKeys = Object.keys(categoryGroups) as CategoryKey[]
 
-export async function loadProducts(): Promise<DataPayload> {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-  const response = await fetch(`${basePath}/data.json`, { cache: 'no-store' })
-  if (!response.ok) {
-    throw new Error('Unable to load product data')
-  }
-  return response.json()
-}
-
 export function normalizeText(value: string): string {
   return value.normalize('NFKC').toLocaleLowerCase('zh-TW')
 }
