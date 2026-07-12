@@ -1272,6 +1272,15 @@ class TimeAndServiceTest(unittest.TestCase):
 
 
 class AppHelperTest(unittest.TestCase):
+    def test_volume_label_caps_single_post_high_confidence_reports(self) -> None:
+        from cvs_radar.app_helpers import volume_label
+
+        single_post = ProductReport("7-11", "單篇商品", 80, "一致好評", "高", 9, 0.1, 1, 10)
+        multi_post = ProductReport("7-11", "多篇商品", 80, "一致好評", "高", 9, 0.1, 2, 10)
+
+        self.assertEqual(volume_label(single_post), "聲量中等")
+        self.assertEqual(volume_label(multi_post), "聲量充足")
+
     def test_consensus_distribution_uses_zero_to_one_contributor_scores(self) -> None:
         from cvs_radar.app_helpers import consensus_distribution
         from cvs_radar.models import Contributor
