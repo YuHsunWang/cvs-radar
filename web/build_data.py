@@ -43,6 +43,14 @@ def calibrate_recommendation_scores(reports: list[Any]) -> dict[str, int]:
     }
 
 
+def display_confidence(report: Any) -> str:
+    """Keep public confidence labels from overstating a single discussion thread."""
+
+    if report.n_posts < 2 and report.confidence == "高":
+        return "中"
+    return report.confidence
+
+
 def to_product(report: Any, recommendation_score: int | None = None) -> dict[str, Any]:
     distribution = None
     if report.confidence != "低" and report.consensus != "資料不足":
@@ -67,7 +75,7 @@ def to_product(report: Any, recommendation_score: int | None = None) -> dict[str
         "fairScore": round(fair_score) if fair_score is not None else None,
         "recommendationScore": recommendation_score,
         "consensus": report.consensus,
-        "confidence": report.confidence,
+        "confidence": display_confidence(report),
         "nPosts": report.n_posts,
         "nComments": report.n_comments,
         "volumeLevel": clean_volume_label(volume_label(report)),

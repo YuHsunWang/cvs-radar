@@ -253,4 +253,6 @@ def volume_label(report: ProductReport) -> str:
     tier = _VOLUME_TIER.get(report.confidence, "不足")
     if report.consensus == "資料不足":
         tier = "不足"
+    elif report.n_posts < 2 and tier == "充足":
+        tier = "中等"
     return f"聲量{tier}"
