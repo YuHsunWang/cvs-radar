@@ -37,7 +37,7 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
   const detailId = useId()
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-3 shadow-card transition hover:border-[#0F7C7C]/40">
+    <article className={`rounded-lg border border-slate-200 bg-white p-3 shadow-card transition hover:border-[#0F7C7C]/40 ${isExpanded ? 'lg:col-span-2' : ''}`}>
       <button
         type="button"
         aria-expanded={isExpanded}

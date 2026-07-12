@@ -107,7 +107,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#F7F5EF] text-slate-900">
-      <div className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FCFAF5] shadow-2xl shadow-slate-300/50">
+      <div className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FCFAF5] shadow-2xl shadow-slate-300/50 lg:max-w-4xl">
         <TopBar
           activeFilterCount={activeFilterLabels.length}
           brand={brand}
@@ -186,7 +186,7 @@ export default function HomePage() {
               沒有符合條件的商品
             </div>
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-3 lg:space-y-0">
               {displayedProducts.map((product, index) => (
                 <ProductCard
                   key={product.id}
