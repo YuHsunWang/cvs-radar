@@ -116,24 +116,20 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
           <div className="mt-3 grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
             <label className="min-w-0 text-sm font-bold text-slate-600">
               起始日期
-              <input
-                type="date"
+              <LocalizedDateInput
                 min={dateBounds.minDate}
                 max={draft.toDate || dateBounds.maxDate}
                 value={draft.fromDate}
-                onChange={(event) => setDraft({ ...draft, fromDate: event.target.value })}
-                className="mt-1.5 min-h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-sm font-semibold text-slate-900"
+                onChange={(value) => setDraft({ ...draft, fromDate: value })}
               />
             </label>
             <label className="min-w-0 text-sm font-bold text-slate-600">
               結束日期
-              <input
-                type="date"
+              <LocalizedDateInput
                 min={draft.fromDate || dateBounds.minDate}
                 max={dateBounds.maxDate}
                 value={draft.toDate}
-                onChange={(event) => setDraft({ ...draft, toDate: event.target.value })}
-                className="mt-1.5 min-h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-sm font-semibold text-slate-900"
+                onChange={(value) => setDraft({ ...draft, toDate: value })}
               />
             </label>
           </div>
@@ -169,4 +165,50 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
 
 function formatDate(value: string): string {
   return value ? value.replaceAll('-', '/') : '載入中'
+}
+
+type LocalizedDateInputProps = {
+  min: string
+  max: string
+  value: string
+  onChange: (value: string) => void
+}
+
+function LocalizedDateInput({ min, max, value, onChange }: LocalizedDateInputProps) {
+  const [text, setText] = useState(value ? formatDate(value) : '')
+
+  useEffect(() => {
+    setText(value ? formatDate(value) : '')
+  }, [value])
+
+  function commit(nextText: string) {
+    const nextValue = parseDate(nextText)
+    if (!nextText || (nextValue && nextValue >= min && nextValue <= max)) {
+      onChange(nextValue ?? '')
+    }
+  }
+
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      placeholder="年/月/日"
+      aria-label="請以年/月/日輸入"
+      value={text}
+      onChange={(event) => {
+        const nextText = event.target.value
+        setText(nextText)
+        commit(nextText)
+      }}
+      onBlur={() => setText(value ? formatDate(value) : '')}
+      className="mt-1.5 min-h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-sm font-semibold text-slate-900"
+    />
+  )
+}
+
+function parseDate(value: string): string | null {
+  const normalized = value.replaceAll('/', '-')
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return null
+  const date = new Date(`${normalized}T00:00:00Z`)
+  return date.toISOString().slice(0, 10) === normalized ? normalized : null
 }

@@ -85,7 +85,7 @@ export function filterByBrand(products: Product[], brand: string | null): Produc
 export function filterByCategory(products: Product[], category: CategoryKey | null): Product[] {
   if (!category) return products
   const includedCategories: readonly string[] = categoryGroups[category]
-  return products.filter((product) => includedCategories.includes(displayCategory(product.category)))
+  return products.filter((product) => includedCategories.includes(product.category.trim() || '其他'))
 }
 
 export function applyAdvanced(products: Product[], filters: AdvancedFilters): Product[] {
@@ -176,7 +176,11 @@ export function displayBrand(brand: string): string {
 }
 
 export function displayCategory(category: string): string {
-  return category.trim() || '其他'
+  const rawCategory = category.trim() || '其他'
+  return categoryKeys.find((key) => {
+    const groupedCategories: readonly string[] = categoryGroups[key]
+    return groupedCategories.includes(rawCategory)
+  }) ?? '其他'
 }
 
 export function consensusTone(consensus: string): 'good' | 'mixed' | 'low' {

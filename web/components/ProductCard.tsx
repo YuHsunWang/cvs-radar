@@ -67,7 +67,7 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
             </p>
             <p className="text-slate-500">最新發文 {product.latestDate?.replaceAll('-', '/') ?? '日期未知'}</p>
             <span className="inline-flex rounded-md border border-slate-300 bg-slate-50 px-2 py-0.5 text-slate-600">
-              {product.price == null ? '價格未知' : `$${product.price}`} · {displayCategory(product.category)}
+              {product.price == null ? displayCategory(product.category) : `$${product.price} · ${displayCategory(product.category)}`}
             </span>
           </div>
         </div>
