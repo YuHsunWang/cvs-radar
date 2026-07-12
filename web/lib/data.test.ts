@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { Product, applyAdvanced, filterByCategory, formatDisplayDate, sortProducts } from './data'
+import { Product, applyAdvanced, displayCategory, filterByCategory, formatDisplayDate, sortProducts } from './data'
 
 function product(overrides: Partial<Product>): Product {
   return {
@@ -77,6 +77,14 @@ describe('filterByCategory', () => {
 
   it('returns every product when no category is selected', () => {
     expect(filterByCategory(products, null)).toEqual(products)
+  })
+})
+
+describe('displayCategory', () => {
+  it('uses the same vocabulary as the category chips without changing filter groups', () => {
+    expect(displayCategory('便當')).toBe('正餐')
+    expect(displayCategory('乳品')).toBe('飲料')
+    expect(displayCategory('')).toBe('其他')
   })
 })
 

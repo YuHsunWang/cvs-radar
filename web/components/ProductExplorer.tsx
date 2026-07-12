@@ -85,6 +85,14 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
     })
   }
 
+  function clearSearchAndFilters() {
+    setQuery('')
+    setBrand(null)
+    setCategory(null)
+    setFilters({ minScore: 0, fromDate: '', toDate: '' })
+    setVisibleCount(PAGE_SIZE)
+  }
+
   return (
     <main className="min-h-screen bg-[#F7F5EF] text-slate-900">
       <div className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FCFAF5] shadow-2xl shadow-slate-300/50 lg:max-w-4xl">
@@ -156,7 +164,14 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
 
           {visibleProducts.length === 0 ? (
             <div className="rounded-lg border border-slate-200 bg-white p-6 text-center text-slate-500">
-              沒有符合條件的商品
+              <p>沒有符合條件的商品</p>
+              <button
+                type="button"
+                onClick={clearSearchAndFilters}
+                className="mt-3 inline-flex rounded-md px-3 py-2 font-black text-[#0F7C7C] underline decoration-[#0F7C7C]/30 underline-offset-4 hover:bg-[#0F7C7C]/5"
+              >
+                清除搜尋與篩選
+              </button>
             </div>
           ) : (
             <div className="space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-3 lg:space-y-0">
