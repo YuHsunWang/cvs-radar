@@ -95,6 +95,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
           generatedAt={initialPayload.generatedAt}
           latestDate={dateBounds.maxDate}
           productCount={products.length}
+          isFilterSheetOpen={isSheetOpen}
           sortKey={sortKey}
           onSortChange={(nextSortKey) => {
             setSortKey(nextSortKey)

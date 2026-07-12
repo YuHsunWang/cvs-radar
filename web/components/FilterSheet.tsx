@@ -17,6 +17,7 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
   const dialogRef = useRef<HTMLElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const onCloseRef = useRef(onClose)
+  const returnFocusRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     onCloseRef.current = onClose
@@ -26,6 +27,7 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
     if (!isOpen) return
 
     setDraft(filters)
+    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     const originalBodyOverflow = document.body.style.overflow
     const originalHtmlOverflow = document.documentElement.style.overflow
     document.body.style.overflow = 'hidden'
@@ -65,8 +67,7 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = originalBodyOverflow
       document.documentElement.style.overflow = originalHtmlOverflow
-      const fallbackTrigger = document.querySelector<HTMLElement>('[data-filter-trigger]')
-      fallbackTrigger?.focus()
+      returnFocusRef.current?.focus()
     }
   }, [filters, isOpen])
 
