@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from web.build_data import calibrate_recommendation_score, calibrate_recommendation_scores
+from web.build_data import calibrate_recommendation_score, calibrate_recommendation_scores, display_confidence
 
 
 def report(key: str, score: float | None, *, confidence: str = "中", consensus: str = "褒貶不一") -> SimpleNamespace:
@@ -65,3 +65,11 @@ def test_recommendation_score_omits_low_confidence_reports() -> None:
     ]
 
     assert calibrate_recommendation_scores(reports) == {"enough": 88}
+
+
+def test_single_post_high_confidence_is_capped_only_for_public_display() -> None:
+    single_post = SimpleNamespace(confidence="高", n_posts=1)
+    multi_post = SimpleNamespace(confidence="高", n_posts=2)
+
+    assert display_confidence(single_post) == "中"
+    assert display_confidence(multi_post) == "高"
