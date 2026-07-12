@@ -9,6 +9,7 @@ type TopBarProps = {
   latestDate: string
   productCount: number
   activeFilterCount: number
+  isFilterSheetOpen: boolean
   sortKey: SortKey
   onSortChange: (sortKey: SortKey) => void
   onOpenFilters: () => void
@@ -21,6 +22,7 @@ export default function TopBar({
   latestDate,
   productCount,
   activeFilterCount,
+  isFilterSheetOpen,
   sortKey,
   onSortChange,
   onOpenFilters,
@@ -54,6 +56,10 @@ export default function TopBar({
     }
   }, [isNoticeOpen])
 
+  useEffect(() => {
+    if (isFilterSheetOpen) setIsNoticeOpen(false)
+  }, [isFilterSheetOpen])
+
   function openFilters() {
     setIsNoticeOpen(false)
     onOpenFilters()
@@ -77,8 +83,9 @@ export default function TopBar({
           aria-label="資料更新通知"
           aria-expanded={isNoticeOpen}
           aria-haspopup="dialog"
+          disabled={isFilterSheetOpen}
           onClick={() => setIsNoticeOpen((open) => !open)}
-          className="grid size-11 place-items-center text-slate-700"
+          className="grid size-11 place-items-center text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Bell size={27} strokeWidth={2.15} />
         </button>
