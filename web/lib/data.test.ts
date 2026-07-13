@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { Product, applyAdvanced, displayCategory, filterByCategory, formatDisplayDate, sortProducts } from './data'
+import {
+  Product,
+  applyAdvanced,
+  dateToOffset,
+  displayCategory,
+  filterByCategory,
+  filterHasScore,
+  formatDisplayDate,
+  offsetToDate,
+  sortProducts,
+} from './data'
 
 function product(overrides: Partial<Product>): Product {
   return {
@@ -77,6 +87,27 @@ describe('filterByCategory', () => {
 
   it('returns every product when no category is selected', () => {
     expect(filterByCategory(products, null)).toEqual(products)
+  })
+})
+
+describe('filterHasScore', () => {
+  it('hides only products without a recommendation score when the quick filter is enabled', () => {
+    const products = [product({ id: 'scored', recommendationScore: 78 }), product({ id: 'unscored', recommendationScore: null })]
+
+    expect(filterHasScore(products, true).map(({ id }) => id)).toEqual(['scored'])
+    expect(filterHasScore(products, false)).toEqual(products)
+  })
+})
+
+describe('date slider offsets', () => {
+  it('round-trips UTC calendar days, including the minimum and maximum bounds', () => {
+    const minDate = '2026-02-27'
+    const maxDate = '2026-03-03'
+
+    expect(dateToOffset(minDate, minDate)).toBe(0)
+    expect(dateToOffset(maxDate, minDate)).toBe(4)
+    expect(offsetToDate(0, minDate)).toBe(minDate)
+    expect(offsetToDate(dateToOffset(maxDate, minDate), minDate)).toBe(maxDate)
   })
 })
 

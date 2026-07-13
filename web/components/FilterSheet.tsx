@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { CalendarDays, RotateCcw, X } from 'lucide-react'
-import type { AdvancedFilters } from '@/lib/data'
+import { dateToOffset, offsetToDate, type AdvancedFilters } from '@/lib/data'
 
 type FilterSheetProps = {
   dateBounds: { minDate: string; maxDate: string }
@@ -18,6 +18,35 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const onCloseRef = useRef(onClose)
   const returnFocusRef = useRef<HTMLElement | null>(null)
+  const maxDateOffset = dateToOffset(dateBounds.maxDate, dateBounds.minDate)
+  const fromDate = draft.fromDate || dateBounds.minDate
+  const toDate = draft.toDate || dateBounds.maxDate
+
+  function applyDraft() {
+    const isFullDateRange = fromDate === dateBounds.minDate && toDate === dateBounds.maxDate
+    onChange({
+      ...draft,
+      fromDate: isFullDateRange ? '' : fromDate,
+      toDate: isFullDateRange ? '' : toDate,
+    })
+    onClose()
+  }
+
+  function updateFromDate(nextFromDate: string) {
+    setDraft({
+      ...draft,
+      fromDate: nextFromDate,
+      toDate: nextFromDate > toDate ? nextFromDate : draft.toDate,
+    })
+  }
+
+  function updateToDate(nextToDate: string) {
+    setDraft({
+      ...draft,
+      fromDate: nextToDate < fromDate ? nextToDate : draft.fromDate,
+      toDate: nextToDate,
+    })
+  }
 
   useEffect(() => {
     onCloseRef.current = onClose
@@ -113,23 +142,39 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
             <CalendarDays size={20} aria-hidden="true" />
             最新發文日期範圍
           </legend>
-          <div className="mt-3 grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
-            <label className="min-w-0 text-sm font-bold text-slate-600">
-              起始日期
-              <LocalizedDateInput
-                min={dateBounds.minDate}
-                max={draft.toDate || dateBounds.maxDate}
-                value={draft.fromDate}
-                onChange={(value) => setDraft({ ...draft, fromDate: value })}
+          <div className="mt-3 space-y-4">
+            <label className="block">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="font-black text-slate-800">起始日期</span>
+                <span className="rounded-md bg-[#0F7C7C]/10 px-2 py-1 font-black text-[#0F7C7C]">
+                  {formatDate(fromDate)}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max={maxDateOffset}
+                step="1"
+                value={dateToOffset(fromDate, dateBounds.minDate)}
+                onChange={(event) => updateFromDate(offsetToDate(Number(event.target.value), dateBounds.minDate))}
+                className="w-full accent-[#0F7C7C]"
               />
             </label>
-            <label className="min-w-0 text-sm font-bold text-slate-600">
-              結束日期
-              <LocalizedDateInput
-                min={draft.fromDate || dateBounds.minDate}
-                max={dateBounds.maxDate}
-                value={draft.toDate}
-                onChange={(value) => setDraft({ ...draft, toDate: value })}
+            <label className="block">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="font-black text-slate-800">結束日期</span>
+                <span className="rounded-md bg-[#0F7C7C]/10 px-2 py-1 font-black text-[#0F7C7C]">
+                  {formatDate(toDate)}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max={maxDateOffset}
+                step="1"
+                value={dateToOffset(toDate, dateBounds.minDate)}
+                onChange={(event) => updateToDate(offsetToDate(Number(event.target.value), dateBounds.minDate))}
+                className="w-full accent-[#0F7C7C]"
               />
             </label>
           </div>
@@ -149,10 +194,7 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
           </button>
           <button
             type="button"
-            onClick={() => {
-              onChange(draft)
-              onClose()
-            }}
+            onClick={applyDraft}
             className="rounded-lg bg-[#0F7C7C] px-4 py-3 text-lg font-black text-white"
           >
             套用篩選
@@ -165,50 +207,4 @@ export default function FilterSheet({ dateBounds, filters, isOpen, onClose, onCh
 
 function formatDate(value: string): string {
   return value ? value.replaceAll('-', '/') : '載入中'
-}
-
-type LocalizedDateInputProps = {
-  min: string
-  max: string
-  value: string
-  onChange: (value: string) => void
-}
-
-function LocalizedDateInput({ min, max, value, onChange }: LocalizedDateInputProps) {
-  const [text, setText] = useState(value ? formatDate(value) : '')
-
-  useEffect(() => {
-    setText(value ? formatDate(value) : '')
-  }, [value])
-
-  function commit(nextText: string) {
-    const nextValue = parseDate(nextText)
-    if (!nextText || (nextValue && nextValue >= min && nextValue <= max)) {
-      onChange(nextValue ?? '')
-    }
-  }
-
-  return (
-    <input
-      type="text"
-      inputMode="numeric"
-      placeholder="年/月/日"
-      aria-label="請以年/月/日輸入"
-      value={text}
-      onChange={(event) => {
-        const nextText = event.target.value
-        setText(nextText)
-        commit(nextText)
-      }}
-      onBlur={() => setText(value ? formatDate(value) : '')}
-      className="mt-1.5 min-h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-sm font-semibold text-slate-900"
-    />
-  )
-}
-
-function parseDate(value: string): string | null {
-  const normalized = value.replaceAll('/', '-')
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return null
-  const date = new Date(`${normalized}T00:00:00Z`)
-  return date.toISOString().slice(0, 10) === normalized ? normalized : null
 }

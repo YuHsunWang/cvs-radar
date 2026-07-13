@@ -88,6 +88,26 @@ export function filterByCategory(products: Product[], category: CategoryKey | nu
   return products.filter((product) => includedCategories.includes(product.category.trim() || '其他'))
 }
 
+export function filterHasScore(products: Product[], hideNoScore: boolean): Product[] {
+  if (!hideNoScore) return products
+  return products.filter((product) => product.recommendationScore !== null)
+}
+
+const millisecondsPerDay = 24 * 60 * 60 * 1000
+
+function toUtcCalendarDay(value: string): number {
+  const [year, month, day] = value.split('-').map(Number)
+  return Date.UTC(year, month - 1, day)
+}
+
+export function dateToOffset(date: string, minDate: string): number {
+  return Math.round((toUtcCalendarDay(date) - toUtcCalendarDay(minDate)) / millisecondsPerDay)
+}
+
+export function offsetToDate(offset: number, minDate: string): string {
+  return new Date(toUtcCalendarDay(minDate) + offset * millisecondsPerDay).toISOString().slice(0, 10)
+}
+
 export function applyAdvanced(products: Product[], filters: AdvancedFilters): Product[] {
   return products.filter((product) => {
     if ((product.recommendationScore ?? 0) < filters.minScore) return false
