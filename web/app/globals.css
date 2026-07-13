@@ -34,3 +34,70 @@ select {
 button {
   -webkit-tap-highlight-color: transparent;
 }
+
+.date-range-input {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 2.75rem;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.date-range-input::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  background: transparent;
+}
+
+.date-range-input::-moz-range-track {
+  height: 0.5rem;
+  background: transparent;
+}
+
+.date-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: -0.625rem;
+  border: 3px solid white;
+  border-radius: 9999px;
+  background: #0f7c7c;
+  box-shadow: 0 1px 4px rgb(15 23 42 / 35%);
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.date-range-input::-moz-range-thumb {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 3px solid white;
+  border-radius: 9999px;
+  background: #0f7c7c;
+  box-shadow: 0 1px 4px rgb(15 23 42 / 35%);
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.date-range-input:active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+
+.date-range-input:active::-moz-range-thumb {
+  cursor: grabbing;
+}
+
+.date-range-input:focus-visible {
+  outline: none;
+}
+
+.date-range-input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgb(15 124 124 / 25%), 0 1px 4px rgb(15 23 42 / 35%);
+}
+
+.date-range-input:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgb(15 124 124 / 25%), 0 1px 4px rgb(15 23 42 / 35%);
+}

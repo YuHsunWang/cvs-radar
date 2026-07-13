@@ -1,9 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ChevronDown, ExternalLink, FileText, X } from 'lucide-react'
+import { ChevronDown, ExternalLink, FileText, SlidersHorizontal, X } from 'lucide-react'
 import BrandChips from '@/components/BrandChips'
 import CategoryChips from '@/components/CategoryChips'
+import DateRangeSlider from '@/components/DateRangeSlider'
 import FilterSheet from '@/components/FilterSheet'
 import ProductCard from '@/components/ProductCard'
 import SearchBar from '@/components/SearchBar'
@@ -100,24 +101,13 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
     <main className="min-h-screen bg-[#F7F5EF] text-slate-900">
       <div className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FCFAF5] shadow-2xl shadow-slate-300/50 lg:max-w-4xl">
         <TopBar
-          activeFilterCount={activeFilterLabels.length}
           brand={brand}
           category={category}
           generatedAt={initialPayload.generatedAt}
           latestDate={dateBounds.maxDate}
           productCount={products.length}
-          hideNoScore={hideNoScore}
           isFilterSheetOpen={isSheetOpen}
           sortKey={sortKey}
-          onHideNoScoreChange={(nextHideNoScore) => {
-            setHideNoScore(nextHideNoScore)
-            setVisibleCount(PAGE_SIZE)
-          }}
-          onSortChange={(nextSortKey) => {
-            setSortKey(nextSortKey)
-            setVisibleCount(PAGE_SIZE)
-          }}
-          onOpenFilters={() => setIsSheetOpen(true)}
         />
 
         <div className="space-y-4 px-4 pb-8 pt-4">
@@ -142,6 +132,74 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
               setVisibleCount(PAGE_SIZE)
             }}
           />
+
+          <div className="min-w-0 space-y-3 lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)] lg:items-start lg:gap-4 lg:space-y-0">
+            <DateRangeSlider
+              dateBounds={dateBounds}
+              fromDate={filters.fromDate}
+              toDate={filters.toDate}
+              onChange={(range) => {
+                setFilters((current) => ({ ...current, ...range }))
+                setVisibleCount(PAGE_SIZE)
+              }}
+            />
+
+            <section
+              aria-label="其他篩選與排序"
+              className="min-w-0 space-y-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
+            >
+              <label className="flex min-h-11 items-center gap-2 rounded-lg px-1 text-sm font-bold text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={hideNoScore}
+                  onChange={(event) => {
+                    setHideNoScore(event.target.checked)
+                    setVisibleCount(PAGE_SIZE)
+                  }}
+                  className="size-5 shrink-0 rounded border-slate-300 accent-[#0F7C7C]"
+                />
+                隱藏暫無推薦分
+              </label>
+
+              <div className="grid min-w-0 grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  data-filter-trigger
+                  onClick={() => setIsSheetOpen(true)}
+                  className="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-lg bg-[#0F7C7C] px-2 py-3 text-sm font-black text-white shadow-md shadow-teal-900/20"
+                >
+                  <SlidersHorizontal className="shrink-0" size={18} aria-hidden="true" />
+                  <span className="truncate">調整篩選</span>
+                  {filters.minScore > 0 ? (
+                    <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white text-xs text-[#0F7C7C]">
+                      1
+                    </span>
+                  ) : null}
+                </button>
+                <label className="relative min-w-0">
+                  <span className="sr-only">排序</span>
+                  <select
+                    value={sortKey}
+                    onChange={(event) => {
+                      setSortKey(event.target.value as SortKey)
+                      setVisibleCount(PAGE_SIZE)
+                    }}
+                    className="h-full w-full min-w-0 appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-2 pr-7 text-center text-sm font-black text-slate-900 shadow-sm"
+                  >
+                    <option value="latestDateDesc">發文 近到遠</option>
+                    <option value="latestDateAsc">發文 遠到近</option>
+                    <option value="volumeDesc">聲量 高到低</option>
+                    <option value="volumeAsc">聲量 低到高</option>
+                    <option value="fairScoreDesc">推薦分 高到低</option>
+                    <option value="fairScoreAsc">推薦分 低到高</option>
+                  </select>
+                  <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-base font-black text-slate-800">
+                    ▾
+                  </span>
+                </label>
+              </div>
+            </section>
+          </div>
 
           <div className="border-y border-slate-200 py-3">
             <p aria-live="polite" className="flex items-center gap-1.5 text-[15px] font-semibold text-slate-600">
@@ -237,12 +295,11 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
       </div>
 
       <FilterSheet
-        dateBounds={dateBounds}
-        filters={filters}
+        minScore={filters.minScore}
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
-        onChange={(nextFilters) => {
-          setFilters(nextFilters)
+        onChange={(minScore) => {
+          setFilters((current) => ({ ...current, minScore }))
           setVisibleCount(PAGE_SIZE)
         }}
       />

@@ -7,6 +7,7 @@ import {
   filterByCategory,
   filterHasScore,
   formatDisplayDate,
+  normalizeDateRange,
   offsetToDate,
   sortProducts,
 } from './data'
@@ -108,6 +109,19 @@ describe('date slider offsets', () => {
     expect(dateToOffset(maxDate, minDate)).toBe(4)
     expect(offsetToDate(0, minDate)).toBe(minDate)
     expect(offsetToDate(dateToOffset(maxDate, minDate), minDate)).toBe(maxDate)
+  })
+
+  it('normalizes the full range to no date filter so undated products stay eligible', () => {
+    const fullRange = normalizeDateRange('2026-02-27', '2026-03-03', '2026-02-27', '2026-03-03')
+    expect(fullRange).toEqual({
+      fromDate: '',
+      toDate: '',
+    })
+    expect(applyAdvanced([product({ latestDate: null })], { minScore: 0, ...fullRange })).toHaveLength(1)
+    expect(normalizeDateRange('2026-02-28', '2026-03-03', '2026-02-27', '2026-03-03')).toEqual({
+      fromDate: '2026-02-28',
+      toDate: '2026-03-03',
+    })
   })
 })
 

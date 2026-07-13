@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bell, Radar, SlidersHorizontal, X } from 'lucide-react'
+import { Bell, Radar, X } from 'lucide-react'
 import { formatDisplayDate, sortLabel, type CategoryKey, type SortKey } from '@/lib/data'
 
 type TopBarProps = {
@@ -8,13 +8,8 @@ type TopBarProps = {
   generatedAt: string
   latestDate: string
   productCount: number
-  activeFilterCount: number
-  hideNoScore: boolean
   isFilterSheetOpen: boolean
   sortKey: SortKey
-  onHideNoScoreChange: (hideNoScore: boolean) => void
-  onSortChange: (sortKey: SortKey) => void
-  onOpenFilters: () => void
 }
 
 export default function TopBar({
@@ -23,13 +18,8 @@ export default function TopBar({
   generatedAt,
   latestDate,
   productCount,
-  activeFilterCount,
-  hideNoScore,
   isFilterSheetOpen,
   sortKey,
-  onHideNoScoreChange,
-  onSortChange,
-  onOpenFilters,
 }: TopBarProps) {
   const [isNoticeOpen, setIsNoticeOpen] = useState(false)
   const noticeButtonRef = useRef<HTMLButtonElement>(null)
@@ -63,11 +53,6 @@ export default function TopBar({
   useEffect(() => {
     if (isFilterSheetOpen) setIsNoticeOpen(false)
   }, [isFilterSheetOpen])
-
-  function openFilters() {
-    setIsNoticeOpen(false)
-    onOpenFilters()
-  }
 
   return (
     <header className="relative border-b border-slate-200 bg-[#FCFAF5]">
@@ -115,51 +100,6 @@ export default function TopBar({
           </div>
         </div>
       ) : null}
-
-      <div className="grid grid-cols-2 gap-2 px-4 pb-4">
-        <button
-          type="button"
-          data-filter-trigger
-          onClick={openFilters}
-          className="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-lg bg-[#0F7C7C] px-2 py-3 text-base font-black text-white shadow-md shadow-teal-900/20"
-        >
-          <SlidersHorizontal className="shrink-0" size={19} aria-hidden="true" />
-          調整篩選
-          {activeFilterCount > 0 ? (
-            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white text-xs text-[#0F7C7C]">
-              {activeFilterCount}
-            </span>
-          ) : null}
-        </button>
-        <label className="relative">
-          <span className="sr-only">排序</span>
-          <select
-            value={sortKey}
-            onChange={(event) => onSortChange(event.target.value as SortKey)}
-            className="h-full w-full appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-2 pr-7 text-center text-base font-black text-slate-900 shadow-sm"
-          >
-            <option value="latestDateDesc">發文 近到遠</option>
-            <option value="latestDateAsc">發文 遠到近</option>
-            <option value="volumeDesc">聲量 高到低</option>
-            <option value="volumeAsc">聲量 低到高</option>
-            <option value="fairScoreDesc">推薦分 高到低</option>
-            <option value="fairScoreAsc">推薦分 低到高</option>
-          </select>
-          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-base font-black text-slate-800">
-            ▾
-          </span>
-        </label>
-      </div>
-
-      <label className="flex items-center gap-2 px-4 pb-4 text-sm font-bold text-slate-700">
-        <input
-          type="checkbox"
-          checked={hideNoScore}
-          onChange={(event) => onHideNoScoreChange(event.target.checked)}
-          className="size-4 rounded border-slate-300 accent-[#0F7C7C]"
-        />
-        隱藏暫無推薦分
-      </label>
     </header>
   )
 }
