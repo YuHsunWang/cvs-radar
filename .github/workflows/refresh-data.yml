@@ -1,0 +1,77 @@
+name: Refresh Live Data
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # UTC 00:00 = Taiwan 08:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Persist the raw crawl history (data/posts.jsonl) across runs WITHOUT
+      # committing it — the repo is public and posts.jsonl holds real PTT
+      # author handles/comments (see .gitignore "never commit real PTT data").
+      # A unique key per run means the cache always saves the freshly-appended
+      # posts.jsonl at post-job; restore-keys pulls the most recent prior cache.
+      - name: Restore crawl history from cache
+        uses: actions/cache@v4
+        with:
+          path: data/posts.jsonl
+          key: cvs-posts-${{ github.run_id }}
+          restore-keys: |
+            cvs-posts-
+
+      # First run has no cache: seed the accumulated history once from the
+      # ui/mobile-redesign branch (where posts.jsonl is tracked) so the live
+      # dataset keeps its existing ~772 products instead of collapsing to a
+      # single 10-page window. Non-fatal if the seed is unavailable.
+      - name: Seed crawl history on cache miss
+        run: |
+          if [ ! -f data/posts.jsonl ]; then
+            echo "No cached posts.jsonl — seeding from ui/mobile-redesign"
+            if git fetch --depth=1 origin ui/mobile-redesign; then
+              git show FETCH_HEAD:data/posts.jsonl > data/posts.jsonl \
+                && echo "Seeded $(wc -l < data/posts.jsonl) posts" \
+                || echo "Seed path missing; starting fresh"
+            else
+              echo "Seed branch unavailable; starting fresh"
+            fi
+          fi
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Crawl and recompute results
+        run: python crawl_job.py --pages 10 --verbose
+
+      - name: Remove account profiles from published results
+        run: python scripts/strip_profiles.py data/results.json
+
+      - name: Build public data
+        run: python web/build_data.py
+
+      # Commit ONLY the de-identified published artifacts. data/posts.jsonl is
+      # gitignored and deliberately never staged — it lives only in the cache.
+      - name: Commit refreshed data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/results.json web/public/data.json
+          git diff --cached --quiet && echo "No new data" && exit 0
+          git commit -m "chore: refresh live data $(date -u +%Y-%m-%d)"
+          git push origin HEAD:main
