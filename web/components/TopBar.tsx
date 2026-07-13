@@ -9,8 +9,10 @@ type TopBarProps = {
   latestDate: string
   productCount: number
   activeFilterCount: number
+  hideNoScore: boolean
   isFilterSheetOpen: boolean
   sortKey: SortKey
+  onHideNoScoreChange: (hideNoScore: boolean) => void
   onSortChange: (sortKey: SortKey) => void
   onOpenFilters: () => void
 }
@@ -22,8 +24,10 @@ export default function TopBar({
   latestDate,
   productCount,
   activeFilterCount,
+  hideNoScore,
   isFilterSheetOpen,
   sortKey,
+  onHideNoScoreChange,
   onSortChange,
   onOpenFilters,
 }: TopBarProps) {
@@ -146,6 +150,16 @@ export default function TopBar({
           </span>
         </label>
       </div>
+
+      <label className="flex items-center gap-2 px-4 pb-4 text-sm font-bold text-slate-700">
+        <input
+          type="checkbox"
+          checked={hideNoScore}
+          onChange={(event) => onHideNoScoreChange(event.target.checked)}
+          className="size-4 rounded border-slate-300 accent-[#0F7C7C]"
+        />
+        隱藏暫無推薦分
+      </label>
     </header>
   )
 }

@@ -17,6 +17,7 @@ import {
   applyAdvanced,
   filterByBrand,
   filterByCategory,
+  filterHasScore,
   filterBySearch,
   formatDisplayDate,
   sortProducts,
@@ -34,6 +35,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
   const [brand, setBrand] = useState<string | null>(null)
   const [category, setCategory] = useState<CategoryKey | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>('latestDateDesc')
+  const [hideNoScore, setHideNoScore] = useState(false)
   const [filters, setFilters] = useState<AdvancedFilters>({ minScore: 0, fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [isSheetOpen, setIsSheetOpen] = useState(false)
@@ -42,12 +44,12 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
   const visibleProducts = useMemo(() => {
     return sortProducts(
       applyAdvanced(
-        filterByCategory(filterByBrand(filterBySearch(products, query), brand), category),
+        filterHasScore(filterByCategory(filterByBrand(filterBySearch(products, query), brand), category), hideNoScore),
         filters,
       ),
       sortKey,
     )
-  }, [brand, category, filters, products, query, sortKey])
+  }, [brand, category, filters, hideNoScore, products, query, sortKey])
 
   const dateBounds = useMemo(() => {
     const dates = products.flatMap((product) => (product.latestDate ? [product.latestDate] : []))
@@ -89,6 +91,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
     setQuery('')
     setBrand(null)
     setCategory(null)
+    setHideNoScore(false)
     setFilters({ minScore: 0, fromDate: '', toDate: '' })
     setVisibleCount(PAGE_SIZE)
   }
@@ -103,8 +106,13 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
           generatedAt={initialPayload.generatedAt}
           latestDate={dateBounds.maxDate}
           productCount={products.length}
+          hideNoScore={hideNoScore}
           isFilterSheetOpen={isSheetOpen}
           sortKey={sortKey}
+          onHideNoScoreChange={(nextHideNoScore) => {
+            setHideNoScore(nextHideNoScore)
+            setVisibleCount(PAGE_SIZE)
+          }}
           onSortChange={(nextSortKey) => {
             setSortKey(nextSortKey)
             setVisibleCount(PAGE_SIZE)
