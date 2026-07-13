@@ -33,7 +33,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
   const [query, setQuery] = useState('')
   const [brand, setBrand] = useState<string | null>(null)
   const [category, setCategory] = useState<CategoryKey | null>(null)
-  const [sortKey, setSortKey] = useState<SortKey>('fairScoreDesc')
+  const [sortKey, setSortKey] = useState<SortKey>('latestDateDesc')
   const [filters, setFilters] = useState<AdvancedFilters>({ minScore: 0, fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [isSheetOpen, setIsSheetOpen] = useState(false)
