@@ -2,6 +2,7 @@ import { BarChart3, ExternalLink, MessageSquareText, ThumbsUp, TriangleAlert, Us
 import {
   Product,
   consensusTone,
+  scoreToneClass,
   volumePercent,
 } from '@/lib/data'
 
@@ -14,6 +15,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     product.positivePct !== null && product.neutralPct !== null && product.negativePct !== null
   const hasPosts = product.postUrls.length > 0
   const tone = consensusTone(product.consensus)
+  const scoreTone = scoreToneClass(product.recommendationScore)
   const volume = volumePercent(product.volumeLevel)
   const positivePct = product.positivePct ?? 0
   const neutralPct = product.neutralPct ?? 0
@@ -26,7 +28,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           <p className="text-lg font-black text-slate-950">單品判斷</p>
           <div className="mt-3">
             <span
-              className={`font-black text-[#0F7C7C] ${
+              className={`font-black ${scoreTone} ${
                 product.recommendationScore === null ? 'text-3xl' : 'text-5xl'
               }`}
             >

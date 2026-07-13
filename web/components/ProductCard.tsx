@@ -1,7 +1,7 @@
 import ProductDetail from '@/components/ProductDetail'
 import { BarChart3, ChevronDown, ChevronUp, CircleCheck, CircleMinus, CircleX } from 'lucide-react'
 import { useId } from 'react'
-import { Product, consensusTone, displayBrand, displayCategory } from '@/lib/data'
+import { Product, consensusTone, displayBrand, displayCategory, scoreToneClass } from '@/lib/data'
 
 const brandBadgeStyles: Record<string, string> = {
   '7-11': 'bg-[#00824E] text-white',
@@ -34,6 +34,7 @@ type ProductCardProps = {
 export default function ProductCard({ product, rank, isExpanded, onToggle }: ProductCardProps) {
   const brand = displayBrand(product.brand)
   const tone = consensusTone(product.consensus)
+  const scoreTone = scoreToneClass(product.recommendationScore)
   const detailId = useId()
 
   return (
@@ -74,7 +75,7 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
         <div className="flex min-h-24 flex-col items-end justify-between text-right font-black">
           <div>
             <span
-              className={`block leading-none text-[#0F7C7C] ${
+              className={`block leading-none ${scoreTone} ${
                 product.recommendationScore === null ? 'text-xl' : 'text-3xl'
               }`}
             >

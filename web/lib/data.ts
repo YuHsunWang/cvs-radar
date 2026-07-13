@@ -189,6 +189,13 @@ export function consensusTone(consensus: string): 'good' | 'mixed' | 'low' {
   return 'low'
 }
 
+export function scoreToneClass(score: number | null): string {
+  if (score === null) return 'text-slate-500'
+  if (score >= 70) return 'text-green-700'
+  if (score >= 50) return 'text-amber-700'
+  return 'text-red-700'
+}
+
 export function volumePercent(level: string): number {
   if (level === '充足') return 78
   if (level === '中等') return 52
