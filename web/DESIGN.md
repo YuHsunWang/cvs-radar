@@ -55,13 +55,14 @@ Per-product shape:
 ```
 app/layout.tsx          root layout, metadata, global styles
 app/page.tsx            shopper page — owns search / brand / date / sort / expanded state
-components/TopBar        responsive header, data-update notice, filter state, sort control
+components/TopBar        responsive header and data-update notice
 components/SearchBar     persistent live search
 components/CategoryChips intent-based category filter (meal, dessert, drink, etc.)
 components/BrandChips    brand filter pills (single-select)
+components/DateRangeSlider accessible live dual-thumb latest-review-date filter
 components/ProductCard   ranked card with a semantic expand/collapse summary button
 components/ProductDetail 單品判斷 detail: score, consensus bar, volume, author review, comment summary, source links
-components/FilterSheet   accessible applied-on-confirm score and latest-review-date filters
+components/FilterSheet   accessible applied-on-confirm minimum-score filter
 lib/data.ts             types + loader + pure filter / sort / search helpers
 ```
 
@@ -96,7 +97,8 @@ Palette: primary teal `#0F7C7C`; consensus bar green `#2E9E5B` / amber `#E0A417`
 - Brand chips single-select; tap again to clear.
 - The card summary button toggles its detail; detail actions remain independent keyboard targets.
 - The sort menu supports newest/oldest post, highest/lowest volume, and highest/lowest score.
-- 調整篩選 opens a focus-trapped sheet with minimum-score and inclusive latest-review-date controls.
+- The inclusive latest-review-date range uses one always-visible dual-thumb slider and filters live.
+- 調整篩選 opens a focus-trapped sheet with the applied-on-confirm minimum-score control.
 - Active advanced filters are summarized below the result count and can be cleared there.
 - Results render in 30-item batches to keep the mobile DOM responsive.
 - The bell opens a data-update notice with product count and latest review date.

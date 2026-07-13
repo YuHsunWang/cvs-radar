@@ -108,6 +108,16 @@ export function offsetToDate(offset: number, minDate: string): string {
   return new Date(toUtcCalendarDay(minDate) + offset * millisecondsPerDay).toISOString().slice(0, 10)
 }
 
+export function normalizeDateRange(
+  fromDate: string,
+  toDate: string,
+  minDate: string,
+  maxDate: string,
+): Pick<AdvancedFilters, 'fromDate' | 'toDate'> {
+  if (fromDate === minDate && toDate === maxDate) return { fromDate: '', toDate: '' }
+  return { fromDate, toDate }
+}
+
 export function applyAdvanced(products: Product[], filters: AdvancedFilters): Product[] {
   return products.filter((product) => {
     if ((product.recommendationScore ?? 0) < filters.minScore) return false
