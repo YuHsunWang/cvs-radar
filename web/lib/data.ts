@@ -27,7 +27,6 @@ export type DataPayload = {
 }
 
 export type AdvancedFilters = {
-  minScore: number
   fromDate: string
   toDate: string
 }
@@ -120,7 +119,6 @@ export function normalizeDateRange(
 
 export function applyAdvanced(products: Product[], filters: AdvancedFilters): Product[] {
   return products.filter((product) => {
-    if ((product.recommendationScore ?? 0) < filters.minScore) return false
     if (!filters.fromDate && !filters.toDate) return true
     if (!product.latestDate) return false
     if (filters.fromDate && product.latestDate < filters.fromDate) return false
