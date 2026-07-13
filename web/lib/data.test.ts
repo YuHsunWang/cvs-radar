@@ -49,20 +49,10 @@ describe('applyAdvanced', () => {
     ]
 
     expect(
-      applyAdvanced(products, { minScore: 0, fromDate: '2026-06-01', toDate: '2026-06-30' }).map(
+      applyAdvanced(products, { fromDate: '2026-06-01', toDate: '2026-06-30' }).map(
         ({ id }) => id,
       ),
     ).toEqual(['start', 'middle', 'end'])
-  })
-
-  it('keeps the minimum-score condition when no date range is active', () => {
-    const products = [
-      product({ id: 'low', recommendationScore: 59 }),
-      product({ id: 'pass', recommendationScore: 60 }),
-    ]
-    expect(applyAdvanced(products, { minScore: 60, fromDate: '', toDate: '' }).map(({ id }) => id)).toEqual([
-      'pass',
-    ])
   })
 })
 
@@ -117,7 +107,7 @@ describe('date slider offsets', () => {
       fromDate: '',
       toDate: '',
     })
-    expect(applyAdvanced([product({ latestDate: null })], { minScore: 0, ...fullRange })).toHaveLength(1)
+    expect(applyAdvanced([product({ latestDate: null })], { ...fullRange })).toHaveLength(1)
     expect(normalizeDateRange('2026-02-28', '2026-03-03', '2026-02-27', '2026-03-03')).toEqual({
       fromDate: '2026-02-28',
       toDate: '2026-03-03',

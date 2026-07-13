@@ -1,11 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ChevronDown, ExternalLink, FileText, SlidersHorizontal, X } from 'lucide-react'
+import { ChevronDown, ExternalLink, FileText, X } from 'lucide-react'
 import BrandChips from '@/components/BrandChips'
 import CategoryChips from '@/components/CategoryChips'
 import DateRangeSlider from '@/components/DateRangeSlider'
-import FilterSheet from '@/components/FilterSheet'
 import ProductCard from '@/components/ProductCard'
 import SearchBar from '@/components/SearchBar'
 import TopBar from '@/components/TopBar'
@@ -37,9 +36,8 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
   const [category, setCategory] = useState<CategoryKey | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>('latestDateDesc')
   const [hideNoScore, setHideNoScore] = useState(false)
-  const [filters, setFilters] = useState<AdvancedFilters>({ minScore: 0, fromDate: '', toDate: '' })
+  const [filters, setFilters] = useState<AdvancedFilters>({ fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const visibleProducts = useMemo(() => {
@@ -62,7 +60,6 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
 
   const activeFilterLabels = useMemo(() => {
     const labels: string[] = []
-    if (filters.minScore > 0) labels.push(`最低推薦分 ${filters.minScore}`)
     if (filters.fromDate && filters.toDate) {
       labels.push(`最新發文 ${formatDisplayDate(filters.fromDate)}–${formatDisplayDate(filters.toDate)}`)
     } else if (filters.fromDate) {
@@ -93,7 +90,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
     setBrand(null)
     setCategory(null)
     setHideNoScore(false)
-    setFilters({ minScore: 0, fromDate: '', toDate: '' })
+    setFilters({ fromDate: '', toDate: '' })
     setVisibleCount(PAGE_SIZE)
   }
 
@@ -106,7 +103,6 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
           generatedAt={initialPayload.generatedAt}
           latestDate={dateBounds.maxDate}
           productCount={products.length}
-          isFilterSheetOpen={isSheetOpen}
           sortKey={sortKey}
         />
 
@@ -161,43 +157,27 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                 隱藏暫無推薦分
               </label>
 
-              <div className="grid min-w-0 grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  data-filter-trigger
-                  onClick={() => setIsSheetOpen(true)}
-                  className="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-lg bg-[#0F7C7C] px-2 py-3 text-sm font-black text-white shadow-md shadow-teal-900/20"
+              <label className="relative block min-w-0">
+                <span className="sr-only">排序</span>
+                <select
+                  value={sortKey}
+                  onChange={(event) => {
+                    setSortKey(event.target.value as SortKey)
+                    setVisibleCount(PAGE_SIZE)
+                  }}
+                  className="h-full w-full min-w-0 appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-3 pr-8 text-left text-sm font-black text-slate-900 shadow-sm"
                 >
-                  <SlidersHorizontal className="shrink-0" size={18} aria-hidden="true" />
-                  <span className="truncate">調整篩選</span>
-                  {filters.minScore > 0 ? (
-                    <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white text-xs text-[#0F7C7C]">
-                      1
-                    </span>
-                  ) : null}
-                </button>
-                <label className="relative min-w-0">
-                  <span className="sr-only">排序</span>
-                  <select
-                    value={sortKey}
-                    onChange={(event) => {
-                      setSortKey(event.target.value as SortKey)
-                      setVisibleCount(PAGE_SIZE)
-                    }}
-                    className="h-full w-full min-w-0 appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-2 pr-7 text-center text-sm font-black text-slate-900 shadow-sm"
-                  >
-                    <option value="latestDateDesc">發文 近到遠</option>
-                    <option value="latestDateAsc">發文 遠到近</option>
-                    <option value="volumeDesc">聲量 高到低</option>
-                    <option value="volumeAsc">聲量 低到高</option>
-                    <option value="fairScoreDesc">推薦分 高到低</option>
-                    <option value="fairScoreAsc">推薦分 低到高</option>
-                  </select>
-                  <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-base font-black text-slate-800">
-                    ▾
-                  </span>
-                </label>
-              </div>
+                  <option value="latestDateDesc">排序：發文 近到遠</option>
+                  <option value="latestDateAsc">排序：發文 遠到近</option>
+                  <option value="volumeDesc">排序：聲量 高到低</option>
+                  <option value="volumeAsc">排序：聲量 低到高</option>
+                  <option value="fairScoreDesc">排序：推薦分 高到低</option>
+                  <option value="fairScoreAsc">排序：推薦分 低到高</option>
+                </select>
+                <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-base font-black text-slate-800">
+                  ▾
+                </span>
+              </label>
             </section>
           </div>
 
@@ -215,7 +195,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                   type="button"
                   aria-label="清除進階篩選"
                   onClick={() => {
-                    setFilters({ minScore: 0, fromDate: '', toDate: '' })
+                    setFilters({ fromDate: '', toDate: '' })
                     setVisibleCount(PAGE_SIZE)
                   }}
                   className="grid size-7 shrink-0 place-items-center rounded-md text-[#0F6666] hover:bg-[#0F7C7C]/10"
@@ -293,16 +273,6 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
           </div>
         </footer>
       </div>
-
-      <FilterSheet
-        minScore={filters.minScore}
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        onChange={(minScore) => {
-          setFilters((current) => ({ ...current, minScore }))
-          setVisibleCount(PAGE_SIZE)
-        }}
-      />
     </main>
   )
 }
