@@ -34,7 +34,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
   const [query, setQuery] = useState('')
   const [brand, setBrand] = useState<string | null>(null)
   const [category, setCategory] = useState<CategoryKey | null>(null)
-  const [sortKey, setSortKey] = useState<SortKey>('latestDateDesc')
+  const [sortKey, setSortKey] = useState<SortKey>('recentRecommendationDesc')
   const [hideNoScore, setHideNoScore] = useState(false)
   const [filters, setFilters] = useState<AdvancedFilters>({ fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
@@ -167,10 +167,8 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                   }}
                   className="h-full w-full min-w-0 appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-3 pr-8 text-left text-sm font-black text-slate-900 shadow-sm"
                 >
-                  <option value="latestDateDesc">排序：發文 近到遠</option>
-                  <option value="latestDateAsc">排序：發文 遠到近</option>
-                  <option value="volumeDesc">排序：聲量 高到低</option>
-                  <option value="volumeAsc">排序：聲量 低到高</option>
+                  <option value="recentRecommendationDesc">排序：近期推薦</option>
+                  <option value="discussionHeatDesc">排序：討論熱度</option>
                   <option value="fairScoreDesc">排序：綜合評分 高到低</option>
                   <option value="fairScoreAsc">排序：綜合評分 低到高</option>
                 </select>
