@@ -3,6 +3,13 @@ name: Refresh Live Data
 on:
   schedule:
     - cron: "0 0 * * *" # UTC 00:00 = Taiwan 08:00
+  push:
+    branches: [main]
+    paths:
+      - "cvs_radar/parser.py"
+      - "cvs_radar/backfill.py"
+      - "scripts/backfill_reviews.py"
+      - ".github/workflows/refresh-data.yml"
   workflow_dispatch:
     inputs:
       backfill_reviews:
@@ -63,7 +70,7 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Backfill missing author reviews
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_reviews }}
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.backfill_reviews) }}
         run: python scripts/backfill_reviews.py --delay 0.5
 
       - name: Crawl and recompute results
