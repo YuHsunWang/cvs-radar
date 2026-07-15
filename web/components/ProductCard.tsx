@@ -3,6 +3,7 @@ import { BarChart3, ChevronDown, ChevronUp, CircleCheck, CircleMinus, CircleX } 
 import { useId } from 'react'
 import {
   Product,
+  comprehensiveScore,
   consensusTone,
   displayBrand,
   displayCategory,
@@ -41,7 +42,8 @@ type ProductCardProps = {
 export default function ProductCard({ product, rank, isExpanded, onToggle }: ProductCardProps) {
   const brand = displayBrand(product.brand)
   const tone = consensusTone(product.consensus)
-  const scoreTone = scoreToneClass(product.recommendationScore)
+  const displayScore = comprehensiveScore(product)
+  const scoreTone = scoreToneClass(displayScore)
   const segments = sentimentSegments(product)
   const detailId = useId()
 
@@ -105,12 +107,12 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
             <div>
               <span
                 className={`block leading-none ${scoreTone} ${
-                  product.recommendationScore === null ? 'text-xl' : 'text-3xl'
+                  displayScore === null ? 'text-xl' : 'text-3xl'
                 }`}
               >
-                {product.recommendationScore ?? '暫無'}
+                {displayScore ?? '暫無'}
               </span>
-              <span className="mt-1 block text-xs text-slate-600">推薦分</span>
+              <span className="mt-1 block text-xs text-slate-600">綜合評分</span>
               {product.confidence === '低' ? (
                 <span className="mt-1 inline-flex rounded-md border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-800">
                   樣本少
