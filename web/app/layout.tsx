@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'CVS Radar | 超商商品評價雷達',
-    description: '把分散的超商商品心得整理成推薦分、共識、聲量與可查證的購買依據。',
+    description: '把分散的超商商品心得整理成綜合評分、共識、聲量與可查證的購買依據。',
     url: './',
     siteName: 'CVS Radar',
     locale: 'zh_TW',

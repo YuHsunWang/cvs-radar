@@ -154,7 +154,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                   }}
                   className="size-5 shrink-0 rounded border-slate-300 accent-[#0F7C7C]"
                 />
-                隱藏暫無推薦分
+                隱藏暫無綜合評分
               </label>
 
               <label className="relative block min-w-0">
@@ -171,8 +171,8 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                   <option value="latestDateAsc">排序：發文 遠到近</option>
                   <option value="volumeDesc">排序：聲量 高到低</option>
                   <option value="volumeAsc">排序：聲量 低到高</option>
-                  <option value="fairScoreDesc">排序：推薦分 高到低</option>
-                  <option value="fairScoreAsc">排序：推薦分 低到高</option>
+                  <option value="fairScoreDesc">排序：綜合評分 高到低</option>
+                  <option value="fairScoreAsc">排序：綜合評分 低到高</option>
                 </select>
                 <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-base font-black text-slate-800">
                   ▾
