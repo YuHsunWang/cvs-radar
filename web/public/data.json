@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-14T01:16:14.752745+00:00",
+  "generatedAt": "2026-07-15T01:13:30.336433+00:00",
   "products": [
     {
       "id": "7-11::抹茶生巧克力生乳捲",
@@ -10664,7 +10664,7 @@
       "category": "便當",
       "fairScore": 68,
       "recommendationScore": 80,
-      "consensus": "褒貶不一",
+      "consensus": "一致好評",
       "confidence": "中",
       "nPosts": 1,
       "nComments": 18,
@@ -11760,8 +11760,8 @@
       "nPosts": 1,
       "nComments": 6,
       "volumeLevel": "中等",
-      "positivePct": 81,
-      "neutralPct": 19,
+      "positivePct": 80,
+      "neutralPct": 20,
       "negativePct": 0,
       "likes": [
         "吃起來有像是在日本便利店買過的布丁 是雙層口感的不會很甜",
@@ -22270,6 +22270,33 @@
         "https://www.ptt.cc/bbs/CVS/M.1781108334.A.3BE.html"
       ],
       "latestDate": "2026-06-11"
+    },
+    {
+      "id": "7-11::立頓夏威夷冰茶",
+      "brand": "7-11",
+      "productName": "立頓夏威夷冰茶",
+      "price": 33,
+      "category": "飲料",
+      "fairScore": 62,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 2,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "有看到七折才會考慮",
+        "之前喝過簡直百香果冰茶~ 給嗜酸者or百香果控可試試"
+      ],
+      "cautions": [],
+      "excerpt": "百香果味味道佔比較多，不太喜歡。 想嚐鮮可以試試看。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1784047721.A.06F.html"
+      ],
+      "latestDate": "2026-07-15"
     },
     {
       "id": "全家::荔枝烏龍鮮果凍",
