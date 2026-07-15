@@ -1,4 +1,6 @@
 from pathlib import Path
+
+import pytest
 from types import SimpleNamespace
 
 from web.build_data import (
@@ -168,3 +170,16 @@ def test_brand_override_rebuilds_public_id(tmp_path: Path) -> None:
     assert corrected["brand"] == "全家"
     assert corrected["productName"] == "正確商品"
     assert corrected["id"] == "全家::正確商品"
+
+
+
+def test_invalid_override_price_fails_fast(tmp_path: Path) -> None:
+    path = tmp_path / "overrides.csv"
+    path.write_text(
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "全家::商品,,,,錯置摘錄,,,欄位錯位\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="invalid product override price"):
+        load_product_overrides(path)
