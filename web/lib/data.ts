@@ -217,6 +217,30 @@ export function consensusTone(consensus: string): 'good' | 'mixed' | 'low' {
   return 'low'
 }
 
+export type SentimentSegment = {
+  label: '正評' | '中立' | '負評'
+  value: number
+  className: string
+}
+
+export function sentimentSegments(product: Product): SentimentSegment[] {
+  if (product.confidence === '低') return []
+
+  const rawSegments: SentimentSegment[] = [
+    { label: '正評', value: product.positivePct ?? 0, className: 'bg-[#5A9F28]' },
+    { label: '中立', value: product.neutralPct ?? 0, className: 'bg-[#9B9A92]' },
+    { label: '負評', value: product.negativePct ?? 0, className: 'bg-[#E84D4D]' },
+  ]
+  const total = rawSegments.reduce((sum, segment) => sum + segment.value, 0)
+
+  if (total <= 0) return []
+
+  return rawSegments.map((segment) => ({
+    ...segment,
+    value: Math.max(0, Math.round((segment.value / total) * 100)),
+  }))
+}
+
 export function scoreToneClass(score: number | null): string {
   if (score === null) return 'text-slate-500'
   if (score >= 70) return 'text-green-700'
