@@ -89,7 +89,11 @@ export function filterByCategory(products: Product[], category: CategoryKey | nu
 
 export function filterHasScore(products: Product[], hideNoScore: boolean): Product[] {
   if (!hideNoScore) return products
-  return products.filter((product) => product.recommendationScore !== null)
+  return products.filter((product) => comprehensiveScore(product) !== null)
+}
+
+export function comprehensiveScore(product: Product): number | null {
+  return product.recommendationScore === null ? null : product.fairScore
 }
 
 const millisecondsPerDay = 24 * 60 * 60 * 1000
@@ -139,15 +143,15 @@ export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
       difference = sortKey === 'volumeDesc' ? bVolume - aVolume : aVolume - bVolume
     } else {
       difference = compareNullableNumbers(
-        a.recommendationScore,
-        b.recommendationScore,
+        comprehensiveScore(a),
+        comprehensiveScore(b),
         sortKey === 'fairScoreDesc',
       )
     }
 
     if (difference !== 0) return difference
 
-    const scoreDiff = (b.recommendationScore ?? -1) - (a.recommendationScore ?? -1)
+    const scoreDiff = (comprehensiveScore(b) ?? -1) - (comprehensiveScore(a) ?? -1)
     const fairScoreDiff = (b.fairScore ?? -1) - (a.fairScore ?? -1)
     const volumeDiff = b.nPosts + b.nComments - (a.nPosts + a.nComments)
     const dateDiff = compareNullableStrings(a.latestDate, b.latestDate, true)
@@ -188,8 +192,8 @@ export function sortLabel(sortKey: SortKey): string {
     latestDateAsc: '發文時間：遠到近',
     volumeDesc: '聲量：高到低',
     volumeAsc: '聲量：低到高',
-    fairScoreDesc: '推薦分：高到低',
-    fairScoreAsc: '推薦分：低到高',
+    fairScoreDesc: '綜合評分：高到低',
+    fairScoreAsc: '綜合評分：低到高',
   }
   return labels[sortKey]
 }
