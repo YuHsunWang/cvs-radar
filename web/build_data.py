@@ -35,7 +35,7 @@ def load_product_overrides(path: Path = PRODUCT_OVERRIDES_PATH) -> dict[str, dic
                 continue
             overrides[product_id] = {
                 key: value.strip()
-                for key in ("productName", "category", "price", "excerpt", "exclude")
+                for key in ("brand", "productName", "category", "price", "excerpt", "exclude")
                 if (value := row.get(key)) is not None and value.strip()
             }
     return overrides
@@ -51,7 +51,7 @@ def apply_product_override(
         return None
 
     corrected = dict(product)
-    for field in ("productName", "category", "excerpt"):
+    for field in ("brand", "productName", "category", "excerpt"):
         if field in override:
             corrected[field] = "" if override[field] == CLEAR_VALUE else override[field]
     if "price" in override:
