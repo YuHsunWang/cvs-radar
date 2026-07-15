@@ -101,6 +101,47 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(post.author_score, 80)
         self.assertEqual(len(post.comments), 1)
 
+    def test_parse_ptt_article_recovers_unlabeled_review_after_score(self) -> None:
+        html = """
+        <div id="main-content">
+          <div class="article-metaline"><span class="article-meta-tag">作者</span><span class="article-meta-value">tester (測試)</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">標題</span><span class="article-meta-value">[商品] 全家 測試商品</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">時間</span><span class="article-meta-value">Mon Jun  1 12:00:00 2026</span></div>
+          【商品名稱/價格】測試商品 / 35
+          【便利商店/廠商名稱】全家
+          【評分】80
+          主要是白胡椒味加芹菜，很像貢丸湯，但香菜味不明顯。
+          不吃香菜的人應該也可以接受。
+        </div>
+        """
+
+        post = parse_ptt_article(html, "https://www.ptt.cc/bbs/CVS/M.unlabeled.html")
+
+        assert post is not None
+        self.assertEqual(post.author_score, 80)
+        self.assertIn("很像貢丸湯", post.review_text)
+        self.assertIn("不吃香菜的人應該也可以接受", post.review_text)
+        self.assertNotIn("80", post.review_text)
+
+    def test_reply_does_not_treat_quoted_score_tail_as_new_review(self) -> None:
+        html = """
+        <div id="main-content">
+          <div class="article-metaline"><span class="article-meta-tag">作者</span><span class="article-meta-value">tester (測試)</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">標題</span><span class="article-meta-value">Re: [商品] 7-11 切達起司貝果</span></div>
+          <div class="article-metaline"><span class="article-meta-tag">時間</span><span class="article-meta-value">Mon Jun  1 12:00:00 2026</span></div>
+          【商品名稱/價格】切達起司貝果 / 28
+          【便利商店/廠商名稱】7-11
+          【評分】60
+          引用舊文中的心得，不是本篇新增內容。
+        </div>
+        """
+
+        post = parse_ptt_article(html, "https://www.ptt.cc/bbs/CVS/M.reply.html")
+
+        assert post is not None
+        self.assertTrue(post.is_reply)
+        self.assertEqual(post.review_text, "")
+
     def test_parse_comments_merges_adjacent_same_user_three_line_run(self) -> None:
         html = """
         <div id="main-content">
