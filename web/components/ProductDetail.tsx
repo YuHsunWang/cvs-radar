@@ -10,7 +10,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="mt-4 rounded-lg border border-slate-200 bg-[#FFFDF8] p-3">
-      <section className="mt-4 border-t border-slate-200 pt-4">
+      <section>
         <h3 className="flex items-center gap-2 font-black text-slate-950">
           <UserRound size={20} className="text-[#0F7C7C]" aria-hidden="true" />
           作者評價
