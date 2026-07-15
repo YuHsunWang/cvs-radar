@@ -35,16 +35,20 @@ def load_product_overrides(path: Path = PRODUCT_OVERRIDES_PATH) -> dict[str, dic
                 continue
             overrides[product_id] = {
                 key: value.strip()
-                for key in ("productName", "category", "price", "excerpt")
+                for key in ("productName", "category", "price", "excerpt", "exclude")
                 if (value := row.get(key)) is not None and value.strip()
             }
     return overrides
 
 
-def apply_product_override(product: dict[str, Any], override: dict[str, Any] | None) -> dict[str, Any]:
+def apply_product_override(
+    product: dict[str, Any], override: dict[str, Any] | None
+) -> dict[str, Any] | None:
     """Apply an audited correction without mutating the source report."""
     if not override:
         return product
+    if override.get("exclude", "").lower() in {"1", "true", "yes"}:
+        return None
 
     corrected = dict(product)
     for field in ("productName", "category", "excerpt"):
@@ -142,7 +146,9 @@ def main() -> None:
     products = []
     for report in reports:
         product = to_product(report, recommendation_scores.get(report.product_key))
-        products.append(apply_product_override(product, product_overrides.get(product["id"])))
+        corrected = apply_product_override(product, product_overrides.get(product["id"]))
+        if corrected is not None:
+            products.append(corrected)
     payload = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "products": products,
