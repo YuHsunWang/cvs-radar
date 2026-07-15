@@ -9,6 +9,7 @@ import {
   formatDisplayDate,
   normalizeDateRange,
   offsetToDate,
+  sentimentSegments,
   sortProducts,
 } from './data'
 
@@ -130,6 +131,23 @@ describe('formatDisplayDate', () => {
 
   it('keeps date-only values readable', () => {
     expect(formatDisplayDate('2026-07-05')).toBe('2026/07/05')
+  })
+})
+
+describe('sentimentSegments', () => {
+  it('normalizes non-low-confidence sentiment percentages for the compact card bar', () => {
+    expect(sentimentSegments(product({ positivePct: 2, neutralPct: 1, negativePct: 1 }))).toEqual([
+      { label: '正評', value: 50, className: 'bg-[#5A9F28]' },
+      { label: '中立', value: 25, className: 'bg-[#9B9A92]' },
+      { label: '負評', value: 25, className: 'bg-[#E84D4D]' },
+    ])
+  })
+
+  it('hides sentiment bars when confidence is low or no percentages exist', () => {
+    expect(sentimentSegments(product({ confidence: '低' }))).toEqual([])
+    expect(
+      sentimentSegments(product({ positivePct: null, neutralPct: null, negativePct: null })),
+    ).toEqual([])
   })
 })
 
