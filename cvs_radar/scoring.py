@@ -1884,7 +1884,7 @@ def _clean_representative_comment(brand: str, text: str) -> str:
         if kw:
             # Only remove a store name when it is a label-like prefix. Brand names
             # inside a sentence carry meaning (e.g. "全家的甜品" / "我買全家的時候").
-            pattern = rf"^{re.escape(kw)}(?=[\\s:：])[\\s:：]*"
+            pattern = rf"^{re.escape(kw)}(?=[\s:：])[\s:：]*"
             s = re.sub(pattern, "", s, count=1, flags=re.IGNORECASE)
     s = _BRACKET_RE.sub(" ", s)
     s = _COMMENT_NOISE_RE.sub(" ", s)
