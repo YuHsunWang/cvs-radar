@@ -246,7 +246,8 @@ def annotate_posts(posts: list[Post]) -> list[Post]:
 def _normalize_override_text(text: str) -> str:
     s = unicodedata.normalize("NFKC", str(text or ""))
     s = s.replace("\r", " ").replace("\n", " ").replace("\t", " ")
-    return re.sub(r"\s+", " ", s).strip()
+    s = re.sub(r"\s+", " ", s).strip()
+    return re.sub(r"[!！?？。．.]+$", "", s).strip()
 
 
 def load_sentiment_overrides(path: str | Path = DEFAULT_OVERRIDES_PATH) -> dict[str, float]:

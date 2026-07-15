@@ -37,7 +37,16 @@ from cvs_radar.scoring import (
     score_all,
     score_product,
 )
-from cvs_radar.sentiment import LlmBackend, annotate_posts, clamp, llm_has_key, resolve_backend, score_comment, tag_prior
+from cvs_radar.sentiment import (
+    LlmBackend,
+    annotate_posts,
+    apply_sentiment_overrides,
+    clamp,
+    llm_has_key,
+    resolve_backend,
+    score_comment,
+    tag_prior,
+)
 
 
 class ParserTest(unittest.TestCase):
@@ -484,6 +493,22 @@ class ScoringTest(unittest.TestCase):
 
         self.assertEqual(reports[0].rep_positive, ["超好吃"])
         self.assertEqual(reports[0].rep_negative, ["很難吃"])
+
+    def test_representative_comment_preserves_brand_inside_sentence(self) -> None:
+        from cvs_radar.scoring import _clean_representative_comment
+
+        self.assertEqual(
+            _clean_representative_comment("全家", "全家的甜品真的只有友善才會捨得買"),
+            "全家的甜品真的只有友善才會捨得買",
+        )
+        self.assertEqual(
+            _clean_representative_comment("全家", "我買全家的時候會配咖啡，好吃"),
+            "我買全家的時候會配咖啡,好吃",
+        )
+        self.assertEqual(
+            _clean_representative_comment("7-11", "7-11 這款超好吃推薦"),
+            "超好吃",
+        )
 
     def test_public_reports_hide_internal_fields_unless_internal_mode(self) -> None:
         post = Post(id="p1", brand="7-11", product_name="測試", author="u", author_score=80)
@@ -982,6 +1007,17 @@ class PrecomputedResultsTest(unittest.TestCase):
 
 
 class SentimentTest(unittest.TestCase):
+    def test_override_ignores_trailing_punctuation(self) -> None:
+        post = Post(
+            id="sentiment-override",
+            comments=[Comment("→", "u1", "先看有沒有毒油啊!!", sentiment=0.8)],
+        )
+
+        apply_sentiment_overrides([post], {"先看有沒有毒油啊": -0.9})
+
+        self.assertEqual(post.comments[0].sentiment, -0.9)
+        self.assertEqual(post.comments[0].backend, "codex")
+
     def test_public_sentiment_helpers_resolve_annotate_and_check_key(self) -> None:
         post = Post(
             id="sentiment",

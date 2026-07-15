@@ -32,10 +32,8 @@ export type AdvancedFilters = {
 }
 
 export type SortKey =
-  | 'latestDateDesc'
-  | 'latestDateAsc'
-  | 'volumeDesc'
-  | 'volumeAsc'
+  | 'recentRecommendationDesc'
+  | 'discussionHeatDesc'
   | 'fairScoreDesc'
   | 'fairScoreAsc'
 
@@ -97,6 +95,7 @@ export function comprehensiveScore(product: Product): number | null {
 }
 
 const millisecondsPerDay = 24 * 60 * 60 * 1000
+const DEFAULT_HALF_LIFE_DAYS = 24
 
 function toUtcCalendarDay(value: string): number {
   const [year, month, day] = value.split('-').map(Number)
@@ -135,12 +134,14 @@ export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
   return [...products].sort((a, b) => {
     let difference = 0
 
-    if (sortKey === 'latestDateDesc' || sortKey === 'latestDateAsc') {
-      difference = compareNullableStrings(a.latestDate, b.latestDate, sortKey === 'latestDateDesc')
-    } else if (sortKey === 'volumeDesc' || sortKey === 'volumeAsc') {
-      const aVolume = a.nPosts + a.nComments
-      const bVolume = b.nPosts + b.nComments
-      difference = sortKey === 'volumeDesc' ? bVolume - aVolume : aVolume - bVolume
+    if (sortKey === 'recentRecommendationDesc') {
+      difference = compareNullableNumbers(
+        recentRecommendationScore(a),
+        recentRecommendationScore(b),
+        true,
+      )
+    } else if (sortKey === 'discussionHeatDesc') {
+      difference = compareNullableNumbers(discussionHeat(a), discussionHeat(b), true)
     } else {
       difference = compareNullableNumbers(
         comprehensiveScore(a),
@@ -156,11 +157,9 @@ export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
     const volumeDiff = b.nPosts + b.nComments - (a.nPosts + a.nComments)
     const dateDiff = compareNullableStrings(a.latestDate, b.latestDate, true)
 
-    if (sortKey === 'latestDateDesc' || sortKey === 'latestDateAsc') {
-      if (scoreDiff !== 0) return scoreDiff
-      if (volumeDiff !== 0) return volumeDiff
-    } else if (sortKey === 'volumeDesc' || sortKey === 'volumeAsc') {
-      if (scoreDiff !== 0) return scoreDiff
+    if (sortKey === 'recentRecommendationDesc' || sortKey === 'discussionHeatDesc') {
+      if (scoreDiff !== 0 && sortKey === 'recentRecommendationDesc') return scoreDiff
+      if (volumeDiff !== 0 && sortKey === 'discussionHeatDesc') return volumeDiff
       if (dateDiff !== 0) return dateDiff
     } else {
       if (fairScoreDiff !== 0) return sortKey === 'fairScoreDesc' ? fairScoreDiff : -fairScoreDiff
@@ -188,14 +187,27 @@ function compareNullableStrings(a: string | null, b: string | null, descending: 
 
 export function sortLabel(sortKey: SortKey): string {
   const labels: Record<SortKey, string> = {
-    latestDateDesc: '發文時間：近到遠',
-    latestDateAsc: '發文時間：遠到近',
-    volumeDesc: '聲量：高到低',
-    volumeAsc: '聲量：低到高',
+    recentRecommendationDesc: '近期推薦',
+    discussionHeatDesc: '討論熱度',
     fairScoreDesc: '綜合評分：高到低',
     fairScoreAsc: '綜合評分：低到高',
   }
   return labels[sortKey]
+}
+
+function ageDecay(product: Product, halfLifeDays = DEFAULT_HALF_LIFE_DAYS): number {
+  if (!product.latestDate) return 0
+  const ageDays = Math.max(0, (Date.now() - Date.parse(`${product.latestDate}T00:00:00+08:00`)) / millisecondsPerDay)
+  return Math.pow(0.5, ageDays / halfLifeDays)
+}
+
+export function recentRecommendationScore(product: Product): number | null {
+  const score = comprehensiveScore(product)
+  return score === null ? null : score * ageDecay(product)
+}
+
+export function discussionHeat(product: Product): number {
+  return ageDecay(product) * Math.log1p(product.nPosts + product.nComments)
 }
 
 export function brandRank(brand: string): number {
