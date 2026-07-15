@@ -33,11 +33,18 @@ def load_product_overrides(path: Path = PRODUCT_OVERRIDES_PATH) -> dict[str, dic
             product_id = (row.get("product_id") or "").strip()
             if not product_id:
                 continue
-            overrides[product_id] = {
+            values = {
                 key: value.strip()
                 for key in ("brand", "productName", "category", "price", "excerpt", "exclude")
                 if (value := row.get(key)) is not None and value.strip()
             }
+            price = values.get("price")
+            if price and price != CLEAR_VALUE and not price.isdigit():
+                raise ValueError(f"invalid product override price for {product_id}: {price!r}")
+            exclude = values.get("exclude", "").lower()
+            if exclude and exclude not in {"1", "true", "yes"}:
+                raise ValueError(f"invalid product override exclude flag for {product_id}: {exclude!r}")
+            overrides[product_id] = values
     return overrides
 
 
