@@ -38,6 +38,12 @@ def main() -> None:
     parser.add_argument("--pages", type=_non_negative_int, default=5, help="Number of PTT list pages to crawl (default: 5)")
     parser.add_argument("--store", default=DEFAULT_STORE_PATH, help=f"JSONL store path (default: {DEFAULT_STORE_PATH})")
     parser.add_argument("--recent-days", type=_non_negative_int, default=None, help="Only keep posts from recent N days")
+    parser.add_argument(
+        "--refresh-recent-days",
+        type=_non_negative_int,
+        default=0,
+        help="Refetch stored articles from the latest N days to update comments",
+    )
     parser.add_argument("--skip-recompute", action="store_true", help="Skip pipeline recompute after crawl")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
     args = parser.parse_args()
@@ -62,6 +68,30 @@ def main() -> None:
         raise
 
     new_count = save_posts(posts, args.store)
+    refresh_attempted = 0
+    refresh_updated = 0
+    if args.refresh_recent_days > 0:
+        from cvs_radar.backfill import (
+            read_jsonl,
+            refresh_recent_posts,
+            write_jsonl_atomic,
+        )
+
+        stored_rows = read_jsonl(args.store)
+        refreshed_rows, refresh_attempted, refresh_updated = refresh_recent_posts(
+            stored_rows,
+            crawler._get,  # noqa: SLF001 - reuse crawler retry, delay and PTT session
+            recent_days=args.refresh_recent_days,
+        )
+        if refresh_updated:
+            write_jsonl_atomic(refreshed_rows, args.store)
+        logger.info(
+            "Recent comments refreshed: attempted=%d updated=%d days=%d",
+            refresh_attempted,
+            refresh_updated,
+            args.refresh_recent_days,
+        )
+
     if not args.skip_recompute:
         from cvs_radar.pipeline import run_pipeline
         from cvs_radar.store import load_posts as load_stored, save_results
@@ -85,6 +115,7 @@ def main() -> None:
     print(
         f"[{datetime.now().isoformat(sep=' ', timespec='seconds')}] "
         f"crawled={len(posts)} new={new_count} "
+        f"recent_refresh={refresh_updated}/{refresh_attempted} "
         f"store_total={stats['post_count']} posts / {stats['comment_count']} comments "
         f"({elapsed:.1f}s)"
     )
