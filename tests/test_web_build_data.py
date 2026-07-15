@@ -86,8 +86,8 @@ def test_single_post_high_confidence_is_capped_only_for_public_display() -> None
 def test_load_and_apply_product_overrides(tmp_path: Path) -> None:
     path = tmp_path / "overrides.csv"
     path.write_text(
-        "product_id,productName,category,price,excerpt,reason\\n"
-        "全家::錯誤名稱,正確名稱,麵包,49,__CLEAR__,人工確認\\n",
+        "product_id,productName,category,price,excerpt,reason\n"
+        "全家::錯誤名稱,正確名稱,麵包,49,__CLEAR__,人工確認\n",
         encoding="utf-8",
     )
     product = {
@@ -115,8 +115,8 @@ def test_load_and_apply_product_overrides(tmp_path: Path) -> None:
 def test_blank_override_fields_preserve_generated_values(tmp_path: Path) -> None:
     path = tmp_path / "overrides.csv"
     path.write_text(
-        "product_id,productName,category,price,excerpt,reason\\n"
-        "7-11::商品,,鹹食,,,只改分類\\n",
+        "product_id,productName,category,price,excerpt,reason\n"
+        "7-11::商品,,鹹食,,,只改分類\n",
         encoding="utf-8",
     )
     product = {
