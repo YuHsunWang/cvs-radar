@@ -100,6 +100,14 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
                     />
                   ))}
                 </div>
+                <div className="mt-1.5 flex flex-wrap gap-x-2.5 gap-y-0.5 text-[11px] font-semibold text-slate-500">
+                  {segments.map((segment) => (
+                    <span key={`${segment.label}-legend`} className="inline-flex items-center gap-1">
+                      <span className={`size-1.5 rounded-full ${segment.className}`} aria-hidden="true" />
+                      {segment.label} {segment.value}%
+                    </span>
+                  ))}
+                </div>
               </div>
             ) : null}
           </div>
