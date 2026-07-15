@@ -16,6 +16,7 @@ from .models import Post
 logger = logging.getLogger(__name__)
 
 DEFAULT_OVERRIDES_PATH = "data/labels/sentiment_overrides.csv"
+SUPPLEMENTAL_OVERRIDES_PATH = "data/labels/sentiment_corrections.csv"
 
 POSITIVE_WORDS = {
     "好吃": 1.0,
@@ -250,19 +251,23 @@ def _normalize_override_text(text: str) -> str:
 
 def load_sentiment_overrides(path: str | Path = DEFAULT_OVERRIDES_PATH) -> dict[str, float]:
     """載入人工/LLM 覆寫的留言情感分數（文字 -> 分數）。檔案不存在時回傳空字典。"""
-    file_path = Path(path)
-    if not file_path.exists():
-        return {}
     overrides: dict[str, float] = {}
-    with open(file_path, encoding="utf-8-sig", newline="") as f:
-        for row in csv.DictReader(f):
-            key = _normalize_override_text(row.get("留言內容", ""))
-            if not key:
-                continue
-            try:
-                overrides[key] = clamp(float(row.get("llm分數", "")))
-            except (TypeError, ValueError):
-                continue
+    paths = [Path(path)]
+    supplemental = Path(SUPPLEMENTAL_OVERRIDES_PATH)
+    if supplemental != paths[0]:
+        paths.append(supplemental)
+    for file_path in paths:
+        if not file_path.exists():
+            continue
+        with open(file_path, encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                key = _normalize_override_text(row.get("留言內容", ""))
+                if not key:
+                    continue
+                try:
+                    overrides[key] = clamp(float(row.get("llm分數", "")))
+                except (TypeError, ValueError):
+                    continue
     return overrides
 
 
