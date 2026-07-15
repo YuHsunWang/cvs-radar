@@ -98,7 +98,11 @@ def parse_ptt_article(html: str, url: str = "", board: str = "CVS") -> Post | No
     fields = _parse_fields(body_text)
     product_name = _first_field(fields, "商品名稱", "商品", default=_title_product_name(title))
     vendor = _first_field(fields, "便利商店/廠商名稱", "便利商店", "廠商名稱", "商店")
+    score_text = _first_field(fields, "評分", "分數")
     review_text = _first_field(fields, "心得", "心得分享", default="")
+    is_reply = title.lower().startswith("re:")
+    if not review_text and not is_reply:
+        review_text = _review_text_after_score(score_text)
     brand = infer_brand(vendor, title, body_text)
 
     post_id = _post_id(url, title, metadata.get("author", ""))
@@ -112,10 +116,10 @@ def parse_ptt_article(html: str, url: str = "", board: str = "CVS") -> Post | No
         product_name=product_name or title,
         price=_first_field(fields, "商品價格", "價格"),
         author=metadata.get("author", ""),
-        author_score=parse_score(_first_field(fields, "評分", "分數")),
+        author_score=parse_score(score_text),
         review_text=review_text,
         posted_at=posted_at,
-        is_reply=title.lower().startswith("re:"),
+        is_reply=is_reply,
         push_count=None,
         comments=comments,
         raw={"fields": fields},
@@ -217,6 +221,21 @@ def _parse_fields(text: str) -> dict[str, str]:
         value = match.group("value").strip()
         fields[key] = value
     return fields
+
+
+def _review_text_after_score(raw: str | None) -> str:
+    """Recover unlabeled review prose that follows the score field."""
+    if not raw:
+        return ""
+    text = raw.replace("\r\n", "\n").replace("\r", "\n").strip()
+    text = re.sub(
+        r"^\s*[:：]?\s*(?:\d+(?:\.\d+)?(?:\s*/\s*(?:5|10|100))?\s*(?:分)?|[★⭐]+)",
+        "",
+        text,
+        count=1,
+    )
+    text = re.sub(r"^\s*[（(]?\s*未滿\s*60\s*分為不推薦\s*[）)]?\s*", "", text, count=1)
+    return text.strip()
 
 
 def _first_field(fields: dict[str, str], *keys: str, default: str | None = None) -> str | None:

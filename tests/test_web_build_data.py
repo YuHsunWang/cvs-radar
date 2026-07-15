@@ -1,6 +1,15 @@
+from pathlib import Path
+
+import pytest
 from types import SimpleNamespace
 
-from web.build_data import calibrate_recommendation_score, calibrate_recommendation_scores, display_confidence
+from web.build_data import (
+    apply_product_override,
+    calibrate_recommendation_score,
+    calibrate_recommendation_scores,
+    display_confidence,
+    load_product_overrides,
+)
 
 
 def report(key: str, score: float | None, *, confidence: str = "中", consensus: str = "褒貶不一") -> SimpleNamespace:
@@ -73,3 +82,104 @@ def test_single_post_high_confidence_is_capped_only_for_public_display() -> None
 
     assert display_confidence(single_post) == "中"
     assert display_confidence(multi_post) == "高"
+
+
+
+def test_load_and_apply_product_overrides(tmp_path: Path) -> None:
+    path = tmp_path / "overrides.csv"
+    path.write_text(
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "全家::錯誤名稱,,正確名稱,麵包,49,__CLEAR__,,人工確認\n",
+        encoding="utf-8",
+    )
+    product = {
+        "id": "全家::錯誤名稱",
+        "brand": "全家",
+        "productName": "錯誤名稱",
+        "category": "飲料",
+        "price": 99,
+        "excerpt": "錯誤摘錄",
+    }
+
+    corrected = apply_product_override(product, load_product_overrides(path)[product["id"]])
+
+    assert corrected == {
+        "id": "全家::正確名稱",
+        "brand": "全家",
+        "productName": "正確名稱",
+        "category": "麵包",
+        "price": 49,
+        "excerpt": "",
+    }
+    assert product["productName"] == "錯誤名稱"
+
+
+def test_blank_override_fields_preserve_generated_values(tmp_path: Path) -> None:
+    path = tmp_path / "overrides.csv"
+    path.write_text(
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "7-11::商品,,,鹹食,,,,只改分類\n",
+        encoding="utf-8",
+    )
+    product = {
+        "id": "7-11::商品",
+        "brand": "7-11",
+        "productName": "商品",
+        "category": "其他",
+        "price": 59,
+        "excerpt": "原始摘錄",
+    }
+
+    corrected = apply_product_override(product, load_product_overrides(path)[product["id"]])
+
+    assert corrected["category"] == "鹹食"
+    assert corrected["price"] == 59
+    assert corrected["excerpt"] == "原始摘錄"
+
+
+
+def test_exclude_override_removes_confirmed_invalid_record(tmp_path: Path) -> None:
+    path = tmp_path / "overrides.csv"
+    path.write_text(
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "萊爾富::合併商品,,,,,,true,兩項商品誤合併\n",
+        encoding="utf-8",
+    )
+    product = {
+        "id": "萊爾富::合併商品",
+        "brand": "萊爾富",
+        "productName": "合併商品",
+    }
+
+    assert apply_product_override(product, load_product_overrides(path)[product["id"]]) is None
+
+
+
+def test_brand_override_rebuilds_public_id(tmp_path: Path) -> None:
+    path = tmp_path / "overrides.csv"
+    path.write_text(
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "7-11::錯品牌,全家,正確商品,,,,,來源確認\n",
+        encoding="utf-8",
+    )
+    product = {"id": "7-11::錯品牌", "brand": "7-11", "productName": "錯品牌"}
+
+    corrected = apply_product_override(product, load_product_overrides(path)[product["id"]])
+
+    assert corrected is not None
+    assert corrected["brand"] == "全家"
+    assert corrected["productName"] == "正確商品"
+    assert corrected["id"] == "全家::正確商品"
+
+
+
+def test_invalid_override_price_fails_fast(tmp_path: Path) -> None:
+    path = tmp_path / "overrides.csv"
+    path.write_text(
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "全家::商品,,,,錯置摘錄,,,欄位錯位\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="invalid product override price"):
+        load_product_overrides(path)
