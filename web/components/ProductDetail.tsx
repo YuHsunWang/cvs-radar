@@ -1,5 +1,5 @@
 import { ExternalLink, MessageSquareText, ThumbsUp, TriangleAlert, UserRound } from 'lucide-react'
-import { Product, comprehensiveScore, scoreToneClass } from '@/lib/data'
+import { Product } from '@/lib/data'
 
 type ProductDetailProps = {
   product: Product
@@ -7,36 +7,9 @@ type ProductDetailProps = {
 
 export default function ProductDetail({ product }: ProductDetailProps) {
   const hasPosts = product.postUrls.length > 0
-  const displayScore = comprehensiveScore(product)
-  const scoreTone = scoreToneClass(displayScore)
 
   return (
     <div className="mt-4 rounded-lg border border-slate-200 bg-[#FFFDF8] p-3">
-      <div>
-        <p className="text-lg font-black text-slate-950">單品判斷</p>
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <span
-              className={`font-black ${scoreTone} ${
-                displayScore === null ? 'text-3xl' : 'text-5xl'
-              }`}
-            >
-              {displayScore ?? '暫無'}
-            </span>
-            {displayScore !== null ? (
-              <span className="ml-1 text-xl font-bold text-slate-600">/ 100</span>
-            ) : null}
-            <p className="font-bold text-slate-600">
-              {displayScore === null ? '暫無可靠分數' : '綜合評分'}
-            </p>
-          </div>
-          <div className="rounded-md bg-slate-100 px-3 py-2 text-right text-sm font-bold text-slate-600">
-            <p>信心度 {product.confidence}</p>
-            <p>{product.nPosts} 篇貼文 · {product.nComments} 則留言</p>
-          </div>
-        </div>
-      </div>
-
       <section className="mt-4 border-t border-slate-200 pt-4">
         <h3 className="flex items-center gap-2 font-black text-slate-950">
           <UserRound size={20} className="text-[#0F7C7C]" aria-hidden="true" />
