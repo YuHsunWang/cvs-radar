@@ -162,10 +162,8 @@ describe('sortProducts', () => {
   ]
 
   it.each([
-    ['latestDateDesc', ['b', 'c', 'a']],
-    ['latestDateAsc', ['a', 'c', 'b']],
-    ['volumeDesc', ['b', 'c', 'a']],
-    ['volumeAsc', ['a', 'c', 'b']],
+    ['recentRecommendationDesc', ['b', 'c', 'a']],
+    ['discussionHeatDesc', ['b', 'c', 'a']],
     ['fairScoreDesc', ['a', 'c', 'b']],
     ['fairScoreAsc', ['b', 'c', 'a']],
   ] as const)('sorts %s in the requested direction', (sortKey, expected) => {
