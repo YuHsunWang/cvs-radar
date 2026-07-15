@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 import re
 import sys
@@ -15,6 +16,44 @@ if str(ROOT) not in sys.path:
 
 from cvs_radar.app_helpers import consensus_distribution, volume_label  # noqa: E402
 from cvs_radar.store import load_results  # noqa: E402
+
+
+PRODUCT_OVERRIDES_PATH = ROOT / "data" / "labels" / "product_overrides.csv"
+CLEAR_VALUE = "__CLEAR__"
+
+
+def load_product_overrides(path: Path = PRODUCT_OVERRIDES_PATH) -> dict[str, dict[str, Any]]:
+    """Load reviewed public-product corrections keyed by the original product ID."""
+    if not path.exists():
+        return {}
+
+    overrides: dict[str, dict[str, Any]] = {}
+    with path.open(encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            product_id = (row.get("product_id") or "").strip()
+            if not product_id:
+                continue
+            overrides[product_id] = {
+                key: value.strip()
+                for key in ("productName", "category", "price", "excerpt")
+                if (value := row.get(key)) is not None and value.strip()
+            }
+    return overrides
+
+
+def apply_product_override(product: dict[str, Any], override: dict[str, Any] | None) -> dict[str, Any]:
+    """Apply an audited correction without mutating the source report."""
+    if not override:
+        return product
+
+    corrected = dict(product)
+    for field in ("productName", "category", "excerpt"):
+        if field in override:
+            corrected[field] = "" if override[field] == CLEAR_VALUE else override[field]
+    if "price" in override:
+        corrected["price"] = None if override["price"] == CLEAR_VALUE else int(override["price"])
+    corrected["id"] = f"{corrected['brand']}::{corrected['productName']}"
+    return corrected
 
 
 def clean_volume_label(value: str) -> str:
@@ -99,9 +138,14 @@ def main() -> None:
 
     reports, _profiles = loaded
     recommendation_scores = calibrate_recommendation_scores(reports)
+    product_overrides = load_product_overrides()
+    products = []
+    for report in reports:
+        product = to_product(report, recommendation_scores.get(report.product_key))
+        products.append(apply_product_override(product, product_overrides.get(product["id"])))
     payload = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
-        "products": [to_product(report, recommendation_scores.get(report.product_key)) for report in reports],
+        "products": products,
     }
 
     output.parent.mkdir(parents=True, exist_ok=True)
