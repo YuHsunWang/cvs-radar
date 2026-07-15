@@ -503,7 +503,7 @@ class ScoringTest(unittest.TestCase):
         )
         self.assertEqual(
             _clean_representative_comment("全家", "我買全家的時候會配咖啡，好吃"),
-            "我買全家的時候會配咖啡，好吃",
+            "我買全家的時候會配咖啡,好吃",
         )
         self.assertEqual(
             _clean_representative_comment("7-11", "7-11 這款超好吃推薦"),
