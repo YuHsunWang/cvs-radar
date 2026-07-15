@@ -5,7 +5,12 @@ from __future__ import annotations
 
 import argparse
 import logging
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from cvs_radar.backfill import backfill_missing_reviews, read_jsonl, write_jsonl_atomic
 from cvs_radar.crawler import PttCrawler
