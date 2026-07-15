@@ -38,7 +38,6 @@ from __future__ import annotations
 import argparse
 import csv
 import re
-import sys
 import unicodedata
 import urllib.request
 from pathlib import Path
