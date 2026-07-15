@@ -86,8 +86,8 @@ def test_single_post_high_confidence_is_capped_only_for_public_display() -> None
 def test_load_and_apply_product_overrides(tmp_path: Path) -> None:
     path = tmp_path / "overrides.csv"
     path.write_text(
-        "product_id,productName,category,price,excerpt,exclude,reason\n"
-        "全家::錯誤名稱,正確名稱,麵包,49,__CLEAR__,,人工確認\n",
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "全家::錯誤名稱,,正確名稱,麵包,49,__CLEAR__,,人工確認\n",
         encoding="utf-8",
     )
     product = {
@@ -115,8 +115,8 @@ def test_load_and_apply_product_overrides(tmp_path: Path) -> None:
 def test_blank_override_fields_preserve_generated_values(tmp_path: Path) -> None:
     path = tmp_path / "overrides.csv"
     path.write_text(
-        "product_id,productName,category,price,excerpt,exclude,reason\n"
-        "7-11::商品,,鹹食,,,,只改分類\n",
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "7-11::商品,,,鹹食,,,,只改分類\n",
         encoding="utf-8",
     )
     product = {
@@ -139,8 +139,8 @@ def test_blank_override_fields_preserve_generated_values(tmp_path: Path) -> None
 def test_exclude_override_removes_confirmed_invalid_record(tmp_path: Path) -> None:
     path = tmp_path / "overrides.csv"
     path.write_text(
-        "product_id,productName,category,price,excerpt,exclude,reason\n"
-        "萊爾富::合併商品,,,,,true,兩項商品誤合併\n",
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "萊爾富::合併商品,,,,,,true,兩項商品誤合併\n",
         encoding="utf-8",
     )
     product = {
@@ -150,3 +150,21 @@ def test_exclude_override_removes_confirmed_invalid_record(tmp_path: Path) -> No
     }
 
     assert apply_product_override(product, load_product_overrides(path)[product["id"]]) is None
+
+
+
+def test_brand_override_rebuilds_public_id(tmp_path: Path) -> None:
+    path = tmp_path / "overrides.csv"
+    path.write_text(
+        "product_id,brand,productName,category,price,excerpt,exclude,reason\n"
+        "7-11::錯品牌,全家,正確商品,,,,,來源確認\n",
+        encoding="utf-8",
+    )
+    product = {"id": "7-11::錯品牌", "brand": "7-11", "productName": "錯品牌"}
+
+    corrected = apply_product_override(product, load_product_overrides(path)[product["id"]])
+
+    assert corrected is not None
+    assert corrected["brand"] == "全家"
+    assert corrected["productName"] == "正確商品"
+    assert corrected["id"] == "全家::正確商品"
