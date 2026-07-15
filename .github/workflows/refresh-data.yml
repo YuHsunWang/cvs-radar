@@ -6,9 +6,14 @@ on:
   push:
     branches: [main]
     paths:
+      - "crawl_job.py"
       - "cvs_radar/parser.py"
       - "cvs_radar/backfill.py"
+      - "cvs_radar/scoring.py"
+      - "cvs_radar/sentiment.py"
+      - "data/labels/*.csv"
       - "scripts/backfill_reviews.py"
+      - "web/build_data.py"
       - ".github/workflows/refresh-data.yml"
   workflow_dispatch:
     inputs:
@@ -73,8 +78,8 @@ jobs:
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.backfill_reviews) }}
         run: python scripts/backfill_reviews.py --delay 0.5
 
-      - name: Crawl and recompute results
-        run: python crawl_job.py --pages 10 --verbose
+      - name: Crawl, refresh recent comments, and recompute results
+        run: python crawl_job.py --pages 10 --refresh-recent-days 30 --verbose
 
       - name: Remove account profiles from published results
         run: python scripts/strip_profiles.py data/results.json
