@@ -83,8 +83,11 @@ describe('filterByCategory', () => {
 })
 
 describe('filterHasScore', () => {
-  it('hides only products without a recommendation score when the quick filter is enabled', () => {
-    const products = [product({ id: 'scored', recommendationScore: 78 }), product({ id: 'unscored', recommendationScore: null })]
+  it('hides products without a reliable comprehensive score when the quick filter is enabled', () => {
+    const products = [
+      product({ id: 'scored', fairScore: 65, recommendationScore: 78 }),
+      product({ id: 'unscored', fairScore: 65, recommendationScore: null }),
+    ]
 
     expect(filterHasScore(products, true).map(({ id }) => id)).toEqual(['scored'])
     expect(filterHasScore(products, false)).toEqual(products)
@@ -183,7 +186,7 @@ describe('sortProducts', () => {
     ])
   })
 
-  it('uses the unrounded fair score to preserve ranking inside a calibrated-score tie', () => {
+  it('sorts directly by the fair score when calibrated scores are tied', () => {
     const tied = [
       product({ id: 'lower', fairScore: 79, recommendationScore: 92 }),
       product({ id: 'higher', fairScore: 80, recommendationScore: 92 }),
