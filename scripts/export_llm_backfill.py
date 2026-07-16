@@ -6,9 +6,14 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from pathlib import Path
 
-from cvs_radar.sentiment import (
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from cvs_radar.sentiment import (  # noqa: E402
     FINGERPRINT_LABELS_PATH,
     _normalize_override_text,
     load_fingerprint_labels,
@@ -16,7 +21,6 @@ from cvs_radar.sentiment import (
     sentiment_fingerprint,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_POSTS_PATH = ROOT / "data" / "posts.jsonl"
 DEFAULT_OUT_PATH = ROOT / "artifacts" / "unlabeled-comments.csv"
 
@@ -50,7 +54,7 @@ def export_unlabeled_comments(
     if known_texts is None:
         known_texts = set(load_sentiment_overrides())
     if known_fingerprints is None:
-        known_fingerprints = set(load_fingerprint_labels(FINGERPRINT_LABELS_PATH))
+        known_fingerprints = set(load_fingerprint_labels(ROOT / FINGERPRINT_LABELS_PATH))
 
     rows: list[dict[str, str]] = []
     seen: set[str] = set()
