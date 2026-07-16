@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import logging
 import os
 import re
@@ -11,12 +12,13 @@ from pathlib import Path
 from typing import Protocol
 
 from .config import SENTIMENT
-from .models import Post
+from .models import Comment, Post
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_OVERRIDES_PATH = "data/labels/sentiment_overrides.csv"
 SUPPLEMENTAL_OVERRIDES_PATH = "data/labels/sentiment_corrections.csv"
+FINGERPRINT_LABELS_PATH = "data/labels/sentiment_fingerprint_labels.csv"
 
 POSITIVE_WORDS = {
     "好吃": 1.0,
@@ -250,6 +252,20 @@ def _normalize_override_text(text: str) -> str:
     return re.sub(r"[!！?？。．.]+$", "", s).strip()
 
 
+def sentiment_fingerprint(source_id: str, tag: str, text: str) -> str:
+    """Build a stable, account-free identifier for one comment in one article."""
+    source = unicodedata.normalize("NFKC", str(source_id or "")).strip()
+    normalized_tag = unicodedata.normalize("NFKC", str(tag or "")).strip()
+    normalized_text = _normalize_override_text(text)
+    payload = "\x1f".join((source, normalized_tag, normalized_text))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def comment_fingerprint(post: Post, comment: Comment) -> str:
+    """Fingerprint a parsed comment without storing its account name."""
+    return sentiment_fingerprint(post.url or post.id, comment.tag, comment.text)
+
+
 def load_sentiment_overrides(path: str | Path = DEFAULT_OVERRIDES_PATH) -> dict[str, float]:
     """載入人工/LLM 覆寫的留言情感分數（文字 -> 分數）。檔案不存在時回傳空字典。"""
     overrides: dict[str, float] = {}
@@ -272,16 +288,53 @@ def load_sentiment_overrides(path: str | Path = DEFAULT_OVERRIDES_PATH) -> dict[
     return overrides
 
 
+def load_fingerprint_labels(
+    path: str | Path = FINGERPRINT_LABELS_PATH,
+) -> dict[str, tuple[float | None, bool]]:
+    """Load privacy-safe LLM labels keyed by comment fingerprint."""
+    file_path = Path(path)
+    if not file_path.exists():
+        return {}
+    labels: dict[str, tuple[float | None, bool]] = {}
+    with open(file_path, encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            fingerprint = str(row.get("fingerprint") or "").strip().lower()
+            if not re.fullmatch(r"[0-9a-f]{64}", fingerprint):
+                continue
+            relevant_raw = str(row.get("is_relevant") or "true").strip().casefold()
+            is_relevant = relevant_raw in {"1", "true", "yes", "y"}
+            if not is_relevant:
+                labels[fingerprint] = (None, False)
+                continue
+            try:
+                score = clamp(float(row.get("llm_score", "")))
+            except (TypeError, ValueError):
+                continue
+            labels[fingerprint] = (score, True)
+    return labels
+
+
 def apply_sentiment_overrides(
-    posts: list[Post], overrides: dict[str, float] | None = None
+    posts: list[Post],
+    overrides: dict[str, float] | None = None,
+    fingerprint_labels: dict[str, tuple[float | None, bool]] | None = None,
 ) -> list[Post]:
-    """以覆寫表取代留言情感分數；未命中的留言維持原後端分數。"""
+    """Apply context-specific LLM labels, then legacy/manual text overrides."""
     if overrides is None:
         overrides = load_sentiment_overrides()
-    if not overrides:
+    if fingerprint_labels is None:
+        fingerprint_labels = load_fingerprint_labels()
+    if not overrides and not fingerprint_labels:
         return posts
     for post in posts:
         for comment in post.comments:
+            fingerprint = comment_fingerprint(post, comment)
+            if fingerprint in fingerprint_labels:
+                score, is_relevant = fingerprint_labels[fingerprint]
+                comment.sentiment = round(score, 4) if is_relevant and score is not None else None
+                comment.backend = "llm-backfill"
+
+            # Text corrections remain the final authority for reviewed edge cases.
             key = _normalize_override_text(comment.text)
             if key in overrides:
                 comment.sentiment = round(overrides[key], 4)
