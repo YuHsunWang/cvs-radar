@@ -1,0 +1,59 @@
+name: Export LLM History Backfill
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/export_llm_backfill.py"
+      - ".github/workflows/export-llm-backfill.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore private crawl history
+        uses: actions/cache@v4
+        with:
+          path: data/posts.jsonl
+          key: cvs-posts-${{ github.run_id }}
+          restore-keys: |
+            cvs-posts-
+
+      - name: Seed crawl history on cache miss
+        run: |
+          if [ ! -f data/posts.jsonl ]; then
+            if git fetch --depth=1 origin ui/mobile-redesign; then
+              git show FETCH_HEAD:data/posts.jsonl > data/posts.jsonl
+            fi
+          fi
+          test -s data/posts.jsonl
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Export account-free unlabeled comments
+        run: |
+          python scripts/export_llm_backfill.py \
+            --posts data/posts.jsonl \
+            --out artifacts/unlabeled-comments.csv
+
+      - name: Upload private labeling artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-history-backfill-${{ github.run_id }}
+          path: artifacts/unlabeled-comments.csv
+          if-no-files-found: error
+          retention-days: 7
