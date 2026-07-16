@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -51,6 +52,88 @@ def backfill_missing_reviews(
         if parsed is None or not parsed.review_text.strip():
             continue
         row["review_text"] = parsed.review_text
+        updated += 1
+
+    return result, attempted, updated
+
+
+def is_recent_refresh_candidate(
+    row: dict,
+    *,
+    recent_days: int,
+    now: datetime | None = None,
+) -> bool:
+    """Return whether a stored PTT CVS article should be refreshed for new comments."""
+    if recent_days <= 0:
+        return False
+    url = str(row.get("url") or "")
+    parsed_url = urlparse(url)
+    if not (
+        parsed_url.scheme == "https"
+        and parsed_url.netloc == "www.ptt.cc"
+        and parsed_url.path.startswith("/bbs/CVS/")
+    ):
+        return False
+
+    raw_posted_at = row.get("posted_at")
+    if not raw_posted_at:
+        return False
+    try:
+        posted_at = datetime.fromisoformat(str(raw_posted_at))
+    except ValueError:
+        return False
+
+    current = now or datetime.now(timezone.utc)
+    if current.tzinfo is None:
+        current = current.replace(tzinfo=timezone.utc)
+    if posted_at.tzinfo is None:
+        posted_at = posted_at.replace(tzinfo=timezone.utc)
+    age = current.astimezone(timezone.utc) - posted_at.astimezone(timezone.utc)
+    return timedelta(0) <= age <= timedelta(days=recent_days)
+
+
+def refresh_recent_posts(
+    rows: list[dict],
+    fetch_html: Callable[[str], str],
+    *,
+    recent_days: int = 30,
+    now: datetime | None = None,
+    limit: int | None = None,
+) -> tuple[list[dict], int, int]:
+    """Refetch recent stored articles and replace their comment snapshots.
+
+    Failed fetches keep the previous row. Successful parses replace comments with
+    the article's current complete snapshot, avoiding duplicate accumulation.
+    """
+    from .store import post_to_dict
+
+    result = [dict(row) for row in rows]
+    attempted = 0
+    updated = 0
+
+    for index, row in enumerate(result):
+        if not is_recent_refresh_candidate(row, recent_days=recent_days, now=now):
+            continue
+        if limit is not None and attempted >= limit:
+            break
+        attempted += 1
+        url = str(row["url"])
+        try:
+            parsed = parse_ptt_article(fetch_html(url), url, str(row.get("board") or "CVS"))
+        except Exception:
+            continue
+        if parsed is None:
+            continue
+
+        refreshed = post_to_dict(parsed)
+        merged = dict(row)
+        merged.update(refreshed)
+        merged["id"] = row.get("id", refreshed["id"])
+        if refreshed.get("push_count") is None:
+            merged["push_count"] = row.get("push_count")
+        if not str(refreshed.get("review_text") or "").strip() and str(row.get("review_text") or "").strip():
+            merged["review_text"] = row["review_text"]
+        result[index] = merged
         updated += 1
 
     return result, attempted, updated
