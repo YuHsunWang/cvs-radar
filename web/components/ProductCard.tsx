@@ -67,6 +67,16 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
             <h2 className="line-clamp-2 text-lg font-black leading-snug text-slate-950">
               {product.productName}
             </h2>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              {product.price != null ? (
+                <span className="inline-flex items-center rounded-md bg-[#0F7C7C] px-2.5 py-1 text-sm font-black text-white">
+                  ${product.price}
+                </span>
+              ) : null}
+              <span className="inline-flex items-center rounded-md border border-slate-300 bg-slate-100 px-2.5 py-1 text-sm font-bold text-slate-700">
+                {displayCategory(product.category)}
+              </span>
+            </div>
             <div className="mt-2 space-y-1 text-sm font-bold">
               <p className={`flex items-center gap-1 ${toneStyles[tone]}`}>
                 <ConsensusIcon consensus={product.consensus} />
@@ -77,11 +87,6 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
                 聲量 {product.nPosts + product.nComments}（{product.volumeLevel}）
               </p>
               <p className="text-slate-500">最新發文 {product.latestDate?.replaceAll('-', '/') ?? '日期未知'}</p>
-              <span className="inline-flex rounded-md border border-slate-300 bg-slate-50 px-2 py-0.5 text-slate-600">
-                {product.price == null
-                  ? displayCategory(product.category)
-                  : `$${product.price} · ${displayCategory(product.category)}`}
-              </span>
             </div>
             {segments.length > 0 ? (
               <div
