@@ -1,0 +1,59 @@
+name: Seed Crawl History Cache
+
+# Disaster-recovery workflow: repopulates the Actions cache copy of
+# data/posts.jsonl after eviction (the raw store is deliberately never
+# committed — the repo is public and posts.jsonl holds real PTT handles).
+# Provide a temporary, directly-downloadable URL to a posts.jsonl produced
+# by a trusted local store; revoke the link after the run.
+# Full procedure: docs/runbook-data-recovery.md
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed_url:
+        description: "Direct-download URL of posts.jsonl (temporary link)"
+        required: true
+        type: string
+      min_posts:
+        description: "Fail if the seed has fewer lines than this"
+        required: false
+        type: string
+        default: "500"
+
+permissions:
+  contents: read
+
+jobs:
+  seed-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download seed
+        run: |
+          mkdir -p data
+          curl -fsSL "${{ inputs.seed_url }}" -o data/posts.jsonl
+          wc -c data/posts.jsonl
+
+      - name: Validate seed (JSONL, enough posts, expected fields)
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          n = 0
+          with open("data/posts.jsonl", encoding="utf-8") as f:
+              for line in f:
+                  if not line.strip():
+                      continue
+                  row = json.loads(line)
+                  assert "id" in row and "comments" in row, "unexpected schema"
+                  n += 1
+          minimum = int("${{ inputs.min_posts }}")
+          print(f"seed posts: {n} (minimum {minimum})")
+          sys.exit(0 if n >= minimum else 1)
+          PY
+
+      # A fresh unique key makes the post-job step save this file; refresh-data
+      # restores it via the cvs-posts- restore-keys prefix (most recent wins).
+      - name: Save as crawl-history cache
+        uses: actions/cache@v4
+        with:
+          path: data/posts.jsonl
+          key: cvs-posts-seed-${{ github.run_id }}
