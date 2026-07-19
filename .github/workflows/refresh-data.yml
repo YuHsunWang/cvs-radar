@@ -6,6 +6,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "config.yaml"
       - "crawl_job.py"
       - "cvs_radar/parser.py"
       - "cvs_radar/backfill.py"
