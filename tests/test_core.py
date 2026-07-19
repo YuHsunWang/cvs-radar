@@ -596,6 +596,22 @@ class ScoringTest(unittest.TestCase):
         self.assertEqual(report.competitor_brands, ["7-11"])
         self.assertEqual(payload["competitor_mentions"]["preferred_other"], 0)
 
+    def test_own_brand_positive_floor_does_not_override_llm_label(self) -> None:
+        from cvs_radar.scoring import _comment_attribution
+
+        # An LLM-labeled negative comment that the heuristics read as "own brand
+        # wins" must keep its LLM score; the +0.4 floor only backstops lexicon.
+        llm_comment = Comment("→", "u1", "全家比小7好一點但都難吃", sentiment=-0.5, backend="llm-backfill")
+        lexicon_comment = Comment("→", "u2", "全家比小7好一點但都難吃", sentiment=-0.5, backend="lexicon")
+
+        llm_attr = _comment_attribution("全家", llm_comment)
+        lexicon_attr = _comment_attribution("全家", lexicon_comment)
+
+        self.assertTrue(llm_attr.own_preference)
+        self.assertEqual(llm_attr.effective_sentiment, -0.5)
+        self.assertTrue(lexicon_attr.own_preference)
+        self.assertEqual(lexicon_attr.effective_sentiment, 0.4)
+
     def test_cross_brand_decision_3_excludes_comment_when_competitor_wins_comparison(self) -> None:
         post = Post(
             id="other-wins",
@@ -1042,6 +1058,18 @@ class SentimentTest(unittest.TestCase):
         self.assertGreater(score_comment("推", "好吃會回購"), 0)
         self.assertLess(score_comment("噓", "難吃踩雷"), 0)
         self.assertEqual(score_comment("→", ""), 0)
+
+    def test_lexicon_skips_sentiment_chars_inside_compound_nouns(self) -> None:
+        from cvs_radar.sentiment import lexicon_score
+
+        # 乾 in 餅乾 / 油 in 麻油 / 香 in 香草 are product names, not opinions:
+        # they must not dilute or flip the real sentiment words around them.
+        self.assertEqual(lexicon_score("這餅乾好吃"), 1.0)
+        self.assertEqual(lexicon_score("麻油雞好香"), 0.6)
+        self.assertEqual(lexicon_score("香草口味"), 0.0)
+        # Standalone sentiment chars still count.
+        self.assertLess(lexicon_score("吃起來太乾"), 0)
+        self.assertLess(lexicon_score("好油喔超難吃"), 0)
 
     def test_backend_switch_accepts_lexicon_and_snownlp(self) -> None:
         lexicon_score = score_comment("→", "好吃會回購", backend="lexicon")

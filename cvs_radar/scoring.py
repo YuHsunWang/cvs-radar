@@ -1097,6 +1097,12 @@ def _both_ice_forms(left_forms: frozenset[str], right_forms: frozenset[str]) -> 
     return bool(left_forms & ice_forms) and bool(right_forms & ice_forms)
 
 
+# Backends whose sentiment is an authoritative per-comment judgment (LLM
+# fingerprint labels, reviewed text overrides); heuristic rewrites like the
+# own-brand positive floor must not override them.
+_AUTHORITATIVE_BACKENDS = frozenset({"llm-backfill", "codex"})
+
+
 def _comment_attribution(post_brand: str, comment: Comment) -> _CommentAttribution:
     """Decide whether a comment's sentiment belongs to the post product."""
 
@@ -1111,8 +1117,11 @@ def _comment_attribution(post_brand: str, comment: Comment) -> _CommentAttributi
     favored = _favored_brand(post_brand, comment.text, other_brands)
     canonical_post_brand = _canonical_brand(post_brand)
     if favored == canonical_post_brand:
-        positive_floor = float(BRAND_COMPARISON.get("own_brand_positive_floor", 0.4))
-        effective = max(sentiment if sentiment is not None else 0.0, positive_floor)
+        if comment.backend in _AUTHORITATIVE_BACKENDS and sentiment is not None:
+            effective = sentiment
+        else:
+            positive_floor = float(BRAND_COMPARISON.get("own_brand_positive_floor", 0.4))
+            effective = max(sentiment if sentiment is not None else 0.0, positive_floor)
         return _CommentAttribution(
             True, effective, other_brands, competitor_preference=False, own_preference=True
         )

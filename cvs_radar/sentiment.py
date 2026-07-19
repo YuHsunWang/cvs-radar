@@ -22,6 +22,7 @@ FINGERPRINT_LABELS_PATH = "data/labels/sentiment_fingerprint_labels.csv"
 
 POSITIVE_WORDS = {
     "好吃": 1.0,
+    "好喝": 1.0,
     "喜歡": 0.8,
     "推薦": 0.9,
     "回購": 1.0,
@@ -39,6 +40,7 @@ POSITIVE_WORDS = {
 
 NEGATIVE_WORDS = {
     "難吃": -1.0,
+    "難喝": -1.0,
     "失望": -0.8,
     "不推": -0.9,
     "雷": -0.9,
@@ -56,6 +58,30 @@ NEGATIVE_WORDS = {
 
 NEGATIONS = ("不", "沒", "無", "沒有", "別")
 INTENSIFIERS = {"超": 1.3, "很": 1.2, "蠻": 1.1, "有點": 0.8, "稍微": 0.7, "太": 1.2}
+
+# Compound nouns in which a sentiment character is part of a product/food name,
+# not an opinion (乾 in 餅乾, 油 in 麻油, 香 in 香草…). A lexicon hit whose span
+# falls inside one of these compounds is skipped.
+LEXICON_BLOCKED_COMPOUNDS: dict[str, tuple[str, ...]] = {
+    "乾": ("餅乾", "肉乾", "豆乾", "果乾", "乾麵", "乾拌"),
+    "油": ("麻油", "奶油", "醬油", "油雞", "油飯", "油條", "油蔥", "油漆"),
+    "香": ("香草", "香蕉", "香菇", "香腸", "香料", "香檳", "香芋", "香菜"),
+    "鹹": ("鹹酥雞", "鹹水雞", "鹹蛋", "鹹食"),
+    "濃": ("濃湯",),
+    "雷": ("打雷", "雷神"),
+    "貴": ("貴妃",),
+}
+
+
+def _in_blocked_compound(text: str, word: str, start: int) -> bool:
+    for compound in LEXICON_BLOCKED_COMPOUNDS.get(word, ()):
+        offset = compound.find(word)
+        while offset != -1:
+            begin = start - offset
+            if begin >= 0 and text[begin : begin + len(compound)] == compound:
+                return True
+            offset = compound.find(word, offset + 1)
+    return False
 
 
 class SentimentBackend(Protocol):
@@ -213,6 +239,8 @@ def lexicon_score(text: str) -> float:
     hits: list[float] = []
     for word, value in {**POSITIVE_WORDS, **NEGATIVE_WORDS}.items():
         for match in re.finditer(re.escape(word), text):
+            if _in_blocked_compound(text, word, match.start()):
+                continue
             start = max(0, match.start() - 4)
             prefix = text[start:match.start()]
             sign = -1.0 if any(n in prefix for n in NEGATIONS) else 1.0

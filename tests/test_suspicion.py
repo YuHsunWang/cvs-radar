@@ -109,12 +109,14 @@ class SuspicionSignalTest(unittest.TestCase):
 
 class ShillDetectionTest(unittest.TestCase):
     def test_shill_keyword_detected(self) -> None:
-        self.assertTrue(_is_shill_comment("葉"))
         self.assertTrue(_is_shill_comment("業配吧"))
-        self.assertTrue(_is_shill_comment("業"))
-        self.assertTrue(_is_shill_comment("滿滿的葉味"))
+        self.assertTrue(_is_shill_comment("這根本葉配"))
 
     def test_false_positive_excluded(self) -> None:
+        # Single-char 業/葉 keywords used to flag ordinary words like 專業/營業.
+        self.assertFalse(_is_shill_comment("專業推文"))
+        self.assertFalse(_is_shill_comment("營業到幾點"))
+        self.assertFalse(_is_shill_comment("畢業快樂"))
         self.assertFalse(_is_shill_comment("茶葉蛋好吃"))
         self.assertFalse(_is_shill_comment("好吃"))
         self.assertFalse(_is_shill_comment(""))
@@ -128,9 +130,9 @@ class ShillDetectionTest(unittest.TestCase):
                 product_name="測試",
                 comments=[
                     Comment("推", "a", "好吃", start),
-                    Comment("噓", "b", "葉", start + timedelta(minutes=1)),
+                    Comment("噓", "b", "葉配無誤", start + timedelta(minutes=1)),
                     Comment("噓", "c", "業配", start + timedelta(minutes=2)),
-                    Comment("→", "d", "業", start + timedelta(minutes=3)),
+                    Comment("→", "d", "業配文吧", start + timedelta(minutes=3)),
                 ],
             )
         ]
@@ -168,9 +170,9 @@ class ShillDetectionTest(unittest.TestCase):
                 author_score=95,
                 comments=[
                     Comment("推", "a", "好吃", start),
-                    Comment("噓", "b", "葉", start + timedelta(minutes=1)),
+                    Comment("噓", "b", "葉配無誤", start + timedelta(minutes=1)),
                     Comment("噓", "c", "業配", start + timedelta(minutes=2)),
-                    Comment("→", "d", "業", start + timedelta(minutes=3)),
+                    Comment("→", "d", "業配文吧", start + timedelta(minutes=3)),
                 ],
             )
         ]
