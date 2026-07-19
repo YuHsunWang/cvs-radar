@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from statistics import mean
 import unittest
 
 from cvs_radar.models import Comment, Post
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.preference import _burst_ratio, _template_like_ratio, build_profiles
 from cvs_radar.reporting import render_suspicion_detail
-from cvs_radar.scoring import _is_shill_comment, _shill_stats
+from cvs_radar.scoring import _decay, _is_shill_comment, _shill_stats
 
 
 class SuspicionSignalTest(unittest.TestCase):
@@ -104,7 +105,11 @@ class SuspicionSignalTest(unittest.TestCase):
         self.assertIn("template_like", profile.suspicion_features)
         self.assertNotIn("repeated_text", profile.suspicion_features)
         self.assertLess(profile.credibility, 1.0)
-        self.assertAlmostEqual(contributor.weight, profile.credibility, places=4)
+        # weight = credibility × time decay: equal to credibility only after
+        # dividing the decay factor back out (λ > 0 since 2026-07-20).
+        decay = mean(_decay(c.posted_at) for c in posts[0].comments)
+        self.assertGreater(decay, 0.0)
+        self.assertAlmostEqual(contributor.weight / decay, profile.credibility, places=4)
 
 
 class ShillDetectionTest(unittest.TestCase):

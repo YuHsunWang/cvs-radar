@@ -51,7 +51,9 @@ SCORING:
     commenter: 1.0
   prior_mean: 0.5
   prior_strength: 1.0
-  time_decay_lambda: 0.0
+  # 0.005 ≈ 139-day half-life: stale discussions drift toward the neutral
+  # prior instead of weighing forever (chosen from the 2026-07-20 λ sweep).
+  time_decay_lambda: 0.005
   per_user_cap: true
   exclude_self_push: true
 
@@ -121,12 +123,15 @@ SHILL_DETECTION:
   ratio_threshold: 0.25
   post_weight_penalty: 0.3
 
+# Recalibrated 2026-07-20 against the live score distribution (median mean
+# 0.56, 90th-pct std 0.26): the old thresholds funneled 69% of products into
+# 褒貶不一 and starved 評價兩極 (std almost never reached 0.30).
 CONSENSUS:
   n_eff_min: 3.0
-  high_mean: 0.70
-  low_mean: 0.40
-  low_std: 0.20
-  high_std: 0.30
+  high_mean: 0.68
+  low_mean: 0.45
+  low_std: 0.25
+  high_std: 0.26
 
 CONFIDENCE_BANDS:
   - [3.0, "低"]
