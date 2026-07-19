@@ -111,8 +111,6 @@ SHILL_DETECTION:
   keywords:
     - "業配"
     - "葉配"
-    - "業"
-    - "葉"
   false_positive_contexts:
     - "茶葉"
     - "葉子"
