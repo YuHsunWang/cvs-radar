@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { GoogleAnalytics } from '@next/third-parties/google'
+import { GA_ID } from '@/lib/analytics'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -32,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="zh-Hant-TW">
       <body>{children}</body>
+      {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
     </html>
   )
 }

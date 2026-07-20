@@ -1,4 +1,5 @@
 import { ExternalLink, MessageSquareText, ThumbsUp, TriangleAlert, UserRound } from 'lucide-react'
+import { trackOutboundPttClick } from '@/lib/analytics'
 import { Product } from '@/lib/data'
 
 type ProductDetailProps = {
@@ -64,6 +65,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 href={url}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => trackOutboundPttClick(product.id)}
                 aria-label={`${product.productName}原文 ${index + 1}，另開新分頁`}
                 className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-bold text-[#0F7C7C] underline decoration-[#0F7C7C]/30 underline-offset-4 hover:bg-[#0F7C7C]/5"
               >

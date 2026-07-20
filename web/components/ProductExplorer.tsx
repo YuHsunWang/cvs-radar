@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ChevronDown, ExternalLink, FileText, X } from 'lucide-react'
 import BrandChips from '@/components/BrandChips'
 import CategoryChips from '@/components/CategoryChips'
@@ -8,6 +8,12 @@ import DateRangeSlider from '@/components/DateRangeSlider'
 import ProductCard from '@/components/ProductCard'
 import SearchBar from '@/components/SearchBar'
 import TopBar from '@/components/TopBar'
+import {
+  trackFilterApply,
+  trackProductExpand,
+  trackSearch,
+  trackSortChange,
+} from '@/lib/analytics'
 import {
   AdvancedFilters,
   CategoryKey,
@@ -39,6 +45,13 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
   const [filters, setFilters] = useState<AdvancedFilters>({ fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+
+  // Fire one search event per settled (debounced) non-empty query, not per keystroke.
+  useEffect(() => {
+    if (!query.trim()) return
+    const timer = window.setTimeout(() => trackSearch(query), 800)
+    return () => window.clearTimeout(timer)
+  }, [query])
 
   const visibleProducts = useMemo(() => {
     return sortProducts(
@@ -73,13 +86,19 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
   const displayedProducts = visibleProducts.slice(0, visibleCount)
   const remainingCount = visibleProducts.length - displayedProducts.length
 
-  function toggleProduct(id: string) {
+  function toggleProduct(product: Product) {
     setExpanded((current) => {
       const next = new Set(current)
-      if (next.has(id)) {
-        next.delete(id)
+      if (next.has(product.id)) {
+        next.delete(product.id)
       } else {
-        next.add(id)
+        next.add(product.id)
+        trackProductExpand({
+          productId: product.id,
+          brand: product.brand,
+          category: product.category,
+          fairScore: product.fairScore,
+        })
       }
       return next
     })
@@ -119,6 +138,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
             onSelect={(nextCategory) => {
               setCategory(nextCategory)
               setVisibleCount(PAGE_SIZE)
+              if (nextCategory) trackFilterApply('category', nextCategory)
             }}
           />
           <BrandChips
@@ -126,6 +146,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
             onSelect={(nextBrand) => {
               setBrand(nextBrand)
               setVisibleCount(PAGE_SIZE)
+              if (nextBrand) trackFilterApply('brand', nextBrand)
             }}
           />
 
@@ -137,6 +158,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
               onChange={(range) => {
                 setFilters((current) => ({ ...current, ...range }))
                 setVisibleCount(PAGE_SIZE)
+                trackFilterApply('date_range', 'adjusted')
               }}
             />
 
@@ -151,6 +173,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                   onChange={(event) => {
                     setHideNoScore(event.target.checked)
                     setVisibleCount(PAGE_SIZE)
+                    if (event.target.checked) trackFilterApply('hide_no_score', 'on')
                   }}
                   className="size-5 shrink-0 rounded border-slate-300 accent-[#0F7C7C]"
                 />
@@ -164,6 +187,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                   onChange={(event) => {
                     setSortKey(event.target.value as SortKey)
                     setVisibleCount(PAGE_SIZE)
+                    trackSortChange(event.target.value)
                   }}
                   className="h-full w-full min-w-0 appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-3 pr-8 text-left text-sm font-black text-slate-900 shadow-sm"
                 >
@@ -225,7 +249,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                   product={product}
                   rank={index + 1}
                   isExpanded={expanded.has(product.id)}
-                  onToggle={() => toggleProduct(product.id)}
+                  onToggle={() => toggleProduct(product)}
                 />
               ))}
               {remainingCount > 0 ? (
