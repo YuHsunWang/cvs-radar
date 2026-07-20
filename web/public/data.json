@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19T23:31:23.446195+00:00",
+  "generatedAt": "2026-07-20T00:36:41.505355+00:00",
   "products": [
     {
       "id": "全家::維也納奶油餐包",
@@ -1600,34 +1600,6 @@
       "latestDate": "2026-04-20"
     },
     {
-      "id": "全家::巧克力千層蛋糕",
-      "brand": "全家",
-      "productName": "巧克力千層蛋糕",
-      "price": 59,
-      "category": "甜點",
-      "fairScore": 67,
-      "recommendationScore": 79,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 5,
-      "volumeLevel": "中等",
-      "positivePct": 85,
-      "neutralPct": 15,
-      "negativePct": 0,
-      "likes": [
-        "我也很愛全家的千層蛋糕,有看到打折的話就一定要拿一塊超級好吃",
-        "之前有一款撒海鹽的也很讚 全家千層蛋糕真的蠻厲害的價格又不到甜點店一半",
-        "法式千層也不錯"
-      ],
-      "cautions": [],
-      "excerpt": "冬天甜點就是要巧克力。 一刀切下去非常柔軟。 實在是太柔軟。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1772683611.A.AD6.html"
-      ],
-      "latestDate": "2026-03-05"
-    },
-    {
       "id": "7-11::乖乖馬上轉運箱",
       "brand": "7-11",
       "productName": "乖乖馬上轉運箱",
@@ -1768,6 +1740,34 @@
         "https://www.ptt.cc/bbs/CVS/M.1774531437.A.038.html"
       ],
       "latestDate": "2026-03-26"
+    },
+    {
+      "id": "全家::巧克力千層蛋糕",
+      "brand": "全家",
+      "productName": "巧克力千層蛋糕",
+      "price": 59,
+      "category": "甜點",
+      "fairScore": 67,
+      "recommendationScore": 79,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 5,
+      "volumeLevel": "中等",
+      "positivePct": 85,
+      "neutralPct": 15,
+      "negativePct": 0,
+      "likes": [
+        "我也很愛全家的千層蛋糕,有看到打折的話就一定要拿一塊超級好吃",
+        "之前有一款撒海鹽的也很讚 全家千層蛋糕真的蠻厲害的價格又不到甜點店一半",
+        "法式千層也不錯"
+      ],
+      "cautions": [],
+      "excerpt": "冬天甜點就是要巧克力。 一刀切下去非常柔軟。 實在是太柔軟。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1772683611.A.AD6.html"
+      ],
+      "latestDate": "2026-03-05"
     },
     {
       "id": "7-11::里肌肉蛋紫米飯糰",
@@ -4189,36 +4189,6 @@
       "latestDate": "2025-09-04"
     },
     {
-      "id": "全家::夯地瓜娃包加",
-      "brand": "全家",
-      "productName": "夯地瓜娃包加",
-      "price": 29,
-      "category": "其他",
-      "fairScore": 63,
-      "recommendationScore": 75,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 15,
-      "volumeLevel": "中等",
-      "positivePct": 92,
-      "neutralPct": 0,
-      "negativePct": 8,
-      "likes": [
-        "好吃",
-        "很可愛XDDDDD",
-        "很可愛的小包"
-      ],
-      "cautions": [
-        "29元網路上可以買3-4個了"
-      ],
-      "excerpt": "他是紫薯餡，太特別了，味道也不錯。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1754540091.A.793.html"
-      ],
-      "latestDate": "2025-08-07"
-    },
-    {
       "id": "全家::小單品美式",
       "brand": "全家",
       "productName": "小單品美式",
@@ -4278,6 +4248,36 @@
         "https://www.ptt.cc/bbs/CVS/M.1779963076.A.371.html"
       ],
       "latestDate": "2026-05-28"
+    },
+    {
+      "id": "全家::夯地瓜娃包加",
+      "brand": "全家",
+      "productName": "夯地瓜娃包加",
+      "price": 29,
+      "category": "其他",
+      "fairScore": 63,
+      "recommendationScore": 75,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 15,
+      "volumeLevel": "中等",
+      "positivePct": 92,
+      "neutralPct": 0,
+      "negativePct": 8,
+      "likes": [
+        "好吃",
+        "很可愛XDDDDD",
+        "很可愛的小包"
+      ],
+      "cautions": [
+        "29元網路上可以買3-4個了"
+      ],
+      "excerpt": "他是紫薯餡，太特別了，味道也不錯。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1754540091.A.793.html"
+      ],
+      "latestDate": "2025-08-07"
     },
     {
       "id": "7-11::Flair杜拜巧克力蛋糕開心果",
@@ -6957,6 +6957,34 @@
         "https://www.ptt.cc/bbs/CVS/M.1758112417.A.C42.html"
       ],
       "latestDate": "2025-09-17"
+    },
+    {
+      "id": "7-11::催淚蛋親子丼飯",
+      "brand": "7-11",
+      "productName": "催淚蛋親子丼飯",
+      "price": 99,
+      "category": "便當",
+      "fairScore": 59,
+      "recommendationScore": 70,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 3,
+      "volumeLevel": "中等",
+      "positivePct": 55,
+      "neutralPct": 23,
+      "negativePct": 22,
+      "likes": [
+        "正在吃 當宵夜!超香"
+      ],
+      "cautions": [
+        "未看先猜推文有超商只有鹹沒有辣"
+      ],
+      "excerpt": "辣感我倒是覺得還可以 並沒有辣到誇張。 可惜的是料太少了點。 喜歡吃辣的 這個很推。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1784472092.A.916.html"
+      ],
+      "latestDate": "2026-07-19"
     },
     {
       "id": "全家::排球少年給我五分鐘茶包式咖啡",
@@ -19054,6 +19082,34 @@
       "latestDate": "2025-11-02"
     },
     {
+      "id": "7-11::栗子地瓜大福",
+      "brand": "7-11",
+      "productName": "栗子地瓜大福",
+      "price": 49,
+      "category": "甜點",
+      "fairScore": 37,
+      "recommendationScore": 45,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 12,
+      "volumeLevel": "中等",
+      "positivePct": 0,
+      "neutralPct": 23,
+      "negativePct": 77,
+      "likes": [],
+      "cautions": [
+        "皮真的完全不行",
+        "本來很期待 ,結果吃了 皮真的很不好吃",
+        "水晶餃皮... 滅火"
+      ],
+      "excerpt": "吃了一口非常失望，他竟然不是麻糬皮是水晶餃皮。 吃起來地瓜香味很重，栗子口感不佳。 不會回購歐~大福我還是吃全家的。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1761629504.A.E0E.html"
+      ],
+      "latestDate": "2025-10-28"
+    },
+    {
       "id": "全家::焦糖拿鐵烤雞細扁麵",
       "brand": "全家",
       "productName": "焦糖拿鐵烤雞細扁麵",
@@ -19112,34 +19168,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1769857925.A.E0F.html"
       ],
       "latestDate": "2026-01-31"
-    },
-    {
-      "id": "7-11::栗子地瓜大福",
-      "brand": "7-11",
-      "productName": "栗子地瓜大福",
-      "price": 49,
-      "category": "甜點",
-      "fairScore": 37,
-      "recommendationScore": 45,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 12,
-      "volumeLevel": "中等",
-      "positivePct": 0,
-      "neutralPct": 23,
-      "negativePct": 77,
-      "likes": [],
-      "cautions": [
-        "皮真的完全不行",
-        "本來很期待 ,結果吃了 皮真的很不好吃",
-        "水晶餃皮... 滅火"
-      ],
-      "excerpt": "吃了一口非常失望，他竟然不是麻糬皮是水晶餃皮。 吃起來地瓜香味很重，栗子口感不佳。 不會回購歐~大福我還是吃全家的。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1761629504.A.E0E.html"
-      ],
-      "latestDate": "2025-10-28"
     },
     {
       "id": "7-11::白種元辣牛肉甜奶油義大利麵",
@@ -20688,34 +20716,6 @@
       "latestDate": "2025-10-02"
     },
     {
-      "id": "7-11::催淚蛋親子丼飯",
-      "brand": "7-11",
-      "productName": "催淚蛋親子丼飯",
-      "price": 99,
-      "category": "便當",
-      "fairScore": 61,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 2,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "正在吃 當宵夜!超香"
-      ],
-      "cautions": [
-        "未看先猜推文有超商只有鹹沒有辣"
-      ],
-      "excerpt": "辣感我倒是覺得還可以 並沒有辣到誇張。 可惜的是料太少了點。 喜歡吃辣的 這個很推。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1784472092.A.916.html"
-      ],
-      "latestDate": "2026-07-19"
-    },
-    {
       "id": "全家::洪瑞珍經典火腿玉米蛋",
       "brand": "全家",
       "productName": "洪瑞珍經典火腿玉米蛋",
@@ -21800,30 +21800,6 @@
       "latestDate": "2025-08-01"
     },
     {
-      "id": "7-11::法國巴黎女孩blonde金啤酒",
-      "brand": "7-11",
-      "productName": "法國巴黎女孩blonde金啤酒",
-      "price": 139,
-      "category": "飲料",
-      "fairScore": 54,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 0,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [],
-      "cautions": [],
-      "excerpt": "苦味中帶偏甜的口感。 她就是濃郁的啤酒花版本。 總之 有打折很推(喜歡喝酒的，畢竟並沒有很便宜)。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1761839934.A.752.html"
-      ],
-      "latestDate": "2025-10-30"
-    },
-    {
       "id": "全家::GABA好眠乳酸飲",
       "brand": "全家",
       "productName": "GABA好眠乳酸飲",
@@ -21846,6 +21822,30 @@
         "https://www.ptt.cc/bbs/CVS/M.1759243384.A.794.html"
       ],
       "latestDate": "2025-09-30"
+    },
+    {
+      "id": "7-11::法國巴黎女孩blonde金啤酒",
+      "brand": "7-11",
+      "productName": "法國巴黎女孩blonde金啤酒",
+      "price": 139,
+      "category": "飲料",
+      "fairScore": 54,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 0,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [],
+      "cautions": [],
+      "excerpt": "苦味中帶偏甜的口感。 她就是濃郁的啤酒花版本。 總之 有打折很推(喜歡喝酒的，畢竟並沒有很便宜)。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1761839934.A.752.html"
+      ],
+      "latestDate": "2025-10-30"
     },
     {
       "id": "7-11::米香黑胡椒紅酒牛肉御飯糰",
