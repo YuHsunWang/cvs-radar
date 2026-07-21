@@ -360,6 +360,39 @@ class ScoringTest(unittest.TestCase):
             normalize_product("全家", "XX蛋糕"),
         )
 
+    def test_noise_regex_keeps_bare_lei_inside_product_name(self) -> None:
+        # DEV-110 Bug B: a lone 雷 in the noise alternation must not be stripped
+        # from inside a real name (蜂蜜雷夢 = 蜂蜜檸檬 pun).
+        self.assertEqual(normalize_product("全家", "蜂蜜雷夢軟歐"), "蜂蜜雷夢軟歐")
+        # compound editorial noise (踩雷) is still stripped.
+        self.assertEqual(
+            normalize_product("全家", "踩雷心得草莓大福"),
+            normalize_product("全家", "草莓大福"),
+        )
+
+    def test_space_separated_parallel_products_split(self) -> None:
+        # DEV-110 Bug A: two names sharing a product-type suffix, separated by a
+        # space, must split into two products instead of concatenating.
+        items = extract_products_and_prices(
+            "：地瓜起司雞排三明治 厚里肌蛋沙拉三明治", "萊爾富"
+        )
+        self.assertEqual(
+            [name for name, _ in items],
+            ["地瓜起司雞排三明治", "厚里肌蛋沙拉三明治"],
+        )
+
+    def test_space_in_single_name_does_not_over_split(self) -> None:
+        # A single product must stay one item when its space-separated segments
+        # do not all end in a product-type suffix (brand prefix / partial name).
+        self.assertEqual(
+            [n for n, _ in extract_products_and_prices("全家 蜂蜜雷夢軟歐", "全家")],
+            ["蜂蜜雷夢軟歐"],
+        )
+        self.assertEqual(
+            [n for n, _ in extract_products_and_prices("明太子 起司貝果", "7-11")],
+            ["明太子起司貝果"],
+        )
+
     def test_product_synonym_normalization(self) -> None:
         self.assertEqual(
             normalize_product("7-11", "起士蛋糕"),
