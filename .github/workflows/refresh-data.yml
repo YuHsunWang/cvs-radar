@@ -1,21 +1,11 @@
 name: Refresh Live Data
 
 on:
-  schedule:
-    - cron: "0 0 * * *" # UTC 00:00 = Taiwan 08:00
-  push:
-    branches: [main]
-    paths:
-      - "config.yaml"
-      - "crawl_job.py"
-      - "cvs_radar/parser.py"
-      - "cvs_radar/backfill.py"
-      - "cvs_radar/scoring.py"
-      - "cvs_radar/sentiment.py"
-      - "data/labels/*.csv"
-      - "scripts/backfill_reviews.py"
-      - "web/build_data.py"
-      - ".github/workflows/refresh-data.yml"
+  # Auto-refresh (schedule + push) disabled 2026-07-21: live data is now
+  # refreshed by the local cvs-rebackfill pipeline
+  # (crawl -> backfill_reviews -> Codex label -> run_pipeline -> strip_profiles
+  # -> build_data -> push). Kept as a MANUAL fallback for when the local
+  # machine is unavailable.
   workflow_dispatch:
     inputs:
       backfill_reviews:
