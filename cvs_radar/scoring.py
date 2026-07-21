@@ -37,7 +37,9 @@ _NOISE_RE = re.compile(
     r"(無限回購|期間限定|季節限定|超好吃|好不好吃|好吃嗎|小心得|新口味|"
     r"心得|開箱|踩雷|地雷|評價|回購|分享|請益|請問|詢問|推薦|推不推|"
     r"反推|實測|試吃|食記|簡評|必買|不推|超商|好吃|難吃|最新|聯名|"
-    r"大推|激推|微雷|不雷|二訪|回味|雷)"
+    r"大推|激推|微雷|不雷|二訪|回味)"
+    # NOTE: keep compound 踩雷/地雷/微雷/不雷 but never a bare 雷 — a lone 雷 in
+    # the alternation matched inside real names (蜂蜜雷夢軟歐 -> 蜂蜜夢軟歐). DEV-110.
 )
 _OPTIONAL_RE = re.compile(
     r"((?:\d+(?:\.\d+)?|[一二三四五六七八九十]+)\s*(入|包|個|顆|片|枚|杯|瓶|罐|盒|組|ml|毫升|g|公克|克|支)|"
@@ -273,6 +275,47 @@ class _CommentAttribution:
     own_preference: bool = False
 
 
+# Distinctive product-type suffixes for detecting space-separated parallel
+# product listings ("地瓜起司雞排三明治 厚里肌蛋沙拉三明治"). Kept to multi-char,
+# unambiguous nouns so an ordinary single name with an internal space is not
+# over-split. DEV-110.
+_PARALLEL_PRODUCT_SUFFIXES = (
+    "三明治", "御飯糰", "飯糰", "便當", "軟歐", "貝果", "可頌", "餐包",
+    "蛋餅", "義大利麵", "霜淇淋", "冰淇淋", "布丁", "泡芙", "蛋糕",
+    "拉麵", "麵包", "吐司", "土司",
+)
+
+
+def _extract_space_separated_parallel_products(
+    text: str, brand: str = ""
+) -> list[tuple[str, int | None]] | None:
+    """Split a space-separated parallel product listing into one item per name.
+
+    Only fires when every space-separated segment cleanly reduces to a product
+    name AND at least two of them end with a distinctive product-type suffix,
+    so ordinary single names that merely contain a space are left intact.
+    """
+    t = unicodedata.normalize("NFKC", text or "").strip()
+    t = re.sub(r"^[：:]+\s*", "", t)
+    segments = [seg for seg in re.split(r"\s+", t) if seg]
+    if len(segments) < 2:
+        return None
+    named: list[tuple[str, int | None]] = []
+    for seg in segments:
+        parsed = _extract_products_and_prices_from_text(seg, brand)
+        if not parsed or not parsed[0][0]:
+            return None
+        named.append((parsed[0][0], parsed[0][1]))
+    suffixed = [
+        name
+        for name, _ in named
+        if any(name.endswith(sfx) for sfx in _PARALLEL_PRODUCT_SUFFIXES)
+    ]
+    if len(suffixed) >= 2 and len(suffixed) == len(named):
+        return named
+    return None
+
+
 def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
     """Split a raw product name into (name, price) pairs.
 
@@ -282,6 +325,10 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
     raw = unicodedata.normalize("NFKC", raw_name or "").strip()
     raw = re.sub(r"^[：:]+\s*", "", raw)
     lines = _candidate_product_lines(raw)
+    if lines:
+        parallel = _extract_space_separated_parallel_products(lines[0], brand)
+        if parallel:
+            return parallel
     if len(lines) > 1:
         results = _extract_multiline_products(lines, brand)
         if results:
