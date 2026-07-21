@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-21T00:39:19.492749+00:00",
+  "generatedAt": "2026-07-21T01:24:32.631045+00:00",
   "products": [
     {
       "id": "全家::維也納奶油餐包",
@@ -10551,8 +10551,8 @@
       "nPosts": 1,
       "nComments": 14,
       "volumeLevel": "中等",
-      "positivePct": 60,
-      "neutralPct": 12,
+      "positivePct": 61,
+      "neutralPct": 11,
       "negativePct": 28,
       "likes": [
         "這好吃",
@@ -14327,6 +14327,38 @@
       "latestDate": "2026-05-18"
     },
     {
+      "id": "全家::蟹味可樂餅風炸飯糰",
+      "brand": "全家",
+      "productName": "蟹味可樂餅風炸飯糰",
+      "price": 42,
+      "category": "便當",
+      "fairScore": 48,
+      "recommendationScore": 58,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 9,
+      "volumeLevel": "中等",
+      "positivePct": 48,
+      "neutralPct": 22,
+      "negativePct": 30,
+      "likes": [
+        "看起來蠻好吃的 喜歡炸飯糰 下次去wg運動完買來吃一下",
+        "看起來不錯耶,下次試試",
+        "看起來還不錯,用烤箱回烤不知道會不會好一點"
+      ],
+      "cautions": [
+        "有油耗味+1不好吃不合期待,根本沒蟹味,就一點點奶味,裡面幾乎沒味道,而且外皮整個濕濕軟軟,氣炸後口感才比較好,但也沒可麗餅感覺*可樂餅",
+        "有油耗味",
+        "吃過 很油 不推"
+      ],
+      "excerpt": "風味尚可 不會過鹹 沒有明顯蟹味 有醬 餡料如圖。 外皮一點點點乾 外皮炸的部分不會軟軟的 但也沒有吃炸物的爽快感。 吃起來就是一個鹹鹹有奶香味的熱飯糰。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1774075270.A.A6D.html"
+      ],
+      "latestDate": "2026-03-21"
+    },
+    {
       "id": "全家::屯京拉麵東京豚骨",
       "brand": "全家",
       "productName": "屯京拉麵東京豚骨",
@@ -14419,38 +14451,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1780643908.A.6ED.html"
       ],
       "latestDate": "2026-06-05"
-    },
-    {
-      "id": "全家::蟹味可樂餅風炸飯糰",
-      "brand": "全家",
-      "productName": "蟹味可樂餅風炸飯糰",
-      "price": 42,
-      "category": "便當",
-      "fairScore": 48,
-      "recommendationScore": 58,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 9,
-      "volumeLevel": "中等",
-      "positivePct": 48,
-      "neutralPct": 22,
-      "negativePct": 30,
-      "likes": [
-        "看起來蠻好吃的 喜歡炸飯糰 下次去wg運動完買來吃一下",
-        "看起來不錯耶,下次試試",
-        "看起來還不錯,用烤箱回烤不知道會不會好一點"
-      ],
-      "cautions": [
-        "有油耗味+1不好吃不合期待,根本沒蟹味,就一點點奶味,裡面幾乎沒味道,而且外皮整個濕濕軟軟,氣炸後口感才比較好,但也沒可麗餅感覺*可樂餅",
-        "有油耗味",
-        "吃過 很油 不推"
-      ],
-      "excerpt": "風味尚可 不會過鹹 沒有明顯蟹味 有醬 餡料如圖。 外皮一點點點乾 外皮炸的部分不會軟軟的 但也沒有吃炸物的爽快感。 吃起來就是一個鹹鹹有奶香味的熱飯糰。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1774075270.A.A6D.html"
-      ],
-      "latestDate": "2026-03-21"
     },
     {
       "id": "全家::椒香溫泉蛋",
