@@ -96,6 +96,7 @@ export function comprehensiveScore(product: Product): number | null {
 
 const millisecondsPerDay = 24 * 60 * 60 * 1000
 const DEFAULT_HALF_LIFE_DAYS = 24
+const RECOMMENDATION_HEAT_WEIGHT = 0.15
 
 function toUtcCalendarDay(value: string): number {
   const [year, month, day] = value.split('-').map(Number)
@@ -203,7 +204,9 @@ function ageDecay(product: Product, halfLifeDays = DEFAULT_HALF_LIFE_DAYS): numb
 
 export function recentRecommendationScore(product: Product): number | null {
   const score = comprehensiveScore(product)
-  return score === null ? null : score * ageDecay(product)
+  return score === null
+    ? null
+    : score * ageDecay(product) * (1 + RECOMMENDATION_HEAT_WEIGHT * Math.log1p(product.nPosts + product.nComments))
 }
 
 export function discussionHeat(product: Product): number {

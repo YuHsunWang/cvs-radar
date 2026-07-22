@@ -9,6 +9,7 @@ import {
   formatDisplayDate,
   normalizeDateRange,
   offsetToDate,
+  recentRecommendationScore,
   sentimentSegments,
   sortProducts,
 } from './data'
@@ -168,6 +169,22 @@ describe('sortProducts', () => {
     ['fairScoreAsc', ['b', 'c', 'a']],
   ] as const)('sorts %s in the requested direction', (sortKey, expected) => {
     expect(sortProducts(products, sortKey).map(({ id }) => id)).toEqual(expected)
+  })
+
+  it('boosts more-discussed products when score and recency are equal', () => {
+    const equallyScoredAndRecent = [
+      product({ id: 'low-volume', productName: '甲', nPosts: 1, nComments: 0, latestDate: '2026-06-15' }),
+      product({ id: 'high-volume', productName: '乙', nPosts: 6, nComments: 12, latestDate: '2026-06-15' }),
+    ]
+
+    expect(sortProducts(equallyScoredAndRecent, 'recentRecommendationDesc').map(({ id }) => id)).toEqual([
+      'high-volume',
+      'low-volume',
+    ])
+  })
+
+  it('returns no recent recommendation score when the fair score is unavailable', () => {
+    expect(recentRecommendationScore(product({ fairScore: null }))).toBeNull()
   })
 
   it('uses volume and then recency to produce useful score tie-breaks', () => {
