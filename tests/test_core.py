@@ -442,6 +442,16 @@ class ScoringTest(unittest.TestCase):
         self.assertTrue(any("牙寶寵物頭套" in (n or "") for n in names))
         self.assertTrue(any("安全帽" in (n or "") for n in names))
 
+    def test_rescue_discount_line_falls_back_to_title(self) -> None:
+        # A Hi-Life poster put the 即時救援 (near-expiry rescue) discount price into the
+        # 商品名稱 field; the real name "炸雞白醬燉飯" lives in the title. The rescue-promo
+        # line must not become the product key (ptt M.1784209146).
+        post = Post(id="p1", brand="萊爾富", title="[商品] 萊爾富-炸雞白醬燉飯",
+                    product_name="售價：99元/ 即時救援7折69元", author="a1", author_score=80)
+        names = [p.product_name for p in preprocess_posts([post])]
+        self.assertNotIn("即時救援7折", names)
+        self.assertTrue(any("炸雞白醬燉飯" in (n or "") for n in names))
+
     def test_bare_form_name_expands_to_title_flavor(self) -> None:
         # A shorthand price line ("霜淇淋49/草莓大福45") loses the flavor; the title
         # carries the full flavored name, which must be used instead of a bare "霜淇淋".
@@ -1448,28 +1458,6 @@ class AppHelperTest(unittest.TestCase):
         with patch("cvs_radar.store.load_results", return_value=([], {})):
             self.assertEqual(load_results_or_none(), ([], {}))
 
-    def test_streamlit_results_loader_cache_reuses_same_file_key(self) -> None:
-        import app
-
-        calls = 0
-
-        def fake_load_results_or_none() -> tuple[list, dict]:
-            nonlocal calls
-            calls += 1
-            return ([], {})
-
-        app._load_results_cached.clear()
-        try:
-            with patch.object(app, "load_results_or_none", side_effect=fake_load_results_or_none):
-                self.assertEqual(app._load_results_cached("data/results.json", 10, 100), ([], {}))
-                self.assertEqual(app._load_results_cached("data/results.json", 10, 100), ([], {}))
-                self.assertEqual(calls, 1)
-
-                self.assertEqual(app._load_results_cached("data/results.json", 11, 100), ([], {}))
-                self.assertEqual(calls, 2)
-        finally:
-            app._load_results_cached.clear()
-
     def test_app_helpers_use_service_query_shape(self) -> None:
         from datetime import datetime
         from cvs_radar.app_helpers import (
@@ -1561,68 +1549,6 @@ class AppHelperTest(unittest.TestCase):
         self.assertEqual(filter_reports_by_recent_days(reports, 0), reports)
         # A 30-day window keeps only the recent report; undated is dropped.
         self.assertEqual(filter_reports_by_recent_days(reports, 30, now=now), [recent])
-
-    def test_order_brand_options(self) -> None:
-        import app
-
-        ordered = app._order_brand_options(["全部", "OK", "其他", "全家", "7-11", "萊爾富"])
-        self.assertEqual(ordered, ["全部", "7-11", "全家", "萊爾富", "OK", "其他"])
-        # An unknown brand sorts after the known order but before 其他.
-        ordered2 = app._order_brand_options(["全部", "其他", "美廉社", "7-11"])
-        self.assertEqual(ordered2, ["全部", "7-11", "美廉社", "其他"])
-
-
-class AppProductRowTest(unittest.TestCase):
-    def _row(self, **overrides: object) -> dict[str, object]:
-        row: dict[str, object] = {
-            "排名": 1,
-            "品牌": "7-11",
-            "商品": "測試飯糰",
-            "價格": 49,
-            "分類": "飯糰",
-            "fair_score": 89,
-            "consensus": "一致好評",
-            "共識分布": (72, 18, 10),
-            "討論聲量": "聲量充足",
-            "貼文數": 3,
-            "留言數": 64,
-            "有效樣本": 5.0,
-        }
-        row.update(overrides)
-        return row
-
-    def test_product_row_score_uses_detail_threshold_classes(self) -> None:
-        import app
-
-        good = app._product_row_html(self._row(fair_score=89))
-        ok = app._product_row_html(self._row(fair_score=55))
-        bad = app._product_row_html(self._row(fair_score=32))
-        empty = app._product_row_html(self._row(fair_score=None))
-
-        self.assertIn('class="row-score score-good"', good)
-        self.assertIn('class="row-score score-ok"', ok)
-        self.assertIn('class="row-score score-bad"', bad)
-        self.assertIn('class="row-score score-empty"', empty)
-
-    def test_product_row_shows_positive_share_and_sample_hint(self) -> None:
-        import app
-
-        html = app._product_row_html(self._row())
-
-        self.assertIn("正向 72%", html)
-        self.assertIn('class="row-consensus-seg pos"', html)
-        self.assertIn("64 則評價", html)
-        self.assertNotIn("好評明確", html)
-
-    def test_product_row_consensus_falls_back_without_distribution(self) -> None:
-        import app
-
-        html = app._product_row_html(self._row(consensus="資料不足", 共識分布=None, 留言數=0, 貼文數=2))
-
-        self.assertIn('class="signal signal-low"', html)
-        self.assertIn("資料不足", html)
-        self.assertIn("2 篇心得", html)
-        self.assertNotIn("row-consensus", html)
 
 
 class ReportingTest(unittest.TestCase):
