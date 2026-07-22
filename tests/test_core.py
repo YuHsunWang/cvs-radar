@@ -442,6 +442,16 @@ class ScoringTest(unittest.TestCase):
         self.assertTrue(any("牙寶寵物頭套" in (n or "") for n in names))
         self.assertTrue(any("安全帽" in (n or "") for n in names))
 
+    def test_rescue_discount_line_falls_back_to_title(self) -> None:
+        # A Hi-Life poster put the 即時救援 (near-expiry rescue) discount price into the
+        # 商品名稱 field; the real name "炸雞白醬燉飯" lives in the title. The rescue-promo
+        # line must not become the product key (ptt M.1784209146).
+        post = Post(id="p1", brand="萊爾富", title="[商品] 萊爾富-炸雞白醬燉飯",
+                    product_name="售價：99元/ 即時救援7折69元", author="a1", author_score=80)
+        names = [p.product_name for p in preprocess_posts([post])]
+        self.assertNotIn("即時救援7折", names)
+        self.assertTrue(any("炸雞白醬燉飯" in (n or "") for n in names))
+
     def test_bare_form_name_expands_to_title_flavor(self) -> None:
         # A shorthand price line ("霜淇淋49/草莓大福45") loses the flavor; the title
         # carries the full flavored name, which must be used instead of a bare "霜淇淋".
