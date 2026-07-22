@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-22T00:34:29.460649+00:00",
+  "generatedAt": "2026-07-22T08:54:36.481414+00:00",
   "products": [
     {
       "id": "全家::維也納奶油餐包",
@@ -786,7 +786,7 @@
       "price": 45,
       "category": "麵包",
       "fairScore": 70,
-      "recommendationScore": 82,
+      "recommendationScore": 81,
       "consensus": "一致好評",
       "confidence": "中",
       "nPosts": 1,
@@ -1163,6 +1163,36 @@
       "latestDate": "2026-02-26"
     },
     {
+      "id": "全家::鮮乳坊馬鈴薯玉米濃湯",
+      "brand": "全家",
+      "productName": "鮮乳坊馬鈴薯玉米濃湯",
+      "price": 55,
+      "category": "飲料",
+      "fairScore": 68,
+      "recommendationScore": 80,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 21,
+      "volumeLevel": "中等",
+      "positivePct": 81,
+      "neutralPct": 14,
+      "negativePct": 5,
+      "likes": [
+        "我也很愛 玉米濃湯",
+        "麵蠻好吃的 不會軟爛 回購好幾次了",
+        "玉米濃湯好喝"
+      ],
+      "cautions": [
+        "份量真的少"
+      ],
+      "excerpt": "香氣蠻夠的， 很好吃。 比起炒麵更愛這種燴麵的濕潤感。 湯頭很濃郁~喝起來有玉米的甜味。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1769575272.A.B3A.html"
+      ],
+      "latestDate": "2026-01-28"
+    },
+    {
       "id": "7-11::雪淋霜甜鹽蜜語牛奶",
       "brand": "7-11",
       "productName": "雪淋霜甜鹽蜜語牛奶",
@@ -1193,36 +1223,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1754166482.A.BB2.html"
       ],
       "latestDate": "2025-08-03"
-    },
-    {
-      "id": "全家::鮮乳坊馬鈴薯玉米濃湯",
-      "brand": "全家",
-      "productName": "鮮乳坊馬鈴薯玉米濃湯",
-      "price": 55,
-      "category": "飲料",
-      "fairScore": 68,
-      "recommendationScore": 80,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 21,
-      "volumeLevel": "中等",
-      "positivePct": 81,
-      "neutralPct": 14,
-      "negativePct": 5,
-      "likes": [
-        "我也很愛 玉米濃湯",
-        "麵蠻好吃的 不會軟爛 回購好幾次了",
-        "玉米濃湯好喝"
-      ],
-      "cautions": [
-        "份量真的少"
-      ],
-      "excerpt": "香氣蠻夠的， 很好吃。 比起炒麵更愛這種燴麵的濕潤感。 湯頭很濃郁~喝起來有玉米的甜味。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1769575272.A.B3A.html"
-      ],
-      "latestDate": "2026-01-28"
     },
     {
       "id": "全家::雙重巧克力Q堤",
@@ -1368,34 +1368,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1776681103.A.7FE.html"
       ],
       "latestDate": "2026-04-20"
-    },
-    {
-      "id": "全家::開心果奶昔",
-      "brand": "全家",
-      "productName": "開心果奶昔",
-      "price": 49,
-      "category": "其他",
-      "fairScore": 67,
-      "recommendationScore": 79,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 13,
-      "volumeLevel": "中等",
-      "positivePct": 100,
-      "neutralPct": 0,
-      "negativePct": 0,
-      "likes": [
-        "好吃 連吃兩天了",
-        "蠻好喝的味道不錯",
-        "蠻喜歡裡面那個米香 脆脆的"
-      ],
-      "cautions": [],
-      "excerpt": "很像在喝很濃郁的堅果牛奶。 脆脆的咬起來很紓壓。 喝過不少口味的全家奶昔。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1765945086.A.596.html"
-      ],
-      "latestDate": "2025-12-17"
     },
     {
       "id": "7-11::松露烤雞義大利麵",
@@ -1598,6 +1570,34 @@
         "https://www.ptt.cc/bbs/CVS/M.1766929301.A.C9E.html"
       ],
       "latestDate": "2025-12-28"
+    },
+    {
+      "id": "全家::開心果奶昔",
+      "brand": "全家",
+      "productName": "開心果奶昔",
+      "price": 49,
+      "category": "其他",
+      "fairScore": 67,
+      "recommendationScore": 79,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 13,
+      "volumeLevel": "中等",
+      "positivePct": 100,
+      "neutralPct": 0,
+      "negativePct": 0,
+      "likes": [
+        "好吃 連吃兩天了",
+        "蠻好喝的味道不錯",
+        "蠻喜歡裡面那個米香 脆脆的"
+      ],
+      "cautions": [],
+      "excerpt": "很像在喝很濃郁的堅果牛奶。 脆脆的咬起來很紓壓。 喝過不少口味的全家奶昔。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1765945086.A.596.html"
+      ],
+      "latestDate": "2025-12-17"
     },
     {
       "id": "全家::醇黑可可波蘿奶酥",
@@ -2638,39 +2638,6 @@
       "latestDate": "2026-01-07"
     },
     {
-      "id": "全家::奶油起司蝦仁通心粉",
-      "brand": "全家",
-      "productName": "奶油起司蝦仁通心粉",
-      "price": 79,
-      "category": "乳品",
-      "fairScore": 65,
-      "recommendationScore": 77,
-      "consensus": "一致好評",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 18,
-      "volumeLevel": "充足",
-      "positivePct": 66,
-      "neutralPct": 17,
-      "negativePct": 17,
-      "likes": [
-        "好吃,我很喜歡!可以再買個霸王腿條配,讚",
-        "真的不錯,搭奶油玉米濃湯很讚",
-        "剛剛買了 好吃"
-      ],
-      "cautions": [
-        "密集恐懼者不行:/",
-        "對標7的焗烤奶油蝦仁通心粉 69元 呵呵",
-        "你熱愛。我討厭通心粉xd 只能接受麵條狀"
-      ],
-      "excerpt": "通心粉份量算多。 奶油起司味道還不錯。 蝦仁雖然很小 但以價格來說還可以。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1761731955.A.FBE.html",
-        "https://www.ptt.cc/bbs/CVS/M.1764993579.A.216.html"
-      ],
-      "latestDate": "2025-12-06"
-    },
-    {
       "id": "全家::莊園牛奶霜淇淋",
       "brand": "全家",
       "productName": "莊園牛奶霜淇淋",
@@ -2724,6 +2691,39 @@
         "https://www.ptt.cc/bbs/CVS/M.1778816435.A.2FF.html"
       ],
       "latestDate": "2026-05-15"
+    },
+    {
+      "id": "全家::奶油起司蝦仁通心粉",
+      "brand": "全家",
+      "productName": "奶油起司蝦仁通心粉",
+      "price": 79,
+      "category": "乳品",
+      "fairScore": 65,
+      "recommendationScore": 77,
+      "consensus": "一致好評",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 18,
+      "volumeLevel": "充足",
+      "positivePct": 66,
+      "neutralPct": 17,
+      "negativePct": 17,
+      "likes": [
+        "好吃,我很喜歡!可以再買個霸王腿條配,讚",
+        "真的不錯,搭奶油玉米濃湯很讚",
+        "剛剛買了 好吃"
+      ],
+      "cautions": [
+        "密集恐懼者不行:/",
+        "對標7的焗烤奶油蝦仁通心粉 69元 呵呵",
+        "你熱愛。我討厭通心粉xd 只能接受麵條狀"
+      ],
+      "excerpt": "通心粉份量算多。 奶油起司味道還不錯。 蝦仁雖然很小 但以價格來說還可以。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1761731955.A.FBE.html",
+        "https://www.ptt.cc/bbs/CVS/M.1764993579.A.216.html"
+      ],
+      "latestDate": "2025-12-06"
     },
     {
       "id": "7-11::熱壓土司丹麥鮪魚嫩蛋",
@@ -3002,34 +3002,6 @@
       "latestDate": "2025-08-08"
     },
     {
-      "id": "全家::包邊絨毛袋",
-      "brand": "全家",
-      "productName": "包邊絨毛袋",
-      "price": 399,
-      "category": "其他",
-      "fairScore": 65,
-      "recommendationScore": 76,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 4,
-      "volumeLevel": "中等",
-      "positivePct": 100,
-      "neutralPct": 0,
-      "negativePct": 0,
-      "likes": [
-        "https://i.mopix.cc/mHsbQt.jpg買了一個杯麵的 很可愛 好少看到杯麵周邊",
-        "CareBears好可愛",
-        "想買杯麵款 但都只看到美樂蒂"
-      ],
-      "cautions": [],
-      "excerpt": "整體質感還不錯。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1767750289.A.8BF.html"
-      ],
-      "latestDate": "2026-01-07"
-    },
-    {
       "id": "全家::褲褲兔福袋",
       "brand": "全家",
       "productName": "褲褲兔福袋",
@@ -3117,6 +3089,34 @@
         "https://www.ptt.cc/bbs/CVS/M.1756448186.A.764.html"
       ],
       "latestDate": "2025-08-29"
+    },
+    {
+      "id": "全家::包邊絨毛袋",
+      "brand": "全家",
+      "productName": "包邊絨毛袋",
+      "price": 399,
+      "category": "其他",
+      "fairScore": 64,
+      "recommendationScore": 76,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 4,
+      "volumeLevel": "中等",
+      "positivePct": 100,
+      "neutralPct": 0,
+      "negativePct": 0,
+      "likes": [
+        "https://i.mopix.cc/mHsbQt.jpg買了一個杯麵的 很可愛 好少看到杯麵周邊",
+        "CareBears好可愛",
+        "想買杯麵款 但都只看到美樂蒂"
+      ],
+      "cautions": [],
+      "excerpt": "整體質感還不錯。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1767750289.A.8BF.html"
+      ],
+      "latestDate": "2026-01-07"
     },
     {
       "id": "7-11::蓮花焦糖巧脆餅熱壓土司",
@@ -4150,34 +4150,6 @@
       "latestDate": "2026-07-08"
     },
     {
-      "id": "7-11::乖乖玉米脆條玉米濃湯",
-      "brand": "7-11",
-      "productName": "乖乖玉米脆條玉米濃湯",
-      "price": 30,
-      "category": "零食",
-      "fairScore": 63,
-      "recommendationScore": 74,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 18,
-      "volumeLevel": "中等",
-      "positivePct": 44,
-      "neutralPct": 56,
-      "negativePct": 0,
-      "likes": [
-        "會回購+1 乖乖好會還原各種口味XD",
-        "去買了 好吃!全聯一包24還26,有點忘了(汗",
-        "很刷嘴"
-      ],
-      "cautions": [],
-      "excerpt": "打開後味道比想像中還濃，帶一點奶香，意外還原度蠻高的。 整體調味不會過甜或太鹹，屬於很耐吃的類型。 如果本來就喜歡玉米濃湯口味，我覺得這包還原度不錯，可以試試看應該會再回購。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1781699711.A.BD0.html"
-      ],
-      "latestDate": "2026-06-17"
-    },
-    {
       "id": "全家::優酪雪幕乳酪",
       "brand": "全家",
       "productName": "優酪雪幕乳酪",
@@ -4235,6 +4207,34 @@
         "https://www.ptt.cc/bbs/CVS/M.1754298106.A.59D.html"
       ],
       "latestDate": "2025-08-04"
+    },
+    {
+      "id": "7-11::乖乖玉米脆條玉米濃湯",
+      "brand": "7-11",
+      "productName": "乖乖玉米脆條玉米濃湯",
+      "price": 30,
+      "category": "零食",
+      "fairScore": 63,
+      "recommendationScore": 74,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 18,
+      "volumeLevel": "中等",
+      "positivePct": 44,
+      "neutralPct": 56,
+      "negativePct": 0,
+      "likes": [
+        "會回購+1 乖乖好會還原各種口味XD",
+        "去買了 好吃!全聯一包24還26,有點忘了(汗",
+        "很刷嘴"
+      ],
+      "cautions": [],
+      "excerpt": "打開後味道比想像中還濃，帶一點奶香，意外還原度蠻高的。 整體調味不會過甜或太鹹，屬於很耐吃的類型。 如果本來就喜歡玉米濃湯口味，我覺得這包還原度不錯，可以試試看應該會再回購。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1781699711.A.BD0.html"
+      ],
+      "latestDate": "2026-06-17"
     },
     {
       "id": "7-11::懷舊滷雙拼便當",
@@ -5482,34 +5482,6 @@
       "latestDate": "2026-04-20"
     },
     {
-      "id": "全家::三明治友善",
-      "brand": "全家",
-      "productName": "三明治友善",
-      "price": 28,
-      "category": "麵包",
-      "fairScore": 60,
-      "recommendationScore": 72,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 7,
-      "volumeLevel": "中等",
-      "positivePct": 78,
-      "neutralPct": 22,
-      "negativePct": 0,
-      "likes": [
-        "三明治 還不錯",
-        "奶茶跟三明治都不錯~ 沒領到券 可惜",
-        "冬天很適合喝草莓奶茶"
-      ],
-      "cautions": [],
-      "excerpt": "",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1764817369.A.647.html"
-      ],
-      "latestDate": "2025-12-04"
-    },
-    {
       "id": "萊爾富::77乳加星球含餡巧克力",
       "brand": "萊爾富",
       "productName": "77乳加星球含餡巧克力",
@@ -5574,36 +5546,32 @@
       "latestDate": "2026-01-21"
     },
     {
-      "id": "全家::花生濃餡蛋捲",
+      "id": "全家::三明治友善",
       "brand": "全家",
-      "productName": "花生濃餡蛋捲",
-      "price": null,
-      "category": "甜點",
+      "productName": "三明治友善",
+      "price": 28,
+      "category": "麵包",
       "fairScore": 60,
       "recommendationScore": 71,
       "consensus": "褒貶不一",
       "confidence": "中",
       "nPosts": 1,
-      "nComments": 30,
+      "nComments": 7,
       "volumeLevel": "中等",
-      "positivePct": 58,
-      "neutralPct": 20,
-      "negativePct": 22,
+      "positivePct": 78,
+      "neutralPct": 22,
+      "negativePct": 0,
       "likes": [
-        "好吃",
-        "這真的蠻好吃的 花生味很濃又不卡喉",
-        "好吃,鮮奶蛋捲也不錯"
+        "三明治 還不錯",
+        "奶茶跟三明治都不錯~ 沒領到券 可惜",
+        "冬天很適合喝草莓奶茶"
       ],
-      "cautions": [
-        "那個植物油也太猛太恐怖",
-        "盤子",
-        "花生製品吃即期的 肝很勇歐"
-      ],
-      "excerpt": "偏甜，花生味很濃郁。",
+      "cautions": [],
+      "excerpt": "",
       "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1768285432.A.790.html"
+        "https://www.ptt.cc/bbs/CVS/M.1764817369.A.647.html"
       ],
-      "latestDate": "2026-01-13"
+      "latestDate": "2025-12-04"
     },
     {
       "id": "7-11::熔岩起司燻培根厚土司95配",
@@ -5700,6 +5668,38 @@
         "https://www.ptt.cc/bbs/CVS/M.1771933341.A.A45.html"
       ],
       "latestDate": "2026-02-24"
+    },
+    {
+      "id": "全家::花生濃餡蛋捲",
+      "brand": "全家",
+      "productName": "花生濃餡蛋捲",
+      "price": null,
+      "category": "甜點",
+      "fairScore": 60,
+      "recommendationScore": 71,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 30,
+      "volumeLevel": "中等",
+      "positivePct": 58,
+      "neutralPct": 20,
+      "negativePct": 22,
+      "likes": [
+        "好吃",
+        "這真的蠻好吃的 花生味很濃又不卡喉",
+        "好吃,鮮奶蛋捲也不錯"
+      ],
+      "cautions": [
+        "那個植物油也太猛太恐怖",
+        "盤子",
+        "花生製品吃即期的 肝很勇歐"
+      ],
+      "excerpt": "偏甜，花生味很濃郁。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1768285432.A.790.html"
+      ],
+      "latestDate": "2026-01-13"
     },
     {
       "id": "全家::草苺丹麥手撕包",
@@ -7938,11 +7938,11 @@
       "latestDate": "2025-12-06"
     },
     {
-      "id": "萊爾富::即時救援7折",
+      "id": "萊爾富::炸雞白醬燉飯",
       "brand": "萊爾富",
-      "productName": "即時救援7折",
-      "price": 69,
-      "category": "其他",
+      "productName": "炸雞白醬燉飯",
+      "price": 99,
+      "category": "便當",
       "fairScore": 57,
       "recommendationScore": 68,
       "consensus": "褒貶不一",
@@ -8183,34 +8183,6 @@
       "latestDate": "2026-01-16"
     },
     {
-      "id": "全家::蘋果芒芒綠",
-      "brand": "全家",
-      "productName": "蘋果芒芒綠",
-      "price": 65,
-      "category": "其他",
-      "fairScore": 57,
-      "recommendationScore": 67,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 2,
-      "nComments": 8,
-      "volumeLevel": "中等",
-      "positivePct": 45,
-      "neutralPct": 36,
-      "negativePct": 19,
-      "likes": [],
-      "cautions": [
-        "今天有嚐鮮 感覺蘋果丁跟芒果綠不太搭",
-        "坐等5折以下出清價再嚐鮮"
-      ],
-      "excerpt": "蘋果芒芒綠是蘋果汁混芒果汁的組合。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1759380405.A.208.html",
-        "https://www.ptt.cc/bbs/CVS/M.1761733451.A.284.html"
-      ],
-      "latestDate": "2025-10-29"
-    },
-    {
       "id": "全家::unopastaXsolopasta煙花女義大利麵",
       "brand": "全家",
       "productName": "unopastaXsolopasta煙花女義大利麵",
@@ -8275,6 +8247,34 @@
       "latestDate": "2025-12-11"
     },
     {
+      "id": "全家::蘋果芒芒綠",
+      "brand": "全家",
+      "productName": "蘋果芒芒綠",
+      "price": 65,
+      "category": "其他",
+      "fairScore": 57,
+      "recommendationScore": 67,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 2,
+      "nComments": 8,
+      "volumeLevel": "中等",
+      "positivePct": 45,
+      "neutralPct": 36,
+      "negativePct": 19,
+      "likes": [],
+      "cautions": [
+        "今天有嚐鮮 感覺蘋果丁跟芒果綠不太搭",
+        "坐等5折以下出清價再嚐鮮"
+      ],
+      "excerpt": "蘋果芒芒綠是蘋果汁混芒果汁的組合。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1759380405.A.208.html",
+        "https://www.ptt.cc/bbs/CVS/M.1761733451.A.284.html"
+      ],
+      "latestDate": "2025-10-29"
+    },
+    {
       "id": "7-11::這不是抹茶鬆餅",
       "brand": "7-11",
       "productName": "這不是抹茶鬆餅",
@@ -8337,37 +8337,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1763386437.A.1B3.html"
       ],
       "latestDate": "2025-11-17"
-    },
-    {
-      "id": "7-11::蓮花焦糖脆餅巴斯克",
-      "brand": "7-11",
-      "productName": "蓮花焦糖脆餅巴斯克",
-      "price": 79,
-      "category": "零食",
-      "fairScore": 56,
-      "recommendationScore": 67,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 12,
-      "volumeLevel": "中等",
-      "positivePct": 70,
-      "neutralPct": 0,
-      "negativePct": 30,
-      "likes": [
-        "巴斯克我比較愛",
-        "巴斯克還不錯",
-        "吃過蓮花餅德式布丁跟蓮花餅巴斯克,兩款蓮花餅的部分口感都濕軟,個人比較喜歡巴斯克,有看到特價可以買"
-      ],
-      "cautions": [
-        "前陣子有吃到蓮花餅德式布丁,CP值比巴斯克蛋糕那款高,巴斯克價格買不下手",
-        "德式布丁和巴斯克都吃過,比較喜歡德式布丁,可以放冷凍會比較硬一點"
-      ],
-      "excerpt": "下方深色的部分類似焦糖的味道。 對我來說蓮花餅軟軟的有點可惜。 好吃，cp值也比較高，我自己是會回購的。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1763557154.A.C96.html"
-      ],
-      "latestDate": "2025-11-19"
     },
     {
       "id": "全家::香蒜胡椒肉骨茶麵",
@@ -8458,6 +8427,37 @@
         "https://www.ptt.cc/bbs/CVS/M.1773127329.A.84F.html"
       ],
       "latestDate": "2026-03-10"
+    },
+    {
+      "id": "7-11::蓮花焦糖脆餅巴斯克",
+      "brand": "7-11",
+      "productName": "蓮花焦糖脆餅巴斯克",
+      "price": 79,
+      "category": "零食",
+      "fairScore": 56,
+      "recommendationScore": 67,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 12,
+      "volumeLevel": "中等",
+      "positivePct": 70,
+      "neutralPct": 0,
+      "negativePct": 30,
+      "likes": [
+        "巴斯克我比較愛",
+        "巴斯克還不錯",
+        "吃過蓮花餅德式布丁跟蓮花餅巴斯克,兩款蓮花餅的部分口感都濕軟,個人比較喜歡巴斯克,有看到特價可以買"
+      ],
+      "cautions": [
+        "前陣子有吃到蓮花餅德式布丁,CP值比巴斯克蛋糕那款高,巴斯克價格買不下手",
+        "德式布丁和巴斯克都吃過,比較喜歡德式布丁,可以放冷凍會比較硬一點"
+      ],
+      "excerpt": "下方深色的部分類似焦糖的味道。 對我來說蓮花餅軟軟的有點可惜。 好吃，cp值也比較高，我自己是會回購的。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1763557154.A.C96.html"
+      ],
+      "latestDate": "2025-11-19"
     },
     {
       "id": "全家::鮮蝦旬彩炊飯飯糰",
@@ -17462,6 +17462,36 @@
       "latestDate": "2025-09-06"
     },
     {
+      "id": "7-11::御弁當金黃炸魚爪哇咖哩飯",
+      "brand": "7-11",
+      "productName": "御弁當金黃炸魚爪哇咖哩飯",
+      "price": 89,
+      "category": "便當",
+      "fairScore": 40,
+      "recommendationScore": 48,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 16,
+      "volumeLevel": "中等",
+      "positivePct": 14,
+      "neutralPct": 20,
+      "negativePct": 66,
+      "likes": [
+        "剛才吃還不錯"
+      ],
+      "cautions": [
+        "這咖哩的配料也太少了 而且三根鴻禧菇的排法有夠嘲諷:「我就是願意花時間一根一根排 也不願意給你一坨鴻禧菇配菜」",
+        "爪哇之前特點就是便宜 現在多一點點料就漲到89 太誇張",
+        "配菜糟糕 不如還我原本的爪哇"
+      ],
+      "excerpt": "佛蒙特送的又是雲朵拿鐵焦糖風味，比較想嘗試白巧炸魚三塊不錯吃，咖哩香氣撲鼻微辣扣掉送的飲料大概等於i 珍食的價格缺點是配菜太少。 一塊南瓜、一朵花椰菜和一小撮菇喬亞原來是可口可樂的，陳柏霖代言免費沒什麼好嫌，不過不太適合配飯還是茶類能解膩，爪哇比佛蒙特好吃。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1754045467.A.FF1.html"
+      ],
+      "latestDate": "2025-08-01"
+    },
+    {
       "id": "全家::芝麻糊糊",
       "brand": "全家",
       "productName": "芝麻糊糊",
@@ -17523,36 +17553,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1760711025.A.BA5.html"
       ],
       "latestDate": "2025-10-17"
-    },
-    {
-      "id": "7-11::御弁當金黃炸魚爪哇咖哩飯",
-      "brand": "7-11",
-      "productName": "御弁當金黃炸魚爪哇咖哩飯",
-      "price": 89,
-      "category": "便當",
-      "fairScore": 40,
-      "recommendationScore": 48,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 16,
-      "volumeLevel": "中等",
-      "positivePct": 14,
-      "neutralPct": 20,
-      "negativePct": 66,
-      "likes": [
-        "剛才吃還不錯"
-      ],
-      "cautions": [
-        "這咖哩的配料也太少了 而且三根鴻禧菇的排法有夠嘲諷:「我就是願意花時間一根一根排 也不願意給你一坨鴻禧菇配菜」",
-        "爪哇之前特點就是便宜 現在多一點點料就漲到89 太誇張",
-        "配菜糟糕 不如還我原本的爪哇"
-      ],
-      "excerpt": "佛蒙特送的又是雲朵拿鐵焦糖風味，比較想嘗試白巧炸魚三塊不錯吃，咖哩香氣撲鼻微辣扣掉送的飲料大概等於i 珍食的價格缺點是配菜太少。 一塊南瓜、一朵花椰菜和一小撮菇喬亞原來是可口可樂的，陳柏霖代言免費沒什麼好嫌，不過不太適合配飯還是茶類能解膩，爪哇比佛蒙特好吃。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1754045467.A.FF1.html"
-      ],
-      "latestDate": "2025-08-01"
     },
     {
       "id": "7-11::福得生活香菜布蕾",
@@ -18248,6 +18248,38 @@
       "latestDate": "2025-08-08"
     },
     {
+      "id": "全家::麻婆豆腐波浪麵",
+      "brand": "全家",
+      "productName": "麻婆豆腐波浪麵",
+      "price": null,
+      "category": "鹹食",
+      "fairScore": 38,
+      "recommendationScore": 45,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 27,
+      "volumeLevel": "中等",
+      "positivePct": 16,
+      "neutralPct": 25,
+      "negativePct": 59,
+      "likes": [
+        "昨天第一次吃 好吃欸,也不 過鹹",
+        "我昨天也吃了 不 過鹹 也 不錯吃",
+        "我吃了 蠻好吃 不過真的不能單吃 我直接配沙拉吃"
+      ],
+      "cautions": [
+        "越改版越難吃,最一開始至少還會辣,現在的只剩死鹹",
+        "鹹死真的",
+        "確實難吃"
+      ],
+      "excerpt": "",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1763953671.A.764.html"
+      ],
+      "latestDate": "2025-11-24"
+    },
+    {
       "id": "全家::開心果霜淇淋",
       "brand": "全家",
       "productName": "開心果霜淇淋",
@@ -18281,38 +18313,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1775492006.A.16F.html"
       ],
       "latestDate": "2026-04-07"
-    },
-    {
-      "id": "全家::麻婆豆腐波浪麵",
-      "brand": "全家",
-      "productName": "麻婆豆腐波浪麵",
-      "price": null,
-      "category": "鹹食",
-      "fairScore": 38,
-      "recommendationScore": 45,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 27,
-      "volumeLevel": "中等",
-      "positivePct": 16,
-      "neutralPct": 25,
-      "negativePct": 59,
-      "likes": [
-        "昨天第一次吃 好吃欸,也不 過鹹",
-        "我昨天也吃了 不 過鹹 也 不錯吃",
-        "我吃了 蠻好吃 不過真的不能單吃 我直接配沙拉吃"
-      ],
-      "cautions": [
-        "越改版越難吃,最一開始至少還會辣,現在的只剩死鹹",
-        "鹹死真的",
-        "確實難吃"
-      ],
-      "excerpt": "",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1763953671.A.764.html"
-      ],
-      "latestDate": "2025-11-24"
     },
     {
       "id": "7-11::聖諾黑千層塔",
@@ -21344,32 +21344,6 @@
       "latestDate": "2025-10-15"
     },
     {
-      "id": "OK::廣達香肉鬆飯糰一起結帳不確定",
-      "brand": "OK",
-      "productName": "廣達香肉鬆飯糰一起結帳不確定",
-      "price": null,
-      "category": "便當",
-      "fairScore": 52,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 2,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [],
-      "cautions": [
-        "OK的飯不喜歡 不知道有沒有改版就是 不過也看不到OK了"
-      ],
-      "excerpt": "也可以跟廣達香聯名。 肉鬆飯糰帶一點甜味。 下次再吃吃看冷藏版的。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1774913447.A.F18.html"
-      ],
-      "latestDate": "2026-03-31"
-    },
-    {
       "id": "全家::酥皮麵包",
       "brand": "全家",
       "productName": "酥皮麵包",
@@ -21396,6 +21370,32 @@
         "https://www.ptt.cc/bbs/CVS/M.1759884287.A.A16.html"
       ],
       "latestDate": "2025-10-08"
+    },
+    {
+      "id": "OK::廣達香肉鬆飯糰一起結帳不確定",
+      "brand": "OK",
+      "productName": "廣達香肉鬆飯糰一起結帳不確定",
+      "price": null,
+      "category": "便當",
+      "fairScore": 52,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 2,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [],
+      "cautions": [
+        "OK的飯不喜歡 不知道有沒有改版就是 不過也看不到OK了"
+      ],
+      "excerpt": "也可以跟廣達香聯名。 肉鬆飯糰帶一點甜味。 下次再吃吃看冷藏版的。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1774913447.A.F18.html"
+      ],
+      "latestDate": "2026-03-31"
     },
     {
       "id": "7-11::TOMMI青花椒雞腿排米漢堡",
