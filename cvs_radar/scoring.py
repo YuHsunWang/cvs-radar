@@ -716,6 +716,10 @@ def _is_junk_extracted_product_name(name: str) -> bool:
     compact = re.sub(r"\s+", "", text)
     if _is_price_label_name(compact):
         return True
+    # 萊爾富「即時救援」是即期品折扣活動名稱，不是商品名。貼文者常把它連同折扣價
+    # 填進商品名稱欄（如「售價：99元/ 即時救援7折69元」），真正商品名留在標題。
+    if re.search(r"即時救援|即期救援|救援價", compact):
+        return True
     if compact in _FRAGMENT_PRODUCT_NAMES:
         return True
     if re.fullmatch(r"(?:今日|會員|搭配|友善|購入)(?:價|\d+折|一)?", compact):
