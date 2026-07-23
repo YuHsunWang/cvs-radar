@@ -1,5 +1,9 @@
 # Runbook:raw 資料(posts.jsonl)遺失復原
 
+> 排程/發布/新鮮度監控見 [`ops-pipeline.md`](./ops-pipeline.md)。發布者自
+> 2026-07-21 起為本機 cron pipeline(`scripts/ops/`),`refresh-data.yml` 僅
+> 手動備援;本頁下方部分 CI-cache 流程屬舊架構,復原步驟仍適用。
+
 ## 背景:raw 資料存放架構
 
 `data/posts.jsonl`(含真實 PTT 帳號的爬取歷史)**絕不進 repo**(repo 是
