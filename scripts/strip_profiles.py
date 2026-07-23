@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remove account profiles from a publishable results snapshot."""
+"""Remove account-level identity from a publishable results snapshot."""
 
 from __future__ import annotations
 
@@ -12,9 +12,27 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RESULTS_PATH = ROOT / "data" / "results.json"
 
 
+def _strip_identity(value: object) -> None:
+    if isinstance(value, list):
+        for item in value:
+            _strip_identity(item)
+        return
+    if not isinstance(value, dict):
+        return
+
+    for key in list(value):
+        if key in {"contributors", "profiles"}:
+            value[key] = []
+        elif key == "user" or key.startswith("suspicion_"):
+            del value[key]
+        else:
+            _strip_identity(value[key])
+
+
 def strip_profiles(path: Path) -> None:
     payload = json.loads(path.read_text(encoding="utf-8"))
     payload["profiles"] = []
+    _strip_identity(payload)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 

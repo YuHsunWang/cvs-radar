@@ -25,8 +25,9 @@ from .config import (
     SCORING,
     SHILL_DETECTION,
 )
+from .filters import normalize_datetime
 from .models import Comment, Contributor, Post, ProductReport
-from .parser import _title_product_name
+from .parser import _title_product_name, brand_alias_positions
 from .preference import AccountProfile
 from .sentiment import NEGATIVE_WORDS, POSITIVE_WORDS
 
@@ -1343,19 +1344,9 @@ def _all_brand_spans(text: str, brands: tuple[str, ...]) -> list[tuple[str, int,
 
 
 def _brand_positions(text: str, brand: str) -> list[tuple[int, int]]:
-    token = _text_token(text)
     positions: list[tuple[int, int]] = []
     for alias in _brand_aliases(brand):
-        alias_token = _text_token(alias)
-        if not alias_token:
-            continue
-        start = 0
-        while True:
-            index = token.find(alias_token, start)
-            if index < 0:
-                break
-            positions.append((index, index + len(alias_token)))
-            start = index + max(1, len(alias_token))
+        positions.extend(brand_alias_positions(text, alias))
     return sorted(set(positions))
 
 
@@ -1467,10 +1458,9 @@ def _decay(posted_at: datetime | None, now: datetime | None = None) -> float:
     lam = float(SCORING["time_decay_lambda"])
     if lam <= 0 or posted_at is None:
         return 1.0
-    now = now or datetime.now(timezone.utc)
-    if posted_at.tzinfo is None:
-        posted_at = posted_at.replace(tzinfo=timezone.utc)
-    days = max(0.0, (now - posted_at).total_seconds() / 86400.0)
+    current = normalize_datetime(now or datetime.now(timezone.utc))
+    posted_at = normalize_datetime(posted_at)
+    days = max(0.0, (current - posted_at).total_seconds() / 86400.0)
     return math.exp(-lam * days)
 
 
@@ -1599,10 +1589,14 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
     ) = _competitor_stats(posts)
     review_excerpt = _load_review_excerpt_overrides().get(product_key) or _review_excerpt(posts)
 
-    post_dates = [p.posted_at for p in posts if p.posted_at]
+    post_dates = [normalize_datetime(p.posted_at) for p in posts if p.posted_at]
     latest_post_date = max(post_dates) if post_dates else None
     priced_posts = [p for p in posts if p.price and p.price.isdigit()]
-    latest_priced_post = max(priced_posts, key=lambda p: p.posted_at or datetime.min, default=None)
+    latest_priced_post = max(
+        priced_posts,
+        key=lambda p: normalize_datetime(p.posted_at or datetime.min),
+        default=None,
+    )
     price = int(latest_priced_post.price) if latest_priced_post is not None and latest_priced_post.price else None
     post_urls = sorted({p.url for p in posts if p.url})
 

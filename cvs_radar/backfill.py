@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
+from .filters import normalize_datetime, parse_datetime
 from .parser import parse_ptt_article
 
 
@@ -78,17 +79,12 @@ def is_recent_refresh_candidate(
     raw_posted_at = row.get("posted_at")
     if not raw_posted_at:
         return False
-    try:
-        posted_at = datetime.fromisoformat(str(raw_posted_at))
-    except ValueError:
-        return False
+    posted_at = parse_datetime(str(raw_posted_at))
+    if posted_at is None:
+        raise ValueError(f"invalid date/datetime: {raw_posted_at!r}")
 
-    current = now or datetime.now(timezone.utc)
-    if current.tzinfo is None:
-        current = current.replace(tzinfo=timezone.utc)
-    if posted_at.tzinfo is None:
-        posted_at = posted_at.replace(tzinfo=timezone.utc)
-    age = current.astimezone(timezone.utc) - posted_at.astimezone(timezone.utc)
+    current = normalize_datetime(now or datetime.now(timezone.utc))
+    age = current - normalize_datetime(posted_at)
     return timedelta(0) <= age <= timedelta(days=recent_days)
 
 

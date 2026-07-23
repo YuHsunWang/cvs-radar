@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+import pytest
+
 from cvs_radar.backfill import (
     backfill_missing_reviews,
     is_backfill_candidate,
@@ -135,10 +137,19 @@ def test_recent_refresh_candidate_respects_age_and_ptt_cvs_url() -> None:
         recent_days=30,
         now=now,
     )
+    with pytest.raises(ValueError, match="invalid date/datetime"):
+        is_recent_refresh_candidate(
+            row(posted_at="not-a-date"),
+            recent_days=30,
+            now=now,
+        )
+
+
+def test_recent_refresh_interprets_naive_timestamp_as_taipei() -> None:
     assert not is_recent_refresh_candidate(
-        row(posted_at="not-a-date"),
-        recent_days=30,
-        now=now,
+        row(posted_at="2026-07-15T01:00:00"),
+        recent_days=1,
+        now=datetime(2026, 7, 16, tzinfo=timezone.utc),
     )
 
 

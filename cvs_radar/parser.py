@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import hashlib
 import re
+import unicodedata
 from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
 
 from .config import BRANDS
+from .filters import TAIPEI_TZ, normalize_datetime
 from .models import Comment, Post
 
 FIELD_RE = re.compile(r"【\s*(?P<key>[^】\n]+?)\s*】\s*(?P<value>.*?)(?=\n\s*【|\Z)", re.S)
@@ -36,9 +38,52 @@ def infer_brand(*texts: str) -> str:
 def _infer_brand_from_text(haystack: str) -> str:
     for brand, keywords in BRANDS.items():
         for keyword in keywords:
-            if keyword.lower() in haystack:
+            if brand_alias_positions(haystack, keyword):
                 return brand
     return "其他"
+
+
+def brand_alias_positions(text: str, alias: str) -> list[tuple[int, int]]:
+    """Return normalized spans where a brand alias matches safely."""
+    haystack = unicodedata.normalize("NFKC", str(text or "")).casefold()
+    needle = unicodedata.normalize("NFKC", str(alias or "")).casefold()
+    if not needle:
+        return []
+
+    positions: list[tuple[int, int]] = []
+    start = 0
+    while True:
+        index = haystack.find(needle, start)
+        if index < 0:
+            break
+        end = index + len(needle)
+        if not needle.isascii() or (
+            _is_ascii_alias_boundary(haystack, index - 1)
+            and _is_ascii_alias_boundary(haystack, end)
+        ):
+            positions.append((index, end))
+        start = index + max(1, len(needle))
+    return positions
+
+
+def _is_ascii_alias_boundary(text: str, index: int) -> bool:
+    if index < 0 or index >= len(text):
+        return True
+    character = text[index]
+    if _is_cjk(character):
+        return True
+    category = unicodedata.category(character)
+    return not (category[0] in {"L", "M", "N"} or category == "Pc")
+
+
+def _is_cjk(character: str) -> bool:
+    codepoint = ord(character)
+    return (
+        0x3400 <= codepoint <= 0x4DBF
+        or 0x4E00 <= codepoint <= 0x9FFF
+        or 0xF900 <= codepoint <= 0xFAFF
+        or 0x20000 <= codepoint <= 0x323AF
+    )
 
 
 def parse_score(raw: str | None) -> float | None:
@@ -286,7 +331,7 @@ def parse_ptt_datetime(raw: str | None) -> datetime | None:
         return None
     for fmt in ("%a %b %d %H:%M:%S %Y", "%Y-%m-%d %H:%M:%S"):
         try:
-            return datetime.strptime(raw.strip(), fmt)
+            return datetime.strptime(raw.strip(), fmt).replace(tzinfo=TAIPEI_TZ)
         except ValueError:
             pass
     return None
@@ -298,13 +343,14 @@ def parse_push_datetime(raw: str | None, reference: datetime | None = None) -> d
         return None
     text = raw.strip()
     try:
-        return datetime.strptime(text, "%Y-%m-%d %H:%M:%S")
+        return datetime.strptime(text, "%Y-%m-%d %H:%M:%S").replace(tzinfo=TAIPEI_TZ)
     except ValueError:
         pass
 
     match = re.fullmatch(r"(?P<month>\d{1,2})/(?P<day>\d{1,2})\s+(?P<hour>\d{1,2}):(?P<minute>\d{2})", text)
     if match:
-        year = reference.year if reference is not None else datetime.now().year
+        reference = normalize_datetime(reference) if reference is not None else None
+        year = reference.year if reference is not None else datetime.now(TAIPEI_TZ).year
         try:
             parsed = datetime(
                 year,
@@ -312,6 +358,7 @@ def parse_push_datetime(raw: str | None, reference: datetime | None = None) -> d
                 int(match.group("day")),
                 int(match.group("hour")),
                 int(match.group("minute")),
+                tzinfo=TAIPEI_TZ,
             )
         except ValueError:
             return None

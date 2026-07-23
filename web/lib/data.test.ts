@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DATA_STALE_DAYS,
   Product,
   applyAdvanced,
+  comprehensiveScore,
+  dataAgeDays,
   dateToOffset,
   displayCategory,
   filterByCategory,
   filterHasScore,
   formatDisplayDate,
+  isDataStale,
   normalizeDateRange,
   offsetToDate,
   recentRecommendationScore,
@@ -95,6 +99,16 @@ describe('filterHasScore', () => {
   })
 })
 
+describe('comprehensiveScore', () => {
+  it('uses the calibrated recommendation score as the canonical public score', () => {
+    expect(comprehensiveScore(product({ fairScore: 20, recommendationScore: 91 }))).toBe(91)
+  })
+
+  it('preserves a null recommendation score even when a Bayesian score exists', () => {
+    expect(comprehensiveScore(product({ fairScore: 75, recommendationScore: null }))).toBeNull()
+  })
+})
+
 describe('date slider offsets', () => {
   it('round-trips UTC calendar days, including the minimum and maximum bounds', () => {
     const minDate = '2026-02-27'
@@ -135,6 +149,29 @@ describe('formatDisplayDate', () => {
 
   it('keeps date-only values readable', () => {
     expect(formatDisplayDate('2026-07-05')).toBe('2026/07/05')
+  })
+})
+
+describe('data freshness', () => {
+  const now = Date.parse('2026-07-23T12:00:00+08:00')
+
+  it('treats a recent data timestamp as fresh', () => {
+    const recent = new Date(now - (DATA_STALE_DAYS - 1) * 24 * 60 * 60 * 1000).toISOString()
+
+    expect(dataAgeDays(recent, now)).toBe(DATA_STALE_DAYS - 1)
+    expect(isDataStale(recent, now)).toBe(false)
+  })
+
+  it('treats data older than the threshold as stale', () => {
+    const stale = new Date(now - (DATA_STALE_DAYS + 1) * 24 * 60 * 60 * 1000).toISOString()
+
+    expect(dataAgeDays(stale, now)).toBe(DATA_STALE_DAYS + 1)
+    expect(isDataStale(stale, now)).toBe(true)
+  })
+
+  it.each(['not-a-date', ''])('treats %j as unknown without throwing', (value) => {
+    expect(dataAgeDays(value, now)).toBeNull()
+    expect(isDataStale(value, now)).toBe(false)
   })
 })
 
@@ -183,8 +220,8 @@ describe('sortProducts', () => {
     ])
   })
 
-  it('returns no recent recommendation score when the fair score is unavailable', () => {
-    expect(recentRecommendationScore(product({ fairScore: null }))).toBeNull()
+  it('returns no recent recommendation score when the recommendation score is unavailable', () => {
+    expect(recentRecommendationScore(product({ fairScore: 75, recommendationScore: null }))).toBeNull()
   })
 
   it('uses volume and then recency to produce useful score tie-breaks', () => {
@@ -201,13 +238,19 @@ describe('sortProducts', () => {
     ])
   })
 
-  it('sorts directly by the fair score when calibrated scores are tied', () => {
-    const tied = [
-      product({ id: 'lower', fairScore: 79, recommendationScore: 92 }),
-      product({ id: 'higher', fairScore: 80, recommendationScore: 92 }),
+  it('sorts score modes by recommendation score rather than Bayesian fair score', () => {
+    const opposedScores = [
+      product({ id: 'higher-fair', fairScore: 90, recommendationScore: 60 }),
+      product({ id: 'higher-recommendation', fairScore: 40, recommendationScore: 80 }),
     ]
 
-    expect(sortProducts(tied, 'fairScoreDesc').map(({ id }) => id)).toEqual(['higher', 'lower'])
-    expect(sortProducts(tied, 'fairScoreAsc').map(({ id }) => id)).toEqual(['lower', 'higher'])
+    expect(sortProducts(opposedScores, 'fairScoreDesc').map(({ id }) => id)).toEqual([
+      'higher-recommendation',
+      'higher-fair',
+    ])
+    expect(sortProducts(opposedScores, 'fairScoreAsc').map(({ id }) => id)).toEqual([
+      'higher-fair',
+      'higher-recommendation',
+    ])
   })
 })

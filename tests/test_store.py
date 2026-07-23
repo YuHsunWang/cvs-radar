@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import json
 import unittest
+import warnings
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from zoneinfo import ZoneInfo
 
 from cvs_radar.models import Comment, Post
 from cvs_radar.pipeline import run_pipeline
@@ -20,9 +23,14 @@ class StoreTest(unittest.TestCase):
             product_name="測試飯糰",
             author="tester",
             author_score=85,
-            posted_at=datetime(2026, 6, 1, 12, 0),
+            posted_at=datetime(2026, 6, 1, 12, 0, tzinfo=ZoneInfo("Asia/Taipei")),
             comments=[
-                Comment("推", "alice", "好吃", datetime(2026, 6, 1, 12, 10)),
+                Comment(
+                    "推",
+                    "alice",
+                    "好吃",
+                    datetime(2026, 6, 1, 12, 10, tzinfo=ZoneInfo("Asia/Taipei")),
+                ),
                 Comment("噓", "bob", "普通", None),
             ],
         )
@@ -58,6 +66,47 @@ class StoreTest(unittest.TestCase):
     def test_load_from_nonexistent_returns_empty(self) -> None:
         self.assertEqual(load_posts("/tmp/does_not_exist_xyz.jsonl"), [])
 
+    def test_load_skips_corrupt_middle_and_truncated_final_lines_with_diagnostics(self) -> None:
+        good_posts = [
+            Post(id="good-1", brand="7-11", product_name="One"),
+            Post(id="good-2", brand="全家", product_name="Two"),
+        ]
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "posts.jsonl"
+            path.write_text(
+                json.dumps(post_to_dict(good_posts[0]), ensure_ascii=False)
+                + "\n{corrupt middle\n"
+                + json.dumps(post_to_dict(good_posts[1]), ensure_ascii=False)
+                + '\n{"id":"truncated"',
+                encoding="utf-8",
+            )
+
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                loaded = load_posts(path)
+
+        self.assertEqual([post.id for post in loaded], ["good-1", "good-2"])
+        diagnostics = "\n".join(str(warning.message) for warning in caught)
+        self.assertIn(f"{path}:2", diagnostics)
+        self.assertIn(f"{path}:4", diagnostics)
+        self.assertIn("skipped 2 invalid JSONL lines", diagnostics)
+
+    def test_append_after_truncated_line_preserves_new_record(self) -> None:
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "posts.jsonl"
+            path.write_text(
+                json.dumps(post_to_dict(Post(id="good-1", product_name="One")))
+                + '\n{"id":"truncated"',
+                encoding="utf-8",
+            )
+
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)
+                self.assertEqual(save_posts([Post(id="good-2", product_name="Two")], path), 1)
+                reloaded = load_posts(path)
+
+        self.assertEqual([post.id for post in reloaded], ["good-1", "good-2"])
+
     def test_store_stats_summarizes_posts_comments_brands_and_dates(self) -> None:
         posts = [
             Post(
@@ -84,7 +133,10 @@ class StoreTest(unittest.TestCase):
         self.assertEqual(stats["post_count"], 2)
         self.assertEqual(stats["comment_count"], 1)
         self.assertEqual(stats["brands"], ["7-11", "全家"])
-        self.assertEqual(stats["date_range"], ("2026-06-01T12:00:00", "2026-06-02T12:00:00"))
+        self.assertEqual(
+            stats["date_range"],
+            ("2026-06-01T12:00:00+08:00", "2026-06-02T12:00:00+08:00"),
+        )
 
     def test_stored_posts_flow_through_pipeline(self) -> None:
         """Posts saved and loaded from store produce valid pipeline output."""
@@ -129,6 +181,8 @@ class StoreTest(unittest.TestCase):
             competitor_mention_count=2,
             competitor_preference_count=1,
             competitor_brands=["全家"],
+            shill_flag=True,
+            shill_ratio=0.375,
         )
         restored = store_dict_to_report(report_to_store_dict(original))
         self.assertEqual(restored.brand, original.brand)
@@ -138,6 +192,23 @@ class StoreTest(unittest.TestCase):
         self.assertEqual(restored.contributors[0].user, "u1")
         self.assertEqual(restored.rep_positive, ["好吃"])
         self.assertEqual(restored.competitor_brands, ["全家"])
+        self.assertTrue(restored.shill_flag)
+        self.assertEqual(restored.shill_ratio, 0.375)
+
+    def test_old_report_schema_defaults_shill_fields(self) -> None:
+        from cvs_radar.models import ProductReport
+        from cvs_radar.store import report_to_store_dict, store_dict_to_report
+
+        old_schema = report_to_store_dict(
+            ProductReport("7-11", "舊資料", 70.0, "褒貶不一", "低", 1.0, 0.2, 1, 2)
+        )
+        old_schema.pop("shill_flag", None)
+        old_schema.pop("shill_ratio", None)
+
+        restored = store_dict_to_report(old_schema)
+
+        self.assertFalse(restored.shill_flag)
+        self.assertEqual(restored.shill_ratio, 0.0)
 
     def test_profile_roundtrip(self) -> None:
         """AccountProfile -> dict -> AccountProfile preserves all fields."""

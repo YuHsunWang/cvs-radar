@@ -24,6 +24,11 @@ class _SandboxSafeTestClient(TestClient):
 
     def get(self, url: str, params: dict[str, Any] | None = None, **_kwargs: Any) -> _Response:
         params = params or {}
+        headers = _kwargs.get("headers") or {}
+        x_api_token = next(
+            (value for name, value in headers.items() if name.lower() == "x-api-token"),
+            None,
+        )
         source = params.get("source", "demo")
         if source not in {"demo", "crawl", "stored", "results"}:
             return _Response(422, {"detail": "invalid source"})
@@ -37,6 +42,7 @@ class _SandboxSafeTestClient(TestClient):
                     start_date=None,
                     end_date=None,
                     recent_days=None,
+                    x_api_token=x_api_token,
                 )
             elif url == "/products":
                 payload = endpoint(
@@ -51,7 +57,8 @@ class _SandboxSafeTestClient(TestClient):
                     min_posts=None,
                     min_comments=None,
                     limit=None,
-                    internal=False,
+                    internal=bool(params.get("internal", False)),
+                    x_api_token=x_api_token,
                 )
             else:
                 payload = endpoint()
@@ -64,6 +71,10 @@ client = _SandboxSafeTestClient(app)
 
 
 def test_health_returns_ok_status() -> None:
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
     assert health() == {"status": "ok"}
 
 
@@ -131,3 +142,146 @@ def test_products_invalid_source_returns_422() -> None:
     response = client.get("/products", params={"source": "invalid_source"})
 
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize("header_value", [None, "wrong-token"], ids=["missing", "invalid"])
+def test_products_internal_requires_api_token(
+    monkeypatch: pytest.MonkeyPatch,
+    header_value: str | None,
+) -> None:
+    monkeypatch.setenv("CVS_RADAR_API_TOKEN", "test-secret")
+    headers = {} if header_value is None else {"X-API-Token": header_value}
+
+    response = client.get(
+        "/products",
+        params={"source": "demo", "internal": True},
+        headers=headers,
+    )
+
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize("configured_token", [None, ""], ids=["unset", "empty"])
+def test_products_internal_is_disabled_without_server_token(
+    monkeypatch: pytest.MonkeyPatch,
+    configured_token: str | None,
+) -> None:
+    if configured_token is None:
+        monkeypatch.delenv("CVS_RADAR_API_TOKEN", raising=False)
+    else:
+        monkeypatch.setenv("CVS_RADAR_API_TOKEN", configured_token)
+
+    response = client.get(
+        "/products",
+        params={"source": "demo", "internal": True},
+        headers={"X-API-Token": "test-secret"},
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.parametrize("path", ["/brands", "/products"])
+@pytest.mark.parametrize("header_value", [None, "wrong-token"], ids=["missing", "invalid"])
+def test_crawl_requires_api_token(
+    monkeypatch: pytest.MonkeyPatch,
+    path: str,
+    header_value: str | None,
+) -> None:
+    monkeypatch.setenv("CVS_RADAR_API_TOKEN", "test-secret")
+    load_calls: list[str] = []
+
+    def fake_load_posts(source: str, **_kwargs: Any) -> list[Any]:
+        load_calls.append(source)
+        return []
+
+    monkeypatch.setattr("cvs_radar.api.load_posts", fake_load_posts)
+    headers = {} if header_value is None else {"X-API-Token": header_value}
+
+    response = client.get(path, params={"source": "crawl"}, headers=headers)
+
+    assert response.status_code == 401
+    assert load_calls == []
+
+
+@pytest.mark.parametrize("path", ["/brands", "/products"])
+@pytest.mark.parametrize("configured_token", [None, ""], ids=["unset", "empty"])
+def test_crawl_is_disabled_without_server_token(
+    monkeypatch: pytest.MonkeyPatch,
+    path: str,
+    configured_token: str | None,
+) -> None:
+    if configured_token is None:
+        monkeypatch.delenv("CVS_RADAR_API_TOKEN", raising=False)
+    else:
+        monkeypatch.setenv("CVS_RADAR_API_TOKEN", configured_token)
+    load_calls: list[str] = []
+
+    def fake_load_posts(source: str, **_kwargs: Any) -> list[Any]:
+        load_calls.append(source)
+        return []
+
+    monkeypatch.setattr("cvs_radar.api.load_posts", fake_load_posts)
+
+    response = client.get(
+        path,
+        params={"source": "crawl"},
+        headers={"X-API-Token": "test-secret"},
+    )
+
+    assert response.status_code == 403
+    assert load_calls == []
+
+
+def test_products_internal_allows_valid_api_token(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CVS_RADAR_API_TOKEN", "test-secret")
+
+    response = client.get(
+        "/products",
+        params={"source": "demo", "internal": True},
+        headers={"X-API-Token": "test-secret"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["filters"]["internal"] is True
+    assert any(report.get("contributors") for report in payload["reports"])
+
+
+@pytest.mark.parametrize("path", ["/brands", "/products"])
+def test_crawl_allows_valid_api_token(monkeypatch: pytest.MonkeyPatch, path: str) -> None:
+    monkeypatch.setenv("CVS_RADAR_API_TOKEN", "test-secret")
+    load_calls: list[str] = []
+
+    def fake_load_posts(source: str, **_kwargs: Any) -> list[Any]:
+        load_calls.append(source)
+        return []
+
+    monkeypatch.setattr("cvs_radar.api.load_posts", fake_load_posts)
+
+    response = client.get(
+        path,
+        params={"source": "crawl"},
+        headers={"X-API-Token": "test-secret"},
+    )
+
+    assert response.status_code == 200
+    assert load_calls == ["crawl"]
+
+
+@pytest.mark.parametrize("source", ["demo", "stored", "results"])
+def test_products_public_sources_need_no_token_and_hide_contributors(
+    monkeypatch: pytest.MonkeyPatch,
+    source: str,
+) -> None:
+    required_path = {
+        "stored": Path("data/posts.jsonl"),
+        "results": Path("data/results.json"),
+    }.get(source)
+    if required_path is not None and not required_path.exists():
+        pytest.skip(f"{required_path} does not exist")
+    monkeypatch.delenv("CVS_RADAR_API_TOKEN", raising=False)
+
+    response = client.get("/products", params={"source": source, "internal": False})
+
+    assert response.status_code == 200
+    assert all("contributors" not in report for report in response.json()["reports"])

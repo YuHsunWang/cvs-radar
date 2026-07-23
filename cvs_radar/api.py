@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from datetime import date
-from typing import Literal
+from typing import Annotated, Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
 
+from .api_auth import require_privileged_access
 from .app_helpers import build_product_query, load_posts
 from .service import (
     ProductQuery,
@@ -37,8 +38,12 @@ def brands(
     start_date: date | None = None,
     end_date: date | None = None,
     recent_days: int | None = Query(None, ge=0),
+    x_api_token: Annotated[str | None, Header(alias="X-API-Token")] = None,
 ) -> list[dict[str, object]]:
     """回傳品牌摘要清單。"""
+    # Production deployments should also enforce rate limiting and a request
+    # timeout around the synchronous crawl path.
+    require_privileged_access(source == "crawl", x_api_token)
     try:
         if source == "results":
             loaded = load_results()
@@ -79,8 +84,11 @@ def products(
     min_comments: int | None = Query(None, ge=0),
     limit: int | None = Query(None, ge=0),
     internal: bool = False,
+    x_api_token: Annotated[str | None, Header(alias="X-API-Token")] = None,
 ) -> dict[str, object]:
     """回傳商品查詢結果。"""
+    privileged = require_privileged_access(internal or source == "crawl", x_api_token)
+    effective_internal = bool(internal and privileged)
     try:
         query = build_product_query(
             brand=brand,
@@ -92,7 +100,7 @@ def products(
             min_posts=min_posts,
             min_comments=min_comments,
             limit=limit,
-            internal=internal,
+            internal=effective_internal,
         )
         if source == "results":
             loaded = load_results()

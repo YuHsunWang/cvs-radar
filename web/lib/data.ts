@@ -23,6 +23,7 @@ export type Product = {
 
 export type DataPayload = {
   generatedAt: string
+  siteBuiltAt: string
   products: Product[]
 }
 
@@ -36,6 +37,9 @@ export type SortKey =
   | 'discussionHeatDesc'
   | 'fairScoreDesc'
   | 'fairScoreAsc'
+
+export const DATA_STALE_DAYS = 14
+const millisecondsPerDay = 24 * 60 * 60 * 1000
 
 export const brands = ['7-11', '全家', '萊爾富', 'OK', '美聯社', '其他'] as const
 export const categoryGroups = {
@@ -66,6 +70,17 @@ export function formatDisplayDate(value: string): string {
   }).format(date)
 }
 
+export function dataAgeDays(generatedAt: string, now = Date.now()): number | null {
+  const generatedAtMs = Date.parse(generatedAt)
+  if (!generatedAt || !Number.isFinite(generatedAtMs)) return null
+  return (now - generatedAtMs) / millisecondsPerDay
+}
+
+export function isDataStale(generatedAt: string, now = Date.now()): boolean {
+  const ageDays = dataAgeDays(generatedAt, now)
+  return ageDays !== null && ageDays > DATA_STALE_DAYS
+}
+
 export function filterBySearch(products: Product[], query: string): Product[] {
   const needle = normalizeText(query.trim())
   if (!needle) return products
@@ -91,10 +106,9 @@ export function filterHasScore(products: Product[], hideNoScore: boolean): Produ
 }
 
 export function comprehensiveScore(product: Product): number | null {
-  return product.recommendationScore === null ? null : product.fairScore
+  return product.recommendationScore
 }
 
-const millisecondsPerDay = 24 * 60 * 60 * 1000
 const DEFAULT_HALF_LIFE_DAYS = 24
 const RECOMMENDATION_HEAT_WEIGHT = 0.15
 
@@ -154,7 +168,6 @@ export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
     if (difference !== 0) return difference
 
     const scoreDiff = (comprehensiveScore(b) ?? -1) - (comprehensiveScore(a) ?? -1)
-    const fairScoreDiff = (b.fairScore ?? -1) - (a.fairScore ?? -1)
     const volumeDiff = b.nPosts + b.nComments - (a.nPosts + a.nComments)
     const dateDiff = compareNullableStrings(a.latestDate, b.latestDate, true)
 
@@ -163,7 +176,6 @@ export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
       if (volumeDiff !== 0 && sortKey === 'discussionHeatDesc') return volumeDiff
       if (dateDiff !== 0) return dateDiff
     } else {
-      if (fairScoreDiff !== 0) return sortKey === 'fairScoreDesc' ? fairScoreDiff : -fairScoreDiff
       if (volumeDiff !== 0) return volumeDiff
       if (dateDiff !== 0) return dateDiff
     }

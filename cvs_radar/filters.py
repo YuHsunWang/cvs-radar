@@ -4,8 +4,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from datetime import date, datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 from .models import Comment, Post
+
+
+TAIPEI_TZ = ZoneInfo("Asia/Taipei")
 
 
 @dataclass(frozen=True, slots=True)
@@ -160,14 +164,13 @@ def _datetime_gt(left: datetime, right: datetime) -> bool:
 
 
 def _comparable_datetimes(left: datetime, right: datetime) -> tuple[datetime, datetime]:
-    if _is_aware(left) and _is_aware(right):
-        return left, right
-    return _drop_tz(left), _drop_tz(right)
+    return normalize_datetime(left), normalize_datetime(right)
 
 
-def _is_aware(value: datetime) -> bool:
-    return value.tzinfo is not None and value.utcoffset() is not None
-
-
-def _drop_tz(value: datetime) -> datetime:
-    return value.replace(tzinfo=None)
+def normalize_datetime(value: datetime) -> datetime:
+    """Interpret naive values as Taipei time and return a Taipei-aware value."""
+    if not isinstance(value, datetime):
+        raise TypeError(f"expected datetime, got {type(value).__name__}")
+    if value.tzinfo is None or value.utcoffset() is None:
+        return value.replace(tzinfo=TAIPEI_TZ)
+    return value.astimezone(TAIPEI_TZ)

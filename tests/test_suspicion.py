@@ -107,9 +107,12 @@ class SuspicionSignalTest(unittest.TestCase):
         self.assertLess(profile.credibility, 1.0)
         # weight = credibility × time decay: equal to credibility only after
         # dividing the decay factor back out (λ > 0 since 2026-07-20).
+        # contributor.weight is stored rounded to 4 places, so dividing it by an
+        # unrounded decay carries up to ~rounding/decay (~1e-4) of error; assert to
+        # 3 places, which still proves credibility (0.175) down-weights vs 1.0.
         decay = mean(_decay(c.posted_at) for c in posts[0].comments)
         self.assertGreater(decay, 0.0)
-        self.assertAlmostEqual(contributor.weight / decay, profile.credibility, places=4)
+        self.assertAlmostEqual(contributor.weight / decay, profile.credibility, places=3)
 
 
 class ShillDetectionTest(unittest.TestCase):

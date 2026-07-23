@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 
 from cvs_radar import store
 from cvs_radar.crawler import PttCrawler
@@ -81,8 +82,20 @@ class ParserTest(unittest.TestCase):
             }
         ])
         self.assertEqual(prev_url, "https://www.ptt.cc/bbs/CVS/index123.html")
-        self.assertEqual(parse_ptt_datetime("Mon Jun  1 12:00:00 2026"), datetime(2026, 6, 1, 12, 0))
+        self.assertEqual(
+            parse_ptt_datetime("Mon Jun  1 12:00:00 2026"),
+            datetime(2026, 6, 1, 12, 0, tzinfo=ZoneInfo("Asia/Taipei")),
+        )
         self.assertIsNone(parse_ptt_datetime("not a date"))
+
+    def test_brand_aliases_respect_ascii_boundaries(self) -> None:
+        for text in ("cookie", "okay", "smoky", "WACOOKIES"):
+            with self.subTest(text=text):
+                self.assertEqual(infer_brand(text), "其他")
+
+        for text in ("OK", "OKmart", "OK超商", "OK便利商店"):
+            with self.subTest(text=text):
+                self.assertEqual(infer_brand(text), "OK")
 
     def test_parse_score_edge_cases(self) -> None:
         self.assertEqual(parse_score("85"), 85)
@@ -172,7 +185,7 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(comment.user, "alice")
         self.assertEqual(comment.tag, "推")
         self.assertEqual(comment.text, "第一段第二段第三段")
-        self.assertEqual(comment.posted_at.isoformat(), "2026-06-01T12:01:00")
+        self.assertEqual(comment.posted_at.isoformat(), "2026-06-01T12:01:00+08:00")
 
     def test_parse_comments_keeps_non_adjacent_same_user_separate(self) -> None:
         html = """
@@ -236,16 +249,17 @@ class ParserTest(unittest.TestCase):
         rollover = parse_push_datetime("01/01 00:05", reference=datetime(2025, 12, 31, 23, 50))
         previous_year = parse_push_datetime("12/31 23:55", reference=datetime(2026, 1, 1, 0, 5))
 
-        self.assertEqual(same_year, datetime(2025, 5, 2, 12, 30))
-        self.assertEqual(rollover, datetime(2026, 1, 1, 0, 5))
-        self.assertEqual(previous_year, datetime(2025, 12, 31, 23, 55))
+        taipei = ZoneInfo("Asia/Taipei")
+        self.assertEqual(same_year, datetime(2025, 5, 2, 12, 30, tzinfo=taipei))
+        self.assertEqual(rollover, datetime(2026, 1, 1, 0, 5, tzinfo=taipei))
+        self.assertEqual(previous_year, datetime(2025, 12, 31, 23, 55, tzinfo=taipei))
 
     def test_parse_push_datetime_accepts_leap_day_with_reference_year(self) -> None:
         from datetime import datetime
 
         parsed = parse_push_datetime("02/29 08:15", reference=datetime(2024, 2, 29, 8, 0))
 
-        self.assertEqual(parsed, datetime(2024, 2, 29, 8, 15))
+        self.assertEqual(parsed, datetime(2024, 2, 29, 8, 15, tzinfo=ZoneInfo("Asia/Taipei")))
 
 
 class CrawlerSeenCacheTest(unittest.TestCase):
@@ -694,6 +708,21 @@ class ScoringTest(unittest.TestCase):
         self.assertEqual(report.competitor_mention_count, 1)
         self.assertEqual(report.competitor_preference_count, 0)
         self.assertEqual(report.competitor_brands, ["7-11"])
+
+    def test_competitor_attribution_respects_ascii_brand_boundaries(self) -> None:
+        from cvs_radar.scoring import _comment_attribution
+
+        for text in ("cookie 很好吃", "okay", "smoky 口味", "WACOOKIES"):
+            with self.subTest(text=text):
+                attribution = _comment_attribution("全家", Comment("推", "u1", text, sentiment=0.8))
+                self.assertTrue(attribution.include_score)
+                self.assertEqual(attribution.competitor_brands, ())
+
+        for text in ("OK", "OKmart", "OK超商", "OK便利商店"):
+            with self.subTest(text=text):
+                attribution = _comment_attribution("全家", Comment("推", "u1", text, sentiment=0.8))
+                self.assertFalse(attribution.include_score)
+                self.assertEqual(attribution.competitor_brands, ("OK",))
 
     def test_reaction_echo_comments_do_not_count_as_independent_complaints(self) -> None:
         post = Post(
@@ -1345,6 +1374,54 @@ class TimeAndServiceTest(unittest.TestCase):
         )
 
         self.assertEqual([post.id for post in selected], ["in"])
+
+    def test_timezone_matrix_filters_recent_window_and_latest_date(self) -> None:
+        from cvs_radar.service import select_reviews
+
+        raw_times = (
+            "2026-06-01T08:00:00",
+            "2026-06-01T08:00:00+08:00",
+            "2026-06-01T00:00:00Z",
+        )
+        posts = [
+            store.dict_to_post(
+                {
+                    "id": f"tz-{index}",
+                    "brand": "7-11",
+                    "product_name": "時區測試",
+                    "posted_at": raw_time,
+                    "comments": [],
+                }
+            )
+            for index, raw_time in enumerate(raw_times)
+        ]
+
+        taipei = ZoneInfo("Asia/Taipei")
+        expected = datetime(2026, 6, 1, 8, 0, tzinfo=taipei)
+        self.assertTrue(all(post.posted_at == expected for post in posts))
+        selected = select_reviews(
+            posts,
+            start_date="2026-06-01T07:59:00+08:00",
+            end_date="2026-06-01T08:01:00+08:00",
+        )
+        recent = select_reviews(
+            posts,
+            recent_days=1,
+            now=datetime(2026, 6, 2, 8, 0, tzinfo=taipei),
+        )
+        self.assertEqual([post.id for post in selected], ["tz-0", "tz-1", "tz-2"])
+        self.assertEqual([post.id for post in recent], ["tz-0", "tz-1", "tz-2"])
+
+        mixed = posts + [
+            Post(
+                id="tz-latest",
+                brand="7-11",
+                product_name="時區測試",
+                posted_at=datetime(2026, 6, 1, 1, 0, tzinfo=ZoneInfo("UTC")),
+            )
+        ]
+        report = score_product(mixed, {})
+        self.assertEqual(report.latest_post_date, datetime(2026, 6, 1, 9, 0, tzinfo=taipei))
 
     def test_service_lists_brands_and_filters_rankings(self) -> None:
         from cvs_radar.service import ProductQuery, list_brands, query_products

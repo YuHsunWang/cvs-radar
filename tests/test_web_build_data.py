@@ -1,14 +1,20 @@
+import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 from types import SimpleNamespace
 
+import web.build_data as build_data
 from web.build_data import (
     apply_product_override,
+    assert_unique_product_ids,
     calibrate_recommendation_score,
     calibrate_recommendation_scores,
     display_confidence,
     load_product_overrides,
+    merge_products,
+    resolve_data_timestamps,
 )
 
 
@@ -19,6 +25,58 @@ def report(key: str, score: float | None, *, confidence: str = "中", consensus:
         confidence=confidence,
         consensus=consensus,
     )
+
+
+def test_source_snapshot_time_is_distinct_from_site_build_time(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "results.json"
+    output = tmp_path / "data.json"
+    source.write_text(json.dumps({"generated_at": "2026-07-22 08:34:28"}), encoding="utf-8")
+    site_built_at = datetime(2026, 7, 23, 4, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(build_data, "ROOT", tmp_path)
+    monkeypatch.setattr(build_data, "load_results", lambda _source: ([], []))
+    monkeypatch.setattr(build_data, "load_product_overrides", lambda: {})
+
+    build_data.main(source=source, output=output, site_built_at=site_built_at)
+    payload = json.loads(output.read_text(encoding="utf-8"))
+
+    assert payload["generatedAt"] == "2026-07-22T08:34:28+08:00"
+    assert payload["siteBuiltAt"] == "2026-07-23T04:00:00+00:00"
+    assert payload["generatedAt"] != payload["siteBuiltAt"]
+
+
+def test_missing_source_snapshot_time_falls_back_to_site_build_time(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source = tmp_path / "results.json"
+    output = tmp_path / "data.json"
+    source.write_text(json.dumps({"reports": []}), encoding="utf-8")
+    site_built_at = datetime(2026, 7, 23, 4, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(build_data, "ROOT", tmp_path)
+    monkeypatch.setattr(build_data, "load_results", lambda _source: ([], []))
+    monkeypatch.setattr(build_data, "load_product_overrides", lambda: {})
+
+    build_data.main(source=source, output=output, site_built_at=site_built_at)
+    payload = json.loads(output.read_text(encoding="utf-8"))
+
+    assert payload["generatedAt"] == site_built_at.isoformat()
+    assert payload["siteBuiltAt"] == site_built_at.isoformat()
+    assert "WARNING: source data has no generated_at" in capsys.readouterr().out
+
+
+def test_stale_source_snapshot_prints_build_warning(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source = tmp_path / "results.json"
+    source.write_text(json.dumps({"generated_at": "2026-07-01 12:00:00"}), encoding="utf-8")
+    site_built_at = datetime(2026, 7, 23, 4, 0, tzinfo=timezone.utc)
+
+    resolve_data_timestamps(source, site_built_at)
+
+    warning = capsys.readouterr().out
+    assert "WARNING: source data is stale" in warning
+    assert "threshold: 14 days" in warning
 
 
 def test_recommendation_score_calibration_is_monotonic_and_reaches_nineties() -> None:
@@ -183,3 +241,67 @@ def test_invalid_override_price_fails_fast(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="invalid product override price"):
         load_product_overrides(path)
+
+
+def test_override_collision_merges_into_one_public_product() -> None:
+    products = [
+        {
+            "id": "7-11::促銷商品49第二件",
+            "brand": "7-11",
+            "productName": "促銷商品49第二件",
+            "category": "冰品",
+            "nPosts": 1,
+            "nComments": 2,
+            "_nEff": 2,
+            "_fairScoreRaw": 80.0,
+            "fairScore": 80,
+            "recommendationScore": 93,
+            "latestDate": "2026-06-01",
+            "firstDate": "2026-05-01",
+            "likes": ["甲", "共同"],
+            "cautions": ["太甜"],
+        },
+        {
+            "id": "7-11::促銷商品",
+            "brand": "7-11",
+            "productName": "促銷商品",
+            "category": "甜點",
+            "nPosts": 3,
+            "nComments": 6,
+            "_nEff": 6,
+            "_fairScoreRaw": 40.0,
+            "fairScore": 40,
+            "recommendationScore": 48,
+            "latestDate": "2026-06-20",
+            "firstDate": "2026-05-10",
+            "likes": ["共同", "乙", "丙"],
+            "cautions": ["偏貴", "份量少", "易融"],
+        },
+    ]
+    overrides = {
+        "7-11::促銷商品49第二件": {"productName": "促銷商品"},
+    }
+    corrected = [apply_product_override(item, overrides.get(item["id"])) for item in products]
+
+    merged = merge_products([item for item in corrected if item is not None])
+
+    assert len(merged) == 1
+    assert merged[0]["id"] == "7-11::促銷商品"
+    assert merged[0]["nPosts"] == 4
+    assert merged[0]["nComments"] == 8
+    assert merged[0]["fairScore"] == 50
+    assert merged[0]["recommendationScore"] == 60
+    assert merged[0]["latestDate"] == "2026-06-20"
+    assert merged[0]["firstDate"] == "2026-05-01"
+    assert merged[0]["likes"] == ["甲", "共同", "乙"]
+    assert merged[0]["cautions"] == ["太甜", "偏貴", "份量少"]
+    assert merged[0]["category"] == "甜點"
+    assert "_nEff" not in merged[0]
+    assert "_fairScoreRaw" not in merged[0]
+
+
+def test_duplicate_public_product_ids_fail_fast() -> None:
+    products = [{"id": "全家::重複商品"}, {"id": "全家::重複商品"}]
+
+    with pytest.raises(ValueError, match="duplicate public product ids after merge"):
+        assert_unique_product_ids(products)

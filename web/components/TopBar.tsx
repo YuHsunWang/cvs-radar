@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bell, Radar, X } from 'lucide-react'
-import { formatDisplayDate, sortLabel, type CategoryKey, type SortKey } from '@/lib/data'
+import {
+  DATA_STALE_DAYS,
+  formatDisplayDate,
+  isDataStale,
+  sortLabel,
+  type CategoryKey,
+  type SortKey,
+} from '@/lib/data'
 
 type TopBarProps = {
   brand: string | null
@@ -22,6 +29,7 @@ export default function TopBar({
   const [isNoticeOpen, setIsNoticeOpen] = useState(false)
   const noticeButtonRef = useRef<HTMLButtonElement>(null)
   const noticeRef = useRef<HTMLDivElement>(null)
+  const dataIsStale = isDataStale(generatedAt)
 
   useEffect(() => {
     if (!isNoticeOpen) return
@@ -63,13 +71,16 @@ export default function TopBar({
         <button
           ref={noticeButtonRef}
           type="button"
-          aria-label="資料更新通知"
+          aria-label={dataIsStale ? '資料更新通知，有資料過期警告' : '資料更新通知'}
           aria-expanded={isNoticeOpen}
           aria-haspopup="dialog"
           onClick={() => setIsNoticeOpen((open) => !open)}
-          className="grid size-11 place-items-center text-slate-700"
+          className="relative grid size-11 place-items-center text-slate-700"
         >
           <Bell size={27} strokeWidth={2.15} />
+          {dataIsStale ? (
+            <span aria-hidden="true" className="absolute right-2 top-2 size-2.5 rounded-full bg-amber-500 ring-2 ring-[#FCFAF5]" />
+          ) : null}
         </button>
       </div>
 
@@ -85,7 +96,12 @@ export default function TopBar({
               <p className="font-black text-slate-950">資料更新</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">目前收錄 {productCount} 項商品</p>
               <p className="text-sm font-semibold text-slate-600">最新發文 {formatDisplayDate(latestDate)}</p>
-              <p className="mt-2 text-xs font-medium text-slate-400">資料建立 {formatDisplayDate(generatedAt)}</p>
+              <p className="mt-2 text-xs font-medium text-slate-400">資料更新 {formatDisplayDate(generatedAt)}</p>
+              {dataIsStale ? (
+                <p role="alert" className="mt-1 text-xs font-bold text-amber-700">
+                  資料可能過期（超過 {DATA_STALE_DAYS} 天未更新）
+                </p>
+              ) : null}
             </div>
             <button type="button" aria-label="關閉通知" onClick={() => setIsNoticeOpen(false)} className="grid size-11 shrink-0 place-items-center text-slate-500">
               <X size={20} />

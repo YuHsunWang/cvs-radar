@@ -16,6 +16,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           <UserRound size={20} className="text-[#0F7C7C]" aria-hidden="true" />
           作者評價
         </h3>
+        <p className="mt-3 text-sm font-bold text-slate-600">
+          貝氏公正分：<span className="text-slate-950">{product.fairScore ?? '—'}</span>
+        </p>
         <blockquote className="mt-3 rounded-r-md border-l-4 border-[#0F7C7C] bg-slate-50 px-3 py-2.5 text-sm font-semibold leading-6 text-slate-700">
           {product.excerpt || '未擷取到足夠的作者評價，請查看原文。'}
         </blockquote>
