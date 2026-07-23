@@ -8,25 +8,30 @@ version = "0.1.0"
 description = "PTT CVS product scoring pipeline"
 requires-python = ">=3.12"
 
+# Version floors are anchored to the versions actually validated against the
+# live pipeline (Python 3.14 user-site); upper bounds cap at the next known
+# breaking major so a fresh install stays reproducible without downgrading a
+# working environment. Notably openai is pinned to the 2.x line (the code uses
+# the 2.x SDK); do not drop below it.
 [project.optional-dependencies]
 core = [
-  "beautifulsoup4==4.12.3",
-  "requests==2.32.3",
-  "PyYAML==6.0.2",
+  "beautifulsoup4>=4.12,<5",
+  "requests>=2.32,<3",
+  "PyYAML>=6.0,<7",
 ]
 api = [
-  "fastapi==0.111.1",
-  "uvicorn==0.30.6",
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.30,<1",
 ]
 nlp-optional = [
-  "SnowNLP==0.12.3",
-  "openai==1.40.6",
+  "SnowNLP>=0.12.3",
+  "openai>=2,<3",
 ]
 legacy = ["streamlit>=1.41,<2"]
 dev = [
-  "httpx==0.27.0",
-  "pytest==8.3.3",
-  "ruff==0.6.9",
+  "httpx>=0.27,<1",
+  "pytest>=8,<10",
+  "ruff>=0.6",
 ]
 
 [tool.setuptools.packages.find]
