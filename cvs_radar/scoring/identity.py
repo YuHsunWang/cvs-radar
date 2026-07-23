@@ -517,10 +517,12 @@ def _name_bigrams(text: str) -> set[str]:
 def _route_comments_by_product(comments: list[Comment], names: list[str]) -> list[list[Comment]]:
     """Route each comment to the split product whose name it distinctly matches.
 
-    Falls back to sharing a comment across all split products when its text
-    does not uniquely single out one product's distinctive name fragments,
-    so ambiguous comments still count (previous behavior) instead of being
-    silently dropped.
+    Only comments that distinctly single out exactly one split product's name
+    fragments are attributed. Ambiguous comments — those matching none or more
+    than one product's distinctive fragments — are dropped rather than shared
+    across every split product, so a comment about one item no longer pollutes
+    the fair score, consensus and excerpt of the other products in the same
+    multi-product post (review #21).
     """
     bigrams = [_name_bigrams(name) for name in names]
     distinctive: list[set[str]] = []
@@ -537,9 +539,7 @@ def _route_comments_by_product(comments: list[Comment], names: list[str]) -> lis
         hits = [i for i, dset in enumerate(distinctive) if dset and (comment_grams & dset)]
         if len(hits) == 1:
             routed[hits[0]].append(comment)
-        else:
-            for bucket in routed:
-                bucket.append(comment)
+        # else: ambiguous (no distinct match, or matches several) -> drop it.
     return routed
 
 

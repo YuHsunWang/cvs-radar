@@ -409,6 +409,26 @@ class ScoringTest(unittest.TestCase):
             ["明太子起司貝果"],
         )
 
+    def test_ambiguous_comment_not_shared_across_split_products(self) -> None:
+        # review #21: in a multi-product post, a comment that does not distinctly
+        # single out exactly one split product must be dropped, not copied into
+        # every product's bucket (which polluted the others' fair score /
+        # consensus / excerpt). Comments that DO distinctly match are still
+        # attributed to that one product.
+        from cvs_radar.scoring import _route_comments_by_product
+
+        names = ["草莓大福", "巧克力泡芙"]
+        comments = [
+            Comment("推", "a", "草莓大福好好吃"),
+            Comment("推", "b", "巧克力泡芙超讚"),
+            Comment("推", "c", "好吃推薦"),  # ambiguous -> must be dropped
+        ]
+        routed = _route_comments_by_product(comments, names)
+        self.assertEqual([c.text for c in routed[0]], ["草莓大福好好吃"])
+        self.assertEqual([c.text for c in routed[1]], ["巧克力泡芙超讚"])
+        # the ambiguous comment must land in NEITHER bucket
+        self.assertNotIn("好吃推薦", [c.text for bucket in routed for c in bucket])
+
     def test_product_synonym_normalization(self) -> None:
         self.assertEqual(
             normalize_product("7-11", "起士蛋糕"),
