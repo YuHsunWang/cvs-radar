@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Any
+import asyncio
 
+import httpx
 import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
@@ -61,7 +63,7 @@ class _SandboxSafeTestClient(TestClient):
                     x_api_token=x_api_token,
                 )
             else:
-                payload = endpoint()
+                payload = asyncio.run(endpoint())
         except HTTPException as exc:
             return _Response(exc.status_code, {"detail": exc.detail})
         return _Response(200, payload)
@@ -75,7 +77,7 @@ def test_health_returns_ok_status() -> None:
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
-    assert health() == {"status": "ok"}
+    assert asyncio.run(health()) == {"status": "ok"}
 
 
 def test_brands_demo_returns_valid_brand_list() -> None:
@@ -142,6 +144,33 @@ def test_products_invalid_source_returns_422() -> None:
     response = client.get("/products", params={"source": "invalid_source"})
 
     assert response.status_code == 422
+
+
+def test_asgi_enforces_query_bounds_and_public_payload_contract() -> None:
+    async def exercise() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as asgi_client:
+            invalid = await asgi_client.get("/products", params={"crawl_pages": 51})
+            public = await asgi_client.get("/health")
+
+        assert invalid.status_code == 422
+        assert public.status_code == 200
+        assert public.json() == {"status": "ok"}
+
+        def public_keys_only(value: Any) -> bool:
+            if isinstance(value, dict):
+                return all(
+                    key not in {"author", "contributors", "user", "suspicion"}
+                    and public_keys_only(item)
+                    for key, item in value.items()
+                )
+            if isinstance(value, list):
+                return all(public_keys_only(item) for item in value)
+            return True
+
+        assert public_keys_only(public.json())
+
+    asyncio.run(exercise())
 
 
 @pytest.mark.parametrize("header_value", [None, "wrong-token"], ids=["missing", "invalid"])

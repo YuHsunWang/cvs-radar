@@ -28,15 +28,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download seed
+        env:
+          SEED_URL: ${{ inputs.seed_url }}
         run: |
           mkdir -p data
-          curl -fsSL "${{ inputs.seed_url }}" -o data/posts.jsonl
+          curl -fsSL "$SEED_URL" -o data/posts.jsonl
           wc -c data/posts.jsonl
 
       - name: Validate seed (JSONL, enough posts, expected fields)
+        env:
+          MIN_POSTS: ${{ inputs.min_posts }}
         run: |
           python3 - <<'PY'
-          import json, sys
+          import json, os, sys
           n = 0
           with open("data/posts.jsonl", encoding="utf-8") as f:
               for line in f:
@@ -45,7 +49,7 @@ jobs:
                   row = json.loads(line)
                   assert "id" in row and "comments" in row, "unexpected schema"
                   n += 1
-          minimum = int("${{ inputs.min_posts }}")
+          minimum = int(os.environ["MIN_POSTS"])
           print(f"seed posts: {n} (minimum {minimum})")
           sys.exit(0 if n >= minimum else 1)
           PY

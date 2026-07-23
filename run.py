@@ -40,6 +40,14 @@ def main() -> None:
     parser.add_argument("--verbose", action="store_true", help="Enable crawler debug logging")
     args = parser.parse_args()
 
+    if args.results and any(
+        value is not None for value in (args.start_date, args.end_date, args.recent_days)
+    ):
+        parser.error(
+            "--results cannot be combined with --start-date, --end-date, or --recent-days: "
+            "precomputed results cannot be re-filtered by date"
+        )
+
     logging.basicConfig(
         level=logging.INFO if args.verbose else logging.WARNING,
         format="%(levelname)s:%(name)s:%(message)s",

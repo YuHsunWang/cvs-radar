@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from collections import Counter
 from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import urlparse
@@ -40,6 +41,7 @@ class PttCrawler:
         self.session.cookies.set("over18", "1", domain="www.ptt.cc")
         self._base_origin = urlparse(self.base_url)
         self.seen_urls = self._load_seen()
+        self.last_crawl_counts: Counter[str] = Counter()
 
     def crawl(
         self,
@@ -62,6 +64,7 @@ class PttCrawler:
         )
         url = f"{self.base_url}/bbs/{board}/index.html"
         posts: list[Post] = []
+        counts: Counter[str] = Counter()
 
         for _ in range(max_pages):
             html = self._get(url)
@@ -69,24 +72,32 @@ class PttCrawler:
             for item in items:
                 article_url = item["url"]
                 if not self._is_allowed_url(article_url):
+                    counts["invalid_url"] += 1
                     logger.warning("skipping off-site article URL: %s", article_url)
                     continue
                 if article_url in self.seen_urls:
+                    counts["seen"] += 1
                     continue
                 try:
                     article = self._get(article_url)
                     post = parse_ptt_article(article, article_url, board)
                 except Exception as exc:  # keep batch running when one article fails
-                    logger.warning("failed to parse %s: %s", article_url, exc)
+                    counts[f"transient_failure:{type(exc).__name__}"] += 1
+                    logger.warning("transient article failure for %s (%s): %s", article_url, type(exc).__name__, exc)
                     continue
                 if post is None:
-                    self.seen_urls.add(article_url)
+                    counts["non_product"] += 1
+                    logger.info("article was not parsed as a product; leaving uncached: %s", article_url)
                     continue
+                counts["parse_success"] += 1
                 post.push_count = parse_push_count(item.get("push_count"))
                 filtered_post = filter_post_by_time(post, window)
+                self.seen_urls.add(article_url)
                 if filtered_post is not None:
-                    self.seen_urls.add(article_url)
+                    counts["included"] += 1
                     posts.append(filtered_post)
+                else:
+                    counts["date_excluded"] += 1
             if not prev_url:
                 break
             if not self._is_allowed_url(prev_url):
@@ -95,6 +106,8 @@ class PttCrawler:
             url = prev_url
 
         self._save_seen()
+        self.last_crawl_counts = counts
+        logger.info("crawl outcome counts: %s", dict(sorted(counts.items())))
         return posts
 
     def _get(self, url: str) -> str:

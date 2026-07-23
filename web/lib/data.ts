@@ -96,8 +96,7 @@ export function filterByBrand(products: Product[], brand: string | null): Produc
 
 export function filterByCategory(products: Product[], category: CategoryKey | null): Product[] {
   if (!category) return products
-  const includedCategories: readonly string[] = categoryGroups[category]
-  return products.filter((product) => includedCategories.includes(product.category.trim() || '其他'))
+  return products.filter((product) => displayCategory(product.category) === category)
 }
 
 export function filterHasScore(products: Product[], hideNoScore: boolean): Product[] {
@@ -244,7 +243,7 @@ export function displayCategory(category: string): string {
 
 export function consensusTone(consensus: string): 'good' | 'mixed' | 'low' {
   if (consensus === '一致好評') return 'good'
-  if (consensus === '評價兩極') return 'mixed'
+  if (consensus === '評價兩極' || consensus === '褒貶不一') return 'mixed'
   return 'low'
 }
 

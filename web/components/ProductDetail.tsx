@@ -42,7 +42,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </ul>
           </div>
           <div className="border-t border-slate-200 pt-3 min-[380px]:border-l min-[380px]:border-t-0 min-[380px]:pl-3 min-[380px]:pt-0">
-            <h4 className="mb-2 flex items-center gap-1.5 font-black text-[#D64545]">
+            <h4 className="mb-2 flex items-center gap-1.5 font-black text-red-700">
               <TriangleAlert size={17} aria-hidden="true" />
               需要留意的點
             </h4>

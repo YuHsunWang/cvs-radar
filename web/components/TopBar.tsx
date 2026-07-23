@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Bell, Radar, X } from 'lucide-react'
 import {
   DATA_STALE_DAYS,
@@ -29,22 +29,35 @@ export default function TopBar({
   const [isNoticeOpen, setIsNoticeOpen] = useState(false)
   const noticeButtonRef = useRef<HTMLButtonElement>(null)
   const noticeRef = useRef<HTMLDivElement>(null)
+  const noticeCloseRef = useRef<HTMLButtonElement>(null)
   const dataIsStale = isDataStale(generatedAt)
+  const closeNotice = useCallback(() => {
+    setIsNoticeOpen(false)
+    noticeButtonRef.current?.focus()
+  }, [])
 
   useEffect(() => {
     if (!isNoticeOpen) return
+    noticeCloseRef.current?.focus()
 
     function handlePointerDown(event: PointerEvent) {
       const target = event.target as Node
       if (!noticeButtonRef.current?.contains(target) && !noticeRef.current?.contains(target)) {
-        setIsNoticeOpen(false)
+        closeNotice()
       }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        setIsNoticeOpen(false)
-        noticeButtonRef.current?.focus()
+        closeNotice()
+      }
+      if (event.key === 'Tab') {
+        const focusable = noticeRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        )
+        if (!focusable?.length) return
+        event.preventDefault()
+        focusable[event.shiftKey ? focusable.length - 1 : 0].focus()
       }
     }
 
@@ -54,7 +67,7 @@ export default function TopBar({
       document.removeEventListener('pointerdown', handlePointerDown)
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isNoticeOpen])
+  }, [closeNotice, isNoticeOpen])
 
   return (
     <header className="relative border-b border-slate-200 bg-[#FCFAF5]">
@@ -74,7 +87,7 @@ export default function TopBar({
           aria-label={dataIsStale ? '資料更新通知，有資料過期警告' : '資料更新通知'}
           aria-expanded={isNoticeOpen}
           aria-haspopup="dialog"
-          onClick={() => setIsNoticeOpen((open) => !open)}
+          onClick={() => (isNoticeOpen ? closeNotice() : setIsNoticeOpen(true))}
           className="relative grid size-11 place-items-center text-slate-700"
         >
           <Bell size={27} strokeWidth={2.15} />
@@ -88,6 +101,7 @@ export default function TopBar({
         <div
           ref={noticeRef}
           role="dialog"
+          aria-modal="true"
           aria-label="資料更新資訊"
           className="absolute right-4 top-[5.1rem] z-20 w-[min(20rem,calc(100%-2rem))] rounded-lg border border-slate-200 bg-white p-4 shadow-xl"
         >
@@ -96,14 +110,14 @@ export default function TopBar({
               <p className="font-black text-slate-950">資料更新</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">目前收錄 {productCount} 項商品</p>
               <p className="text-sm font-semibold text-slate-600">最新發文 {formatDisplayDate(latestDate)}</p>
-              <p className="mt-2 text-xs font-medium text-slate-400">資料更新 {formatDisplayDate(generatedAt)}</p>
+              <p className="mt-2 text-xs font-medium text-slate-600">資料更新 {formatDisplayDate(generatedAt)}</p>
               {dataIsStale ? (
                 <p role="alert" className="mt-1 text-xs font-bold text-amber-700">
                   資料可能過期（超過 {DATA_STALE_DAYS} 天未更新）
                 </p>
               ) : null}
             </div>
-            <button type="button" aria-label="關閉通知" onClick={() => setIsNoticeOpen(false)} className="grid size-11 shrink-0 place-items-center text-slate-500">
+            <button ref={noticeCloseRef} type="button" aria-label="關閉通知" onClick={closeNotice} className="grid size-11 shrink-0 place-items-center text-slate-500">
               <X size={20} />
             </button>
           </div>

@@ -22,7 +22,7 @@ const brandBadgeStyles: Record<string, string> = {
 
 const toneStyles = {
   good: 'text-[#2E7D32]',
-  mixed: 'text-[#D97706]',
+  mixed: 'text-[#B45309]',
   low: 'text-slate-500',
 }
 
@@ -123,9 +123,15 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
                   displayScore === null ? 'text-xl' : 'text-3xl'
                 }`}
               >
-                {displayScore ?? '暫無'}
+                {displayScore === null ? '暫無' : `${displayScore}/100`}
               </span>
-              <span className="mt-1 block text-xs text-slate-600">綜合評分</span>
+              <a
+                href="#score-method"
+                title="綜合評分以公開心得、留言情緒與樣本可信度彙整，滿分 100 分。"
+                className="mt-1 block text-xs text-slate-600 underline decoration-slate-400 underline-offset-2"
+              >
+                綜合評分
+              </a>
               {product.confidence === '低' ? (
                 <span className="mt-1 inline-flex rounded-md border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-800">
                   樣本少

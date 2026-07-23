@@ -19,13 +19,13 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install Python dependencies
-        run: python -m pip install -r requirements.txt pytest ruff
+        run: python -m pip install ".[core,api,dev]"
       - name: Run Python tests
         run: python -m pytest -q
       - name: Smoke-test review backfill CLI
         run: python scripts/backfill_reviews.py --help
       - name: Run Ruff
-        run: ruff check cvs_radar scripts tests web/build_data.py
+        run: ruff check .
 
   web:
     runs-on: ubuntu-latest
@@ -40,13 +40,15 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - name: Install data-build dependencies
-        run: python -m pip install beautifulsoup4 pyyaml
+        run: python -m pip install ".[core]"
       - name: Install web dependencies
         working-directory: web
         run: npm ci
       - name: Rebuild public data
         working-directory: web
         run: npm run build:data
+      - name: Verify committed public data is current
+        run: git diff --exit-code -- web/public/data.json
       - name: Run web tests
         working-directory: web
         run: npm test

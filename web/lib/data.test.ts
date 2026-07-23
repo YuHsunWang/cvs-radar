@@ -4,6 +4,7 @@ import {
   Product,
   applyAdvanced,
   comprehensiveScore,
+  consensusTone,
   dataAgeDays,
   dateToOffset,
   displayCategory,
@@ -82,6 +83,10 @@ describe('filterByCategory', () => {
     expect(filterByCategory(products, '其他').map(({ id }) => id)).toEqual(['merch', 'unknown'])
   })
 
+  it('finds upstream categories shown as other under the other filter', () => {
+    expect(filterByCategory([product({ id: 'new', category: '新品類' })], '其他').map(({ id }) => id)).toEqual(['new'])
+  })
+
   it('returns every product when no category is selected', () => {
     expect(filterByCategory(products, null)).toEqual(products)
   })
@@ -139,6 +144,12 @@ describe('displayCategory', () => {
     expect(displayCategory('便當')).toBe('正餐')
     expect(displayCategory('乳品')).toBe('飲料')
     expect(displayCategory('')).toBe('其他')
+  })
+})
+
+describe('consensusTone', () => {
+  it('renders the dominant mixed-consensus enum as mixed', () => {
+    expect(consensusTone('褒貶不一')).toBe('mixed')
   })
 })
 

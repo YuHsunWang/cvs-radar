@@ -12,9 +12,11 @@ from web.build_data import (
     calibrate_recommendation_score,
     calibrate_recommendation_scores,
     display_confidence,
+    existing_site_built_at,
     load_product_overrides,
     merge_products,
     resolve_data_timestamps,
+    to_product,
 )
 
 
@@ -63,6 +65,16 @@ def test_missing_source_snapshot_time_falls_back_to_site_build_time(
     assert payload["generatedAt"] == site_built_at.isoformat()
     assert payload["siteBuiltAt"] == site_built_at.isoformat()
     assert "WARNING: source data has no generated_at" in capsys.readouterr().out
+
+
+def test_rebuild_reuses_existing_site_timestamp_for_a_reproducible_artifact(tmp_path: Path) -> None:
+    output = tmp_path / "data.json"
+    output.write_text(
+        json.dumps({"siteBuiltAt": "2026-07-23T02:15:21.663714+00:00"}),
+        encoding="utf-8",
+    )
+
+    assert existing_site_built_at(output) == datetime(2026, 7, 23, 2, 15, 21, 663714, tzinfo=timezone.utc)
 
 
 def test_stale_source_snapshot_prints_build_warning(
@@ -305,3 +317,53 @@ def test_duplicate_public_product_ids_fail_fast() -> None:
 
     with pytest.raises(ValueError, match="duplicate public product ids after merge"):
         assert_unique_product_ids(products)
+
+
+def test_data_build_fails_if_duplicate_ids_reach_the_public_payload(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "results.json"
+    source.write_text("{}", encoding="utf-8")
+    reports = [
+        SimpleNamespace(product_key="one", n_eff=1, fair_score=None),
+        SimpleNamespace(product_key="two", n_eff=1, fair_score=None),
+    ]
+    monkeypatch.setattr(build_data, "load_results", lambda _source: (reports, []))
+    monkeypatch.setattr(build_data, "calibrate_recommendation_scores", lambda _reports: {})
+    monkeypatch.setattr(build_data, "load_product_overrides", lambda: {})
+    monkeypatch.setattr(
+        build_data,
+        "to_product",
+        lambda _report, _score: {"id": "全家::重複商品"},
+    )
+    monkeypatch.setattr(build_data, "merge_products", lambda products: products)
+
+    with pytest.raises(ValueError, match="duplicate public product ids after merge"):
+        build_data.main(source=source, output=tmp_path / "data.json")
+
+
+def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    public_report = SimpleNamespace(
+        brand="全家",
+        product_name="測試商品",
+        price=45,
+        category="飲料",
+        fair_score=47.4,
+        confidence="中",
+        consensus="褒貶不一",
+        n_posts=2,
+        n_comments=3,
+        rep_positive=[],
+        rep_negative=[],
+        review_excerpt="",
+        post_urls=[],
+        latest_post_date=None,
+    )
+    monkeypatch.setattr(build_data, "consensus_distribution", lambda _report: (50, 25, 25))
+
+    product = to_product(public_report, recommendation_score=57)
+
+    assert product["fairScore"] == 47
+    assert product["recommendationScore"] == 57

@@ -11,7 +11,7 @@ const config: Config = {
         consensus: {
           green: '#2E9E5B',
           amber: '#E0A417',
-          red: '#D64545',
+          red: '#B91C1C',
         },
       },
       boxShadow: {

@@ -48,6 +48,18 @@ def resolve_data_timestamps(source: Path, site_built_at: datetime) -> tuple[str,
     return data_generated_at.isoformat(), site_built_at.isoformat()
 
 
+def existing_site_built_at(output: Path) -> datetime | None:
+    """Reuse the committed artifact timestamp so a no-op rebuild stays reproducible."""
+    if not output.exists():
+        return None
+    try:
+        value = json.loads(output.read_text(encoding="utf-8")).get("siteBuiltAt")
+        timestamp = datetime.fromisoformat(str(value))
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return None
+    return timestamp if timestamp.tzinfo is not None else None
+
+
 def load_product_overrides(path: Path = PRODUCT_OVERRIDES_PATH) -> dict[str, dict[str, Any]]:
     """Load reviewed public-product corrections keyed by the original product ID."""
     if not path.exists():
@@ -239,7 +251,7 @@ def main(
 ) -> None:
     source = source or ROOT / "data" / "results.json"
     output = output or Path(__file__).resolve().parent / "public" / "data.json"
-    site_built_at = site_built_at or datetime.now(timezone.utc)
+    site_built_at = site_built_at or existing_site_built_at(output) or datetime.now(timezone.utc)
     loaded = load_results(source)
     if loaded is None:
         raise FileNotFoundError(source)

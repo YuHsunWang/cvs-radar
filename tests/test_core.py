@@ -283,21 +283,23 @@ class CrawlerSeenCacheTest(unittest.TestCase):
             cached_urls = json.loads(cache_path.read_text(encoding="utf-8"))
         return article_url, crawler, cached_urls, posts
 
-    def test_crawl_does_not_mark_out_of_window_post_seen(self) -> None:
+    def test_crawl_marks_successfully_parsed_out_of_window_post_seen(self) -> None:
         post = Post(id="old", url="https://example.test/bbs/CVS/M.1.html", posted_at=datetime(2026, 6, 1, 12, 0))
 
         article_url, crawler, cached_urls, posts = self._crawl_one(post)
 
         self.assertEqual(posts, [])
-        self.assertNotIn(article_url, crawler.seen_urls)
-        self.assertNotIn(article_url, cached_urls)
+        self.assertIn(article_url, crawler.seen_urls)
+        self.assertIn(article_url, cached_urls)
+        self.assertEqual(crawler.last_crawl_counts["date_excluded"], 1)
 
-    def test_crawl_marks_non_product_post_seen(self) -> None:
+    def test_crawl_leaves_non_product_post_uncached_for_a_future_parse_retry(self) -> None:
         article_url, crawler, cached_urls, posts = self._crawl_one(None)
 
         self.assertEqual(posts, [])
-        self.assertIn(article_url, crawler.seen_urls)
-        self.assertIn(article_url, cached_urls)
+        self.assertNotIn(article_url, crawler.seen_urls)
+        self.assertNotIn(article_url, cached_urls)
+        self.assertEqual(crawler.last_crawl_counts["non_product"], 1)
 
     def test_crawl_skips_off_site_article_urls(self) -> None:
         with TemporaryDirectory() as tmpdir:
@@ -1670,7 +1672,7 @@ class CrawlerTest(unittest.TestCase):
 
             self.assertTrue(cache_path.exists())
 
-    def test_crawl_does_not_mark_filtered_out_articles_as_seen(self) -> None:
+    def test_crawl_marks_successfully_parsed_filtered_out_articles_as_seen(self) -> None:
         from pathlib import Path
         from tempfile import TemporaryDirectory
         from cvs_radar.crawler import PttCrawler
@@ -1704,10 +1706,24 @@ class CrawlerTest(unittest.TestCase):
             posts = crawler.crawl(max_pages=1, start_date="2026-06-02", end_date="2026-06-03")
 
             self.assertEqual(posts, [])
-            self.assertNotIn("https://www.ptt.cc/bbs/CVS/M.old.html", crawler.seen_urls)
+            self.assertIn("https://www.ptt.cc/bbs/CVS/M.old.html", crawler.seen_urls)
 
 
 class CliTest(unittest.TestCase):
+    def test_cli_rejects_date_filters_with_precomputed_results(self) -> None:
+        import subprocess
+        import sys
+
+        result = subprocess.run(
+            [sys.executable, "run.py", "--results", "--recent-days", "7"],
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("precomputed results cannot be re-filtered by date", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+
     def test_cli_rejects_negative_recent_days_without_traceback(self) -> None:
         import subprocess
         import sys

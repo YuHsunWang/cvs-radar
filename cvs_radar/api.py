@@ -26,7 +26,7 @@ PRECOMPUTED_TIME_FILTER_NOTE = "precomputed data does not support time filtering
 
 
 @app.get("/health")
-def health() -> dict[str, str]:
+async def health() -> dict[str, str]:
     """回傳服務健康狀態。"""
     return {"status": "ok"}
 

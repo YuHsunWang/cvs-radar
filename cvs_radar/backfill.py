@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import logging
+from collections import Counter
 from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -10,6 +12,9 @@ from urllib.parse import urlparse
 
 from .filters import normalize_datetime, parse_datetime
 from .parser import parse_ptt_article
+
+
+logger = logging.getLogger(__name__)
 
 
 def is_backfill_candidate(row: dict) -> bool:
@@ -38,6 +43,7 @@ def backfill_missing_reviews(
     result = [dict(row) for row in rows]
     attempted = 0
     updated = 0
+    counts: Counter[str] = Counter()
 
     for index, row in enumerate(result):
         if not is_backfill_candidate(row):
@@ -48,13 +54,22 @@ def backfill_missing_reviews(
         url = str(row["url"])
         try:
             parsed = parse_ptt_article(fetch_html(url), url, str(row.get("board") or "CVS"))
-        except Exception:
+        except Exception as exc:
+            counts[f"transient_failure:{type(exc).__name__}"] += 1
+            logger.warning("backfill transient failure for %s (%s): %s", url, type(exc).__name__, exc)
             continue
-        if parsed is None or not parsed.review_text.strip():
+        if parsed is None:
+            counts["non_product"] += 1
+            continue
+        counts["parse_success"] += 1
+        if not parsed.review_text.strip():
+            counts["no_review_text"] += 1
             continue
         row["review_text"] = parsed.review_text
         updated += 1
+        counts["updated"] += 1
 
+    logger.info("backfill outcome counts: %s", dict(sorted(counts.items())))
     return result, attempted, updated
 
 
@@ -106,6 +121,7 @@ def refresh_recent_posts(
     result = [dict(row) for row in rows]
     attempted = 0
     updated = 0
+    counts: Counter[str] = Counter()
 
     for index, row in enumerate(result):
         if not is_recent_refresh_candidate(row, recent_days=recent_days, now=now):
@@ -116,10 +132,14 @@ def refresh_recent_posts(
         url = str(row["url"])
         try:
             parsed = parse_ptt_article(fetch_html(url), url, str(row.get("board") or "CVS"))
-        except Exception:
+        except Exception as exc:
+            counts[f"transient_failure:{type(exc).__name__}"] += 1
+            logger.warning("refresh transient failure for %s (%s): %s", url, type(exc).__name__, exc)
             continue
         if parsed is None:
+            counts["non_product"] += 1
             continue
+        counts["parse_success"] += 1
 
         refreshed = post_to_dict(parsed)
         merged = dict(row)
@@ -131,7 +151,9 @@ def refresh_recent_posts(
             merged["review_text"] = row["review_text"]
         result[index] = merged
         updated += 1
+        counts["updated"] += 1
 
+    logger.info("refresh outcome counts: %s", dict(sorted(counts.items())))
     return result, attempted, updated
 
 

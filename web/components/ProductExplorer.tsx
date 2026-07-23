@@ -126,6 +126,10 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
         />
 
         <div className="space-y-4 px-4 pb-8 pt-4">
+          <section aria-label="服務說明" className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm">
+            <p className="font-semibold text-slate-700">整理公開 CVS 心得與討論，協助比較架上商品。</p>
+            <p className="mt-1 text-xs font-medium text-slate-600">資料更新至 {formatDisplayDate(initialPayload.generatedAt)}</p>
+          </section>
           <SearchBar
             value={query}
             onChange={(value) => {
@@ -273,6 +277,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
 
         <footer className="border-t border-slate-200 px-4 py-5 text-xs font-semibold leading-5 text-slate-500">
           <p>資料來自公開使用者內容，僅供選購參考；CVS Radar 並非 PTT 或便利商店品牌的官方評鑑。</p>
+          <p id="score-method" className="mt-2">綜合評分以公開心得、留言情緒與樣本可信度彙整，滿分 100 分。</p>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
             <a
               href="https://github.com/YuHsunWang/cvs-radar"
