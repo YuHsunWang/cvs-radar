@@ -46,13 +46,6 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
-  // Fire one search event per settled (debounced) non-empty query, not per keystroke.
-  useEffect(() => {
-    if (!query.trim()) return
-    const timer = window.setTimeout(() => trackSearch(query), 800)
-    return () => window.clearTimeout(timer)
-  }, [query])
-
   const visibleProducts = useMemo(() => {
     return sortProducts(
       applyAdvanced(
@@ -62,6 +55,15 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
       sortKey,
     )
   }, [brand, category, filters, hideNoScore, products, query, sortKey])
+
+  const searchHitCount = useMemo(() => filterBySearch(products, query).length, [products, query])
+
+  // Fire one search event per settled non-empty query. Never send its text.
+  useEffect(() => {
+    if (!query.trim()) return
+    const timer = window.setTimeout(() => trackSearch(query, searchHitCount), 800)
+    return () => window.clearTimeout(timer)
+  }, [query, searchHitCount])
 
   const dateBounds = useMemo(() => {
     const dates = products.flatMap((product) => (product.latestDate ? [product.latestDate] : []))
@@ -278,6 +280,7 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
         <footer className="border-t border-slate-200 px-4 py-5 text-xs font-semibold leading-5 text-slate-500">
           <p>資料來自公開使用者內容，僅供選購參考；CVS Radar 並非 PTT 或便利商店品牌的官方評鑑。</p>
           <p id="score-method" className="mt-2">綜合評分以公開心得、留言情緒與樣本可信度彙整，滿分 100 分。</p>
+          <p className="mt-2">啟用分析時，僅統計搜尋字數與結果數等去識別使用情形，不會傳送搜尋文字。</p>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
             <a
               href="https://github.com/YuHsunWang/cvs-radar"

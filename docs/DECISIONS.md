@@ -8,11 +8,11 @@
 | Q2 | 可疑帳號只內部降權、不公開個別標籤？ | **是，維持**（公開指控真實帳號有法律/名譽風險；對外只出商品層級結論）。 |
 | Q3 | 公正分數尺度：0–100 或 0–5 星？ | **0–100**（對齊 PTT 評分；前端要星等可再換算）。 |
 | Q4 | 角色權重：作者 vs 留言者？納入發文者本身？ | **作者自推已排除（exclude_self_push）；作者與留言權重調為相等**（`role_weight` author 1.0 = commenter 1.0，原 1.5 偏向作者已修正）。 |
-| Q5 | 輸出形式：CLI/JSON 或查詢介面？ | **已實作**：CLI + Streamlit app + FastAPI。確認以 **Streamlit 為主要查詢介面**。 |
+| Q5 | 輸出形式：CLI/JSON 或查詢介面？ | **已 superseded**：原決策為 CLI + Streamlit app + FastAPI，並以 Streamlit 為主要查詢介面；現已由 Next.js 靜態網站作為主要公開查詢介面。 |
 
 ## 已落實
 - Q4 → `cvs_radar/config.py` SCORING.role_weight 改為 {author:1.0, commenter:1.0}。
-- Q2/Q3/Q5 → 與現行實作一致（內部降權、0–100、Streamlit/FastAPI 已在）。
+- Q2/Q3 → 與現行實作一致（內部降權、0–100）。Q5 的 Streamlit 主介面決策已 superseded。
 
 ## 後續（見 beads issues）
 - 情感分析升級 詞典→SnowNLP/LLM（`cvs-radar-e9d`，P1）。

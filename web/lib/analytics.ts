@@ -23,10 +23,10 @@ export function fairScoreBucket(score: number | null): string {
   return '<50'
 }
 
-export function trackSearch(searchTerm: string) {
-  const term = searchTerm.trim()
-  if (!term) return
-  trackEvent('search', { search_term: term })
+export function trackSearch(query: string, resultCount: number) {
+  const queryLength = query.trim().length
+  if (!queryLength) return
+  trackEvent('search', { query_length: queryLength, result_count: resultCount })
 }
 
 export function trackProductExpand(params: {

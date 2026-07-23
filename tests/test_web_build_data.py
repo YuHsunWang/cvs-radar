@@ -16,7 +16,9 @@ from web.build_data import (
     load_product_overrides,
     merge_products,
     resolve_data_timestamps,
+    strip_urls,
     to_product,
+    write_json_atomic,
 )
 
 
@@ -152,6 +154,29 @@ def test_single_post_high_confidence_is_capped_only_for_public_display() -> None
 
     assert display_confidence(single_post) == "中"
     assert display_confidence(multi_post) == "高"
+
+
+def test_representative_comments_strip_urls_before_publication() -> None:
+    assert strip_urls("口感很好 https://example.com/image.jpg") == "口感很好"
+    assert strip_urls("https://example.com/image.jpg") == ""
+
+
+def test_atomic_write_validates_before_replacing_existing_payload(tmp_path: Path) -> None:
+    output = tmp_path / "data.json"
+    output.write_text('{"previous": true}\n', encoding="utf-8")
+
+    with pytest.raises(ValueError, match="public payload must contain"):
+        write_json_atomic(output, {"products": []})
+
+    assert json.loads(output.read_text(encoding="utf-8")) == {"previous": True}
+
+    payload = {
+        "generatedAt": "2026-07-23T00:00:00+00:00",
+        "siteBuiltAt": "2026-07-23T00:00:00+00:00",
+        "products": [],
+    }
+    write_json_atomic(output, payload)
+    assert json.loads(output.read_text(encoding="utf-8")) == payload
 
 
 
@@ -355,8 +380,8 @@ def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
         consensus="褒貶不一",
         n_posts=2,
         n_comments=3,
-        rep_positive=[],
-        rep_negative=[],
+        rep_positive=["茶香明顯 https://example.com/photo.jpg"],
+        rep_negative=["包裝有刮痕 www.example.com/photo.jpg"],
         review_excerpt="",
         post_urls=[],
         latest_post_date=None,
@@ -367,3 +392,5 @@ def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
 
     assert product["fairScore"] == 47
     assert product["recommendationScore"] == 57
+    assert product["likes"] == ["茶香明顯"]
+    assert product["cautions"] == ["包裝有刮痕"]

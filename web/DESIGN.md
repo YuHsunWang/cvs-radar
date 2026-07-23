@@ -1,5 +1,7 @@
 # CVS Radar Web — Frontend Design
 
+> Last verified: 2026-07-23 against `components/ProductExplorer.tsx`.
+
 A mobile-first static web frontend for CVS Radar. It presents the ranked
 convenience-store product reviews as a shopper-facing app you can read standing
 in front of the shelf. Built with Next.js and deployed as a static site on
@@ -62,7 +64,6 @@ components/BrandChips    brand filter pills (single-select)
 components/DateRangeSlider accessible live dual-thumb latest-review-date filter
 components/ProductCard   ranked card with a semantic expand/collapse summary button
 components/ProductDetail 單品判斷 detail: score, consensus bar, volume, author review, comment summary, source links
-components/FilterSheet   accessible applied-on-confirm minimum-score filter
 lib/data.ts             types + loader + pure filter / sort / search helpers
 ```
 
@@ -73,8 +74,8 @@ independently testable.
 
 Follows `../docs/redesign/app_mockup_mobile_v3.png`: a single mobile column with
 
-- a header (title + 全部品牌 · 評分最高 subtitle),
-- a filter row (⚙ 調整篩選 + 綜合分數 sort),
+- a header with product count and data-update notice,
+- an always-visible latest-review-date range slider plus a hide-unscored toggle and sort menu,
 - intent category chips (正餐 / 甜點 / 冰品 / 飲料 / 麵包 / 零食 / 其他),
 - brand chips (7-11 / 全家 / 萊爾富 / OK / 美聯社 / 其他, each in its brand colour),
 - a result count and section title, and
@@ -92,14 +93,14 @@ Palette: primary teal `#0F7C7C`; consensus bar green `#2E9E5B` / amber `#E0A417`
 
 ## Interaction
 
-- Default: all brands, sorted by 評分高到低 (recommendationScore desc, fairScore tie-break).
+- Default: all brands, sorted by 近期推薦.
 - Search matches product name + brand (NFKC, case-insensitive), live.
 - Brand chips single-select; tap again to clear.
+- Category chips single-select; tap again to clear.
 - The card summary button toggles its detail; detail actions remain independent keyboard targets.
-- The sort menu supports newest/oldest post, highest/lowest volume, and highest/lowest score.
+- The sort menu supports 近期推薦、討論熱度、綜合評分高到低及綜合評分低到高。
 - The inclusive latest-review-date range uses one always-visible dual-thumb slider and filters live.
-- 調整篩選 opens a focus-trapped sheet with the applied-on-confirm minimum-score control.
-- Active advanced filters are summarized below the result count and can be cleared there.
+- 暫無綜合評分的商品可隱藏；有效日期篩選會在結果數下方摘要並可清除。
 - Results render in 30-item batches to keep the mobile DOM responsive.
 - The bell opens a data-update notice with product count and latest review date.
 

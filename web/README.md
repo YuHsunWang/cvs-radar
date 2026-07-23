@@ -42,11 +42,11 @@ tracking calls are silent no-ops. Set it in the Vercel project environment to
 enable tracking in production. All calls go through `lib/analytics.ts`;
 components never use `gtag` directly.
 
-Custom events (no PII; no free text beyond the search term itself):
+Custom events contain no PII or raw search text:
 
 | Event | Params | Fired when |
 | --- | --- | --- |
-| `search` | `search_term` | query settles (800 ms debounce), non-empty |
+| `search` | `query_length`, `result_count` | query settles (800 ms debounce), non-empty |
 | `product_expand` | `product_id`, `brand`, `category`, `fair_score_bucket` (`70+`/`50-69`/`<50`/`none`) | a product card is expanded (not collapsed) |
 | `filter_apply` | `filter_type` (`brand`/`category`/`date_range`/`hide_no_score`), `value` | a filter is applied (clearing does not fire) |
 | `sort_change` | `sort_key` | sort dropdown changes |

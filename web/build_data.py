@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
 import sys
+import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -24,6 +26,7 @@ CLEAR_VALUE = "__CLEAR__"
 REPRESENTATIVE_LIMIT = 3
 DATA_STALE_DAYS = 14
 TAIPEI_TIMEZONE = ZoneInfo("Asia/Taipei")
+URL_PATTERN = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
 
 
 def resolve_data_timestamps(source: Path, site_built_at: datetime) -> tuple[str, str]:
@@ -110,10 +113,20 @@ def _evidence(product: dict[str, Any]) -> float:
     return n_eff if n_eff > 0 else float(product.get("nComments") or 0)
 
 
+def strip_urls(value: str) -> str:
+    """Keep representative comments readable without publishing embedded links."""
+    return " ".join(URL_PATTERN.sub("", value).split())
+
+
+def clean_representatives(representatives: list[str]) -> list[str]:
+    """Remove URLs, blanks, and duplicates from a representative-comment list."""
+    cleaned = (strip_urls(item) for item in representatives)
+    return list(dict.fromkeys(item for item in cleaned if item))[:REPRESENTATIVE_LIMIT]
+
+
 def _unique_representatives(products: list[dict[str, Any]], field: str) -> list[str]:
-    return list(dict.fromkeys(item for product in products for item in product.get(field, [])))[
-        :REPRESENTATIVE_LIMIT
-    ]
+    representatives = (item for product in products for item in product.get(field, []))
+    return clean_representatives(list(representatives))
 
 
 def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -236,12 +249,60 @@ def to_product(report: Any, recommendation_score: int | None = None) -> dict[str
         "positivePct": positive_pct,
         "neutralPct": neutral_pct,
         "negativePct": negative_pct,
-        "likes": list(report.rep_positive or []),
-        "cautions": list(report.rep_negative or []),
+        "likes": clean_representatives(list(report.rep_positive or [])),
+        "cautions": clean_representatives(list(report.rep_negative or [])),
         "excerpt": report.review_excerpt or "",
         "postUrls": list(report.post_urls or []),
         "latestDate": latest_date,
     }
+
+
+def validate_payload(payload: dict[str, Any]) -> None:
+    """Fail before publication if the static browser payload has an unexpected shape."""
+    if set(payload) != {"generatedAt", "siteBuiltAt", "products"}:
+        raise ValueError("public payload must contain generatedAt, siteBuiltAt, and products")
+    if not all(isinstance(payload[key], str) and payload[key] for key in ("generatedAt", "siteBuiltAt")):
+        raise ValueError("public payload timestamps must be non-empty strings")
+    if not isinstance(payload["products"], list):
+        raise ValueError("public payload products must be a list")
+
+    required_fields = {
+        "id", "brand", "productName", "price", "category", "fairScore", "recommendationScore",
+        "consensus", "confidence", "nPosts", "nComments", "volumeLevel", "positivePct",
+        "neutralPct", "negativePct", "likes", "cautions", "excerpt", "postUrls", "latestDate",
+    }
+    for index, product in enumerate(payload["products"]):
+        if not isinstance(product, dict) or set(product) != required_fields:
+            raise ValueError(f"public payload product {index} has an invalid shape")
+        if not all(isinstance(product[key], str) for key in ("id", "brand", "productName", "category", "consensus", "confidence", "volumeLevel", "excerpt")):
+            raise ValueError(f"public payload product {index} has invalid text fields")
+        if not all(isinstance(product[key], int) and product[key] >= 0 for key in ("nPosts", "nComments")):
+            raise ValueError(f"public payload product {index} has invalid count fields")
+        if not all(isinstance(product[key], list) and all(isinstance(item, str) for item in product[key]) for key in ("likes", "cautions", "postUrls")):
+            raise ValueError(f"public payload product {index} has invalid list fields")
+        if any(URL_PATTERN.search(item) for key in ("likes", "cautions") for item in product[key]):
+            raise ValueError(f"public payload product {index} has a URL in a representative comment")
+
+
+def write_json_atomic(output: Path, payload: dict[str, Any]) -> None:
+    """Flush a complete payload to a sibling temp file, then atomically publish it."""
+    validate_payload(payload)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=output.parent, prefix=f".{output.name}.", suffix=".tmp", delete=False
+        ) as handle:
+            temp_path = Path(handle.name)
+            json.dump(payload, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_path, output)
+    except Exception:
+        if temp_path is not None:
+            temp_path.unlink(missing_ok=True)
+        raise
 
 
 def main(
@@ -276,8 +337,7 @@ def main(
         "products": products,
     }
 
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json_atomic(output, payload)
     print(f"Wrote {len(payload['products'])} products to {output.relative_to(ROOT)}")
 
 

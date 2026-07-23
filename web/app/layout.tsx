@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { GA_ID } from '@/lib/analytics'
+import { getSiteUrl } from '@/lib/site-url'
 import './globals.css'
 
+const siteUrl = getSiteUrl()
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://cvs-radar.vercel.app/'),
+  metadataBase: siteUrl,
   title: 'CVS Radar | 超商商品評價雷達',
   description: '整合 PTT CVS 公開心得、留言情緒、可信度權重與貝氏評分的手機優先超商商品推薦工具。',
   keywords: ['超商新品', '便利商店', 'PTT CVS', '情感分析', 'NLP', '商品推薦'],
@@ -18,11 +21,13 @@ export const metadata: Metadata = {
     siteName: 'CVS Radar',
     locale: 'zh_TW',
     type: 'website',
+    images: [{ url: '/opengraph-image.png', width: 1200, height: 630, alt: 'CVS Radar | 超商商品評價雷達' }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'CVS Radar | 超商商品評價雷達',
     description: '以 NLP、可信度權重與貝氏評分整理超商商品心得。',
+    images: ['/opengraph-image.png'],
   },
 }
 
