@@ -356,7 +356,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <p>資料來自公開使用者內容，僅供選購參考；本頁為 CVS Radar 的介面設計試作，非官方評鑑。</p>
         <p className="sl-foot-mono">
           SHELF-EDGE LABEL VARIANT · 資料更新 {formatDisplayDate(initialPayload.generatedAt)} ·{' '}
-          <a href="/">回到預設版</a>
+          <a href="/classic">經典版</a>
         </p>
       </footer>
     </div>
