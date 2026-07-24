@@ -207,30 +207,6 @@
   cursor: pointer;
 }
 .sl-check input { width: 18px; height: 18px; accent-color: var(--sl-hot); }
-.sl-select {
-  position: relative;
-  font-family: var(--sl-cjk);
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--sl-ink);
-  background: var(--sl-tag);
-  border: 1px solid var(--sl-hair);
-  border-radius: 3px;
-  padding: 8px 30px 8px 12px;
-  cursor: pointer;
-  appearance: none;
-}
-.sl-select-wrap { position: relative; }
-.sl-select-wrap::after {
-  content: "▾";
-  position: absolute;
-  right: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  font-size: 13px;
-  color: var(--sl-ink);
-}
 
 .sl-count {
   display: flex;
@@ -532,20 +508,39 @@
   }
   .sl-sheet {
     width: 100%;
-    max-height: 86vh;
+    max-height: 85vh;
     display: flex;
     flex-direction: column;
     background: var(--sl-aisle);
     border-radius: 16px 16px 0 0;
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.28);
     animation: sl-slideup 0.24s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+    /* Snap back smoothly after a partial drag; suppressed while finger is down. */
+    transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
   }
+  .sl-sheet.sl-dragging { transition: none; animation: none; }
   .sl-sheet-head {
+    padding: 8px 16px 12px;
+    border-bottom: 1px solid var(--sl-hair);
+    cursor: grab;
+    /* Let the handle own vertical gestures instead of scrolling the page. */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .sl-sheet.sl-dragging .sl-sheet-head { cursor: grabbing; }
+  .sl-grabber {
+    display: block;
+    width: 40px;
+    height: 5px;
+    margin: 2px auto 10px;
+    border-radius: 3px;
+    background: var(--sl-hair);
+  }
+  .sl-sheet-headrow {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--sl-hair);
   }
   .sl-sheet-title { font-weight: 900; font-size: 16px; letter-spacing: 0.04em; }
   .sl-sheet-x {
@@ -564,13 +559,11 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
   }
   /* Sheet has room, so labels never wrap into a cramped column. */
   .sl-sheet-body .sl-filterrow { flex-direction: column; align-items: stretch; gap: 8px; }
   .sl-sheet-body .sl-eyebrow { padding-top: 0; }
-  .sl-sheet-body .sl-select,
-  .sl-sheet-body .sl-select-wrap { width: 100%; }
   .sl-sheet-foot {
     display: flex;
     gap: 10px;
@@ -607,5 +600,5 @@
   .sl-sweep { animation: none; }
   .sl-rowbtn:hover .sl-row { transform: none; }
   .sl-sheet-backdrop,
-  .sl-sheet { animation: none; }
+  .sl-sheet { animation: none; transition: none; }
 }

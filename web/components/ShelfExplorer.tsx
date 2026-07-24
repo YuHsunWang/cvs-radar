@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
@@ -60,6 +60,16 @@ const DATE_PRESETS = [
   { key: '1w', label: '近一週', from: () => isoDaysAgo(7) },
 ] as const
 
+const SORT_OPTIONS: readonly { key: SortKey; label: string }[] = [
+  { key: 'recentRecommendationDesc', label: '近期推薦' },
+  { key: 'discussionHeatDesc', label: '討論熱度' },
+  { key: 'fairScoreDesc', label: '評分高→低' },
+  { key: 'fairScoreAsc', label: '評分低→高' },
+]
+
+// Drag distance (px) past which a downward flick on the sheet handle closes it.
+const SHEET_CLOSE_THRESHOLD = 110
+
 type ShelfExplorerProps = {
   initialPayload: DataPayload
 }
@@ -76,8 +86,55 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [datePreset, setDatePreset] = useState<string>('all')
   const [sheetOpen, setSheetOpen] = useState(false)
+  // Drag-to-dismiss: track finger offset while dragging the sheet's grab handle.
+  const [dragY, setDragY] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const dragStartY = useRef(0)
+  const dragYRef = useRef(0)
+  // Ref mirrors `dragging` so move/end read it synchronously (state closure is
+  // stale for the first pointermove fired before React re-renders).
+  const draggingRef = useRef(false)
   // Client-only store clock (24h konbini). Starts blank so SSR/CSR markup matches.
   const [clock, setClock] = useState<{ time: string; day: string }>({ time: '--:--:--', day: '' })
+
+  function openSheet() {
+    dragYRef.current = 0
+    setDragY(0)
+    setSheetOpen(true)
+  }
+  function closeSheet() {
+    setSheetOpen(false)
+    dragYRef.current = 0
+    setDragY(0)
+  }
+
+  function onSheetDragStart(event: ReactPointerEvent<HTMLDivElement>) {
+    dragStartY.current = event.clientY
+    draggingRef.current = true
+    setDragging(true)
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // Pointer capture is best-effort; drag still works without it.
+    }
+  }
+  function onSheetDragMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!draggingRef.current) return
+    const offset = Math.max(0, event.clientY - dragStartY.current)
+    dragYRef.current = offset
+    setDragY(offset)
+  }
+  function onSheetDragEnd() {
+    if (!draggingRef.current) return
+    draggingRef.current = false
+    setDragging(false)
+    if (dragYRef.current > SHEET_CLOSE_THRESHOLD) {
+      closeSheet()
+    } else {
+      setDragY(0)
+    }
+    dragYRef.current = 0
+  }
 
   useEffect(() => {
     const tick = () => {
@@ -103,7 +160,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setSheetOpen(false)
+      if (event.key === 'Escape') closeSheet()
     }
     document.addEventListener('keydown', onKeyDown)
     return () => {
@@ -270,23 +327,26 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     </div>
   )
 
-  const sortControl = (
-    <div className="sl-select-wrap">
-      <select
-        className="sl-select"
-        aria-label="排序方式"
-        value={sortKey}
-        onChange={(event) => {
-          setSortKey(event.target.value as SortKey)
-          resetPage()
-          trackSortChange(event.target.value)
-        }}
-      >
-        <option value="recentRecommendationDesc">排序：近期推薦</option>
-        <option value="discussionHeatDesc">排序：討論熱度</option>
-        <option value="fairScoreDesc">排序：評分 高→低</option>
-        <option value="fairScoreAsc">排序：評分 低→高</option>
-      </select>
+  const sortGroup = (
+    <div className="sl-filterrow">
+      <span className="sl-eyebrow">排序</span>
+      <nav className="sl-chips" aria-label="排序方式">
+        {SORT_OPTIONS.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            className={`sl-datebtn${sortKey === option.key ? ' sl-on' : ''}`}
+            aria-pressed={sortKey === option.key}
+            onClick={() => {
+              setSortKey(option.key)
+              resetPage()
+              trackSortChange(option.key)
+            }}
+          >
+            {option.label}
+          </button>
+        ))}
+      </nav>
     </div>
   )
 
@@ -350,10 +410,8 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         {categoryGroup}
         {brandGroup}
         {dateGroup}
-        <div className="sl-toolbar-row">
-          {hideToggle}
-          {sortControl}
-        </div>
+        {sortGroup}
+        <div className="sl-toolbar-row">{hideToggle}</div>
       </div>
 
       <p className="sl-count" aria-live="polite">
@@ -407,47 +465,55 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         className="sl-fab"
         aria-label={`篩選${activeFilterCount ? `（已套用 ${activeFilterCount} 項）` : ''}`}
         aria-expanded={sheetOpen}
-        onClick={() => setSheetOpen(true)}
+        onClick={openSheet}
       >
         <SlidersHorizontal size={22} aria-hidden="true" />
         {activeFilterCount > 0 ? <span className="sl-fab-badge">{activeFilterCount}</span> : null}
       </button>
 
       {sheetOpen ? (
-        <div className="sl-sheet-backdrop" onClick={() => setSheetOpen(false)}>
+        <div className="sl-sheet-backdrop" onClick={closeSheet}>
           <div
-            className="sl-sheet"
+            className={`sl-sheet${dragging ? ' sl-dragging' : ''}`}
             role="dialog"
             aria-modal="true"
             aria-label="篩選"
             onClick={(event) => event.stopPropagation()}
+            style={dragY ? ({ transform: `translateY(${dragY}px)` } as CSSProperties) : undefined}
           >
-            <div className="sl-sheet-head">
-              <span className="sl-sheet-title">篩選</span>
-              <button
-                type="button"
-                className="sl-sheet-x"
-                aria-label="關閉篩選"
-                onClick={() => setSheetOpen(false)}
-              >
-                <X size={20} aria-hidden="true" />
-              </button>
+            {/* Grab handle — drag it down past the threshold to dismiss. */}
+            <div
+              className="sl-sheet-head"
+              onPointerDown={onSheetDragStart}
+              onPointerMove={onSheetDragMove}
+              onPointerUp={onSheetDragEnd}
+              onPointerCancel={onSheetDragEnd}
+            >
+              <span className="sl-grabber" aria-hidden="true" />
+              <div className="sl-sheet-headrow">
+                <span className="sl-sheet-title">篩選</span>
+                <button
+                  type="button"
+                  className="sl-sheet-x"
+                  aria-label="關閉篩選"
+                  onClick={closeSheet}
+                >
+                  <X size={20} aria-hidden="true" />
+                </button>
+              </div>
             </div>
             <div className="sl-sheet-body">
               {categoryGroup}
               {brandGroup}
               {dateGroup}
-              <div className="sl-filterrow">
-                <span className="sl-eyebrow">排序</span>
-                {sortControl}
-              </div>
+              {sortGroup}
               {hideToggle}
             </div>
             <div className="sl-sheet-foot">
               <button type="button" className="sl-sheet-clear" onClick={clearAll}>
                 清除
               </button>
-              <button type="button" className="sl-sheet-apply" onClick={() => setSheetOpen(false)}>
+              <button type="button" className="sl-sheet-apply" onClick={closeSheet}>
                 看 {visibleProducts.length} 項結果
               </button>
             </div>
