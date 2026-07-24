@@ -140,10 +140,6 @@
 /* ---- controls ---- */
 .sl-controls { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
 
-.sl-searchrow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
-.sl-searchrow > label { flex: 1 1 220px; min-width: 0; }
-.sl-searchrow .sl-select-wrap { flex: 0 0 auto; }
-
 .sl-filterrow { display: flex; align-items: flex-start; gap: 10px; }
 .sl-eyebrow {
   flex: none;
@@ -185,10 +181,23 @@
 .sl-chip-btn.sl-on { background: var(--sl-ink); color: #f6f3ea; border-color: var(--sl-ink); }
 .sl-chip-btn.sl-on::before { border-color: var(--sl-pop); background: var(--sl-pop); }
 .sl-chip-btn.sl-brand.sl-on { background: var(--sl-brand, var(--sl-ink)); border-color: var(--sl-brand, var(--sl-ink)); }
+.sl-b-short { display: none; }
 
-.sl-advanced { display: flex; flex-direction: column; gap: 10px; }
+.sl-datebtn {
+  font-family: var(--sl-cjk);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: var(--sl-ink);
+  background: var(--sl-tag);
+  border: 1px solid var(--sl-hair);
+  border-radius: 3px;
+  padding: 6px 11px;
+  cursor: pointer;
+}
+.sl-datebtn.sl-on { background: var(--sl-ink); color: #f6f3ea; border-color: var(--sl-ink); }
+
+.sl-toolbar-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .sl-adv-toggle {
-  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -481,26 +490,24 @@
 .sl-foot a { color: var(--sl-hot); text-underline-offset: 3px; }
 .sl-foot-mono { font-family: var(--sl-mono); font-size: 10.5px; letter-spacing: 0.06em; margin-top: 6px; opacity: 0.85; }
 
-/* ---- re-skin reused teal components, scoped to the shelf page only ---- */
+/* Re-skin the reused search input, scoped to the shelf page only. */
 .sl-page input[type="search"] { border-color: var(--sl-hair); border-radius: 4px; }
 .sl-page input[type="search"]:focus {
   border-color: var(--sl-ink);
   box-shadow: 0 0 0 3px rgba(23, 19, 14, 0.12);
 }
-.sl-page fieldset { border-color: var(--sl-hair); border-radius: 5px; }
-.sl-page fieldset [data-date-range-track] > div:nth-of-type(2) { background: var(--sl-hot); }
-.sl-page fieldset .grid button { background: #faf3ee; }
-.sl-page fieldset .grid button span:last-child { color: var(--sl-hot); }
-.sl-page .date-range-input::-webkit-slider-thumb { background: var(--sl-ink); }
-.sl-page .date-range-input::-moz-range-thumb { background: var(--sl-ink); }
-.sl-page .date-range-input:focus-visible::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px rgba(229, 48, 31, 0.25), 0 1px 4px rgb(15 23 42 / 35%);
-}
-.sl-page .date-range-input:focus-visible::-moz-range-thumb {
-  box-shadow: 0 0 0 3px rgba(229, 48, 31, 0.25), 0 1px 4px rgb(15 23 42 / 35%);
-}
 
 .sl-page :focus-visible { outline: 3px solid #35e0a1; outline-offset: 2px; }
+
+/* Narrow screens: brand chips shrink to single-character marks so the row
+   stays on one line; drop the leading dot to save width. */
+@media (max-width: 640px) {
+  .sl-b-full { display: none; }
+  .sl-b-short { display: inline; }
+  .sl-brandrow .sl-chip-btn { padding: 6px 10px; }
+  .sl-brandrow .sl-chip-btn::before { display: none; }
+  .sl-brandrow .sl-eyebrow { min-width: 2.2em; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .sl-sweep { animation: none; }

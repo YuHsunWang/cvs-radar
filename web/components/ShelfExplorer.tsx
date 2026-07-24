@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { ChevronDown, SlidersHorizontal } from 'lucide-react'
-import DateRangeSlider from '@/components/DateRangeSlider'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
 import {
@@ -37,9 +36,37 @@ const BRAND_RAIL: Record<string, string> = {
   全家: '#009B4C',
   萊爾富: '#E51F26',
   OK: '#F5A623',
-  美聯社: '#6C3DBF',
+  美廉社: '#6C3DBF',
   其他: '#6B7280',
 }
+// Single-character marks used for the brand chips on narrow screens.
+const BRAND_SHORT: Record<string, string> = {
+  '7-11': '7',
+  全家: '全',
+  萊爾富: '萊',
+  OK: 'OK',
+  其他: '其',
+}
+// 美聯社 in lib/data is a typo for 美廉社 and has no products — hide it for now.
+const HIDDEN_BRANDS = new Set(['美聯社'])
+
+function isoDaysAgo(days: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - days)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+function isoMonthsAgo(months: number): string {
+  const d = new Date()
+  d.setMonth(d.getMonth() - months)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+const DATE_PRESETS = [
+  { key: 'all', label: '不限', from: () => '' },
+  { key: '3m', label: '近三個月', from: () => isoMonthsAgo(3) },
+  { key: '1m', label: '近一個月', from: () => isoMonthsAgo(1) },
+  { key: '2w', label: '近兩週', from: () => isoDaysAgo(14) },
+  { key: '1w', label: '近一週', from: () => isoDaysAgo(7) },
+] as const
 
 type ShelfExplorerProps = {
   initialPayload: DataPayload
@@ -56,6 +83,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [datePreset, setDatePreset] = useState<string>('all')
   // Client-only store clock (24h konbini). Starts blank so SSR/CSR markup matches.
   const [clock, setClock] = useState<{ time: string; day: string }>({ time: '--:--:--', day: '' })
 
@@ -77,7 +105,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     return () => window.clearInterval(id)
   }, [])
 
-  const advancedActive = Boolean(filters.fromDate || filters.toDate || hideNoScore)
+  const advancedActive = datePreset !== 'all' || hideNoScore
 
   const visibleProducts = useMemo(() => {
     return sortProducts(
@@ -100,19 +128,18 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     return () => window.clearTimeout(timer)
   }, [query, searchHitCount])
 
-  const dateBounds = useMemo(() => {
-    const dates = products.flatMap((product) => (product.latestDate ? [product.latestDate] : []))
-    return {
-      minDate: dates.length ? dates.reduce((earliest, date) => (date < earliest ? date : earliest)) : '',
-      maxDate: dates.length ? dates.reduce((latest, date) => (date > latest ? date : latest)) : '',
-    }
-  }, [products])
-
   const displayedProducts = visibleProducts.slice(0, visibleCount)
   const remainingCount = visibleProducts.length - displayedProducts.length
 
   function resetPage() {
     setVisibleCount(PAGE_SIZE)
+  }
+
+  function applyDatePreset(preset: (typeof DATE_PRESETS)[number]) {
+    setDatePreset(preset.key)
+    setFilters({ fromDate: preset.from(), toDate: '' })
+    resetPage()
+    if (preset.key !== 'all') trackFilterApply('date_range', preset.key)
   }
 
   function toggleProduct(product: Product) {
@@ -139,6 +166,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     setCategory(null)
     setHideNoScore(false)
     setFilters({ fromDate: '', toDate: '' })
+    setDatePreset('all')
     resetPage()
   }
 
@@ -173,35 +201,13 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </div>
 
       <div className="sl-controls">
-        <div className="sl-searchrow">
-          <SearchBar
-            value={query}
-            onChange={(value) => {
-              setQuery(value)
-              resetPage()
-            }}
-          />
-          <div className="sl-select-wrap">
-            <label className="sr-only" htmlFor="sl-sort">
-              排序
-            </label>
-            <select
-              id="sl-sort"
-              className="sl-select"
-              value={sortKey}
-              onChange={(event) => {
-                setSortKey(event.target.value as SortKey)
-                resetPage()
-                trackSortChange(event.target.value)
-              }}
-            >
-              <option value="recentRecommendationDesc">近期推薦</option>
-              <option value="discussionHeatDesc">討論熱度</option>
-              <option value="fairScoreDesc">評分 高→低</option>
-              <option value="fairScoreAsc">評分 低→高</option>
-            </select>
-          </div>
-        </div>
+        <SearchBar
+          value={query}
+          onChange={(value) => {
+            setQuery(value)
+            resetPage()
+          }}
+        />
 
         <div className="sl-filterrow">
           <span className="sl-eyebrow">分類</span>
@@ -234,7 +240,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
           </nav>
         </div>
 
-        <div className="sl-filterrow">
+        <div className="sl-filterrow sl-brandrow">
           <span className="sl-eyebrow">品牌</span>
           <nav className="sl-chips" aria-label="品牌">
             <button
@@ -247,30 +253,36 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             >
               全部
             </button>
-            {brands.map((name) => (
-              <button
-                key={name}
-                type="button"
-                className={`sl-chip-btn sl-brand${brand === name ? ' sl-on' : ''}`}
-                style={
-                  brand === name
-                    ? ({ '--sl-brand': BRAND_RAIL[displayBrand(name)] } as CSSProperties)
-                    : undefined
-                }
-                onClick={() => {
-                  const next = brand === name ? null : name
-                  setBrand(next)
-                  resetPage()
-                  if (next) trackFilterApply('brand', next)
-                }}
-              >
-                {name}
-              </button>
-            ))}
+            {brands
+              .filter((name) => !HIDDEN_BRANDS.has(name))
+              .map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  className={`sl-chip-btn sl-brand${brand === name ? ' sl-on' : ''}`}
+                  aria-label={name}
+                  style={
+                    brand === name
+                      ? ({ '--sl-brand': BRAND_RAIL[displayBrand(name)] } as CSSProperties)
+                      : undefined
+                  }
+                  onClick={() => {
+                    const next = brand === name ? null : name
+                    setBrand(next)
+                    resetPage()
+                    if (next) trackFilterApply('brand', next)
+                  }}
+                >
+                  <span className="sl-b-full">{name}</span>
+                  <span className="sl-b-short" aria-hidden="true">
+                    {BRAND_SHORT[name] ?? name}
+                  </span>
+                </button>
+              ))}
           </nav>
         </div>
 
-        <div className="sl-advanced">
+        <div className="sl-toolbar-row">
           <button
             type="button"
             className="sl-adv-toggle"
@@ -286,33 +298,59 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
               className={`sl-caret${advancedOpen ? ' sl-caret-open' : ''}`}
             />
           </button>
-          {advancedOpen ? (
-            <div className="sl-adv-panel">
-              <DateRangeSlider
-                dateBounds={dateBounds}
-                fromDate={filters.fromDate}
-                toDate={filters.toDate}
-                onChange={(range) => {
-                  setFilters((current) => ({ ...current, ...range }))
+          <div className="sl-select-wrap">
+            <label className="sr-only" htmlFor="sl-sort">
+              排序
+            </label>
+            <select
+              id="sl-sort"
+              className="sl-select"
+              value={sortKey}
+              onChange={(event) => {
+                setSortKey(event.target.value as SortKey)
+                resetPage()
+                trackSortChange(event.target.value)
+              }}
+            >
+              <option value="recentRecommendationDesc">排序：近期推薦</option>
+              <option value="discussionHeatDesc">排序：討論熱度</option>
+              <option value="fairScoreDesc">排序：評分 高→低</option>
+              <option value="fairScoreAsc">排序：評分 低→高</option>
+            </select>
+          </div>
+        </div>
+
+        {advancedOpen ? (
+          <div className="sl-adv-panel">
+            <div className="sl-filterrow">
+              <span className="sl-eyebrow">日期</span>
+              <nav className="sl-chips" aria-label="最新發文日期">
+                {DATE_PRESETS.map((preset) => (
+                  <button
+                    key={preset.key}
+                    type="button"
+                    className={`sl-datebtn${datePreset === preset.key ? ' sl-on' : ''}`}
+                    onClick={() => applyDatePreset(preset)}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </nav>
+            </div>
+            <label className="sl-check">
+              <input
+                type="checkbox"
+                checked={hideNoScore}
+                onChange={(event) => {
+                  setHideNoScore(event.target.checked)
                   resetPage()
-                  trackFilterApply('date_range', 'adjusted')
+                  if (event.target.checked) trackFilterApply('hide_no_score', 'on')
                 }}
               />
-              <label className="sl-check">
-                <input
-                  type="checkbox"
-                  checked={hideNoScore}
-                  onChange={(event) => {
-                    setHideNoScore(event.target.checked)
-                    resetPage()
-                    if (event.target.checked) trackFilterApply('hide_no_score', 'on')
-                  }}
-                />
-                隱藏暫無綜合評分
-              </label>
-            </div>
-          ) : null}
-        </div>
+              隱藏暫無綜合評分
+            </label>
+          </div>
+        ) : null}
       </div>
 
       <p className="sl-count" aria-live="polite">
