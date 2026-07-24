@@ -31,7 +31,7 @@ legacy = ["streamlit>=1.41,<2"]
 dev = [
   "httpx>=0.27,<1",
   "pytest>=8,<10",
-  "ruff>=0.6",
+  "ruff>=0.6,<0.16",
 ]
 
 [tool.setuptools.packages.find]
