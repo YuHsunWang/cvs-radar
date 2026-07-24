@@ -181,7 +181,6 @@
 .sl-chip-btn.sl-on { background: var(--sl-ink); color: #f6f3ea; border-color: var(--sl-ink); }
 .sl-chip-btn.sl-on::before { border-color: var(--sl-pop); background: var(--sl-pop); }
 .sl-chip-btn.sl-brand.sl-on { background: var(--sl-brand, var(--sl-ink)); border-color: var(--sl-brand, var(--sl-ink)); }
-.sl-b-short { display: none; }
 
 .sl-datebtn {
   font-family: var(--sl-cjk);
@@ -197,25 +196,6 @@
 .sl-datebtn.sl-on { background: var(--sl-ink); color: #f6f3ea; border-color: var(--sl-ink); }
 
 .sl-toolbar-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.sl-adv-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--sl-cjk);
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--sl-ink);
-  background: var(--sl-tag);
-  border: 1px solid var(--sl-hair);
-  border-radius: 4px;
-  padding: 8px 12px;
-  cursor: pointer;
-}
-.sl-adv-toggle:hover { background: #fbfaf6; }
-.sl-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sl-hot); }
-.sl-caret { transition: transform 0.18s ease; }
-.sl-caret-open { transform: rotate(180deg); }
-.sl-adv-panel { display: flex; flex-direction: column; gap: 12px; }
 
 .sl-check {
   display: inline-flex;
@@ -499,17 +479,133 @@
 
 .sl-page :focus-visible { outline: 3px solid #35e0a1; outline-offset: 2px; }
 
-/* Narrow screens: brand chips shrink to single-character marks so the row
-   stays on one line; drop the leading dot to save width. */
+/* ---- mobile: floating filter button + bottom sheet ---- */
+.sl-fab { display: none; }
+.sl-sheet-backdrop { display: none; }
+
 @media (max-width: 640px) {
-  .sl-b-full { display: none; }
-  .sl-b-short { display: inline; }
-  .sl-brandrow .sl-chip-btn { padding: 6px 10px; }
-  .sl-brandrow .sl-chip-btn::before { display: none; }
-  .sl-brandrow .sl-eyebrow { min-width: 2.2em; }
+  /* Inline filter bar is replaced by the sheet on phones. */
+  .sl-controls { display: none; }
+
+  .sl-fab {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border: none;
+    border-radius: 50%;
+    background: var(--sl-ink);
+    color: #f6f3ea;
+    box-shadow: 0 6px 18px rgba(23, 19, 14, 0.32);
+    cursor: pointer;
+  }
+  .sl-fab-badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 5px;
+    border-radius: 11px;
+    background: var(--sl-pop);
+    border: 2px solid var(--sl-aisle);
+    color: var(--sl-ink);
+    font-family: var(--sl-mono);
+    font-size: 11px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+  }
+
+  .sl-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: flex-end;
+    background: rgba(23, 19, 14, 0.42);
+    animation: sl-fade 0.18s ease both;
+  }
+  .sl-sheet {
+    width: 100%;
+    max-height: 86vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--sl-aisle);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.28);
+    animation: sl-slideup 0.24s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  }
+  .sl-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--sl-hair);
+  }
+  .sl-sheet-title { font-weight: 900; font-size: 16px; letter-spacing: 0.04em; }
+  .sl-sheet-x {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--sl-soft);
+    cursor: pointer;
+  }
+  .sl-sheet-body {
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  /* Sheet has room, so labels never wrap into a cramped column. */
+  .sl-sheet-body .sl-filterrow { flex-direction: column; align-items: stretch; gap: 8px; }
+  .sl-sheet-body .sl-eyebrow { padding-top: 0; }
+  .sl-sheet-body .sl-select,
+  .sl-sheet-body .sl-select-wrap { width: 100%; }
+  .sl-sheet-foot {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--sl-hair);
+  }
+  .sl-sheet-clear {
+    flex: 0 0 auto;
+    padding: 12px 18px;
+    border: 1.5px solid var(--sl-hair);
+    border-radius: 6px;
+    background: var(--sl-tag);
+    font-weight: 800;
+    color: var(--sl-ink);
+    cursor: pointer;
+  }
+  .sl-sheet-apply {
+    flex: 1 1 auto;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: var(--sl-ink);
+    color: #f6f3ea;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+  }
 }
+
+@keyframes sl-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sl-slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 @media (prefers-reduced-motion: reduce) {
   .sl-sweep { animation: none; }
   .sl-rowbtn:hover .sl-row { transform: none; }
+  .sl-sheet-backdrop,
+  .sl-sheet { animation: none; }
 }
