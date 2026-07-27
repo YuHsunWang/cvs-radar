@@ -892,6 +892,49 @@ class ExtractionRegressionTest(unittest.TestCase):
             ]
         )
 
+    def test_extract_strips_promo_size_and_discount_tail_noise(self) -> None:
+        # Posters append coupon / cup-size / friendly-time-discount markers and
+        # stray prices to the 商品名稱 field; the report must key on the product
+        # itself, otherwise the same item scatters across separate keys.
+        cases = [
+            # 全家 Fami 酷碰價 優惠券
+            ("：四季檸檬酷繽球/酷碰價39元", "全家", [("四季檸檬酷繽球", 39)]),
+            # 全家 友善時光 即期折扣尾巴：品名/原價 /折扣價時光
+            ("： 核桃腰果稻禾壽司組/55 /38時光", "全家", [("核桃腰果稻禾壽司組", 55)]),
+            # 酷碰券 優惠券 + 杯型
+            ("：厚奶拿鐵/酷碰券特大杯59", "全家", [("厚奶拿鐵", 59)]),
+        ]
+        for raw_name, brand, expected in cases:
+            with self.subTest(raw_name=raw_name):
+                self.assertEqual(extract_products_and_prices(raw_name, brand), expected)
+
+    def test_combo_bundle_keeps_only_first_product(self) -> None:
+        # "A3入+B3入/75元" 是併購組合，第二項是比較對象；報告只以第一個商品為
+        # key，而非把兩個品名黏成「翻轉布丁統一布丁」。
+        self.assertEqual(
+            extract_products_and_prices("：翻轉布丁3入+統一布丁3入/75元", "7-11"),
+            [("翻轉布丁", 75)],
+        )
+
+    def test_combo_guard_does_not_split_flavour_swirl(self) -> None:
+        # 沒有「兩側都帶數量」的 '+'（如霜淇淋雙口味）不可被截半，避免誤把
+        # 完整品名砍成前半段。
+        self.assertEqual(
+            extract_products_and_prices("巧克力+香草霜淇淋/59", "7-11"),
+            [("巧克力香草霜淇淋", 59)],
+        )
+
+    def test_friendly_time_mark_stripped_but_real_name_preserved(self) -> None:
+        # 「友善時光」整組剝除；但含「時光」的真實品名（午后時光）不可被誤傷。
+        self.assertEqual(
+            extract_products_and_prices("度小月擔仔炊粉湯 友善時光 56", "全家"),
+            [("度小月擔仔炊粉湯", 56)],
+        )
+        self.assertEqual(
+            [n for n, _ in extract_products_and_prices("光泉午后時光紅茶39", "全家")],
+            ["光泉午后時光紅茶"],
+        )
+
     def test_reply_post_signature_commentary_is_not_a_product(self) -> None:
         raw_name = (
             "：7-11 切達起士貝果 28元\n\n"

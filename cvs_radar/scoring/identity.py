@@ -14,7 +14,7 @@ from ..config import (
 from ..models import Comment, Post
 from ..parser import _title_product_name
 
-from ._common import (_BRACKET_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
+from ._common import (_BRACKET_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
 
 
 def _extract_space_separated_parallel_products(
@@ -179,9 +179,42 @@ def _name_continuation(line: str, brand: str) -> str:
     return name
 
 
+_COMBO_QTY_RE = re.compile(r"\d+\s*(?:入|包|個|顆|片|杯|瓶|罐|盒|組|件|份)")
+
+
+def _extract_combo_first_product(s: str, brand: str) -> list[tuple[str, int | None]] | None:
+    """Keep only the first product of a bundled combo like 'A3入+B3入/75元'.
+
+    A combo joins two separately-quantified packaged items with '+'/'＋' under one
+    shared price; the second item is a comparison/bundle partner, so the report
+    should key on the first product only (e.g. 翻轉布丁, not 翻轉布丁統一布丁).
+    Requires a quantity marker on BOTH sides so it never fires on a flavour swirl
+    ('巧克力+香草霜淇淋') or on separately-priced multi-product lists ('A59+B65').
+    """
+    match = re.match(r"^(?P<first>[^+＋]+?)[+＋](?P<rest>.+)$", s)
+    if not match:
+        return None
+    first, rest = match.group("first"), match.group("rest")
+    if not (_COMBO_QTY_RE.search(first) and _COMBO_QTY_RE.search(rest)):
+        return None
+    parsed = _extract_products_and_prices_from_text(first, brand)
+    if not parsed or not parsed[0][0]:
+        return None
+    name = _QUANTITY_SUFFIX_RE.sub("", parsed[0][0]).strip() or parsed[0][0]
+    name = _OPTIONAL_RE.sub("", name).strip() or name
+    if len(name) < 2:
+        return None
+    price = parsed[0][1] if parsed[0][1] is not None else _primary_price_from_text(s)
+    return [(name, price)]
+
+
 def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
     """Extract product names and prices from one logical product-name text."""
     s = _normalize_product_pattern_text(raw_name, brand)
+
+    combo = _extract_combo_first_product(s, brand)
+    if combo:
+        return combo
 
     same_price = _extract_slash_same_price_products(s)
     if same_price:
@@ -289,6 +322,8 @@ def _normalize_product_pattern_text(raw_name: str, brand: str = "") -> str:
     s = _BRACKET_RE.sub(" ", s)
     s = re.sub(r"[\[\(（【][^\]\)）】]*$", " ", s)
     s = _strip_brand_keywords(s, brand)
+    s = _FRIENDLY_TIME_MARK_RE.sub(" ", s)
+    s = _FRIENDLY_TIME_TAIL_RE.sub("", s)
     return _strip_payment_asides(s)
 
 
