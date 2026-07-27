@@ -227,6 +227,25 @@ rm -rf rebackfill_work
 # refresh the persistent seed so the next run continues from here
 cp data/posts.jsonl "$STORE_SEED" 2>/dev/null || true
 
+# --- 7a. label any new raw 商品名稱 fields (same cache pattern as sentiment) ---
+# Deciding what product a free-text field names is a judgement call, so an LLM makes
+# it once per distinct field and the answer is cached in
+# data/labels/product_name_labels.csv. Non-fatal: on failure the extraction rules
+# still cover unlabelled fields, so a flaky labelling run must not block publishing.
+log "label new product-name fields"
+PN_DELTA="$WORK/unlabeled-product-names.csv"
+if python3 scripts/export_product_names.py --out "$PN_DELTA" 2>&1 | tail -1; then
+  PN_ROWS="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('$PN_DELTA',encoding='utf-8-sig'))))" 2>/dev/null || echo 0)"
+  if [ "$PN_ROWS" -gt 0 ]; then
+    log "product-name delta: $PN_ROWS field(s) — label them with scripts/label_product_names.sh, then:"
+    log "  python3 scripts/import_product_names.py <labeled.csv>"
+  else
+    log "product-name delta: none"
+  fi
+else
+  log "product-name export failed (continuing on extraction rules)"
+fi
+
 # --- 7b. recompute scores (uses fresh labels) + de-identify + build public data ---
 # This is the former GitHub Actions "refresh live data" work, moved local so the
 # whole pipeline is one flow. run_pipeline reads posts.jsonl + the label cache.

@@ -5,6 +5,7 @@ import re
 import unicodedata
 from collections import defaultdict
 from difflib import SequenceMatcher
+from functools import lru_cache
 from ..config import (
     BRANDS,
     PRODUCT_ALIASES,
@@ -13,6 +14,7 @@ from ..config import (
 )
 from ..models import Comment, Post
 from ..parser import _title_product_name
+from ..product_labels import load_product_name_labels, product_name_fingerprint
 
 from ._common import (_BRACKET_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
 
@@ -47,15 +49,54 @@ def _extract_space_separated_parallel_products(
     return None
 
 
+@lru_cache(maxsize=1)
+def _cached_product_name_labels() -> dict[str, list[tuple[str, int | None]]]:
+    return load_product_name_labels()
+
+
 def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
     """Split a raw product name into (name, price) pairs.
 
-    Handles single products with trailing prices ("BF薄荷岩鹽檸檬糖35")
-    and multi-product titles ("抹茶霜淇淋兩支55抹茶千層59").
+    An LLM label for this exact raw field wins when one exists: deciding what the
+    product is in free text is a judgement call, and the label was made once and
+    cached (see cvs_radar/product_labels.py). The rules below stay as the fallback
+    for fields that have not been labelled yet, so a fresh crawl still produces
+    something without waiting on a labelling run.
     """
+    labelled = _cached_product_name_labels().get(
+        product_name_fingerprint(brand, raw_name)
+    )
+    if labelled is not None:
+        return _fill_missing_price_from_rules(list(labelled), raw_name, brand)
+
+    return extract_products_and_prices_by_rules(raw_name, brand)
+
+
+def extract_products_and_prices_by_rules(
+    raw_name: str, brand: str = ""
+) -> list[tuple[str, int | None]]:
+    """Run only the rule engine, ignoring any LLM label. Used by rule-level tests."""
     raw = unicodedata.normalize("NFKC", raw_name or "").strip()
     raw = re.sub(r"^[：:]+\s*", "", raw)
     return _strip_trailing_qualifiers(_extract_products_and_prices_raw(raw, brand))
+
+
+def _fill_missing_price_from_rules(
+    items: list[tuple[str, int | None]], raw_name: str, brand: str
+) -> list[tuple[str, int | None]]:
+    """Let the rules supply a price the labeller left blank.
+
+    Naming is a judgement call and the label wins it outright; reading a price out
+    of "49 第二隻10元" is arithmetic the rules already do reliably. Only applied to
+    a single-item label matched by a single-item rule result, so there is no
+    guessing about which product a price belongs to.
+    """
+    if len(items) != 1 or items[0][1] is not None:
+        return items
+    rule_items = extract_products_and_prices_by_rules(raw_name, brand)
+    if len(rule_items) != 1 or rule_items[0][1] is None:
+        return items
+    return [(items[0][0], rule_items[0][1])]
 
 
 def _extract_products_and_prices_raw(raw: str, brand: str) -> list[tuple[str, int | None]]:

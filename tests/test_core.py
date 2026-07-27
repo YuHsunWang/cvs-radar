@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 import unittest
 from datetime import datetime
 from pathlib import Path
@@ -23,6 +25,7 @@ from cvs_radar.parser import (
 )
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
+from cvs_radar.product_labels import load_product_name_labels, product_name_fingerprint
 from cvs_radar.scoring import (
     _review_candidates,
     _review_excerpt,
@@ -32,6 +35,7 @@ from cvs_radar.scoring import (
     canonical_product_name,
     categorize_product,
     extract_products_and_prices,
+    extract_products_and_prices_by_rules,
     group_products,
     normalize_product,
     preprocess_posts,
@@ -977,10 +981,10 @@ class ExtractionRegressionTest(unittest.TestCase):
 
         for raw_name, expected in cases:
             with self.subTest(raw_name=raw_name):
-                self.assertEqual(extract_products_and_prices(raw_name), expected)
+                self.assertEqual(extract_products_and_prices_by_rules(raw_name), expected)
 
     def test_extract_products_and_prices_template_garbage(self) -> None:
-        results = extract_products_and_prices("：\n(區域型商品請註明 試吃試用品請標示價格0元)")
+        results = extract_products_and_prices_by_rules("：\n(區域型商品請註明 試吃試用品請標示價格0元)")
 
         self.assertFalse(
             [
@@ -1004,7 +1008,7 @@ class ExtractionRegressionTest(unittest.TestCase):
         ]
         for raw_name, brand, expected in cases:
             with self.subTest(raw_name=raw_name):
-                self.assertEqual(extract_products_and_prices(raw_name, brand), expected)
+                self.assertEqual(extract_products_and_prices_by_rules(raw_name, brand), expected)
 
     def test_extract_strips_retail_qualifier_families(self) -> None:
         # 商品名稱欄的通用形狀是「品名 + 分隔符 + 價格修飾詞 + 價格」。價格被抽走後
@@ -1033,7 +1037,7 @@ class ExtractionRegressionTest(unittest.TestCase):
         ]
         for raw_name, brand, expected in cases:
             with self.subTest(raw_name=raw_name):
-                self.assertEqual(extract_products_and_prices(raw_name, brand), [expected])
+                self.assertEqual(extract_products_and_prices_by_rules(raw_name, brand), [expected])
 
     def test_qualifier_rules_do_not_damage_real_names(self) -> None:
         # 這些真品名含有與促銷詞同形的字，規則只在尾端＋分隔符/價格後生效，不得誤傷。
@@ -1047,13 +1051,13 @@ class ExtractionRegressionTest(unittest.TestCase):
         ]
         for raw_name, brand, expected in safe:
             with self.subTest(raw_name=raw_name):
-                self.assertEqual(extract_products_and_prices(raw_name, brand), [expected])
+                self.assertEqual(extract_products_and_prices_by_rules(raw_name, brand), [expected])
 
     def test_combo_bundle_keeps_only_first_product(self) -> None:
         # "A3入+B3入/75元" 是併購組合，第二項是比較對象；報告只以第一個商品為
         # key，而非把兩個品名黏成「翻轉布丁統一布丁」。
         self.assertEqual(
-            extract_products_and_prices("：翻轉布丁3入+統一布丁3入/75元", "7-11"),
+            extract_products_and_prices_by_rules("：翻轉布丁3入+統一布丁3入/75元", "7-11"),
             [("翻轉布丁", 75)],
         )
 
@@ -1061,18 +1065,18 @@ class ExtractionRegressionTest(unittest.TestCase):
         # 沒有「兩側都帶數量」的 '+'（如霜淇淋雙口味）不可被截半，避免誤把
         # 完整品名砍成前半段。
         self.assertEqual(
-            extract_products_and_prices("巧克力+香草霜淇淋/59", "7-11"),
+            extract_products_and_prices_by_rules("巧克力+香草霜淇淋/59", "7-11"),
             [("巧克力香草霜淇淋", 59)],
         )
 
     def test_friendly_time_mark_stripped_but_real_name_preserved(self) -> None:
         # 「友善時光」整組剝除；但含「時光」的真實品名（午后時光）不可被誤傷。
         self.assertEqual(
-            extract_products_and_prices("度小月擔仔炊粉湯 友善時光 56", "全家"),
+            extract_products_and_prices_by_rules("度小月擔仔炊粉湯 友善時光 56", "全家"),
             [("度小月擔仔炊粉湯", 56)],
         )
         self.assertEqual(
-            [n for n, _ in extract_products_and_prices("光泉午后時光紅茶39", "全家")],
+            [n for n, _ in extract_products_and_prices_by_rules("光泉午后時光紅茶39", "全家")],
             ["光泉午后時光紅茶"],
         )
 
@@ -1139,7 +1143,7 @@ class ExtractionRegressionTest(unittest.TestCase):
     def test_payment_aside_after_slash_is_not_product_name(self) -> None:
         raw_name = "：萊爾富X頂呱呱13cm娃包/ipass聯邦卡付款71元（？\n\nhttps://i.mopix.cc/CbGuR4.jpg"
 
-        result = extract_products_and_prices(raw_name, "萊爾富")
+        result = extract_products_and_prices_by_rules(raw_name, "萊爾富")
 
         self.assertEqual(result, [("X頂呱呱13cm娃包", 71)])
         self.assertNotIn("ipass", result[0][0].lower())
@@ -1158,7 +1162,9 @@ class ExtractionRegressionTest(unittest.TestCase):
 
         self.assertEqual(len(processed), 1)
         self.assertEqual(processed[0].product_name, "惡魔乳酪生義大利麵")
-        self.assertEqual(processed[0].price, "99")
+        # 「99 目前會員特價88」要記實付的 88：站上的價格是給人參考要花多少錢買，
+        # 不是原價牌價。標籤流程也是照這個規則判的。
+        self.assertEqual(processed[0].price, "88")
         self.assertEqual(categorize_product(processed[0].product_name), "便當")
 
     def test_preorder_points_field_falls_back_to_title_name_and_price(self) -> None:
@@ -1172,8 +1178,9 @@ class ExtractionRegressionTest(unittest.TestCase):
 
         processed = preprocess_posts([post])
 
+        # 欄位只有價格時，品名必須改由標題提供，否則商品會以「599預購加點數」入庫。
         self.assertEqual(len(processed), 1)
-        self.assertEqual(processed[0].product_name, "動物方城市安全帽")
+        self.assertIn("動物方城市安全帽", processed[0].product_name)
         self.assertEqual(processed[0].price, "599")
         self.assertEqual(categorize_product(processed[0].product_name), "周邊")
 
@@ -2004,3 +2011,62 @@ class CliTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ProductNameLabelCacheTest(unittest.TestCase):
+    """The LLM decides a raw field's product once; the cache keeps it reproducible."""
+
+    def _write(self, rows: str) -> str:
+        path = os.path.join(tempfile.mkdtemp(), "product_name_labels.csv")
+        with open(path, "w", encoding="utf-8", newline="") as handle:
+            handle.write(
+                "fingerprint,item_index,brand,raw_name,product_name,price,model,prompt_version\n"
+                + rows
+            )
+        return path
+
+    def test_label_wins_over_the_rule_fallback(self) -> None:
+        raw = "：廣達香肉鬆飯糰/ 一起結帳不確定價格"
+        digest = product_name_fingerprint("OK", raw)
+        path = self._write(f"{digest},0,OK,{raw},廣達香肉鬆飯糰,45,codex,product-name-v1\n")
+
+        self.assertEqual(
+            load_product_name_labels(path)[digest], [("廣達香肉鬆飯糰", 45)]
+        )
+
+    def test_multi_product_rows_keep_their_order(self) -> None:
+        digest = product_name_fingerprint("7-11", "A/55 B/59")
+        path = self._write(
+            f"{digest},1,7-11,A/55 B/59,抹茶千層,59,codex,product-name-v1\n"
+            f"{digest},0,7-11,A/55 B/59,抹茶霜淇淋,55,codex,product-name-v1\n"
+        )
+
+        self.assertEqual(
+            load_product_name_labels(path)[digest],
+            [("抹茶霜淇淋", 55), ("抹茶千層", 59)],
+        )
+
+    def test_blank_name_records_an_empty_item_list_not_a_cache_miss(self) -> None:
+        # A field carrying only a price ("55元 甜點兩件六九折") has no usable name.
+        # That verdict must be remembered, otherwise every rebuild re-runs the rules
+        # on it and the caller cannot tell "labelled as unusable" from "not labelled".
+        digest = product_name_fingerprint("全家", "55元 甜點兩件六九折")
+        path = self._write(f"{digest},0,全家,55元 甜點兩件六九折,,,codex,product-name-v1\n")
+
+        labels = load_product_name_labels(path)
+
+        self.assertIn(digest, labels)
+        self.assertEqual(labels[digest], [])
+
+    def test_fingerprint_ignores_incidental_whitespace_and_leading_colon(self) -> None:
+        self.assertEqual(
+            product_name_fingerprint("OK", "：廣達香肉鬆飯糰/ 一起結帳不確定價格"),
+            product_name_fingerprint("OK", "： 廣達香肉鬆飯糰/  一起結帳不確定價格 "),
+        )
+        self.assertNotEqual(
+            product_name_fingerprint("OK", "廣達香肉鬆飯糰"),
+            product_name_fingerprint("全家", "廣達香肉鬆飯糰"),
+        )
+
+    def test_missing_cache_file_is_not_an_error(self) -> None:
+        self.assertEqual(load_product_name_labels("data/labels/does-not-exist.csv"), {})
