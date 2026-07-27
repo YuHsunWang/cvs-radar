@@ -189,15 +189,22 @@ def clean_volume_label(value: str) -> str:
     return match.group(1) if match else "不足"
 
 
+# The Bayesian fair score only ever occupies roughly 20-80 (its prior pulls
+# unopinionated products to 50), so the raw number reads as if nothing is ever
+# good. Stretch that band across the full 0-100 scale instead of inflating it:
+# the anchors are fixed constants, not the observed min/max, so a product's score
+# does not drift when other products are added. Because 20-80 is symmetric about
+# 50, the prior's neutral point still lands exactly on 50.
+_SCORE_FLOOR = 20.0
+_SCORE_CEILING = 80.0
+
+
 def calibrate_recommendation_score(fair_score: float) -> int:
     """Map a Bayesian fair score onto a stable, user-facing 0-100 scale."""
 
-    score = max(0.0, min(100.0, float(fair_score)))
-    if score <= 50:
-        return round(score * 1.2)
-    if score <= 80:
-        return round(60 + (score - 50) * 1.1)
-    return round(93 + (score - 80) * 0.35)
+    score = max(_SCORE_FLOOR, min(_SCORE_CEILING, float(fair_score)))
+    span = _SCORE_CEILING - _SCORE_FLOOR
+    return round((score - _SCORE_FLOOR) * 100 / span)
 
 
 def calibrate_recommendation_scores(reports: list[Any]) -> dict[str, int]:

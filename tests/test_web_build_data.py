@@ -127,9 +127,14 @@ def test_recommendation_score_calibration_handles_no_scores() -> None:
 
 
 def test_recommendation_score_uses_stable_fixed_anchors() -> None:
+    # The scale must not flatter products: the Bayesian prior's neutral point (50)
+    # has to survive calibration as 50, or "average" reads to users as "good".
+    assert calibrate_recommendation_score(50) == 50
+    # The occupied band 20-80 is stretched onto the full scale, and anything
+    # outside it clamps rather than escaping 0-100.
+    assert calibrate_recommendation_score(20) == 0
+    assert calibrate_recommendation_score(80) == 100
     assert calibrate_recommendation_score(0) == 0
-    assert calibrate_recommendation_score(50) == 60
-    assert calibrate_recommendation_score(80) == 93
     assert calibrate_recommendation_score(100) == 100
 
     original = [report("middle", 60), report("high", 80)]
@@ -145,7 +150,7 @@ def test_recommendation_score_omits_low_confidence_reports() -> None:
         report("enough", 75),
     ]
 
-    assert calibrate_recommendation_scores(reports) == {"enough": 88}
+    assert calibrate_recommendation_scores(reports) == {"enough": 92}
 
 
 def test_single_post_high_confidence_is_capped_only_for_public_display() -> None:
@@ -327,7 +332,7 @@ def test_override_collision_merges_into_one_public_product() -> None:
     assert merged[0]["nPosts"] == 4
     assert merged[0]["nComments"] == 8
     assert merged[0]["fairScore"] == 50
-    assert merged[0]["recommendationScore"] == 60
+    assert merged[0]["recommendationScore"] == 50
     assert merged[0]["latestDate"] == "2026-06-20"
     assert merged[0]["firstDate"] == "2026-05-01"
     assert merged[0]["likes"] == ["甲", "共同", "乙"]

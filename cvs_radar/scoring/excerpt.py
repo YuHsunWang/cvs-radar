@@ -43,12 +43,21 @@ class _ReviewCandidate:
     aspects: frozenset[str]
     post_index: int
     sentence_index: int
+    decisive: bool = False
 
 
 def _review_excerpt(posts: list[Post], max_len: int = 180, max_sentences: int = 3) -> str:
     """Select diverse, purchase-relevant sentences from every author review."""
 
     candidates = _review_candidates(posts)
+    # Prefer sentences that either describe the product or state a verdict. Only
+    # fall back to contentless praise when the post offers nothing else —
+    # merchandise reviews (福袋, 鑰匙圈) have no taste/texture/portion to report.
+    substantive = [
+        candidate for candidate in candidates if candidate.aspects or candidate.decisive
+    ]
+    if substantive:
+        candidates = substantive
     selected: list[_ReviewCandidate] = []
     covered_aspects: set[str] = set()
 
@@ -105,6 +114,12 @@ def _review_candidates(posts: list[Post]) -> list[_ReviewCandidate]:
                 continue
 
             score = 3.0 * len(aspects) + 2.5 * min(decision_hits, 2) + 1.25 * min(sentiment_hits, 3)
+            # Contentless praise ("超級好吃", "我很愛") tells a reader nothing about the
+            # product. Penalise rather than drop it: merchandise posts (福袋, 鑰匙圈)
+            # often have no describable aspect at all, and a weak excerpt still beats
+            # an empty one.
+            if not aspects:
+                score -= 2.0
             if 12 <= len(sentence) <= 80:
                 score += 1.0
             if _EXCERPT_FIRST_HAND_RE.search(sentence):
@@ -121,6 +136,7 @@ def _review_candidates(posts: list[Post]) -> list[_ReviewCandidate]:
                     aspects=aspects,
                     post_index=post_index,
                     sentence_index=sentence_index,
+                    decisive=bool(decision_hits),
                 )
             )
     return candidates

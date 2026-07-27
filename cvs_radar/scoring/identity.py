@@ -14,7 +14,7 @@ from ..config import (
 from ..models import Comment, Post
 from ..parser import _title_product_name
 
-from ._common import (_BRACKET_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
+from ._common import (_BRACKET_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
 
 
 def _extract_space_separated_parallel_products(
@@ -55,6 +55,10 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
     """
     raw = unicodedata.normalize("NFKC", raw_name or "").strip()
     raw = re.sub(r"^[：:]+\s*", "", raw)
+    return _strip_trailing_qualifiers(_extract_products_and_prices_raw(raw, brand))
+
+
+def _extract_products_and_prices_raw(raw: str, brand: str) -> list[tuple[str, int | None]]:
     lines = _candidate_product_lines(raw)
     if lines:
         parallel = _extract_space_separated_parallel_products(lines[0], brand)
@@ -68,6 +72,39 @@ def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[st
     if lines:
         return _extract_products_and_prices_from_text(lines[0], brand)
     return _extract_products_and_prices_from_text("", brand)
+
+
+def _strip_trailing_qualifiers(
+    items: list[tuple[str, int | None]],
+) -> list[tuple[str, int | None]]:
+    """Drop retail price/promo qualifiers left clinging to an extracted name.
+
+    Every extraction path funnels through here so the tail vocabulary lives in one
+    place instead of being re-applied per branch. Only strips at the end of the
+    string, and never down to a stub — a name that is *entirely* qualifier text is
+    left alone for the junk detector to route to the title fallback.
+    """
+    cleaned: list[tuple[str, int | None]] = []
+    for name, price in items:
+        match = _TRAILING_QUALIFIER_RE.search(name)
+        if not match:
+            cleaned.append((name, price))
+            continue
+        stripped = re.sub(r"[、,，.。/／|｜\-\s]+$", "", name[: match.start()]).strip()
+        if len(stripped) < 3:
+            cleaned.append((name, price))
+            continue
+        # a price swallowed by the qualifier tail is the product's own price
+        if price is None and match.group("price"):
+            recovered = int(match.group("price"))
+            if _MIN_PRICE <= recovered <= _MAX_PRICE:
+                price = recovered
+        # a bare pack size left behind by the promo clause ("明治指定巧克力兩件")
+        without_quantity = _QUANTITY_SUFFIX_RE.sub("", stripped).strip()
+        if len(without_quantity) >= 2:
+            stripped = without_quantity
+        cleaned.append((stripped, price))
+    return cleaned
 
 
 def _candidate_product_lines(raw_name: str) -> list[str]:
@@ -225,7 +262,12 @@ def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> li
         return shared_flavors
 
     s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
+    # Keep a decimal point that sits inside a number: stripping it welds the digits
+    # together ("牧場直送4.0花生牛奶雪糕" -> "...40...") and the 2-3 digit price matcher
+    # then reads that as a price and splits one product into two.
+    s = re.sub(r"(?<=\d)\.(?=\d)", "\x00", s)
     s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
+    s = s.replace("\x00", ".")
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s).strip()
@@ -324,7 +366,23 @@ def _normalize_product_pattern_text(raw_name: str, brand: str = "") -> str:
     s = _strip_brand_keywords(s, brand)
     s = _FRIENDLY_TIME_MARK_RE.sub(" ", s)
     s = _FRIENDLY_TIME_TAIL_RE.sub("", s)
+    s = _DECIMAL_PRICE_RE.sub(r"\1", s)
+    s = _DISCOUNT_MULTIPLIER_RE.sub(" ", s)
+    s = _strip_price_note_aside(s)
+    s = _strip_gift_tail(s)
     return _strip_payment_asides(s)
+
+
+def _strip_price_note_aside(text: str) -> str:
+    """Drop a digit-free 'I forgot the price' aside written after the separator."""
+    stripped = _PRICE_NOTE_ASIDE_RE.sub("", text).strip()
+    return stripped if len(stripped) >= 2 else text
+
+
+def _strip_gift_tail(text: str) -> str:
+    """Drop a trailing free-gift / spend-threshold clause (…消費滿200免費送)."""
+    stripped = _GIFT_TAIL_RE.sub("", text).strip()
+    return stripped if len(stripped) >= 2 else text
 
 
 def _strip_payment_asides(text: str) -> str:
@@ -469,6 +527,10 @@ def _is_junk_extracted_product_name(name: str) -> bool:
         return True
     compact = re.sub(r"\s+", "", text)
     if _is_price_label_name(compact):
+        return True
+    # A bare category word is what is left when the poster filled the 商品名稱 field
+    # with a price and a promo ("55元 甜點兩件六九折") — the real name is in the title.
+    if compact in PRODUCT_CATEGORIES:
         return True
     # 萊爾富「即時救援」是即期品折扣活動名稱，不是商品名。貼文者常把它連同折扣價
     # 填進商品名稱欄（如「售價：99元/ 即時救援7折69元」），真正商品名留在標題。

@@ -768,6 +768,36 @@ class ScoringTest(unittest.TestCase):
 
 
 class ReviewExcerptTest(unittest.TestCase):
+    def test_contentless_praise_loses_to_a_sentence_with_substance(self) -> None:
+        # 「超級好吃」對選購者沒有任何資訊；同一篇裡講份量與價格的句子才有用。
+        post = Post(
+            id="vacuous",
+            review_text=(
+                "我拍的不好看\n"
+                "但是這個超級好吃\n"
+                "而且冰淇淋好大一坨\n"
+                "單價90塊我都會買"
+            ),
+        )
+
+        excerpt = _review_excerpt([post])
+
+        self.assertIn("好大一坨", excerpt)
+        self.assertIn("90塊", excerpt)
+        self.assertNotIn("超級好吃", excerpt)
+
+    def test_verdict_without_a_described_aspect_still_counts_as_substance(self) -> None:
+        # 「會回購」沒有口感/份量等面向，但那是明確的購買結論，不可被當成空泛稱讚丟掉。
+        post = Post(id="verdict", review_text="看起來很讚\n整體耐吃，應該會再回購！")
+
+        self.assertIn("回購", _review_excerpt([post]))
+
+    def test_merchandise_review_still_gets_an_excerpt(self) -> None:
+        # 周邊商品沒有味道口感可寫，只剩主觀評價；此時寧可用弱節錄也不要空白。
+        post = Post(id="goods", review_text="免費送但質感做得很不錯")
+
+        self.assertTrue(_review_excerpt([post]).strip())
+
     def test_selects_purchase_relevant_sentences_in_source_order(self) -> None:
         post = Post(
             id="review",
@@ -907,6 +937,49 @@ class ExtractionRegressionTest(unittest.TestCase):
         for raw_name, brand, expected in cases:
             with self.subTest(raw_name=raw_name):
                 self.assertEqual(extract_products_and_prices(raw_name, brand), expected)
+
+    def test_extract_strips_retail_qualifier_families(self) -> None:
+        # 商品名稱欄的通用形狀是「品名 + 分隔符 + 價格修飾詞 + 價格」。價格被抽走後
+        # 修飾詞會黏在品名尾巴，讓同一商品散成多個 key。逐族各鎖一例。DEV-110。
+        cases = [
+            # 價格／折扣尾巴
+            ("：鹽花生焦糖捲蛋糕/友善$34", "全家", ("鹽花生焦糖捲蛋糕", 34)),
+            ("：楊枝甘露果C果昔 嚐鮮價$79", "萊爾富", ("楊枝甘露果C果昔", 79)),
+            ("：白蘭氏養蔘元氣凍/折價後$49", "全家", ("白蘭氏養蔘元氣凍", 49)),
+            # 價格黏在修飾詞前面時要回收成 price
+            ("：法朋蛋黃酥霜淇淋  49 第二隻10元", "7-11", ("法朋蛋黃酥霜淇淋", 49)),
+            # 贈品／門檻尾巴
+            ("：褲褲兔中秋款光柵扇/消費滿200免費送", "全家", ("褲褲兔中秋款光柵扇", None)),
+            ("：炙燒燒肉拌麵89元+5元送可樂", "全家", ("炙燒燒肉拌麵", 89)),
+            ("：明治指定巧克力兩件8折送手機掛繩", "7-11", ("明治指定巧克力", None)),
+            # 價格不確定／結帳敘述（斜線後整段不含數字）
+            ("：廣達香肉鬆飯糰/ 一起結帳不確定價格", "OK", ("廣達香肉鬆飯糰", None)),
+            ("：光泉優質蛋白牛奶/一起結帳忘記了", "OK", ("光泉優質蛋白牛奶", None)),
+            # 供應／模板標籤殘留
+            # 名稱是重點；此路徑的價格目前救不回來（已知小缺口，不影響分組 key）
+            ("：五窨茉莉茶后 40元限店", "全家", ("五窨茉莉茶后", None)),
+            ("：世界的山將 - 夢幻唐揚雞 / 單價59", "7-11", ("世界的山將夢幻唐揚雞", 59)),
+            # 折扣乘數與小數價格
+            ("：燻雞起司米披薩卷/79X0.7", "7-11", ("燻雞起司米披薩卷", 79)),
+            ("：雪淋霜-甜鹽蜜語牛奶/24.5元", "7-11", ("雪淋霜甜鹽蜜語牛奶", 24)),
+        ]
+        for raw_name, brand, expected in cases:
+            with self.subTest(raw_name=raw_name):
+                self.assertEqual(extract_products_and_prices(raw_name, brand), [expected])
+
+    def test_qualifier_rules_do_not_damage_real_names(self) -> None:
+        # 這些真品名含有與促銷詞同形的字，規則只在尾端＋分隔符/價格後生效，不得誤傷。
+        safe = [
+            # 「送」在品名中間，不是贈品條款
+            ("：牧場直送生食鮮蛋/150元", "全家", ("牧場直送生食鮮蛋", 150)),
+            # 品名內的小數不接「元」，不可被當價格而拆成兩個商品
+            ("：牧場直送4.0花生牛奶雪糕/45元", "全家", ("牧場直送4.0花生牛奶雪糕", 45)),
+            ("：開運黑糖發糕/59元", "7-11", ("開運黑糖發糕", 59)),
+            ("：光泉午后時光紅茶39", "全家", ("光泉午后時光紅茶", 39)),
+        ]
+        for raw_name, brand, expected in safe:
+            with self.subTest(raw_name=raw_name):
+                self.assertEqual(extract_products_and_prices(raw_name, brand), [expected])
 
     def test_combo_bundle_keeps_only_first_product(self) -> None:
         # "A3入+B3入/75元" 是併購組合，第二項是比較對象；報告只以第一個商品為
