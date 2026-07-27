@@ -35,8 +35,8 @@ export type AdvancedFilters = {
 export type SortKey =
   | 'recentRecommendationDesc'
   | 'discussionHeatDesc'
-  | 'fairScoreDesc'
-  | 'fairScoreAsc'
+  | 'comprehensiveDesc'
+  | 'comprehensiveAsc'
 
 export const DATA_STALE_DAYS = 14
 const millisecondsPerDay = 24 * 60 * 60 * 1000
@@ -160,7 +160,7 @@ export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
       difference = compareNullableNumbers(
         comprehensiveScore(a),
         comprehensiveScore(b),
-        sortKey === 'fairScoreDesc',
+        sortKey === 'comprehensiveDesc',
       )
     }
 
@@ -201,8 +201,8 @@ export function sortLabel(sortKey: SortKey): string {
   const labels: Record<SortKey, string> = {
     recentRecommendationDesc: '近期推薦',
     discussionHeatDesc: '討論熱度',
-    fairScoreDesc: '綜合評分：高到低',
-    fairScoreAsc: '綜合評分：低到高',
+    comprehensiveDesc: '綜合評分：高到低',
+    comprehensiveAsc: '綜合評分：低到高',
   }
   return labels[sortKey]
 }

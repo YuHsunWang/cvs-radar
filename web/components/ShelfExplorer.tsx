@@ -63,8 +63,8 @@ const DATE_PRESETS = [
 const SORT_OPTIONS: readonly { key: SortKey; label: string }[] = [
   { key: 'recentRecommendationDesc', label: '近期推薦' },
   { key: 'discussionHeatDesc', label: '討論熱度' },
-  { key: 'fairScoreDesc', label: '評分高→低' },
-  { key: 'fairScoreAsc', label: '評分低→高' },
+  { key: 'comprehensiveDesc', label: '評分高→低' },
+  { key: 'comprehensiveAsc', label: '評分低→高' },
 ]
 
 // Drag distance (px) past which a downward flick on the sheet handle closes it.

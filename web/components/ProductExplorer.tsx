@@ -199,8 +199,8 @@ export default function ProductExplorer({ initialPayload }: ProductExplorerProps
                 >
                   <option value="recentRecommendationDesc">排序：近期推薦</option>
                   <option value="discussionHeatDesc">排序：討論熱度</option>
-                  <option value="fairScoreDesc">排序：綜合評分 高到低</option>
-                  <option value="fairScoreAsc">排序：綜合評分 低到高</option>
+                  <option value="comprehensiveDesc">排序：綜合評分 高到低</option>
+                  <option value="comprehensiveAsc">排序：綜合評分 低到高</option>
                 </select>
                 <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-base font-black text-slate-800">
                   ▾

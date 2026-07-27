@@ -213,8 +213,8 @@ describe('sortProducts', () => {
   it.each([
     ['recentRecommendationDesc', ['b', 'c', 'a']],
     ['discussionHeatDesc', ['b', 'c', 'a']],
-    ['fairScoreDesc', ['a', 'c', 'b']],
-    ['fairScoreAsc', ['b', 'c', 'a']],
+    ['comprehensiveDesc', ['a', 'c', 'b']],
+    ['comprehensiveAsc', ['b', 'c', 'a']],
   ] as const)('sorts %s in the requested direction', (sortKey, expected) => {
     expect(sortProducts(products, sortKey).map(({ id }) => id)).toEqual(expected)
   })
@@ -242,7 +242,7 @@ describe('sortProducts', () => {
       product({ id: 'old-high-volume', fairScore: 70, recommendationScore: 84, nComments: 8, latestDate: '2026-05-01' }),
     ]
 
-    expect(sortProducts(tied, 'fairScoreDesc').map(({ id }) => id)).toEqual([
+    expect(sortProducts(tied, 'comprehensiveDesc').map(({ id }) => id)).toEqual([
       'new-high-volume',
       'old-high-volume',
       'old-low-volume',
@@ -255,11 +255,11 @@ describe('sortProducts', () => {
       product({ id: 'higher-recommendation', fairScore: 40, recommendationScore: 80 }),
     ]
 
-    expect(sortProducts(opposedScores, 'fairScoreDesc').map(({ id }) => id)).toEqual([
+    expect(sortProducts(opposedScores, 'comprehensiveDesc').map(({ id }) => id)).toEqual([
       'higher-recommendation',
       'higher-fair',
     ])
-    expect(sortProducts(opposedScores, 'fairScoreAsc').map(({ id }) => id)).toEqual([
+    expect(sortProducts(opposedScores, 'comprehensiveAsc').map(({ id }) => id)).toEqual([
       'higher-fair',
       'higher-recommendation',
     ])
