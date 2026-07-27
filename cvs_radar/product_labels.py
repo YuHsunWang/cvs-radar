@@ -28,6 +28,7 @@ FIELDNAMES = (
     "fingerprint",
     "item_index",
     "brand",
+    "title",
     "raw_name",
     "product_name",
     "price",
@@ -46,14 +47,27 @@ def _normalize_raw_name(text: str) -> str:
     return re.sub(r"^[：:]+\s*", "", s).strip()
 
 
-def product_name_fingerprint(brand: str, raw_name: str) -> str:
+def product_name_fingerprint(brand: str, title: str, raw_name: str) -> str:
     """Build a stable identifier for one raw 商品名稱 field under one brand.
 
     Whitespace and full/half-width differences are normalised away so that two
     posts writing the same field slightly differently share a label.
+
+    The post title is part of the key because the field alone does not identify
+    the product. When a poster leaves 商品名稱 as bare noise ("：49"), every such
+    post hashes identically, and one label then overwrites the rest — which merged
+    這不是滷肉飯, 法朋蛋黃酥霜淇淋 and 維力炸醬拌麵堡 into 飛燕煉乳炸銀絲卷. The
+    title is what the labeller reads to resolve those fields, so it belongs in the
+    key that stores the answer.
     """
     normalized_brand = unicodedata.normalize("NFKC", str(brand or "")).strip()
-    payload = "\x1f".join((normalized_brand, _normalize_raw_name(raw_name)))
+    payload = "\x1f".join(
+        (
+            normalized_brand,
+            _normalize_raw_name(title),
+            _normalize_raw_name(raw_name),
+        )
+    )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 

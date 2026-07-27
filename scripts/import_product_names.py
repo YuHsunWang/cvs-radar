@@ -94,6 +94,7 @@ def import_labels(
                 "fingerprint": fingerprint,
                 "item_index": str(index),
                 "brand": str(row.get("brand") or "").strip(),
+                "title": str(row.get("title") or "").strip(),
                 "raw_name": str(row.get("raw_name") or "").strip(),
                 "product_name": name,
                 "price": price,

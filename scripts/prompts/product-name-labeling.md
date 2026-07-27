@@ -12,7 +12,7 @@ rules are exactly what this cache exists to replace.
 
 <how_to_fill_each_row>
 Keep every column and the same header, rows in the SAME order, and keep
-`fingerprint`, `brand`, `raw_name`, `post_title`, `rule_guess` UNCHANGED.
+`fingerprint`, `brand`, `raw_name`, `title`, `rule_guess` UNCHANGED.
 `rule_guess` is what the old rule engine produced, in `name#price` form — it is a
 hint only and is often wrong; correct it.
 
@@ -24,7 +24,7 @@ Fill in:
   asides (「一起結帳不確定價格」,「價格忘記」). KEEP brand/sub-brand and flavour
   words that are genuinely part of the name (牧場直送4.0巧克力牛奶雪糕,
   光泉午后時光紅茶, Seasons法式香草烤雞翅). Do not invent words that are not
-  supported by raw_name or post_title.
+  supported by raw_name or title.
 - `price`: the unit price the poster paid, as a plain integer, or blank if the
   field states none. For "原價79元、優惠價48元" use the price actually paid (48).
   For a bundle ("2支55") give the per-unit price (28) only if that is clearly the
@@ -38,8 +38,8 @@ combo where the second item is just a bundle partner or comparison
 (「翻轉布丁3入+統一布丁3入/75元」) is ONE product — the first one.
 
 NO USABLE NAME: when the field carries only a price or promo text (「55元 甜點兩件
-六九折」, 「49」) and the real name is only in `post_title`, take the name from
-`post_title` (drop its 「[商品] 品牌」 prefix). Only if neither gives a usable
+六九折」, 「49」) and the real name is only in `title`, take the name from
+`title` (drop its 「[商品] 品牌」 prefix). Only if neither gives a usable
 product name, leave `product_name` blank — that blank is a real verdict and is
 stored as such.
 </how_to_fill_each_row>

@@ -2026,25 +2026,28 @@ class ProductNameLabelCacheTest(unittest.TestCase):
         path = os.path.join(tempfile.mkdtemp(), "product_name_labels.csv")
         with open(path, "w", encoding="utf-8", newline="") as handle:
             handle.write(
-                "fingerprint,item_index,brand,raw_name,product_name,price,model,prompt_version\n"
+                "fingerprint,item_index,brand,title,raw_name,product_name,price,model,prompt_version\n"
                 + rows
             )
         return path
 
     def test_label_wins_over_the_rule_fallback(self) -> None:
         raw = "：廣達香肉鬆飯糰/ 一起結帳不確定價格"
-        digest = product_name_fingerprint("OK", raw)
-        path = self._write(f"{digest},0,OK,{raw},廣達香肉鬆飯糰,45,codex,product-name-v1\n")
+        title = "[商品] OK 廣達香肉鬆飯糰"
+        digest = product_name_fingerprint("OK", title, raw)
+        path = self._write(
+            f"{digest},0,OK,{title},{raw},廣達香肉鬆飯糰,45,codex,product-name-v1\n"
+        )
 
         self.assertEqual(
             load_product_name_labels(path)[digest], [("廣達香肉鬆飯糰", 45)]
         )
 
     def test_multi_product_rows_keep_their_order(self) -> None:
-        digest = product_name_fingerprint("7-11", "A/55 B/59")
+        digest = product_name_fingerprint("7-11", "[商品] 7-11 抹茶", "A/55 B/59")
         path = self._write(
-            f"{digest},1,7-11,A/55 B/59,抹茶千層,59,codex,product-name-v1\n"
-            f"{digest},0,7-11,A/55 B/59,抹茶霜淇淋,55,codex,product-name-v1\n"
+            f"{digest},1,7-11,[商品] 7-11 抹茶,A/55 B/59,抹茶千層,59,codex,product-name-v1\n"
+            f"{digest},0,7-11,[商品] 7-11 抹茶,A/55 B/59,抹茶霜淇淋,55,codex,product-name-v1\n"
         )
 
         self.assertEqual(
@@ -2056,8 +2059,10 @@ class ProductNameLabelCacheTest(unittest.TestCase):
         # A field carrying only a price ("55元 甜點兩件六九折") has no usable name.
         # That verdict must be remembered, otherwise every rebuild re-runs the rules
         # on it and the caller cannot tell "labelled as unusable" from "not labelled".
-        digest = product_name_fingerprint("全家", "55元 甜點兩件六九折")
-        path = self._write(f"{digest},0,全家,55元 甜點兩件六九折,,,codex,product-name-v1\n")
+        digest = product_name_fingerprint("全家", "[商品] 全家 甜點", "55元 甜點兩件六九折")
+        path = self._write(
+            f"{digest},0,全家,[商品] 全家 甜點,55元 甜點兩件六九折,,,codex,product-name-v1\n"
+        )
 
         labels = load_product_name_labels(path)
 
@@ -2065,13 +2070,23 @@ class ProductNameLabelCacheTest(unittest.TestCase):
         self.assertEqual(labels[digest], [])
 
     def test_fingerprint_ignores_incidental_whitespace_and_leading_colon(self) -> None:
+        title = "[商品] OK 廣達香肉鬆飯糰"
         self.assertEqual(
-            product_name_fingerprint("OK", "：廣達香肉鬆飯糰/ 一起結帳不確定價格"),
-            product_name_fingerprint("OK", "： 廣達香肉鬆飯糰/  一起結帳不確定價格 "),
+            product_name_fingerprint("OK", title, "：廣達香肉鬆飯糰/ 一起結帳不確定價格"),
+            product_name_fingerprint("OK", title, "： 廣達香肉鬆飯糰/  一起結帳不確定價格 "),
         )
         self.assertNotEqual(
-            product_name_fingerprint("OK", "廣達香肉鬆飯糰"),
-            product_name_fingerprint("全家", "廣達香肉鬆飯糰"),
+            product_name_fingerprint("OK", title, "廣達香肉鬆飯糰"),
+            product_name_fingerprint("全家", title, "廣達香肉鬆飯糰"),
+        )
+
+    def test_same_junk_field_under_different_titles_does_not_collide(self) -> None:
+        # A poster who leaves 商品名稱 as bare noise ("：49") makes every such post
+        # hash identically unless the title is in the key, and one label then
+        # overwrites the rest — which merged four unrelated 7-11 products into one.
+        self.assertNotEqual(
+            product_name_fingerprint("7-11", "[商品] 711 飛燕煉乳炸銀絲卷", "：49"),
+            product_name_fingerprint("7-11", "[商品] 711 這不是滷肉飯", "：49"),
         )
 
     def test_missing_cache_file_is_not_an_error(self) -> None:

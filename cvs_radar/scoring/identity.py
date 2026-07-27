@@ -54,17 +54,19 @@ def _cached_product_name_labels() -> dict[str, list[tuple[str, int | None]]]:
     return load_product_name_labels()
 
 
-def extract_products_and_prices(raw_name: str, brand: str = "") -> list[tuple[str, int | None]]:
+def extract_products_and_prices(
+    raw_name: str, brand: str = "", title: str = ""
+) -> list[tuple[str, int | None]]:
     """Split a raw product name into (name, price) pairs.
 
-    An LLM label for this exact raw field wins when one exists: deciding what the
-    product is in free text is a judgement call, and the label was made once and
-    cached (see cvs_radar/product_labels.py). The rules below stay as the fallback
-    for fields that have not been labelled yet, so a fresh crawl still produces
-    something without waiting on a labelling run.
+    An LLM label for this exact (title, raw field) wins when one exists: deciding
+    what the product is in free text is a judgement call, and the label was made
+    once and cached (see cvs_radar/product_labels.py). The rules below stay as the
+    fallback for fields that have not been labelled yet, so a fresh crawl still
+    produces something without waiting on a labelling run.
     """
     labelled = _cached_product_name_labels().get(
-        product_name_fingerprint(brand, raw_name)
+        product_name_fingerprint(brand, title, raw_name)
     )
     if labelled is not None:
         return _fill_missing_price_from_rules(list(labelled), raw_name, brand)
@@ -690,7 +692,7 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             if post.is_reply
             else post.product_name
         )
-        items = extract_products_and_prices(extraction_name, post.brand)
+        items = extract_products_and_prices(extraction_name, post.brand, post.title)
         cleaned_items = [_strip_product_item_promo_suffix(name, price) for name, price in items]
         if len(items) == 1 and items[0][0] == extraction_name and items[0][1] is None:
             cleaned_name = _strip_product_name_promo_suffix(extraction_name)

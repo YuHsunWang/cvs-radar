@@ -27,8 +27,8 @@ FIELDNAMES = (
     "fingerprint",
     "item_index",
     "brand",
+    "title",
     "raw_name",
-    "post_title",
     "rule_guess",
     "product_name",
     "price",
@@ -56,18 +56,18 @@ def export_unlabeled_product_names(
         raw_name = post.product_name or ""
         if not raw_name.strip():
             continue
-        fingerprint = product_name_fingerprint(post.brand, raw_name)
+        fingerprint = product_name_fingerprint(post.brand, post.title, raw_name)
         if fingerprint in labelled or fingerprint in seen:
             continue
         seen.add(fingerprint)
-        guess = extract_products_and_prices(raw_name, post.brand)
+        guess = extract_products_and_prices(raw_name, post.brand, post.title)
         rows.append(
             {
                 "fingerprint": fingerprint,
                 "item_index": "0",
                 "brand": post.brand,
+                "title": post.title,
                 "raw_name": raw_name,
-                "post_title": post.title,
                 "rule_guess": " | ".join(
                     f"{name}#{price if price is not None else ''}" for name, price in guess
                 ),
