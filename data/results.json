@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-27 08:33:40",
+  "generated_at": "2026-07-27 09:33:53",
   "reports": [
     {
       "brand": "全家",
@@ -542,39 +542,6 @@
     },
     {
       "brand": "全家",
-      "product_name": "桃氣奶霜蛋糕",
-      "fair_score": 71.6,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "n_eff": 7.91,
-      "score_std": 0.069,
-      "n_posts": 1,
-      "n_comments": 8,
-      "contributors": [],
-      "rep_positive": [
-        "好吃 而且熱量意外很低",
-        "桃子好吃",
-        "蠻好吃的"
-      ],
-      "rep_negative": [],
-      "product_key": "全家:桃氣奶霜蛋糕",
-      "score_mean": 0.7591,
-      "price": 49,
-      "category": "甜點",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-05-09T19:41:38+08:00",
-      "review_excerpt": "這款則是杏桃片搭配奶霜蛋糕，切片後罐頭水蜜桃感降低，加上柔軟奶霜蛋糕整體很順口，有點像在吃迷你生日蛋糕的感覺。",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1778326901.A.3A0.html"
-      ]
-    },
-    {
-      "brand": "全家",
       "product_name": "草莓大福",
       "fair_score": 71.6,
       "consensus": "一致好評",
@@ -648,8 +615,41 @@
     },
     {
       "brand": "全家",
-      "product_name": "阿里山極選綜合拿鐵",
+      "product_name": "桃氣奶霜蛋糕",
       "fair_score": 71.5,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "n_eff": 7.91,
+      "score_std": 0.069,
+      "n_posts": 1,
+      "n_comments": 8,
+      "contributors": [],
+      "rep_positive": [
+        "好吃 而且熱量意外很低",
+        "桃子好吃",
+        "蠻好吃的"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:桃氣奶霜蛋糕",
+      "score_mean": 0.7591,
+      "price": 49,
+      "category": "甜點",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-05-09T19:41:38+08:00",
+      "review_excerpt": "這款則是杏桃片搭配奶霜蛋糕，切片後罐頭水蜜桃感降低，加上柔軟奶霜蛋糕整體很順口，有點像在吃迷你生日蛋糕的感覺。",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1778326901.A.3A0.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "阿里山極選綜合拿鐵",
+      "fair_score": 71.4,
       "consensus": "一致好評",
       "confidence": "中",
       "n_eff": 5.84,
@@ -7687,7 +7687,7 @@
     },
     {
       "brand": "全家",
-      "product_name": "度小月擔仔炊粉湯友善時光",
+      "product_name": "度小月擔仔炊粉湯",
       "fair_score": 59.1,
       "consensus": "褒貶不一",
       "confidence": "中",
@@ -7703,7 +7703,7 @@
       "rep_negative": [
         "我很愛吃米粉 但 不會回購"
       ],
-      "product_key": "全家:度小月擔仔炊粉湯友善時光",
+      "product_key": "全家:度小月擔仔炊粉湯",
       "score_mean": 0.6767,
       "price": 56,
       "category": "其他",
@@ -11017,7 +11017,7 @@
     },
     {
       "brand": "全家",
-      "product_name": "厚奶拿鐵酷碰券特大杯",
+      "product_name": "厚奶拿鐵",
       "fair_score": 54.8,
       "consensus": "褒貶不一",
       "confidence": "高",
@@ -11031,7 +11031,7 @@
         "感覺好像不錯 之後買來喝喝看"
       ],
       "rep_negative": [],
-      "product_key": "全家:厚奶拿鐵酷碰券特大杯",
+      "product_key": "全家:厚奶拿鐵",
       "score_mean": 0.5522,
       "price": 59,
       "category": "飲料",
@@ -15142,7 +15142,7 @@
       ],
       "product_key": "全家:lotte生巧克力派法式濃巧",
       "score_mean": 0.4811,
-      "price": 89,
+      "price": null,
       "category": "零食",
       "competitor_mention_count": 0,
       "competitor_preference_count": 0,
@@ -16599,7 +16599,7 @@
     },
     {
       "brand": "全家",
-      "product_name": "四季檸檬酷繽球酷碰",
+      "product_name": "四季檸檬酷繽球",
       "fair_score": 46.5,
       "consensus": "評價兩極",
       "confidence": "高",
@@ -16618,7 +16618,7 @@
         "之前看到買了一杯 超騙錢的,那顆球轉換成酷濱沙量很少,超商原配只能搭咖啡反正就賺好奇的商品",
         "不難喝 但很不方便 會黏在一起 不會回購"
       ],
-      "product_key": "全家:四季檸檬酷繽球酷碰",
+      "product_key": "全家:四季檸檬酷繽球",
       "score_mean": 0.4617,
       "price": 39,
       "category": "冰品",
@@ -20648,7 +20648,7 @@
       ],
       "product_key": "全家:日式壽喜燒",
       "score_mean": 0.3513,
-      "price": 99,
+      "price": 70,
       "category": "其他",
       "competitor_mention_count": 1,
       "competitor_preference_count": 0,
@@ -21609,7 +21609,7 @@
     },
     {
       "brand": "7-11",
-      "product_name": "翻轉布丁統一布丁",
+      "product_name": "翻轉布丁",
       "fair_score": 33.6,
       "consensus": "一致負評",
       "confidence": "高",
@@ -21626,9 +21626,9 @@
         "撿買剩下一個,但吃完很甜膩,不會想再吃",
         "感覺弄個焦糖風味的黑色布丁再加上底下有比較甜的布丁醬會比較好吃 現在看來整塊都是凍 要濃厚黑糖沒有要布丁感也沒有的四不像"
       ],
-      "product_key": "7-11:翻轉布丁統一布丁",
+      "product_key": "7-11:翻轉布丁",
       "score_mean": 0.3106,
-      "price": 25,
+      "price": 75,
       "category": "甜點",
       "competitor_mention_count": 1,
       "competitor_preference_count": 1,
@@ -22255,7 +22255,7 @@
     },
     {
       "brand": "全家",
-      "product_name": "核桃腰果稻禾壽司組5538時光",
+      "product_name": "核桃腰果稻禾壽司組",
       "fair_score": 29.6,
       "consensus": "一致負評",
       "confidence": "高",
@@ -22274,9 +22274,9 @@
         "全家好噁心",
         "詐騙壽司以後任何東西都能這樣魚目混珠"
       ],
-      "product_key": "全家:核桃腰果稻禾壽司組5538時光",
+      "product_key": "全家:核桃腰果稻禾壽司組",
       "score_mean": 0.2837,
-      "price": null,
+      "price": 55,
       "category": "便當",
       "competitor_mention_count": 2,
       "competitor_preference_count": 0,

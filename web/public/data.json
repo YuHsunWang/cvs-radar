@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T08:33:40+08:00",
+  "generatedAt": "2026-07-27T09:33:53+08:00",
   "siteBuiltAt": "2026-07-23T02:15:21.663714+00:00",
   "products": [
     {
@@ -456,34 +456,6 @@
       "latestDate": "2026-06-06"
     },
     {
-      "id": "全家::桃氣奶霜蛋糕",
-      "brand": "全家",
-      "productName": "桃氣奶霜蛋糕",
-      "price": 49,
-      "category": "甜點",
-      "fairScore": 72,
-      "recommendationScore": 84,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 8,
-      "volumeLevel": "中等",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "好吃 而且熱量意外很低",
-        "桃子好吃",
-        "蠻好吃的"
-      ],
-      "cautions": [],
-      "excerpt": "這款則是杏桃片搭配奶霜蛋糕，切片後罐頭水蜜桃感降低，加上柔軟奶霜蛋糕整體很順口，有點像在吃迷你生日蛋糕的感覺。",
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1778326901.A.3A0.html"
-      ],
-      "latestDate": "2026-05-09"
-    },
-    {
       "id": "全家::草莓大福",
       "brand": "全家",
       "productName": "草莓大福",
@@ -545,12 +517,40 @@
       "latestDate": "2025-12-23"
     },
     {
+      "id": "全家::桃氣奶霜蛋糕",
+      "brand": "全家",
+      "productName": "桃氣奶霜蛋糕",
+      "price": 49,
+      "category": "甜點",
+      "fairScore": 72,
+      "recommendationScore": 84,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 8,
+      "volumeLevel": "中等",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "好吃 而且熱量意外很低",
+        "桃子好吃",
+        "蠻好吃的"
+      ],
+      "cautions": [],
+      "excerpt": "這款則是杏桃片搭配奶霜蛋糕，切片後罐頭水蜜桃感降低，加上柔軟奶霜蛋糕整體很順口，有點像在吃迷你生日蛋糕的感覺。",
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1778326901.A.3A0.html"
+      ],
+      "latestDate": "2026-05-09"
+    },
+    {
       "id": "全家::阿里山極選綜合拿鐵",
       "brand": "全家",
       "productName": "阿里山極選綜合拿鐵",
       "price": 90,
       "category": "飲料",
-      "fairScore": 72,
+      "fairScore": 71,
       "recommendationScore": 84,
       "consensus": "一致好評",
       "confidence": "中",
@@ -684,7 +684,7 @@
         "看起來不錯,感覺拿回家氣炸很讚"
       ],
       "cautions": [],
-      "excerpt": "內裡地瓜內餡香甜。",
+      "excerpt": "外皮很紮實的Q，內裡地瓜內餡香甜，覺得比路邊的地瓜球好吃。",
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1782550835.A.57B.html"
       ],
@@ -2947,7 +2947,7 @@
         "還我藍莓的",
         "真的現在買超商麵包都要看糖份"
       ],
-      "excerpt": "全家推出了兩款切 片軟歐 優惠券也超級搶手。 麵包本體吃起來也軟。 但因為麵包本體份量大。",
+      "excerpt": "果乾的確滿滿，麵包本體吃起來也軟帶點彈牙；但因為麵包本體份量大，熱量也是要注意。",
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1784534083.A.472.html"
       ],
@@ -12113,7 +12113,7 @@
       "id": "全家::LOTTE生巧克力派法式濃巧",
       "brand": "全家",
       "productName": "LOTTE生巧克力派法式濃巧",
-      "price": 89,
+      "price": null,
       "category": "零食",
       "fairScore": 48,
       "recommendationScore": 58,
@@ -13336,9 +13336,9 @@
       "latestDate": "2025-08-26"
     },
     {
-      "id": "全家::四季檸檬酷繽球酷碰",
+      "id": "全家::四季檸檬酷繽球",
       "brand": "全家",
-      "productName": "四季檸檬酷繽球酷碰",
+      "productName": "四季檸檬酷繽球",
       "price": 39,
       "category": "冰品",
       "fairScore": 46,
@@ -16599,7 +16599,7 @@
       "id": "全家::日式壽喜燒",
       "brand": "全家",
       "productName": "日式壽喜燒",
-      "price": 99,
+      "price": 70,
       "category": "其他",
       "fairScore": 38,
       "recommendationScore": 45,
@@ -17355,10 +17355,10 @@
       "latestDate": "2025-10-17"
     },
     {
-      "id": "7-11::翻轉布丁統一布丁",
+      "id": "7-11::翻轉布丁",
       "brand": "7-11",
-      "productName": "翻轉布丁統一布丁",
-      "price": 25,
+      "productName": "翻轉布丁",
+      "price": 75,
       "category": "甜點",
       "fairScore": 34,
       "recommendationScore": 40,
@@ -17860,10 +17860,10 @@
       "latestDate": "2025-08-18"
     },
     {
-      "id": "全家::核桃腰果稻禾壽司組5538時光",
+      "id": "全家::核桃腰果稻禾壽司組",
       "brand": "全家",
-      "productName": "核桃腰果稻禾壽司組5538時光",
-      "price": null,
+      "productName": "核桃腰果稻禾壽司組",
+      "price": 55,
       "category": "便當",
       "fairScore": 30,
       "recommendationScore": 36,
