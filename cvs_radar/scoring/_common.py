@@ -185,6 +185,15 @@ _PTT_PRODUCT_TEMPLATE = "(區域型商品請註明 試吃試用品請標示價�
 
 _URL_RE = re.compile(r"https?://", re.IGNORECASE)
 
+# _URL_RE only detects that a line carries a link. This one matches the whole link
+# so it can be removed from text that is kept. It stops at CJK rather than at
+# whitespace: PTT comments paste a link straight against the sentence that follows
+# it, and Chinese has no spaces, so a \S+ match would swallow the review with it.
+_FULL_URL_RE = re.compile(
+    r"(?:https?://|www\.)[^\s　-〿一-鿿＀-￯]+",
+    re.IGNORECASE,
+)
+
 _PRODUCT_REVIEW_START_RE = re.compile(r"^\s*[：:]?\s*[【\[]?\s*心得\s*[】\]]?\s*[:：]")
 
 _PRICE_TOKEN_RE = re.compile(r"(?<!\d)(\d{1,3})(?!\d)\s*(?:元|台幣)?")

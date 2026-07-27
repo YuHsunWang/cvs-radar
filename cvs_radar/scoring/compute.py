@@ -183,17 +183,16 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         n_eff = 0.0
 
     contributors = sorted(author_contributors + commenter_contributors, key=lambda c: -c.weight)
-    rep_pos, rep_neg = _rep_comments(posts)
     product_name = representative_product_name(posts)
     product_key = f"{posts[0].brand}:{normalize_product(posts[0].brand, product_name)}"
+    review_excerpt = _load_review_excerpt_overrides().get(product_key) or _review_excerpt(posts)
+    rep_pos, rep_neg = _rep_comments(posts, excerpt=review_excerpt)
     (
         competitor_mention_count,
         competitor_preference_count,
         competitor_own_preference_count,
         competitor_brands,
     ) = _competitor_stats(posts)
-    review_excerpt = _load_review_excerpt_overrides().get(product_key) or _review_excerpt(posts)
-
     post_dates = [normalize_datetime(p.posted_at) for p in posts if p.posted_at]
     latest_post_date = max(post_dates) if post_dates else None
     priced_posts = [p for p in posts if p.price and p.price.isdigit()]

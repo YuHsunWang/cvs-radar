@@ -264,6 +264,24 @@ else
   log "excerpt export failed (continuing on the scoring selector)"
 fi
 
+# --- 7a3. label representative comments for any new product candidate pool ---
+# Sentiment magnitude cannot judge whether a comment is concrete enough to show, so
+# an LLM chooses candidate indices once per product. Non-fatal: unlabelled products
+# still use the existing ranking selector.
+log "label new representative-comment pools"
+CP_DELTA="$WORK/unlabeled-comment-picks.csv"
+if python3 scripts/export_comment_picks.py --out "$CP_DELTA" 2>&1 | tail -1; then
+  CP_ROWS="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('$CP_DELTA',encoding='utf-8-sig'))))" 2>/dev/null || echo 0)"
+  if [ "$CP_ROWS" -gt 0 ]; then
+    log "comment-pick delta: $CP_ROWS product(s) — label them, then:"
+    log "  python3 scripts/import_comment_picks.py <labeled.csv>"
+  else
+    log "comment-pick delta: none"
+  fi
+else
+  log "comment-pick export failed (continuing on the scoring selector)"
+fi
+
 # --- 7b. recompute scores (uses fresh labels) + de-identify + build public data ---
 # This is the former GitHub Actions "refresh live data" work, moved local so the
 # whole pipeline is one flow. run_pipeline reads posts.jsonl + the label cache.

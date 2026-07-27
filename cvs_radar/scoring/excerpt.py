@@ -12,11 +12,12 @@ from pathlib import Path
 from ..config import (
     BRANDS,
 )
+from ..comment_labels import CommentPicks, comment_picks_fingerprint, load_comment_picks
 from ..excerpt_labels import excerpt_fingerprint, load_excerpt_labels
 from ..models import Post
 from ..sentiment import NEGATIVE_WORDS, POSITIVE_WORDS
 
-from ._common import (DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH, _BRACKET_RE, _COMMENT_NOISE_RE, _EXCERPT_ASPECT_TERMS, _EXCERPT_CONTINUATION_RE, _EXCERPT_DECISION_TERMS, _EXCERPT_DROP_RE, _EXCERPT_FIRST_HAND_RE, _EXCERPT_INTRO_RE, _EXCERPT_LABEL_RE, _EXCERPT_PRODUCT_FORM_TERMS, _EXCERPT_REPORTED_OPINION_RE, _EXCERPT_SENTENCE_RE, _EXCERPT_SENTENCE_START_RE, _EXCERPT_SIGNATURE_RE, _OFF_TOPIC_COMMENT_RE, _URL_RE)
+from ._common import (DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH, _FULL_URL_RE, _BRACKET_RE, _COMMENT_NOISE_RE, _EXCERPT_ASPECT_TERMS, _EXCERPT_CONTINUATION_RE, _EXCERPT_DECISION_TERMS, _EXCERPT_DROP_RE, _EXCERPT_FIRST_HAND_RE, _EXCERPT_INTRO_RE, _EXCERPT_LABEL_RE, _EXCERPT_PRODUCT_FORM_TERMS, _EXCERPT_REPORTED_OPINION_RE, _EXCERPT_SENTENCE_RE, _EXCERPT_SENTENCE_START_RE, _EXCERPT_SIGNATURE_RE, _OFF_TOPIC_COMMENT_RE, _URL_RE)
 from .attribution import (_comment_attribution, _is_reaction_echo_comment)
 from .identity import (canonical_product_name)
 
@@ -47,9 +48,18 @@ class _ReviewCandidate:
     decisive: bool = False
 
 
+REP_CANDIDATE_LIMIT = 12
+BODY_CANDIDATE_LIMIT = 12
+
+
 @lru_cache(maxsize=1)
 def _cached_excerpt_labels() -> dict[str, str]:
     return load_excerpt_labels()
+
+
+@lru_cache(maxsize=1)
+def _cached_comment_picks() -> dict[str, CommentPicks]:
+    return load_comment_picks()
 
 
 def _labelled_excerpt(posts: list[Post], max_len: int) -> str | None:
@@ -404,7 +414,8 @@ def _render_review_sentences(candidates: list[_ReviewCandidate]) -> str:
     return " ".join(rendered)
 
 
-def _rep_comments(posts: list[Post], k: int = 3) -> tuple[list[str], list[str]]:
+def _rep_candidates(posts: list[Post]) -> tuple[list[str], list[str]]:
+    """Build the ranked, deduplicated comment pool used by label fingerprints."""
     positive: list[tuple[float, str]] = []
     negative: list[tuple[float, str]] = []
     for post in posts:
@@ -428,7 +439,152 @@ def _rep_comments(posts: list[Post], k: int = 3) -> tuple[list[str], list[str]]:
                 negative.append(item)
     positive.sort(key=lambda item: -item[0])
     negative.sort(key=lambda item: item[0])
-    return _dedupe_ranked_comments(positive, k), _dedupe_ranked_comments(negative, k)
+    return (
+        _dedupe_ranked_comments(positive, REP_CANDIDATE_LIMIT),
+        _dedupe_ranked_comments(negative, REP_CANDIDATE_LIMIT),
+    )
+
+
+def _body_candidates(posts: list[Post]) -> list[str]:
+    """Build the stable author-sentence pool used by body-pick labels."""
+    selected: list[str] = []
+    for candidate in sorted(
+        _review_candidates(posts),
+        key=lambda item: (item.post_index, item.sentence_index),
+    ):
+        if not candidate.aspects:
+            continue
+        rendered = _render_review_sentences([candidate])
+        if not rendered or any(_review_sentences_similar(rendered, item) for item in selected):
+            continue
+        selected.append(rendered)
+        if len(selected) >= BODY_CANDIDATE_LIMIT:
+            break
+    return selected
+
+
+def _body_highlights(
+    posts: list[Post],
+    *,
+    positive: bool,
+    exclude: list[str],
+    excerpt: str,
+    k: int,
+) -> list[str]:
+    """Return standalone, aspect-bearing author sentences for one polarity.
+
+    This rule fallback can select a sentence about a thread-mate because split
+    products retain the whole post body. The per-product body label is the fix;
+    this remains only for newly crawled, unlabelled products.
+    """
+    if k <= 0:
+        return []
+    highlights: list[str] = []
+    for candidate in sorted(
+        _review_candidates(posts),
+        key=lambda item: (-item.score, item.post_index, item.sentence_index, item.text),
+    ):
+        if not candidate.aspects:
+            continue
+        text = candidate.text
+        positive_hits = sum(
+            text.casefold().count(word.casefold())
+            for word in POSITIVE_WORDS
+            if len(word) >= 2
+        )
+        negative_hits = sum(
+            text.casefold().count(word.casefold())
+            for word in NEGATIVE_WORDS
+            if len(word) >= 2
+        )
+        if positive_hits == negative_hits or (positive_hits > negative_hits) != positive:
+            continue
+        if _review_sentences_similar(text, excerpt) or any(
+            _review_sentences_similar(text, item) for item in exclude + highlights
+        ):
+            continue
+        rendered = _render_review_sentences([candidate])
+        if rendered:
+            highlights.append(rendered)
+        if len(highlights) >= k:
+            break
+    return highlights
+
+
+def _picked_sentences(
+    candidates: list[str],
+    picks: tuple[int, ...],
+    *,
+    excerpt: str,
+    exclude: list[str],
+) -> list[str]:
+    """Map stored indices while suppressing excerpt and cross-polarity repeats."""
+    selected: list[str] = []
+    excluded_keys = {
+        re.sub(r"\s+", "", unicodedata.normalize("NFKC", item).casefold())
+        for item in exclude
+    }
+    for index in picks:
+        if not 0 <= index < len(candidates):
+            continue
+        text = candidates[index]
+        key = re.sub(r"\s+", "", unicodedata.normalize("NFKC", text).casefold())
+        if _review_sentences_similar(text, excerpt) or key in excluded_keys:
+            continue
+        selected.append(text)
+        excluded_keys.add(key)
+    return selected
+
+
+def _rep_comments(
+    posts: list[Post],
+    k: int = 3,
+    *,
+    excerpt: str = "",
+) -> tuple[list[str], list[str]]:
+    positive, negative = _rep_candidates(posts)
+    body = _body_candidates(posts)
+    fingerprint = comment_picks_fingerprint(
+        posts[0].brand if posts else "",
+        representative_product_name(posts),
+        positive,
+        negative,
+        body,
+    )
+    picks = _cached_comment_picks().get(fingerprint)
+    if picks is None:
+        rep_positive = _picked_sentences(positive, tuple(range(k)), excerpt=excerpt, exclude=[])
+        rep_negative = _picked_sentences(
+            negative, tuple(range(k)), excerpt=excerpt, exclude=rep_positive
+        )
+    else:
+        rep_positive = _picked_sentences(
+            positive, picks.positive, excerpt=excerpt, exclude=[]
+        )
+        rep_negative = _picked_sentences(
+            negative, picks.negative, excerpt=excerpt, exclude=rep_positive
+        )
+        if not rep_positive:
+            rep_positive = _picked_sentences(
+                body, picks.positive_body, excerpt=excerpt, exclude=rep_negative
+            )
+        if not rep_negative:
+            rep_negative = _picked_sentences(
+                body,
+                picks.negative_body,
+                excerpt=excerpt,
+                exclude=rep_positive,
+            )
+
+    if picks is None and not rep_positive:
+        rep_positive = _body_highlights(
+            posts, positive=True, exclude=rep_negative, excerpt=excerpt, k=k
+        )
+    if picks is None and not rep_negative:
+        rep_negative = _body_highlights(
+            posts, positive=False, exclude=rep_positive, excerpt=excerpt, k=k
+        )
+    return rep_positive, rep_negative
 
 
 def representative_product_name(posts: list[Post]) -> str:
@@ -442,6 +598,11 @@ def representative_product_name(posts: list[Post]) -> str:
 
 def _clean_representative_comment(brand: str, text: str) -> str:
     s = unicodedata.normalize("NFKC", text or "").strip()
+    # Strip links here rather than at publish time: the candidate pool is what the
+    # labeller reads and what the pick fingerprint is computed over, so a comment
+    # that is nothing but an image link has to collapse to "" and drop out now,
+    # instead of being pickable and then rendering as a blank bullet.
+    s = _FULL_URL_RE.sub(" ", s)
     for kw in sorted(set([*BRANDS.get(brand, []), brand]), key=len, reverse=True):
         if kw:
             # Only remove a store name when it is a label-like prefix. Brand names

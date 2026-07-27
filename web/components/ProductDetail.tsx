@@ -24,7 +24,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       <section className="mt-4 border-t border-slate-200 pt-4">
         <h3 className="flex items-center gap-2 font-black text-slate-950">
           <MessageSquareText size={20} className="text-[#0F7C7C]" aria-hidden="true" />
-          留言評價
+          評價重點
         </h3>
         <div className="mt-3 grid grid-cols-1 gap-3 rounded-lg border border-slate-200 p-3 min-[380px]:grid-cols-2">
           <div>

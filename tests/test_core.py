@@ -26,8 +26,13 @@ from cvs_radar.parser import (
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
 from cvs_radar.excerpt_labels import excerpt_fingerprint, load_excerpt_labels
+from cvs_radar.comment_labels import CommentPicks, comment_picks_fingerprint, load_comment_picks
 from cvs_radar.product_labels import load_product_name_labels, product_name_fingerprint
 from cvs_radar.scoring import (
+    _rep_candidates,
+    _rep_comments,
+    _body_candidates,
+    _ReviewCandidate,
     _review_candidates,
     _review_excerpt,
     _review_sentences,
@@ -2111,3 +2116,146 @@ class ExcerptLabelCacheTest(unittest.TestCase):
 
     def test_missing_cache_file_is_not_an_error(self) -> None:
         self.assertEqual(load_excerpt_labels("data/labels/does-not-exist.csv"), {})
+
+
+class CommentPickCacheTest(unittest.TestCase):
+    """The LLM picks concrete comments once; the cache keeps that choice reproducible."""
+
+    def _with_picks(
+        self,
+        picks: dict[str, CommentPicks],
+    ):
+        from cvs_radar.scoring import excerpt as excerpt_module
+
+        excerpt_module._cached_comment_picks.cache_clear()
+        return patch("cvs_radar.scoring.excerpt.load_comment_picks", return_value=picks)
+
+    def _post(self, *, review_text: str = "") -> Post:
+        return Post(
+            id="comment-picks",
+            brand="7-11",
+            product_name="草莓蛋糕",
+            review_text=review_text,
+            comments=[
+                Comment("推", "one", "第一則具體好評", sentiment=0.9),
+                Comment("推", "two", "第二則具體好評", sentiment=0.8),
+                Comment("推", "three", "第三則具體好評", sentiment=0.7),
+                Comment("噓", "four", "第一則具體負評", sentiment=-0.9),
+            ],
+        )
+
+    def test_labelled_product_uses_picked_indices_in_given_order(self) -> None:
+        post = self._post()
+        positive, negative = _rep_candidates([post])
+        body = _body_candidates([post])
+        digest = comment_picks_fingerprint(post.brand, post.product_name, positive, negative, body)
+
+        with self._with_picks({digest: CommentPicks((2, 0), (0,), (), ())}):
+            rep_positive, rep_negative = _rep_comments([post])
+
+        self.assertEqual(rep_positive, ["第三則具體好評", "第一則具體好評"])
+        self.assertEqual(rep_negative, ["第一則具體負評"])
+
+    def test_out_of_range_pick_is_dropped_instead_of_raising(self) -> None:
+        post = self._post()
+        positive, negative = _rep_candidates([post])
+        body = _body_candidates([post])
+        digest = comment_picks_fingerprint(post.brand, post.product_name, positive, negative, body)
+
+        with self._with_picks({digest: CommentPicks((99, 1), (), (), ())}):
+            rep_positive, _ = _rep_comments([post])
+
+        self.assertEqual(rep_positive, ["第二則具體好評"])
+
+    def test_unlabelled_product_falls_back_to_top_ranked_comments(self) -> None:
+        post = self._post()
+
+        with self._with_picks({}):
+            rep_positive, rep_negative = _rep_comments([post], k=2)
+
+        self.assertEqual(rep_positive, ["第一則具體好評", "第二則具體好評"])
+        self.assertEqual(rep_negative, ["第一則具體負評"])
+
+    def test_labelled_empty_polarity_without_body_pick_does_not_use_rule_fallback(self) -> None:
+        post = self._post(review_text="外皮很脆而且好吃。價格太貴而且很難吃。")
+        positive, negative = _rep_candidates([post])
+        body = _body_candidates([post])
+        digest = comment_picks_fingerprint(post.brand, post.product_name, positive, negative, body)
+
+        with self._with_picks({digest: CommentPicks((), (), (), ())}):
+            rep_positive, rep_negative = _rep_comments([post])
+
+        self.assertEqual(rep_positive, [])
+        self.assertEqual(rep_negative, [])
+
+    def test_body_picks_fill_a_polarity_left_empty_by_comment_picks(self) -> None:
+        post = self._post(
+            review_text=(
+                "口感滑順又很好吃。\n"
+                "外皮很脆而且好吃。\n"
+                "價格太貴而且很難吃。"
+            )
+        )
+        positive, negative = _rep_candidates([post])
+        body = _body_candidates([post])
+        digest = comment_picks_fingerprint(post.brand, post.product_name, positive, negative, body)
+
+        with self._with_picks({digest: CommentPicks((), (), (1,), (2,))}):
+            rep_positive, rep_negative = _rep_comments(
+                [post], excerpt="口感滑順又很好吃。"
+            )
+
+        self.assertEqual(rep_positive, ["外皮很脆而且好吃。"])
+        self.assertEqual(rep_negative, ["價格太貴而且很難吃。"])
+        self.assertNotIn("口感滑順又很好吃", " ".join(rep_positive + rep_negative))
+
+    def test_unlabelled_product_still_uses_body_highlights_rule_fallback(self) -> None:
+        post = self._post(review_text="外皮很脆而且好吃。價格太貴而且很難吃。")
+
+        with self._with_picks({}):
+            rep_positive, rep_negative = _rep_comments([post])
+
+        self.assertEqual(rep_positive, ["第一則具體好評", "第二則具體好評", "第三則具體好評"])
+        self.assertEqual(rep_negative, ["第一則具體負評"])
+
+        post.comments = []
+        with self._with_picks({}):
+            rep_positive, rep_negative = _rep_comments([post])
+
+        self.assertEqual(rep_positive, ["外皮很脆而且好吃。"])
+        self.assertEqual(rep_negative, ["價格太貴而且很難吃。"])
+
+    def test_body_candidates_order_by_post_and_sentence_not_score(self) -> None:
+        from cvs_radar.scoring import excerpt as excerpt_module
+
+        first = _ReviewCandidate("第一句口感很好", 1.0, frozenset({"texture"}), 0, 1)
+        second = _ReviewCandidate("第二句價格太高", 99.0, frozenset({"price"}), 0, 2)
+        earlier = _ReviewCandidate("更早一句奶味濃", 50.0, frozenset({"taste"}), 0, 0)
+        no_aspect = _ReviewCandidate("不應列入", 100.0, frozenset(), 1, 0)
+
+        with patch.object(excerpt_module, "_review_candidates", return_value=[first, second, earlier, no_aspect]):
+            self.assertEqual(
+                _body_candidates([self._post()]),
+                ["更早一句奶味濃。", "第一句口感很好。", "第二句價格太高。"],
+            )
+
+    def test_fingerprint_changes_when_candidate_pool_changes(self) -> None:
+        original = comment_picks_fingerprint(
+            "7-11", "草莓蛋糕", ["外皮很脆"], ["價格太貴"], ["奶味濃"]
+        )
+        changed = comment_picks_fingerprint(
+            "7-11", "草莓蛋糕", ["外皮很脆"], ["價格太貴"], ["奶味濃", "口感滑順"]
+        )
+
+        self.assertNotEqual(original, changed)
+
+    def test_blank_cells_are_kept_as_a_verdict(self) -> None:
+        digest = comment_picks_fingerprint("7-11", "草莓蛋糕", ["外皮很脆"], [], [])
+        path = os.path.join(tempfile.mkdtemp(), "comment_picks.csv")
+        with open(path, "w", encoding="utf-8", newline="") as handle:
+            handle.write(
+                "fingerprint,brand,product_name,positive_picks,negative_picks,positive_body_picks,negative_body_picks,model,prompt_version\n"
+                f"{digest},7-11,草莓蛋糕,,,,,codex,comment-picks-v1\n"
+            )
+
+        self.assertEqual(load_comment_picks(path)[digest], CommentPicks((), (), (), ()))

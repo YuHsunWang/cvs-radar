@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from cvs_radar.app_helpers import consensus_distribution, volume_label  # noqa: E402
+from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
 from cvs_radar.store import load_results  # noqa: E402
 
 
@@ -114,8 +115,13 @@ def _evidence(product: dict[str, Any]) -> float:
 
 
 def strip_urls(value: str) -> str:
-    """Keep representative comments readable without publishing embedded links."""
-    return " ".join(URL_PATTERN.sub("", value).split())
+    """Keep representative comments readable without publishing embedded links.
+
+    URL_PATTERN stays greedy for *detecting* a leaked link in validate_payload;
+    removal uses the CJK-aware pattern so stripping a link pasted against Chinese
+    text does not take the sentence with it.
+    """
+    return " ".join(_FULL_URL_RE.sub(" ", value).split())
 
 
 def clean_representatives(representatives: list[str]) -> list[str]:
