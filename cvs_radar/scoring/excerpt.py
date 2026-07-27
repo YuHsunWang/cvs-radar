@@ -15,7 +15,7 @@ from ..config import (
 from ..models import Post
 from ..sentiment import NEGATIVE_WORDS, POSITIVE_WORDS
 
-from ._common import (DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH, _BRACKET_RE, _COMMENT_NOISE_RE, _EXCERPT_ASPECT_TERMS, _EXCERPT_DECISION_TERMS, _EXCERPT_DROP_RE, _EXCERPT_FIRST_HAND_RE, _EXCERPT_INTRO_RE, _EXCERPT_LABEL_RE, _EXCERPT_SENTENCE_RE, _EXCERPT_SENTENCE_START_RE, _EXCERPT_SIGNATURE_RE, _OFF_TOPIC_COMMENT_RE, _URL_RE)
+from ._common import (DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH, _BRACKET_RE, _COMMENT_NOISE_RE, _EXCERPT_ASPECT_TERMS, _EXCERPT_CONTINUATION_RE, _EXCERPT_DECISION_TERMS, _EXCERPT_DROP_RE, _EXCERPT_FIRST_HAND_RE, _EXCERPT_INTRO_RE, _EXCERPT_LABEL_RE, _EXCERPT_PRODUCT_FORM_TERMS, _EXCERPT_REPORTED_OPINION_RE, _EXCERPT_SENTENCE_RE, _EXCERPT_SENTENCE_START_RE, _EXCERPT_SIGNATURE_RE, _OFF_TOPIC_COMMENT_RE, _URL_RE)
 from .attribution import (_comment_attribution, _is_reaction_echo_comment)
 from .identity import (canonical_product_name)
 
@@ -75,6 +75,17 @@ def _review_excerpt(posts: list[Post], max_len: int = 180, max_sentences: int = 
         for candidate in ranked:
             if any(_review_sentences_similar(candidate.text, item.text) for item in selected):
                 continue
+            # Keep a detailed, first-hand description ahead of an older sentence
+            # that only repeats an already-covered aspect.
+            if (
+                selected
+                and candidate.post_index < selected[0].post_index
+                and candidate.aspects <= covered_aspects
+                and not candidate.decisive
+                and len(selected[0].aspects) >= 2
+                and _EXCERPT_FIRST_HAND_RE.search(selected[0].text)
+            ):
+                continue
             rendered = _render_review_sentences([*selected, candidate])
             if len(rendered) <= max_len:
                 chosen = candidate
@@ -89,6 +100,19 @@ def _review_excerpt(posts: list[Post], max_len: int = 180, max_sentences: int = 
 
 
 def _review_candidates(posts: list[Post]) -> list[_ReviewCandidate]:
+    """Build excerpt candidates, never letting the filters starve a product.
+
+    The cross-product and product-name-aspect suppressions are heuristics: a
+    comparison ("吃起來就是奶油餅乾") reads as another product, and a name like
+    椒香皮蛋香菜冷麵 makes every 香 look like part of the name. When they remove
+    everything, fall back to the unsuppressed pass so the product keeps an
+    excerpt rather than going blank.
+    """
+    strict = _build_review_candidates(posts, suppress=True)
+    return strict if strict else _build_review_candidates(posts, suppress=False)
+
+
+def _build_review_candidates(posts: list[Post], *, suppress: bool) -> list[_ReviewCandidate]:
     candidates: list[_ReviewCandidate] = []
     ordered_posts = sorted(
         posts,
@@ -99,12 +123,20 @@ def _review_candidates(posts: list[Post]) -> list[_ReviewCandidate]:
     for post_index, post in enumerate(ordered_posts):
         for sentence_index, sentence in enumerate(_review_sentences(post.review_text)):
             compact = re.sub(r"\s+", "", sentence).casefold()
+            if suppress and _mentions_different_product_form(compact, post.product_name):
+                continue
             aspects = frozenset(
                 aspect
                 for aspect, terms in _EXCERPT_ASPECT_TERMS.items()
-                if any(term.casefold() in compact for term in terms)
+                if (
+                    _has_descriptive_aspect(compact, post.product_name, terms)
+                    if suppress
+                    else any(term.casefold() in compact for term in terms)
+                )
             )
-            decision_hits = sum(term.casefold() in compact for term in _EXCERPT_DECISION_TERMS)
+            decision_hits = 0 if _EXCERPT_REPORTED_OPINION_RE.search(sentence) else sum(
+                term.casefold() in compact for term in _EXCERPT_DECISION_TERMS
+            )
             sentiment_hits = sum(
                 term.casefold() in compact
                 for term in {*POSITIVE_WORDS, *NEGATIVE_WORDS}
@@ -140,6 +172,57 @@ def _review_candidates(posts: list[Post]) -> list[_ReviewCandidate]:
                 )
             )
     return candidates
+
+
+def _has_descriptive_aspect(compact: str, product_name: str, terms: tuple[str, ...]) -> bool:
+    return any(
+        term.casefold() in compact
+        and not _aspect_term_only_in_product_name(compact, product_name, term.casefold())
+        for term in terms
+    )
+
+
+def _aspect_term_only_in_product_name(compact: str, product_name: str, term: str) -> bool:
+    """Do not treat a form word in the product name as a review attribute."""
+
+    product_names = {
+        re.sub(r"\s+", "", name).casefold()
+        for name in (product_name, canonical_product_name("", product_name))
+        if len(name) >= 2
+    }
+    positions = [match.start() for match in re.finditer(re.escape(term), compact)]
+    if not product_names or not positions:
+        return False
+    return all(
+        any(_matches_product_name_context(compact, name, term, position) for name in product_names)
+        for position in positions
+    )
+
+
+def _matches_product_name_context(compact: str, product_name: str, term: str, position: int) -> bool:
+    start = product_name.find(term)
+    while start >= 0:
+        before_matches = start > 0 and position > 0 and product_name[start - 1] == compact[position - 1]
+        end = start + len(term)
+        sentence_end = position + len(term)
+        after_matches = end < len(product_name) and sentence_end < len(compact) and product_name[end] == compact[sentence_end]
+        if before_matches or after_matches or product_name == term == compact:
+            return True
+        start = product_name.find(term, start + 1)
+    return False
+
+
+def _mentions_different_product_form(compact: str, product_name: str) -> bool:
+    product_compact = re.sub(r"\s+", "", product_name).casefold()
+    target_forms = {term.casefold() for term in _EXCERPT_PRODUCT_FORM_TERMS if term.casefold() in product_compact}
+    mentioned_forms = {term.casefold() for term in _EXCERPT_PRODUCT_FORM_TERMS if term.casefold() in compact}
+    return bool(
+        target_forms
+        and any(
+            re.search(rf"(?:這|那|一).{{0,8}}(?:支|個|款).{{0,12}}{re.escape(form)}|(?:買|吃).{{0,16}}{re.escape(form)}", compact)
+            for form in mentioned_forms - target_forms
+        )
+    )
 
 
 def _review_sentences(review_text: str) -> list[str]:
@@ -194,8 +277,12 @@ def _merge_wrapped_review_lines(lines: list[str]) -> list[str]:
     current = lines[0]
     previous = lines[0]
     for line in lines[1:]:
+        terminal = re.search(r"[。！？!?；;)）]$", previous)
         continues = previous.endswith((",", "，", "、", ":", "：")) or (
-            len(previous) >= 28 and not re.search(r"[。！？!?；;)）]$", previous)
+            not terminal and (
+                len(previous) >= 28
+                or (len(previous) >= 6 and len(line) <= 8 and _EXCERPT_CONTINUATION_RE.search(line))
+            )
         )
         if continues:
             separator = "。" if _EXCERPT_SENTENCE_START_RE.search(line) else ""

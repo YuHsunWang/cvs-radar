@@ -24,6 +24,7 @@ from cvs_radar.parser import (
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
 from cvs_radar.scoring import (
+    _review_candidates,
     _review_excerpt,
     _review_sentences,
     _same_combo_flavor_product,
@@ -792,6 +793,25 @@ class ReviewExcerptTest(unittest.TestCase):
 
         self.assertIn("回購", _review_excerpt([post]))
 
+    def test_suppression_heuristics_never_blank_an_excerpt(self) -> None:
+        # 跨品類過濾與「aspect 只出現在品名」的抑制都是啟發式：比較句（吃起來就是奶油
+        # 餅乾）會被誤判成別的商品，而品名含「香」會讓每個「香」都被當成品名的一部分。
+        # 兩者同時命中時不可把候選句清成零，否則商品的摘錄整個消失。
+        comparison = Post(
+            id="compare",
+            product_name="這不是菠蘿麵包",
+            review_text="跟扁可頌一樣的概念吧\n吃起來就是奶油餅乾\n有糖粒感 還蠻涮嘴的",
+        )
+        name_collision = Post(
+            id="collide",
+            product_name="椒香皮蛋香菜冷麵",
+            review_text="只有香菜味是有的\n皮蛋我吃完再看才想到\n但是就完全跟預期的落差非常大",
+        )
+
+        for post in (comparison, name_collision):
+            with self.subTest(product=post.product_name):
+                self.assertTrue(_review_excerpt([post]).strip())
+
     def test_merchandise_review_still_gets_an_excerpt(self) -> None:
         # 周邊商品沒有味道口感可寫，只剩主觀評價；此時寧可用弱節錄也不要空白。
         post = Post(id="goods", review_text="免費送但質感做得很不錯")
@@ -859,6 +879,54 @@ class ReviewExcerptTest(unittest.TestCase):
         self.assertNotIn("這款。", excerpt)
         self.assertNotIn("生日蛋。", excerpt)
         self.assertNotIn("(。", excerpt)
+
+    def test_uses_wrapped_product_description_not_product_name_or_promo(self) -> None:
+        # 「軟」在「軟歐」裡只是品名的一部分；真正的口感描述在下一段，且被硬換行拆開。
+        post = Post(
+            id="fruit-bread",
+            product_name="滿滿果乾切片軟歐",
+            review_text=(
+                "全家推出了兩款切 片軟歐 優惠券也超級搶手\n"
+                "滿滿果乾切片軟歐\n"
+                "果乾的確也是滿滿\n"
+                "麵包本體吃起來也軟\n"
+                "帶點彈牙\n"
+                "但因為麵包本體份量大"
+            ),
+        )
+
+        candidates = _review_candidates([post])
+        excerpt = _review_excerpt([post])
+
+        # 「軟歐」的「軟」不再把促銷句升格為有 aspect 的候選句。
+        self.assertFalse(any("優惠券" in candidate.text for candidate in candidates))
+        self.assertIn("果乾", excerpt)
+        self.assertRegex(excerpt, r"軟|彈牙")
+        self.assertIn("軟帶點彈牙", excerpt)
+        self.assertNotIn("優惠券", excerpt)
+        self.assertNotIn("超級搶手", excerpt)
+
+    def test_prefers_target_product_review_over_other_product_in_thread(self) -> None:
+        # 多商品串中，雪糕的句子不能因「鹹／一坨」等 aspect 詞污染涼麵節錄。
+        post = Post(
+            id="vinegar-noodles",
+            product_name="嘉義崇文白醋涼麵",
+            review_text=(
+                "吃起來很清爽、醋味很解膩，跟一般涼麵比起來就是多了醋味。\n"
+                "有網路說的超好吃嗎，其實也沒有，但是滿便宜清爽的解決一餐很不錯。\n"
+                "這不是一支鹹甜口味的雪糕，是單純的鹹而已。\n"
+                "最後可能是製程關係，末端會有一坨美乃滋。\n"
+                "有49元想吃冰的話，請去買古娃娃的紅心芭樂雪糕。"
+            ),
+        )
+
+        excerpt = _review_excerpt([post])
+
+        self.assertTrue(excerpt.startswith("吃起來很清爽、醋味很解膩"))
+        self.assertIn("清爽", excerpt)
+        self.assertIn("解膩", excerpt)
+        self.assertNotIn("雪糕", excerpt)
+        self.assertNotIn("一坨", excerpt)
 
     def test_respects_length_limit_without_cutting_a_sentence(self) -> None:
         post = Post(id="short", review_text="茶味濃而且不會太甜。\n口感滑順，喝起來很清爽。")
