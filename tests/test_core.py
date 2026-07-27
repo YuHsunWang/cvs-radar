@@ -25,6 +25,7 @@ from cvs_radar.parser import (
 )
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
+from cvs_radar.excerpt_labels import excerpt_fingerprint, load_excerpt_labels
 from cvs_radar.product_labels import load_product_name_labels, product_name_fingerprint
 from cvs_radar.scoring import (
     _review_candidates,
@@ -2070,3 +2071,43 @@ class ProductNameLabelCacheTest(unittest.TestCase):
 
     def test_missing_cache_file_is_not_an_error(self) -> None:
         self.assertEqual(load_product_name_labels("data/labels/does-not-exist.csv"), {})
+
+
+class ExcerptLabelCacheTest(unittest.TestCase):
+    """The LLM picks a product's sentences once; the cache keeps it reproducible."""
+
+    def _write(self, rows: str) -> str:
+        path = os.path.join(tempfile.mkdtemp(), "excerpt_labels.csv")
+        with open(path, "w", encoding="utf-8", newline="") as handle:
+            handle.write(
+                "fingerprint,post_id,brand,product_name,excerpt,model,prompt_version\n" + rows
+            )
+        return path
+
+    def test_fingerprint_covers_the_review_text(self) -> None:
+        # A backfill that finally recovers a post body must invalidate a label that
+        # was chosen when the body was empty, instead of keeping a stale excerpt.
+        empty = excerpt_fingerprint("M.1", "紫薯QQ球", "")
+        filled = excerpt_fingerprint("M.1", "紫薯QQ球", "外皮很紮實的Q")
+        self.assertNotEqual(empty, filled)
+
+    def test_same_post_different_products_get_different_labels(self) -> None:
+        # The whole point of labelling per (post, product): one thread, two products,
+        # two different excerpts.
+        review = "涼麵吃起來很清爽。雪糕則是單純的鹹。"
+        self.assertNotEqual(
+            excerpt_fingerprint("M.2", "白醋涼麵", review),
+            excerpt_fingerprint("M.2", "鹹雪糕", review),
+        )
+
+    def test_blank_excerpt_is_stored_as_a_verdict(self) -> None:
+        digest = excerpt_fingerprint("M.3", "福袋", "只是買來抽獎")
+        path = self._write(f"{digest},M.3,全家,福袋,,codex,excerpt-v1\n")
+
+        labels = load_excerpt_labels(path)
+
+        self.assertIn(digest, labels)
+        self.assertEqual(labels[digest], "")
+
+    def test_missing_cache_file_is_not_an_error(self) -> None:
+        self.assertEqual(load_excerpt_labels("data/labels/does-not-exist.csv"), {})

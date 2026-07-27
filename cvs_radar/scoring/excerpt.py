@@ -12,6 +12,7 @@ from pathlib import Path
 from ..config import (
     BRANDS,
 )
+from ..excerpt_labels import excerpt_fingerprint, load_excerpt_labels
 from ..models import Post
 from ..sentiment import NEGATIVE_WORDS, POSITIVE_WORDS
 
@@ -46,8 +47,55 @@ class _ReviewCandidate:
     decisive: bool = False
 
 
+@lru_cache(maxsize=1)
+def _cached_excerpt_labels() -> dict[str, str]:
+    return load_excerpt_labels()
+
+
+def _labelled_excerpt(posts: list[Post], max_len: int) -> str | None:
+    """Return the LLM-chosen excerpt for this product, or None if unlabelled.
+
+    Labels are per (post, product), so in a thread covering several products the
+    labeller has already decided which sentences belong to this one — the failure
+    the keyword selector cannot fix. Newest post first, matching the order the
+    fallback selector prefers.
+    """
+    labels = _cached_excerpt_labels()
+    if not labels:
+        return None
+
+    ordered = sorted(
+        posts,
+        key=lambda post: (post.posted_at.isoformat() if post.posted_at else "", post.id),
+        reverse=True,
+    )
+    chosen: list[str] = []
+    seen_any = False
+    for post in ordered:
+        label = labels.get(
+            excerpt_fingerprint(post.id, post.product_name, post.review_text or "")
+        )
+        if label is None:
+            continue
+        seen_any = True
+        if not label or any(_review_sentences_similar(label, item) for item in chosen):
+            continue
+        candidate = " ".join([*chosen, label])
+        if len(candidate) > max_len:
+            break
+        chosen.append(label)
+
+    if not seen_any:
+        return None
+    return " ".join(chosen)
+
+
 def _review_excerpt(posts: list[Post], max_len: int = 180, max_sentences: int = 3) -> str:
     """Select diverse, purchase-relevant sentences from every author review."""
+
+    labelled = _labelled_excerpt(posts, max_len)
+    if labelled is not None:
+        return labelled
 
     candidates = _review_candidates(posts)
     # Prefer sentences that either describe the product or state a verdict. Only

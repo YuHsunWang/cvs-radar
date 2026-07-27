@@ -246,6 +246,24 @@ else
   log "product-name export failed (continuing on extraction rules)"
 fi
 
+# --- 7a2. label excerpts for any new (post, product) pair ---
+# Same cache pattern: choosing which sentences describe THIS product — and keeping
+# out the ones describing the other product in a multi-product thread — is
+# judgement the keyword selector cannot do. Non-fatal for the same reason as above.
+log "label new excerpt pairs"
+EX_DELTA="$WORK/unlabeled-excerpts.csv"
+if python3 scripts/export_excerpts.py --out "$EX_DELTA" 2>&1 | tail -1; then
+  EX_ROWS="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('$EX_DELTA',encoding='utf-8-sig'))))" 2>/dev/null || echo 0)"
+  if [ "$EX_ROWS" -gt 0 ]; then
+    log "excerpt delta: $EX_ROWS pair(s) — label them, then:"
+    log "  python3 scripts/import_excerpts.py <labeled.csv>"
+  else
+    log "excerpt delta: none"
+  fi
+else
+  log "excerpt export failed (continuing on the scoring selector)"
+fi
+
 # --- 7b. recompute scores (uses fresh labels) + de-identify + build public data ---
 # This is the former GitHub Actions "refresh live data" work, moved local so the
 # whole pipeline is one flow. run_pipeline reads posts.jsonl + the label cache.
