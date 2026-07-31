@@ -1,3 +1,4 @@
+import CountUp from '@/components/CountUp'
 import ProductDetail from '@/components/ProductDetail'
 import { BarChart3, ChevronDown, ChevronUp, CircleCheck, CircleMinus, CircleX } from 'lucide-react'
 import { useId } from 'react'
@@ -123,7 +124,13 @@ export default function ProductCard({ product, rank, isExpanded, onToggle }: Pro
                   displayScore === null ? 'text-xl' : 'text-3xl'
                 }`}
               >
-                {displayScore === null ? '暫無' : `${displayScore}/100`}
+                {displayScore === null ? (
+                  '暫無'
+                ) : (
+                  <>
+                    <CountUp end={displayScore} />/100
+                  </>
+                )}
               </span>
               <a
                 href="#score-method"
