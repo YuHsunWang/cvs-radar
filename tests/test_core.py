@@ -29,6 +29,7 @@ from cvs_radar.excerpt_labels import excerpt_fingerprint, load_excerpt_labels
 from cvs_radar.comment_labels import CommentPicks, comment_picks_fingerprint, load_comment_picks
 from cvs_radar.product_labels import load_product_name_labels, product_name_fingerprint
 from cvs_radar.scoring import (
+    _clean_extracted_product_name,
     _rep_candidates,
     _rep_comments,
     _body_candidates,
@@ -1206,6 +1207,21 @@ class ExtractionRegressionTest(unittest.TestCase):
         )
         # 品名裡本來就沒有點的數字不受影響。
         self.assertEqual(canonical_product_name("萊爾富", "77乳加星球含餡巧克力"), "77乳加星球含餡巧克力")
+
+    def test_percent_is_kept_in_a_name_but_dropped_from_a_discount(self) -> None:
+        # 54% 是可可含量，屬於品名；後面還接著品名文字。
+        self.assertEqual(
+            canonical_product_name("全家", "GODIVA 54%黑巧克力夏威夷果仁脆粒雪糕"),
+            "GODIVA54%黑巧克力夏威夷果仁脆粒雪糕",
+        )
+        # 位在字尾的百分比是折扣，不是商品的一部分。
+        self.assertNotIn("%", _clean_extracted_product_name("台式海陸炒麵 89元 刷卡再折5%", "萊爾富"))
+        self.assertNotIn("%", _clean_extracted_product_name("50 x 65%", "7-11"))
+        # 合併 key 照樣吃掉 %，讓有寫和沒寫的兩種拼法算同一個商品。
+        self.assertEqual(
+            normalize_product("全家", "GODIVA 54%黑巧克力夏威夷果仁脆粒雪糕"),
+            normalize_product("全家", "GODIVA54黑巧克力夏威夷果仁脆粒雪糕"),
+        )
 
     def test_acquisition_condition_field_falls_back_to_title_name_without_price(self) -> None:
         post = Post(

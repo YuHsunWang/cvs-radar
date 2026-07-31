@@ -513,8 +513,9 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
     s = _PROMO_TAIL_RE.sub(" ", s)
     s = _QUANTITY_SUFFIX_RE.sub("", s).strip()
     s = re.sub(r"\s+", "", s)
-    # A dot reaches here only where _NAME_SEPARATOR_RE kept it between digits.
-    s = re.sub(r"[^\w.\u4e00-\u9fff]+", "", s)
+    # A dot or percent reaches here only where _NAME_SEPARATOR_RE judged it part
+    # of the name rather than a separator or a discount.
+    s = re.sub(r"[^\w.%\u4e00-\u9fff]+", "", s)
     return s
 
 
@@ -860,8 +861,9 @@ def _clean_product_name(brand: str, name: str) -> str:
     s = _OPTIONAL_RE.sub(" ", s)
     s = _PROMO_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
-    # A dot reaches here only where _NAME_SEPARATOR_RE kept it between digits.
-    s = re.sub(r"[^\w.\u4e00-\u9fff]+", "", s)
+    # A dot or percent reaches here only where _NAME_SEPARATOR_RE judged it part
+    # of the name rather than a separator or a discount.
+    s = re.sub(r"[^\w.%\u4e00-\u9fff]+", "", s)
     s = _strip_trailing_noise(s)
     for old, new in _SYNONYM_MAP.items():
         s = s.replace(old, new)
@@ -903,8 +905,9 @@ def _clean_product_name_without_alias(brand: str, name: str) -> str:
     s = _OPTIONAL_RE.sub(" ", s)
     s = _PROMO_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
-    # A dot reaches here only where _NAME_SEPARATOR_RE kept it between digits.
-    s = re.sub(r"[^\w.\u4e00-\u9fff]+", "", s)
+    # A dot or percent reaches here only where _NAME_SEPARATOR_RE judged it part
+    # of the name rather than a separator or a discount.
+    s = re.sub(r"[^\w.%\u4e00-\u9fff]+", "", s)
     for old, new in _SYNONYM_MAP.items():
         s = s.replace(old, new)
     return s or "unknown"
