@@ -34,7 +34,7 @@ CVS Radar 是一個端到端的 NLP 與資料產品專案。系統從公開討�
 - **大家為什麼喜歡或不喜歡？** 展開後依序閱讀作者評價、留言評價與原文。
 - **這個分數可靠嗎？** 低樣本商品不顯示推薦分或百分比分布，避免過度解讀。
 
-目前公開快照包含 **740 項商品**，支援 7-11、全家、萊爾富、OK、美聯社及其他通路。
+公開快照每日自動更新，支援 7-11、全家、萊爾富、OK、美聯社及其他通路。
 
 ## 核心功能
 
@@ -45,8 +45,8 @@ CVS Radar 是一個端到端的 NLP 與資料產品專案。系統從公開討�
 - 推薦分仍可由高到低或由低到高排序。
 - 最低推薦分與發文日期區間篩選。
 - 手機優先的卡片式排行；收合時可看推薦分與正評／中立／負評分布，展開後直接閱讀作者心得、代表留言與原文。
-- 作者評價萃取：保留口味、口感、份量、價格、回購意圖等完整句。
-- 留言正向／中立／負向共識分布與代表性優缺點。
+- 作者評價萃取：由 LLM 逐（貼文、商品）判讀後快取，保留口味、口感、份量、價格、回購意圖等有實質內容的句子；同篇涉及多項商品時排除其他商品的敘述。未標註的新資料以規則式抽取為備援。
+- 留言正向／中立／負向共識分布與代表性優缺點：由 LLM 從候選留言中挑選，排除「好吃」「我很愛」等空泛好評與未購買者的臆測；候選留言不足時退回作者心得摘句。
 - 原文連結與清楚的資料不足狀態。
 - 純靜態 Next.js export，載入後所有查詢都在瀏覽器本地完成。
 
@@ -60,7 +60,7 @@ CVS Radar 不會只看單篇文章，也不會讓模型憑空寫出結論。每�
 
 1. **收集公開心得**：讀取 PTT CVS 板商品文與留言。
 2. **整理成同一商品**：辨識通路、品名與價格，合併名稱不同但實際相同的商品。
-3. **保留真正的使用感受**：作者心得維持原句；留言則辨識正向、中立、負向，排除離題、純附和與只談其他通路的內容。
+3. **保留真正的使用感受**：作者心得維持原句；留言則辨識正向、中立、負向，排除離題、純附和與只談其他通路的內容。心得摘句、代表留言與商品名稱判讀等需要語意判斷的步驟，由 LLM 判讀一次後以內容指紋快取到版本控制中的 CSV，之後的重新計算與 CI 只讀取快取、不重新呼叫模型，確保結果可重現。
 4. **彙整共識與時效**：同一人不因重複留言而被放大；樣本不足不顯示推薦分。近期推薦兼顧評價與新鮮度，討論熱度則回答「現在大家在聊什麼」。
 5. **回到證據查證**：商品卡先給快速摘要，展開後仍能閱讀作者評價、代表留言與原文連結。
 
@@ -79,10 +79,11 @@ CVS Radar 不會只看單篇文章，也不會讓模型憑空寫出結論。每�
 |---|---|
 | Data collection | Python, Requests, Beautiful Soup |
 | NLP / scoring | Rule-based sentiment, SnowNLP adapter, Bayesian shrinkage |
+| Labelling | LLM judgement (sentiment, product name, excerpt, representative comments), each cached by content fingerprint in `data/labels/*.csv` so rebuilds and CI stay deterministic |
 | Service layer | Framework-independent query API, FastAPI adapter |
 | Web | Next.js 15, React 19, TypeScript, Tailwind CSS, Lucide |
 | Quality | Pytest, Vitest, Ruff, TypeScript / Next.js production build |
-| Deployment | GitHub Actions, GitHub Pages static export |
+| Deployment | Vercel (primary), GitHub Actions + GitHub Pages static mirror |
 
 ## Repository Structure
 
@@ -96,8 +97,9 @@ web/
   lib/                     typed search, filter and sort logic
   public/data.json         de-identified browser payload
 data/results.json          precomputed product-level snapshot
+data/labels/                fingerprint-keyed LLM label caches (sentiment, product name, excerpt, representative comments)
 docs/screenshots/          portfolio screenshots generated from production build
-.github/workflows/         CI and GitHub Pages deployment
+.github/workflows/         CI and the GitHub Pages mirror deployment
 ```
 
 ## Run Locally
@@ -137,20 +139,25 @@ npm run build
 
 The current suite covers parsing edge cases, product normalization, sentiment attribution, one-user caps, consensus distribution, author excerpt extraction, score calibration, search, category and brand filtering, date boundaries, four sort modes and static production export.
 
-## GitHub Pages
+## Deployment
 
+The primary deployment is <https://cvs-radar.vercel.app/>. Vercel is connected
+to this repository with `web/` as its Root Directory, and every push to `main`
+creates a new production deployment. The app is still a Next.js static export
+(`output: 'export'`), served from the domain root with no base path.
+
+`https://yuhsunwang.github.io/cvs-radar/` is a static mirror of the same site.
 Every push to `main` runs `.github/workflows/pages.yml`:
 
 1. rebuild the de-identified frontend payload;
 2. build the Next.js static export with the `/cvs-radar` base path;
 3. upload `web/out` as a Pages artifact;
-4. deploy to `https://yuhsunwang.github.io/cvs-radar/`.
+4. deploy to GitHub Pages.
+
+Both deployments serve the de-identified `web/public/data.json` that the daily
+pipeline run recomputes and commits to `main`, so they stay in sync.
 
 CI runs backend and frontend checks independently through `.github/workflows/ci.yml`.
-
-The primary portfolio deployment is <https://cvs-radar.vercel.app/>. Vercel is
-connected to this repository with `web/` as its Root Directory; pushes to
-`main` create a new production deployment. GitHub Pages remains a static mirror.
 
 ## Limitations and Next Steps
 
