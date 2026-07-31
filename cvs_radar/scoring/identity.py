@@ -16,7 +16,7 @@ from ..models import Comment, Post
 from ..parser import _title_product_name
 from ..product_labels import load_product_name_labels, product_name_fingerprint
 
-from ._common import (_BRACKET_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
+from ._common import (_BRACKET_RE, _NAME_SEPARATOR_RE, _PURCHASE_CONDITION_RE, _GIVEAWAY_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
 
 
 def _extract_space_separated_parallel_products(
@@ -305,12 +305,7 @@ def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> li
         return shared_flavors
 
     s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
-    # Keep a decimal point that sits inside a number: stripping it welds the digits
-    # together ("牧場直送4.0花生牛奶雪糕" -> "...40...") and the 2-3 digit price matcher
-    # then reads that as a price and splits one product into two.
-    s = re.sub(r"(?<=\d)\.(?=\d)", "\x00", s)
-    s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
-    s = s.replace("\x00", ".")
+    s = _NAME_SEPARATOR_RE.sub(" ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s).strip()
@@ -509,7 +504,7 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
     s = _BRACKET_RE.sub(" ", s)
     s = _strip_brand_keywords(s, brand)
     s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
-    s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
+    s = _NAME_SEPARATOR_RE.sub(" ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
     s = _OPTIONAL_RE.sub(" ", s)
@@ -518,7 +513,8 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
     s = _PROMO_TAIL_RE.sub(" ", s)
     s = _QUANTITY_SUFFIX_RE.sub("", s).strip()
     s = re.sub(r"\s+", "", s)
-    s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
+    # A dot reaches here only where _NAME_SEPARATOR_RE kept it between digits.
+    s = re.sub(r"[^\w.\u4e00-\u9fff]+", "", s)
     return s
 
 
@@ -579,6 +575,9 @@ def _is_junk_extracted_product_name(name: str) -> bool:
     # 填進商品名稱欄（如「售價：99元/ 即時救援7折69元」），真正商品名留在標題。
     if re.search(r"即時救援|即期救援|救援價", compact):
         return True
+    # 「買六件20元以上冰品飲料免費送」描述的是取得條件，不是商品，真正的品名在標題。
+    if _is_acquisition_condition_name(compact):
+        return True
     if compact in _FRAGMENT_PRODUCT_NAMES:
         return True
     if re.fullmatch(r"(?:今日|會員|搭配|友善|購入)(?:價|\d+折|一)?", compact):
@@ -592,6 +591,24 @@ def _is_junk_extracted_product_name(name: str) -> bool:
         return True
     promo_chars = sum(len(token) for token in re.findall(r"預購|加點數|點數|會員|特價|優惠|原價|售價|目前|元", compact))
     return promo_chars >= 2 and promo_chars / max(len(compact), 1) >= 0.5
+
+
+def _is_acquisition_condition_name(name: str) -> bool:
+    """True when the field states how to obtain the item rather than what it is."""
+    compact = re.sub(r"\s+", "", unicodedata.normalize("NFKC", name or ""))
+    return bool(_PURCHASE_CONDITION_RE.search(compact) and _GIVEAWAY_RE.search(compact))
+
+
+def _fallback_price_from_text(text: str) -> int | None:
+    """Price to pair with a title fallback name.
+
+    Numbers inside an acquisition condition are the terms of the offer, not the
+    product's price — "買六件20元以上冰品飲料免費送" would otherwise price the free
+    gift at 20. The item is a giveaway, so no price is the honest answer.
+    """
+    if _is_acquisition_condition_name(text):
+        return None
+    return _primary_price_from_text(text)
 
 
 def _title_fallback_product_name(post: Post) -> str:
@@ -705,7 +722,7 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             if _is_junk_extracted_product_name(extraction_name):
                 fallback_name = _title_fallback_product_name(post)
                 if fallback_name and len(fallback_name) >= 2:
-                    result.append(_replace_post_product(post, fallback_name, _primary_price_from_text(extraction_name)))
+                    result.append(_replace_post_product(post, fallback_name, _fallback_price_from_text(extraction_name)))
                     continue
             result.append(post)
             continue
@@ -721,7 +738,7 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
         ]
         if not valid_items and junk_items:
             fallback_name = _title_fallback_product_name(post)
-            fallback_price = _primary_price_from_text(extraction_name)
+            fallback_price = _fallback_price_from_text(extraction_name)
             if fallback_name and len(fallback_name) >= 2:
                 valid_items = [(fallback_name, fallback_price)]
         # Drop items that still canonicalize to "unknown" (promo/fragment tokens such
@@ -739,7 +756,7 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
                 and len(fallback_name) >= 2
                 and canonical_product_name(post.brand, fallback_name) != "unknown"
             ):
-                resolved_items = [(fallback_name, _primary_price_from_text(extraction_name))]
+                resolved_items = [(fallback_name, _fallback_price_from_text(extraction_name))]
         valid_items = resolved_items
         # Expand a bare product-form name (e.g. "霜淇淋" from a shorthand price line) to
         # the title's more specific flavored name when the title ends with that form word
@@ -837,13 +854,14 @@ def _clean_product_name(brand: str, name: str) -> str:
     for kw in sorted(set(keywords), key=len, reverse=True):
         if kw:
             s = re.sub(re.escape(kw), " ", s, flags=re.IGNORECASE)
-    s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
+    s = _NAME_SEPARATOR_RE.sub(" ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
     s = _OPTIONAL_RE.sub(" ", s)
     s = _PROMO_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
-    s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
+    # A dot reaches here only where _NAME_SEPARATOR_RE kept it between digits.
+    s = re.sub(r"[^\w.\u4e00-\u9fff]+", "", s)
     s = _strip_trailing_noise(s)
     for old, new in _SYNONYM_MAP.items():
         s = s.replace(old, new)
@@ -879,13 +897,14 @@ def _clean_product_name_without_alias(brand: str, name: str) -> str:
     for kw in sorted(set(keywords), key=len, reverse=True):
         if kw:
             s = re.sub(re.escape(kw), " ", s, flags=re.IGNORECASE)
-    s = re.sub(r"[#:/／｜|,，.。!！?？~～\-_=+]+", " ", s)
+    s = _NAME_SEPARATOR_RE.sub(" ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
     s = _OPTIONAL_RE.sub(" ", s)
     s = _PROMO_RE.sub(" ", s)
     s = re.sub(r"\s+", "", s)
-    s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
+    # A dot reaches here only where _NAME_SEPARATOR_RE kept it between digits.
+    s = re.sub(r"[^\w.\u4e00-\u9fff]+", "", s)
     for old, new in _SYNONYM_MAP.items():
         s = s.replace(old, new)
     return s or "unknown"
@@ -894,6 +913,9 @@ def _clean_product_name_without_alias(brand: str, name: str) -> str:
 def _compact_key(name: str) -> str:
     s = unicodedata.normalize("NFKC", name or "").casefold()
     s = re.sub(r"[\s　]+", "", s)
+    # Deliberately drops the decimal point the display name keeps: the merge key
+    # has to collapse "牧場直送4.0" and "牧場直送40" onto one product, because posters
+    # spell it both ways. Fidelity belongs in the display name, not in the key.
     s = re.sub(r"[^\w\u4e00-\u9fff]+", "", s)
     return s or "unknown"
 

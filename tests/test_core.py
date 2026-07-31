@@ -1190,6 +1190,59 @@ class ExtractionRegressionTest(unittest.TestCase):
         self.assertEqual(processed[0].price, "599")
         self.assertEqual(categorize_product(processed[0].product_name), "周邊")
 
+    def test_decimal_point_survives_in_the_name_but_not_in_the_merge_key(self) -> None:
+        # 「牧場直送4.0」的 4.0 是品名的一部分，剝掉會變成看起來像容量的「40」。
+        # 過去是靠 product_overrides 逐項把點補回去。
+        self.assertEqual(
+            canonical_product_name("全家", "牧場直送4.0玉米牛奶雪糕"),
+            "牧場直送4.0玉米牛奶雪糕",
+        )
+        self.assertEqual(canonical_product_name("7-11", "可樂2.5公升"), "可樂2.5公升")
+        # 合併用的 key 反過來要吃掉小數點：發文者兩種寫法都有，同一個商品不能因為
+        # 有人漏打點就被拆成兩項。顯示要保真、合併要粗暴，兩者刻意不同。
+        self.assertEqual(
+            normalize_product("全家", "牧場直送4.0玉米牛奶雪糕"),
+            normalize_product("全家", "牧場直送40玉米牛奶雪糕"),
+        )
+        # 品名裡本來就沒有點的數字不受影響。
+        self.assertEqual(canonical_product_name("萊爾富", "77乳加星球含餡巧克力"), "77乳加星球含餡巧克力")
+
+    def test_acquisition_condition_field_falls_back_to_title_name_without_price(self) -> None:
+        post = Post(
+            id="M.1785371973.A.101",
+            title="[商品] 全家超級瑪利歐矽膠杯墊",
+            brand="全家",
+            product_name="：買六件20元以上冰品飲料免費送",
+            price="：買六件20元以上冰品飲料免費送",
+        )
+
+        processed = preprocess_posts([post])
+
+        # 欄位寫的是「怎麼拿到」而不是「這是什麼」，品名要改由標題提供，
+        # 否則首頁會出現一項叫「買六件以上冰品飲料免費送」的商品。
+        self.assertEqual(len(processed), 1)
+        self.assertEqual(processed[0].product_name, "超級瑪利歐矽膠杯墊")
+        # 20 是「買六件20元以上」的門檻，不是杯墊的售價；杯墊是贈品，不該有價格。
+        # score_product 只採計純數字的 price 欄位（compute.py），所以「沒有被換成
+        # 數字」就等於商品頁不顯示價格。
+        self.assertFalse(processed[0].price.isdigit())
+        self.assertNotEqual(processed[0].price, "20")
+
+    def test_promo_tail_after_a_real_name_keeps_the_name(self) -> None:
+        post = Post(
+            id="M.1785371974.A.102",
+            title="[商品] 全家 香草布丁",
+            brand="全家",
+            product_name="：香草布丁 39 買一送一",
+            price="：香草布丁 39 買一送一",
+        )
+
+        processed = preprocess_posts([post])
+
+        # 「買一送一」單獨出現只是接在真品名後的促銷尾巴，不能讓整個品名作廢。
+        self.assertEqual(len(processed), 1)
+        self.assertEqual(processed[0].product_name, "香草布丁")
+
     def test_digit_promo_fragment_falls_back_to_title_name(self) -> None:
         post = Post(
             id="M.1761067990.A.125",
@@ -1254,6 +1307,11 @@ class CategoryRegressionTest(unittest.TestCase):
             ("動物方城市安全帽", "周邊"),
             ("雞排", "鹹食"),
             ("unknown_product_xyz", "其他"),
+            # Cookware redeemed with stamps is merchandise; a hotpot dish is a meal.
+            # Both contain 鍋, so the specific cookware term has to outrank it.
+            ("導磁不沾鍋", "周邊"),
+            ("暖心麻油雞鍋", "便當"),
+            ("韓式部隊鍋", "便當"),
         ]
 
         for name, expected in cases:
