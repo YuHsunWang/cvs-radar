@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-01 03:42:03",
+  "generated_at": "2026-08-01 04:04:28",
   "reports": [
     {
       "brand": "全家",
@@ -7986,40 +7986,6 @@
       ]
     },
     {
-      "brand": "7-11",
-      "product_name": "八棟花生麻糬熱壓土司",
-      "fair_score": 58.4,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "n_eff": 4.94,
-      "score_std": 0.233,
-      "n_posts": 1,
-      "n_comments": 9,
-      "contributors": [],
-      "rep_positive": [
-        "整體甜度恰到好處 不會太甜還蠻喜歡的。",
-        "但意外的吃起來有口感哈哈。"
-      ],
-      "rep_negative": [
-        "上週吃 很普 花生很少"
-      ],
-      "product_key": "7-11:八棟花生麻糬熱壓土司",
-      "score_mean": 0.6705,
-      "price": null,
-      "category": "甜點",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2025-09-30T00:03:41+08:00",
-      "review_excerpt": "麻糬軟Q 會牽絲,整體甜度恰到好處 不會太甜。花生跟麻糬各自分布,比較不是完美融合那種",
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1759161823.A.B2B.html"
-      ]
-    },
-    {
       "brand": "全家",
       "product_name": "萌寵可愛箱",
       "fair_score": 58.4,
@@ -8079,6 +8045,40 @@
       "review_excerpt": "微辣 咖哩味很濃厚,有椰奶香和甜味。配料豬肉片很嫩也很入味。麵條偏硬 有麵芯感那種",
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1763959811.A.E6C.html"
+      ]
+    },
+    {
+      "brand": "7-11",
+      "product_name": "八棟花生麻糬熱壓土司",
+      "fair_score": 58.3,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "n_eff": 4.94,
+      "score_std": 0.233,
+      "n_posts": 1,
+      "n_comments": 9,
+      "contributors": [],
+      "rep_positive": [
+        "整體甜度恰到好處 不會太甜還蠻喜歡的。",
+        "但意外的吃起來有口感哈哈。"
+      ],
+      "rep_negative": [
+        "上週吃 很普 花生很少"
+      ],
+      "product_key": "7-11:八棟花生麻糬熱壓土司",
+      "score_mean": 0.6705,
+      "price": null,
+      "category": "甜點",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2025-09-30T00:03:41+08:00",
+      "review_excerpt": "麻糬軟Q 會牽絲,整體甜度恰到好處 不會太甜。花生跟麻糬各自分布,比較不是完美融合那種",
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1759161823.A.B2B.html"
       ]
     },
     {
@@ -17800,7 +17800,7 @@
     },
     {
       "brand": "全家",
-      "product_name": "GODIVA54黑巧克力夏威夷果仁脆粒雪糕",
+      "product_name": "GODIVA54%黑巧克力夏威夷果仁脆粒雪糕",
       "fair_score": 42.5,
       "consensus": "一致負評",
       "confidence": "中",
