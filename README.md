@@ -25,6 +25,16 @@ CVS Radar 是一個端到端的 NLP 與資料產品專案。系統從公開討�
   預設以「近期推薦」呈現最近值得買的商品；也能切換「討論熱度」，快速掌握現在大家在聊什麼。
 </p>
 
+<p align="center">
+  <img src="docs/screenshots/app-mobile.png" width="260" alt="CVS Radar 手機版首頁：貨架標題列、搜尋、排行卡片與浮動篩選鈕" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/product-detail.png" width="520" alt="展開後的商品卡：作者評價、留言整理出的優缺點與原文連結" />
+</p>
+
+<p align="center">
+  站在貨架前用手機看排行；展開任一張卡片，就能讀作者評價、留言整理出的優缺點與原文連結。
+</p>
+
 ## 使用者問題
 
 超商新品討論通常散落在不同文章與推文中。單看一篇心得容易受到作者偏好影響，直接看推文又必須自行判斷反諷、離題回覆與樣本數。CVS Radar 將這些訊號整理成可比較的商品層級資訊：
