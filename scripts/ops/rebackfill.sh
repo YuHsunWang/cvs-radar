@@ -227,60 +227,33 @@ rm -rf rebackfill_work
 # refresh the persistent seed so the next run continues from here
 cp data/posts.jsonl "$STORE_SEED" 2>/dev/null || true
 
-# --- 7a. label any new raw 商品名稱 fields (same cache pattern as sentiment) ---
-# Deciding what product a free-text field names is a judgement call, so an LLM makes
-# it once per distinct field and the answer is cached in
-# data/labels/product_name_labels.csv. Non-fatal: on failure the extraction rules
-# still cover unlabelled fields, so a flaky labelling run must not block publishing.
-log "label new product-name fields"
-PN_DELTA="$WORK/unlabeled-product-names.csv"
-if python3 scripts/export_product_names.py --out "$PN_DELTA" 2>&1 | tail -1; then
-  PN_ROWS="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('$PN_DELTA',encoding='utf-8-sig'))))" 2>/dev/null || echo 0)"
-  if [ "$PN_ROWS" -gt 0 ]; then
-    log "product-name delta: $PN_ROWS field(s) — label them with scripts/label_product_names.sh, then:"
-    log "  python3 scripts/import_product_names.py <labeled.csv>"
-  else
-    log "product-name delta: none"
+# --- 7a. the remaining LLM label layers, in dependency order ---
+# Each of these is a judgement an LLM makes once and caches in a committed CSV, the
+# same pattern as the sentiment step above. Running them here — after the crawl and
+# before the recompute — is what lets a post crawled this morning reach the site with
+# its labels today; 近期推薦 puts the newest products on the front page, so anything
+# still on the rule fallback is exactly what visitors see first.
+#
+# Order matters: the excerpt and comment-pick fingerprints both include the product
+# name, so names have to be settled before those two export their deltas. Each script
+# exports its own delta, so it sees the names the step before it just imported.
+#
+# Non-fatal by design. If Codex is down or out of quota, unlabelled data falls back to
+# the rules and the site still publishes; the delta is still there tomorrow. A failure
+# is recorded and surfaced in the final line rather than blocking the run.
+LABEL_WARNINGS=""
+label_layer(){
+  local name="$1" script="$2" fallback="$3"
+  log "label: $name"
+  if bash "scripts/$script" 2>&1 | sed 's/^/  /'; then
+    return 0
   fi
-else
-  log "product-name export failed (continuing on extraction rules)"
-fi
-
-# --- 7a2. label excerpts for any new (post, product) pair ---
-# Same cache pattern: choosing which sentences describe THIS product — and keeping
-# out the ones describing the other product in a multi-product thread — is
-# judgement the keyword selector cannot do. Non-fatal for the same reason as above.
-log "label new excerpt pairs"
-EX_DELTA="$WORK/unlabeled-excerpts.csv"
-if python3 scripts/export_excerpts.py --out "$EX_DELTA" 2>&1 | tail -1; then
-  EX_ROWS="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('$EX_DELTA',encoding='utf-8-sig'))))" 2>/dev/null || echo 0)"
-  if [ "$EX_ROWS" -gt 0 ]; then
-    log "excerpt delta: $EX_ROWS pair(s) — label them, then:"
-    log "  python3 scripts/import_excerpts.py <labeled.csv>"
-  else
-    log "excerpt delta: none"
-  fi
-else
-  log "excerpt export failed (continuing on the scoring selector)"
-fi
-
-# --- 7a3. label representative comments for any new product candidate pool ---
-# Sentiment magnitude cannot judge whether a comment is concrete enough to show, so
-# an LLM chooses candidate indices once per product. Non-fatal: unlabelled products
-# still use the existing ranking selector.
-log "label new representative-comment pools"
-CP_DELTA="$WORK/unlabeled-comment-picks.csv"
-if python3 scripts/export_comment_picks.py --out "$CP_DELTA" 2>&1 | tail -1; then
-  CP_ROWS="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('$CP_DELTA',encoding='utf-8-sig'))))" 2>/dev/null || echo 0)"
-  if [ "$CP_ROWS" -gt 0 ]; then
-    log "comment-pick delta: $CP_ROWS product(s) — label them, then:"
-    log "  python3 scripts/import_comment_picks.py <labeled.csv>"
-  else
-    log "comment-pick delta: none"
-  fi
-else
-  log "comment-pick export failed (continuing on the scoring selector)"
-fi
+  log "WARNING: $name labelling failed — publishing on $fallback"
+  LABEL_WARNINGS="${LABEL_WARNINGS}${LABEL_WARNINGS:+, }$name"
+}
+label_layer "product names"         label_product_names.sh "the extraction rules"
+label_layer "excerpts"              label_excerpts.sh      "the scoring selector"
+label_layer "representative comments" label_comment_picks.sh "the ranking selector"
 
 # --- 7b. recompute scores (uses fresh labels) + de-identify + build public data ---
 # This is the former GitHub Actions "refresh live data" work, moved local so the
@@ -300,15 +273,22 @@ python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
 # --- 8. commit (+push): labels + recomputed, de-identified public data ---
 if [ "$DO_COMMIT" = "1" ]; then
-  git add data/labels/sentiment_fingerprint_labels.csv data/results.json web/public/data.json
+  # Every label cache this run may have written has to be committed. Step 0 resets the
+  # worktree to origin, so an uncommitted label file is silently destroyed before the
+  # next run — and the layer would be paid for and re-labelled every single day.
+  git add data/labels/sentiment_fingerprint_labels.csv \
+          data/labels/product_name_labels.csv \
+          data/labels/excerpt_labels.csv \
+          data/labels/comment_picks.csv \
+          data/results.json web/public/data.json
   if git diff --cached --quiet; then
     log "no data change to commit"
   else
-    git commit -q -m "chore: refresh live data + LLM sentiment labels (cache ${before}→${after})
+    git commit -q -m "chore: refresh live data + LLM labels (sentiment cache ${before}→${after})
 
 Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
     [ "$PUSH" = "1" ] && { git push -q origin "$BRANCH" && log "pushed to origin/$BRANCH"; }
   fi
 fi
 
-log "DONE. delta labeled=$N | cache ${before} -> ${after} | pushed=${PUSH}"
+log "DONE. delta labeled=$N | cache ${before} -> ${after} | pushed=${PUSH}${LABEL_WARNINGS:+ | LABEL FAILURES: ${LABEL_WARNINGS}}"
