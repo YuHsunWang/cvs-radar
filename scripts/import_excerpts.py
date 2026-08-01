@@ -49,6 +49,7 @@ def import_labels(
     labels_path: Path = DEFAULT_LABELS_PATH,
     *,
     replace: bool = False,
+    model_tag: str = "",
 ) -> tuple[int, int, int]:
     """Merge completed rows and return (added, replaced, skipped_incomplete).
 
@@ -82,7 +83,7 @@ def import_labels(
                 "brand": str(row.get("brand") or "").strip(),
                 "product_name": str(row.get("product_name") or "").strip(),
                 "excerpt": excerpt,
-                "model": model or "subscription-llm",
+                "model": model_tag or model or "subscription-llm",
                 "prompt_version": str(row.get("prompt_version") or PROMPT_VERSION).strip(),
             }
             if fingerprint in existing:
@@ -108,11 +109,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("labeled", type=Path)
     parser.add_argument("--labels", type=Path, default=DEFAULT_LABELS_PATH)
+    parser.add_argument(
+        "--model-tag",
+        default="",
+        help="record this model name instead of the one the labeller wrote "
+             "(its value still marks which rows it worked on)",
+    )
     parser.add_argument("--replace", action="store_true")
     args = parser.parse_args()
 
     added, replaced, skipped = import_labels(
-        args.labeled, args.labels, replace=args.replace
+        args.labeled, args.labels, replace=args.replace, model_tag=args.model_tag
     )
     print(
         f"imported excerpts: {added} added, {replaced} replaced, "

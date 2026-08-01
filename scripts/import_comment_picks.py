@@ -77,6 +77,7 @@ def import_picks(
     labels_path: Path = DEFAULT_LABELS_PATH,
     *,
     replace: bool = False,
+    model_tag: str = "",
 ) -> tuple[int, int, int]:
     """Merge completed rows and return (added, replaced, skipped_incomplete).
 
@@ -143,7 +144,7 @@ def import_picks(
                 "negative_picks": "|".join(str(index) for index in negative_picks),
                 "positive_body_picks": "|".join(str(index) for index in positive_body_picks),
                 "negative_body_picks": "|".join(str(index) for index in negative_body_picks),
-                "model": model or "subscription-llm",
+                "model": model_tag or model or "subscription-llm",
                 "prompt_version": str(row.get("prompt_version") or PROMPT_VERSION).strip(),
             }
             if fingerprint in existing:
@@ -169,10 +170,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("labeled", type=Path, help="CSV produced by the labelling run")
     parser.add_argument("--labels", type=Path, default=DEFAULT_LABELS_PATH)
+    parser.add_argument(
+        "--model-tag",
+        default="",
+        help="record this model name instead of the one the labeller wrote "
+             "(its value still marks which rows it worked on)",
+    )
     parser.add_argument("--replace", action="store_true", help="overwrite existing labels")
     args = parser.parse_args()
 
-    added, replaced, skipped = import_picks(args.labeled, args.labels, replace=args.replace)
+    added, replaced, skipped = import_picks(args.labeled, args.labels, replace=args.replace, model_tag=args.model_tag)
     print(
         f"imported comment picks: {added} added, {replaced} replaced, "
         f"{skipped} skipped (0 errors)"
