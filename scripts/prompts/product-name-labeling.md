@@ -25,17 +25,24 @@ Fill in:
   words that are genuinely part of the name (牧場直送4.0巧克力牛奶雪糕,
   光泉午后時光紅茶, Seasons法式香草烤雞翅). Do not invent words that are not
   supported by raw_name or title.
-- `price`: the unit price the poster paid, as a plain integer, or blank if the
-  field states none. For "原價79元、優惠價48元" use the price actually paid (48).
-  For a bundle ("2支55") give the per-unit price (28) only if that is clearly the
-  intent, otherwise leave blank. Ignore prices that belong to a gift or threshold.
+- `price`: what one item costs, as a plain integer, or blank if the field states
+  none. For "原價79元、優惠價48元" use the price actually paid (48) — the discount
+  applies to a single item. For "買一送一" or "第二件6折" keep the sticker price
+  ("49 買一送一" is 49, not 25): the stated price still buys one item, and the extra
+  one is free on top. But when the stated price covers several items — "2支55",
+  "買二送二$98" — divide it by the number you pay for (28, and 49) if that is clearly
+  the intent, otherwise leave blank. The test is what the number buys: one item at
+  full price, or a multi-item purchase. Ignore prices that belong to a gift or
+  threshold.
 - `model`: set to `codex`.
 
 MULTI-PRODUCT ROWS: when the field really covers several distinct products
 (「抹茶霜淇淋55/抹茶千層59」), emit ONE ROW PER PRODUCT: copy the row, keep the same
 `fingerprint`, and set `item_index` to 0, 1, 2 … in the order they appear. A
 combo where the second item is just a bundle partner or comparison
-(「翻轉布丁3入+統一布丁3入/75元」) is ONE product — the first one.
+(「翻轉布丁3入+統一布丁3入/75元」) is ONE product — the first one. When a brand or
+sub-brand is written once but covers every item (「西雅圖 開心果風味咖啡 + 抹茶拿鐵」),
+repeat it on each row — a bare 抹茶拿鐵 no longer says whose it is.
 
 NO USABLE NAME: when the field carries only a price or promo text (「55元 甜點兩件
 六九折」, 「49」) and the real name is only in `title`, take the name from
