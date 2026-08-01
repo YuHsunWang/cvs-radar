@@ -33,6 +33,43 @@ from ..sentiment import NEGATIVE_WORDS, POSITIVE_WORDS
 
 _BRACKET_RE = re.compile(r"[\[\(（【].*?[\]\)）】]")
 
+# 品名裡的括號有兩種：促銷附註（(原價$399)、(優惠券買一送一)）要連內容剝掉，商品修飾
+# 語（(無糖)、(含牛肉)、(晶華)、(中)）只該脫括號、內容是識別商品的一部分。整組剝掉會
+# 讓無糖與有糖、大杯與中杯變成同一項。判斷保守：短、無數字、無促銷詞才解包，其餘維持
+# 原本的整段剝除。留言清理仍直接用 _BRACKET_RE——留言裡的括號多半真的是附註。
+_BRACKET_PROMO_RE = re.compile(
+    r"價|折|券|贈|送|兌換|集章|優惠|特價|原價|嚐鮮|友善|珍食|限定|活動|搭配|跨店|"
+    r"任選|第[二三四五六七八九十\d]+件|買\d|coupon|促",
+    re.IGNORECASE,
+)
+
+
+def unwrap_name_brackets(text: str) -> str:
+    """Drop promo asides in brackets; keep a bracketed product qualifier's content.
+
+    Only round brackets can hold a qualifier. 【】 marks a PTT form field
+    (【評分】, 【心得】) and [] marks a title tag ([商品]) — unwrapping either would
+    turn the form's own scaffolding into a product name.
+
+    The length cap separates a variant marker from a gloss. (無糖), (含牛肉) and (中)
+    distinguish one product from another; (石榴洛神氣泡飲) merely explains what 沙漠之星
+    is, and the product is still 沙漠之星. Anything longer is treated as a gloss.
+    """
+    def _sub(match: re.Match[str]) -> str:
+        inner = match.group(1).strip()
+        if (
+            inner
+            and len(inner) <= 4
+            and not re.search(r"[\d$＄%~／/\-]", inner)
+            and not _BRACKET_PROMO_RE.search(inner)
+            and re.fullmatch(r"[\w一-鿿]+", inner)
+        ):
+            return f" {inner} "
+        return " "
+
+    text = re.sub(r"[\[【].*?[\]】]", " ", text or "")
+    return re.sub(r"[\(（](.*?)[\)）]", _sub, text)
+
 _TITLE_PREFIX_RE = re.compile(r"^\s*(商品|心得|情報|問題|請益|討論|問卦)\s*")
 
 _NOISE_RE = re.compile(

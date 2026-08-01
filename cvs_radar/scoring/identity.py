@@ -16,7 +16,7 @@ from ..models import Comment, Post
 from ..parser import _title_product_name
 from ..product_labels import load_product_name_labels, product_name_fingerprint
 
-from ._common import (_BRACKET_RE, _NAME_SEPARATOR_RE, _PURCHASE_CONDITION_RE, _GIVEAWAY_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
+from ._common import (unwrap_name_brackets, _NAME_SEPARATOR_RE, _PURCHASE_CONDITION_RE, _GIVEAWAY_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
 
 
 def _extract_space_separated_parallel_products(
@@ -399,7 +399,7 @@ def _normalize_product_pattern_text(raw_name: str, brand: str = "") -> str:
     s = _normalize_marketing_text(s)
     s = re.sub(r"\$(\d)", r"\1", s)
     s = re.sub(r"(\d)\$", r"\1", s)
-    s = _BRACKET_RE.sub(" ", s)
+    s = unwrap_name_brackets(s)
     s = re.sub(r"[\[\(（【][^\]\)）】]*$", " ", s)
     s = _strip_brand_keywords(s, brand)
     s = _FRIENDLY_TIME_MARK_RE.sub(" ", s)
@@ -501,7 +501,7 @@ def _bundle_adjusted_price(raw_name: str, price: int) -> tuple[int | None, str]:
 def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
     s = unicodedata.normalize("NFKC", raw_name or "").strip()
     s = _normalize_marketing_text(s)
-    s = _BRACKET_RE.sub(" ", s)
+    s = unwrap_name_brackets(s)
     s = _strip_brand_keywords(s, brand)
     s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
     s = _NAME_SEPARATOR_RE.sub(" ", s)
@@ -850,7 +850,7 @@ def canonical_product_name(brand: str, name: str) -> str:
 
 def _clean_product_name(brand: str, name: str) -> str:
     s = unicodedata.normalize("NFKC", name or "").strip()
-    s = _BRACKET_RE.sub(" ", s)
+    s = unwrap_name_brackets(s)
     keywords = [*BRANDS.get(brand, []), brand]
     for kw in sorted(set(keywords), key=len, reverse=True):
         if kw:
@@ -894,7 +894,7 @@ def _apply_product_alias(brand: str, cleaned_name: str) -> str:
 
 def _clean_product_name_without_alias(brand: str, name: str) -> str:
     s = unicodedata.normalize("NFKC", name or "").strip()
-    s = _BRACKET_RE.sub(" ", s)
+    s = unwrap_name_brackets(s)
     keywords = [*BRANDS.get(brand, []), brand]
     for kw in sorted(set(keywords), key=len, reverse=True):
         if kw:

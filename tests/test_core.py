@@ -1208,6 +1208,31 @@ class ExtractionRegressionTest(unittest.TestCase):
         # 品名裡本來就沒有點的數字不受影響。
         self.assertEqual(canonical_product_name("萊爾富", "77乳加星球含餡巧克力"), "77乳加星球含餡巧克力")
 
+    def test_bracketed_qualifier_survives_but_a_bracketed_promo_does_not(self) -> None:
+        # 括號裡的變體標記是識別商品的一部分：整組剝掉會讓無糖與有糖、中杯與大杯
+        # 收斂成同一項商品。
+        for brand, name, expected in (
+            ("7-11", "純喫茶金萱青茶(無糖)", "純喫茶金萱青茶無糖"),
+            ("7-11", "拿坡里風味肉球義大利麵(含牛肉)", "拿坡里風味肉球義大利麵含牛肉"),
+            ("7-11", "(晶華)富貴海皇羹", "晶華富貴海皇羹"),
+            ("7-11", "單品拿鐵(中)", "單品拿鐵中"),
+        ):
+            with self.subTest(name=name):
+                self.assertEqual(canonical_product_name(brand, name), expected)
+        # 括號裡的促銷／價格附註仍要連內容剝掉。
+        for brand, name, expected in (
+            ("全家", "芋泥Q皮半月燒(友善35)", "芋泥Q皮半月燒"),
+            ("7-11", "Rody摺疊置物箱(原價$399)", "Rody摺疊置物箱"),
+            ("全家", "抹茶蒙布朗布丁(活動期間八折 52 元)", "抹茶蒙布朗布丁"),
+        ):
+            with self.subTest(name=name):
+                self.assertEqual(canonical_product_name(brand, name), expected)
+        # 有寫括號和沒寫括號是同一個商品，合併 key 必須一致。
+        self.assertEqual(
+            normalize_product("7-11", "純喫茶金萱青茶(無糖)"),
+            normalize_product("7-11", "純喫茶金萱青茶無糖"),
+        )
+
     def test_percent_is_kept_in_a_name_but_dropped_from_a_discount(self) -> None:
         # 54% 是可可含量，屬於品名；後面還接著品名文字。
         self.assertEqual(
