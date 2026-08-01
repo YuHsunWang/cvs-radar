@@ -15,7 +15,7 @@ set -uo pipefail
 REPO="${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 CHUNK="${CHUNK:-50}"
 CONC="${CONC:-5}"
-MODEL="${MODEL:-gpt-5.6-terra}"
+MODEL="${MODEL:-gpt-5.6-luna}"
 RUNNER="${RUNNER:-$HOME/.claude/skills/codex-direct/scripts/run-codex.mjs}"
 PROMPT="${PROMPT:-$REPO/scripts/prompts/comment-picks-labeling.md}"
 
