@@ -15,10 +15,12 @@ if str(ROOT) not in sys.path:
 
 from cvs_radar.sentiment import (  # noqa: E402
     FINGERPRINT_LABELS_PATH,
+    SENTIMENT_PROMPT_VERSION,
     _normalize_override_text,
     load_fingerprint_labels,
-    load_sentiment_overrides,
+    load_sentiment_corrections,
     sentiment_fingerprint,
+    sentiment_fingerprint_v2,
 )
 
 DEFAULT_POSTS_PATH = ROOT / "data" / "posts.jsonl"
@@ -51,8 +53,11 @@ def export_unlabeled_comments(
     if not posts_path.exists():
         raise FileNotFoundError(f"no stored posts found at {posts_path}")
 
+    # Only reviewed corrections suppress export: they already have the final say.
+    # Legacy text labels deliberately do NOT, so their comments can still receive a
+    # context-aware fingerprint label (see load_sentiment_overrides).
     if known_texts is None:
-        known_texts = set(load_sentiment_overrides())
+        known_texts = set(load_sentiment_corrections())
     if known_fingerprints is None:
         known_fingerprints = set(load_fingerprint_labels(ROOT / FINGERPRINT_LABELS_PATH))
 
@@ -68,24 +73,40 @@ def export_unlabeled_comments(
             normalized = _normalize_override_text(text)
             if not normalized or normalized in known_texts:
                 continue
-            fingerprint = sentiment_fingerprint(source_id, str(comment.get("tag") or ""), text)
-            if fingerprint in known_fingerprints or fingerprint in seen:
+            tag = str(comment.get("tag") or "")
+            brand = str(post.get("brand") or "")
+            product_name = str(post.get("product_name") or "")
+            post_title = str(post.get("title") or "")
+            fingerprint = sentiment_fingerprint_v2(
+                source_id,
+                tag,
+                text,
+                brand=brand,
+                product_name=product_name,
+                post_title=post_title,
+            )
+            # A row already answered under the legacy key stays answered; only rows
+            # covered by neither key are worth paying a labelling run for.
+            legacy = sentiment_fingerprint(source_id, tag, text)
+            if fingerprint in known_fingerprints or legacy in known_fingerprints:
+                continue
+            if fingerprint in seen:
                 continue
             seen.add(fingerprint)
             rows.append(
                 {
                     "fingerprint": fingerprint,
-                    "brand": str(post.get("brand") or ""),
-                    "product_name": str(post.get("product_name") or ""),
-                    "post_title": str(post.get("title") or ""),
-                    "tag": str(comment.get("tag") or ""),
+                    "brand": brand,
+                    "product_name": product_name,
+                    "post_title": post_title,
+                    "tag": tag,
                     "comment_text": text,
                     "llm_score": "",
                     "llm_label": "",
                     "is_relevant": "",
                     "reason": "",
                     "model": "",
-                    "prompt_version": "sentiment-v1",
+                    "prompt_version": SENTIMENT_PROMPT_VERSION,
                 }
             )
 

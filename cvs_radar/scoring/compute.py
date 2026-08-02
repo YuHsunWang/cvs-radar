@@ -69,13 +69,14 @@ def _decay(posted_at: datetime | None, now: datetime | None = None) -> float:
     return math.exp(-lam * days)
 
 
-def _commenter_pairs(
+def _commenter_contributions(
     posts: list[Post],
     profiles: dict[str, AccountProfile],
-) -> tuple[list[tuple[float, float]], list[Contributor]]:
+    now: datetime | None = None,
+) -> list[tuple[str, str, float, float]]:
+    """One (user, role, score01, weight) row per eligible comment."""
     role_weight = float(SCORING["role_weight"]["commenter"])
-    per_user: dict[str, list[tuple[float, float]]] = defaultdict(list)
-
+    rows: list[tuple[str, str, float, float]] = []
     for post in posts:
         for comment in post.comments:
             if comment.sentiment is None:
@@ -90,36 +91,78 @@ def _commenter_pairs(
             if not attribution.include_score or attribution.effective_sentiment is None:
                 continue
             score01 = (attribution.effective_sentiment + 1.0) / 2.0
-            credibility = profiles.get(comment.user).credibility if comment.user in profiles else 1.0
-            weight = max(0.0, credibility * role_weight * _decay(comment.posted_at or post.posted_at))
-            per_user[comment.user].append((score01, weight))
-
-    pairs: list[tuple[float, float]] = []
-    contributors: list[Contributor] = []
-    for user, values in per_user.items():
-        if SCORING["per_user_cap"]:
-            stance = mean(score for score, _ in values)
-            weight = mean(weight for _, weight in values)
-            pairs.append((stance, weight))
-            contributors.append(Contributor(user, "commenter", round(stance, 4), round(weight, 4)))
-        else:
-            for score, weight in values:
-                pairs.append((score, weight))
-                contributors.append(Contributor(user, "commenter", round(score, 4), round(weight, 4)))
-    return pairs, contributors
+            credibility = _credibility(profiles, comment.user)
+            weight = max(
+                0.0,
+                credibility * role_weight * _decay(comment.posted_at or post.posted_at, now),
+            )
+            rows.append((comment.user, "commenter", score01, weight))
+    return rows
 
 
-def _author_pairs(posts: list[Post]) -> tuple[list[tuple[float, float]], list[Contributor]]:
+def _author_contributions(
+    posts: list[Post],
+    profiles: dict[str, AccountProfile],
+    now: datetime | None = None,
+) -> list[tuple[str, str, float, float]]:
+    """One (user, role, score01, weight) row per scored post."""
     role_weight = float(SCORING["role_weight"]["author"])
-    pairs: list[tuple[float, float]] = []
-    contributors: list[Contributor] = []
+    rows: list[tuple[str, str, float, float]] = []
     for post in posts:
         if post.author_score is None:
             continue
         score01 = max(0.0, min(1.0, post.author_score / 100.0))
-        weight = role_weight * _decay(post.posted_at)
-        pairs.append((score01, weight))
-        contributors.append(Contributor(post.author, "author", round(score01, 4), round(weight, 4)))
+        # An author is the same human as a commenter, so the same credibility and
+        # the same per-user cap apply. Leaving authors uncapped let one account post
+        # ten reviews of one product and carry ten full votes.
+        weight = max(0.0, _credibility(profiles, post.author) * role_weight * _decay(post.posted_at, now))
+        rows.append((post.author, "author", score01, weight))
+    return rows
+
+
+def _credibility(profiles: dict[str, AccountProfile], user: str) -> float:
+    profile = profiles.get(user)
+    return profile.credibility if profile is not None else 1.0
+
+
+def _opinion_pairs(
+    posts: list[Post],
+    profiles: dict[str, AccountProfile],
+    now: datetime | None = None,
+) -> tuple[list[tuple[float, float]], list[Contributor]]:
+    """Collapse every contribution to one stance per human when per_user_cap is set.
+
+    Authors and commenters are pooled by account first: `per_user_cap` is meant to
+    stop one person outvoting a product, and a person who reviews a product and also
+    pushes someone else's thread about it is still one person.
+    """
+    per_user: dict[str, list[tuple[str, float, float]]] = defaultdict(list)
+    for user, role, score01, weight in (
+        _author_contributions(posts, profiles, now)
+        + _commenter_contributions(posts, profiles, now)
+    ):
+        per_user[user].append((role, score01, weight))
+
+    pairs: list[tuple[float, float]] = []
+    contributors: list[Contributor] = []
+    for user, values in per_user.items():
+        if not SCORING["per_user_cap"]:
+            for role, score, weight in values:
+                pairs.append((score, weight))
+                contributors.append(Contributor(user, role, round(score, 4), round(weight, 4)))
+            continue
+        # Weight each of the person's own opinions by its decay before collapsing
+        # them. An unweighted mean lets a 200-day-old push cancel today's complaint
+        # outright, which is the opposite of what time_decay_lambda configures.
+        total_weight = sum(weight for _, _, weight in values)
+        if total_weight > 0:
+            stance = sum(score * weight for _, score, weight in values) / total_weight
+        else:
+            stance = mean(score for _, score, _ in values)
+        weight = mean(weight for _, _, weight in values)
+        role = max(values, key=lambda item: item[2])[0]
+        pairs.append((stance, weight))
+        contributors.append(Contributor(user, role, round(stance, 4), round(weight, 4)))
     return pairs, contributors
 
 
@@ -152,8 +195,17 @@ def _shill_stats(posts: list[Post]) -> tuple[float, bool]:
     return round(ratio, 4), flag
 
 
-def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> ProductReport:
-    """計算單一商品彙整分數。"""
+def score_product(
+    posts: list[Post],
+    profiles: dict[str, AccountProfile],
+    now: datetime | None = None,
+) -> ProductReport:
+    """計算單一商品彙整分數。
+
+    ``now`` is the as-of instant the time decay is measured from. Passing it makes a
+    rebuild of a stored snapshot reproduce the scores it was published with; leaving
+    it unset means "score as of this moment", which is only correct for a live run.
+    """
     if not posts:
         raise ValueError("score_product requires at least one post")
 
@@ -162,9 +214,7 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
     shill_ratio, shill_flag = _shill_stats(posts)
     shill_penalty = float(SHILL_DETECTION["post_weight_penalty"]) if shill_flag else 1.0
 
-    author_pairs, author_contributors = _author_pairs(posts)
-    commenter_pairs, commenter_contributors = _commenter_pairs(posts, profiles)
-    opinion_pairs = author_pairs + commenter_pairs
+    opinion_pairs, opinion_contributors = _opinion_pairs(posts, profiles, now)
 
     if shill_flag and opinion_pairs:
         opinion_pairs = [(score, weight * shill_penalty) for score, weight in opinion_pairs]
@@ -182,7 +232,7 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
         std = 0.0
         n_eff = 0.0
 
-    contributors = sorted(author_contributors + commenter_contributors, key=lambda c: -c.weight)
+    contributors = sorted(opinion_contributors, key=lambda c: -c.weight)
     product_name = representative_product_name(posts)
     product_key = f"{posts[0].brand}:{normalize_product(posts[0].brand, product_name)}"
     review_excerpt = _load_review_excerpt_overrides().get(product_key) or _review_excerpt(posts)
@@ -233,9 +283,13 @@ def score_product(posts: list[Post], profiles: dict[str, AccountProfile]) -> Pro
     )
 
 
-def score_all(posts: list[Post], profiles: dict[str, AccountProfile]) -> list[ProductReport]:
-    """計算所有商品報告並排序。"""
-    reports = [score_product(group, profiles) for group in group_products(posts).values()]
+def score_all(
+    posts: list[Post],
+    profiles: dict[str, AccountProfile],
+    now: datetime | None = None,
+) -> list[ProductReport]:
+    """計算所有商品報告並排序。``now`` is the as-of instant for time decay."""
+    reports = [score_product(group, profiles, now) for group in group_products(posts).values()]
     reports.sort(
         key=lambda report: (
             report.fair_score is None,

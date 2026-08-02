@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_OVERRIDES_PATH = "data/labels/sentiment_overrides.csv"
 SUPPLEMENTAL_OVERRIDES_PATH = "data/labels/sentiment_corrections.csv"
 FINGERPRINT_LABELS_PATH = "data/labels/sentiment_fingerprint_labels.csv"
+SENTIMENT_PROMPT_VERSION = "sentiment-v1"
 
 POSITIVE_WORDS = {
     "好吃": 1.0,
@@ -289,31 +290,98 @@ def sentiment_fingerprint(source_id: str, tag: str, text: str) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def sentiment_fingerprint_v2(
+    source_id: str,
+    tag: str,
+    text: str,
+    *,
+    brand: str = "",
+    product_name: str = "",
+    post_title: str = "",
+    prompt_version: str = SENTIMENT_PROMPT_VERSION,
+) -> str:
+    """Fingerprint a comment over everything the labeller actually reads.
+
+    The exporter shows the labeller the brand, product name and post title so it
+    can judge relevance ("好油" is praise for a fried snack and a complaint about
+    a coffee). Those fields steer the answer but were absent from
+    :func:`sentiment_fingerprint`, so a retitled or re-split post silently kept a
+    label decided under different context. The prompt version is included as well,
+    so rewriting the rubric retires the answers it produced instead of leaving
+    them valid forever.
+    """
+    payload = "\x1f".join(
+        (
+            unicodedata.normalize("NFKC", str(source_id or "")).strip(),
+            unicodedata.normalize("NFKC", str(tag or "")).strip(),
+            _normalize_override_text(text),
+            unicodedata.normalize("NFKC", str(brand or "")).strip(),
+            _normalize_override_text(product_name),
+            _normalize_override_text(post_title),
+            str(prompt_version or ""),
+        )
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def comment_fingerprint(post: Post, comment: Comment) -> str:
-    """Fingerprint a parsed comment without storing its account name."""
+    """Fingerprint a parsed comment without storing its account name (legacy key)."""
     return sentiment_fingerprint(post.url or post.id, comment.tag, comment.text)
 
 
+def comment_fingerprint_v2(post: Post, comment: Comment) -> str:
+    """Context-complete fingerprint for one parsed comment."""
+    return sentiment_fingerprint_v2(
+        post.url or post.id,
+        comment.tag,
+        comment.text,
+        brand=post.brand,
+        product_name=post.product_name,
+        post_title=post.title,
+    )
+
+
+def comment_fingerprints(post: Post, comment: Comment) -> tuple[str, str]:
+    """Return (current, legacy) keys for one comment, newest scheme first.
+
+    Both are consulted so the labels collected under the old key keep working
+    while new rows are written under the complete one. Retiring the legacy key
+    means re-labelling the rows that still answer to it.
+    """
+    return comment_fingerprint_v2(post, comment), comment_fingerprint(post, comment)
+
+
+def _load_text_scores(path: str | Path) -> dict[str, float]:
+    """Read one text-keyed score CSV into {normalized text -> score}."""
+    scores: dict[str, float] = {}
+    file_path = Path(path)
+    if not file_path.exists():
+        return scores
+    with open(file_path, encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            key = _normalize_override_text(row.get("留言內容", ""))
+            if not key:
+                continue
+            try:
+                scores[key] = clamp(float(row.get("llm分數", "")))
+            except (TypeError, ValueError):
+                continue
+    return scores
+
+
 def load_sentiment_overrides(path: str | Path = DEFAULT_OVERRIDES_PATH) -> dict[str, float]:
-    """載入人工/LLM 覆寫的留言情感分數（文字 -> 分數）。檔案不存在時回傳空字典。"""
-    overrides: dict[str, float] = {}
-    paths = [Path(path)]
-    supplemental = Path(SUPPLEMENTAL_OVERRIDES_PATH)
-    if supplemental != paths[0]:
-        paths.append(supplemental)
-    for file_path in paths:
-        if not file_path.exists():
-            continue
-        with open(file_path, encoding="utf-8-sig", newline="") as f:
-            for row in csv.DictReader(f):
-                key = _normalize_override_text(row.get("留言內容", ""))
-                if not key:
-                    continue
-                try:
-                    overrides[key] = clamp(float(row.get("llm分數", "")))
-                except (TypeError, ValueError):
-                    continue
-    return overrides
+    """載入 legacy 文字標籤（文字 -> 分數）。
+
+    這批標籤沒有 is_relevant，也不帶文章脈絡，因此只作為「沒有 fingerprint
+    標籤時」的 fallback，不再具有最終權威。人工校正請見
+    :func:`load_sentiment_corrections`。
+    """
+    return _load_text_scores(path)
+
+
+def load_sentiment_corrections(path: str | Path = SUPPLEMENTAL_OVERRIDES_PATH) -> dict[str, float]:
+    """載入人工審過的校正（文字 -> 分數）。這批仍是最終權威。"""
+    return _load_text_scores(path)
 
 
 def load_fingerprint_labels(
@@ -346,26 +414,41 @@ def apply_sentiment_overrides(
     posts: list[Post],
     overrides: dict[str, float] | None = None,
     fingerprint_labels: dict[str, tuple[float | None, bool]] | None = None,
+    corrections: dict[str, float] | None = None,
 ) -> list[Post]:
-    """Apply context-specific LLM labels, then legacy/manual text overrides."""
+    """Apply contextual LLM labels, falling back to legacy text labels.
+
+    Precedence, weakest first: rule backend -> legacy text label -> contextual
+    fingerprint label -> reviewed manual correction. Legacy text labels carry no
+    article context and no relevance judgement, so a fingerprint label for the
+    same comment always wins over them.
+    """
     if overrides is None:
         overrides = load_sentiment_overrides()
     if fingerprint_labels is None:
         fingerprint_labels = load_fingerprint_labels()
-    if not overrides and not fingerprint_labels:
+    if corrections is None:
+        corrections = load_sentiment_corrections()
+    if not overrides and not fingerprint_labels and not corrections:
         return posts
     for post in posts:
         for comment in post.comments:
-            fingerprint = comment_fingerprint(post, comment)
-            if fingerprint in fingerprint_labels:
-                score, is_relevant = fingerprint_labels[fingerprint]
+            key = _normalize_override_text(comment.text)
+            labelled = next(
+                (fp for fp in comment_fingerprints(post, comment) if fp in fingerprint_labels),
+                None,
+            )
+            if labelled is not None:
+                score, is_relevant = fingerprint_labels[labelled]
                 comment.sentiment = round(score, 4) if is_relevant and score is not None else None
                 comment.backend = "llm-backfill"
-
-            # Text corrections remain the final authority for reviewed edge cases.
-            key = _normalize_override_text(comment.text)
-            if key in overrides:
+            elif key in overrides:
                 comment.sentiment = round(overrides[key], 4)
+                comment.backend = "codex-legacy"
+
+            # Reviewed corrections remain the final authority for edge cases.
+            if key in corrections:
+                comment.sentiment = round(corrections[key], 4)
                 comment.backend = "codex"
     return posts
 

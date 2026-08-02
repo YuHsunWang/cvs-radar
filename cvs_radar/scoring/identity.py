@@ -14,7 +14,12 @@ from ..config import (
 )
 from ..models import Comment, Post
 from ..parser import _title_product_name
-from ..product_labels import load_product_name_labels, product_name_fingerprint
+from ..product_labels import (
+    format_rule_guess,
+    load_product_name_labels,
+    product_name_fingerprint,
+    product_name_fingerprint_v2,
+)
 
 from ._common import (unwrap_name_brackets, _NAME_SEPARATOR_RE, _PURCHASE_CONDITION_RE, _GIVEAWAY_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
 
@@ -65,13 +70,20 @@ def extract_products_and_prices(
     fallback for fields that have not been labelled yet, so a fresh crawl still
     produces something without waiting on a labelling run.
     """
-    labelled = _cached_product_name_labels().get(
-        product_name_fingerprint(brand, title, raw_name)
+    rule_items = extract_products_and_prices_by_rules(raw_name, brand)
+    labels = _cached_product_name_labels()
+    # The current key covers the rule guess the labeller was shown; the legacy key
+    # is still consulted so labels collected before that fix keep applying.
+    current = product_name_fingerprint_v2(
+        brand, title, raw_name, rule_guess=format_rule_guess(rule_items)
     )
+    labelled = labels.get(current)
+    if labelled is None:
+        labelled = labels.get(product_name_fingerprint(brand, title, raw_name))
     if labelled is not None:
-        return _fill_missing_price_from_rules(list(labelled), raw_name, brand)
+        return _fill_missing_price_from_rules(list(labelled), rule_items)
 
-    return extract_products_and_prices_by_rules(raw_name, brand)
+    return rule_items
 
 
 def extract_products_and_prices_by_rules(
@@ -84,7 +96,7 @@ def extract_products_and_prices_by_rules(
 
 
 def _fill_missing_price_from_rules(
-    items: list[tuple[str, int | None]], raw_name: str, brand: str
+    items: list[tuple[str, int | None]], rule_items: list[tuple[str, int | None]]
 ) -> list[tuple[str, int | None]]:
     """Let the rules supply a price the labeller left blank.
 
@@ -95,7 +107,6 @@ def _fill_missing_price_from_rules(
     """
     if len(items) != 1 or items[0][1] is not None:
         return items
-    rule_items = extract_products_and_prices_by_rules(raw_name, brand)
     if len(rule_items) != 1 or rule_items[0][1] is None:
         return items
     return [(items[0][0], rule_items[0][1])]

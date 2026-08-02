@@ -71,6 +71,39 @@ def product_name_fingerprint(brand: str, title: str, raw_name: str) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def product_name_fingerprint_v2(
+    brand: str,
+    title: str,
+    raw_name: str,
+    *,
+    rule_guess: str = "",
+    prompt_version: str = PROMPT_VERSION,
+) -> str:
+    """Fingerprint a raw 商品名稱 field over everything the labeller is shown.
+
+    The exported row carries the rule engine's guess, and the labeller reads it —
+    so a change to the extraction rules changes the question without changing the
+    old key, leaving an answer that was given about a different guess. The prompt
+    version is included for the same reason: a rewritten rubric must retire the
+    answers produced under the old one.
+    """
+    payload = "\x1f".join(
+        (
+            unicodedata.normalize("NFKC", str(brand or "")).strip(),
+            _normalize_raw_name(title),
+            _normalize_raw_name(raw_name),
+            _normalize_raw_name(rule_guess),
+            str(prompt_version or ""),
+        )
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def format_rule_guess(items: list[tuple[str, int | None]]) -> str:
+    """Render a rule-engine result the way the exported row shows it."""
+    return " | ".join(f"{name}#{price if price is not None else ''}" for name, price in items)
+
+
 def load_product_name_labels(
     path: str | Path = PRODUCT_NAME_LABELS_PATH,
 ) -> dict[str, list[tuple[str, int | None]]]:

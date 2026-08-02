@@ -24,13 +24,19 @@ bash "$HERE/rebackfill.sh"
 rc=$?
 
 if [ "$rc" -eq 0 ]; then
-  # exit 0 covers both "labeled+pushed" and "nothing new to label" — both healthy.
-  mkdir -p "$(dirname "$LAST_SUCCESS_FILE")"
-  date -u +%FT%TZ > "$LAST_SUCCESS_FILE"
-  # Verify the published data actually meets the freshness SLO. A non-zero exit
-  # here (or a webhook when CVS_FRESHNESS_WEBHOOK is set) is the alert signal.
-  python3 "$REPO/scripts/check_data_freshness.py" || \
-    echo "[cron] WARNING: freshness check reported the published data is stale" >&2
+  # Freshness decides whether this run counts as a success. A pipeline that exits 0
+  # while the published data is stale is precisely the failure an exit-status monitor
+  # exists to catch, so the check runs before the marker is written and its exit code
+  # is kept instead of being downgraded to a warning.
+  python3 "$REPO/scripts/check_data_freshness.py"
+  fresh_rc=$?
+  if [ "$fresh_rc" -eq 0 ]; then
+    mkdir -p "$(dirname "$LAST_SUCCESS_FILE")"
+    date -u +%FT%TZ > "$LAST_SUCCESS_FILE"
+  else
+    echo "[cron] FAILED: published data did not meet the freshness SLO" >&2
+    rc="$fresh_rc"
+  fi
 fi
 
 echo "========== $(date -u +%FT%TZ) cvs-rebackfill cron end (exit $rc) =========="

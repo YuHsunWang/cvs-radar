@@ -15,8 +15,10 @@ if str(ROOT) not in sys.path:
 from cvs_radar.product_labels import (  # noqa: E402
     PRODUCT_NAME_LABELS_PATH,
     PROMPT_VERSION,
+    format_rule_guess,
     load_product_name_labels,
     product_name_fingerprint,
+    product_name_fingerprint_v2,
 )
 from cvs_radar.store import load_posts  # noqa: E402
 
@@ -46,9 +48,10 @@ def export_unlabeled_product_names(
     labelled = load_product_name_labels(labels_path)
     posts = load_posts(str(posts_path))
 
-    # Import lazily: the rule engine reads the label cache, and we only need its
-    # guess as a reviewing aid in the exported file.
-    from cvs_radar.scoring import extract_products_and_prices
+    # Import lazily: the rule engine reads the label cache. Use the rule-only entry
+    # point so the guess shown to the labeller — and hashed into the key — depends
+    # on the rules alone and stays recomputable from the exported row.
+    from cvs_radar.scoring import extract_products_and_prices_by_rules
 
     seen: set[str] = set()
     rows: list[dict[str, str]] = []
@@ -56,11 +59,16 @@ def export_unlabeled_product_names(
         raw_name = post.product_name or ""
         if not raw_name.strip():
             continue
-        fingerprint = product_name_fingerprint(post.brand, post.title, raw_name)
-        if fingerprint in labelled or fingerprint in seen:
+        rule_guess = format_rule_guess(
+            extract_products_and_prices_by_rules(raw_name, post.brand)
+        )
+        fingerprint = product_name_fingerprint_v2(
+            post.brand, post.title, raw_name, rule_guess=rule_guess
+        )
+        legacy = product_name_fingerprint(post.brand, post.title, raw_name)
+        if fingerprint in labelled or legacy in labelled or fingerprint in seen:
             continue
         seen.add(fingerprint)
-        guess = extract_products_and_prices(raw_name, post.brand, post.title)
         rows.append(
             {
                 "fingerprint": fingerprint,
@@ -68,9 +76,7 @@ def export_unlabeled_product_names(
                 "brand": post.brand,
                 "title": post.title,
                 "raw_name": raw_name,
-                "rule_guess": " | ".join(
-                    f"{name}#{price if price is not None else ''}" for name, price in guess
-                ),
+                "rule_guess": rule_guess,
                 "product_name": "",
                 "price": "",
                 "model": "",

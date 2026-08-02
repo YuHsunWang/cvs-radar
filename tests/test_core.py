@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import tempfile
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -27,7 +28,11 @@ from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
 from cvs_radar.excerpt_labels import excerpt_fingerprint, load_excerpt_labels
 from cvs_radar.comment_labels import CommentPicks, comment_picks_fingerprint, load_comment_picks
-from cvs_radar.product_labels import load_product_name_labels, product_name_fingerprint
+from cvs_radar.product_labels import (
+    load_product_name_labels,
+    product_name_fingerprint,
+    product_name_fingerprint_v2,
+)
 from cvs_radar.scoring import (
     _clean_extracted_product_name,
     _rep_candidates,
@@ -529,6 +534,105 @@ class ScoringTest(unittest.TestCase):
         commenters = [c for c in report.contributors if c.role == "commenter"]
         self.assertEqual({c.user for c in commenters}, {"spammer", "critic"})
         self.assertEqual(len(commenters), 2)
+
+    def test_capped_user_stance_respects_time_decay(self) -> None:
+        # One user pushing 200 days ago and complaining today must not net out to
+        # neutral: at lambda=0.005 the old push carries e^-1≈0.368 of the weight, so
+        # the stance has to land near 0.27, not the 0.5 an unweighted mean produces.
+        # Averaging the scores first is what silently switched the decay off.
+        as_of = datetime(2026, 8, 1, tzinfo=timezone.utc)
+        post = Post(
+            id="p1",
+            brand="7-11",
+            product_name="測試飯糰",
+            author="author",
+            author_score=None,
+            posted_at=as_of - timedelta(days=200),
+            comments=[
+                Comment("推", "u1", "好吃", sentiment=1.0,
+                        posted_at=as_of - timedelta(days=200)),
+                Comment("噓", "u1", "難吃", sentiment=-1.0, posted_at=as_of),
+            ],
+        )
+        from cvs_radar.scoring.compute import _opinion_pairs
+
+        pairs, contributors = _opinion_pairs([post], {}, as_of)
+        self.assertEqual(len(pairs), 1)
+        old_weight = math.exp(-0.005 * 200)
+        expected = old_weight / (1.0 + old_weight)
+        self.assertAlmostEqual(contributors[0].score, round(expected, 4), places=4)
+        # The unweighted mean these two comments used to produce:
+        self.assertNotAlmostEqual(contributors[0].score, 0.5, places=2)
+
+    def test_one_author_posting_repeatedly_gets_one_vote(self) -> None:
+        # per_user_cap is meant to stop one person outvoting a product, but it only
+        # ever applied to commenters: ten reviews by one account carried ten full
+        # votes and inflated n_eff with them, so a single enthusiast could hold a
+        # product at a high score and high confidence on their own.
+        as_of = datetime(2026, 8, 1, tzinfo=timezone.utc)
+        posts = [
+            Post(
+                id=f"p{i}",
+                brand="7-11",
+                product_name="測試飯糰",
+                author="fan",
+                author_score=100,
+                posted_at=as_of,
+            )
+            for i in range(10)
+        ]
+        posts.append(
+            Post(
+                id="p10",
+                brand="7-11",
+                product_name="測試飯糰",
+                author="other",
+                author_score=0,
+                posted_at=as_of,
+            )
+        )
+        reports, _ = run_pipeline(posts, now=as_of)
+        report = reports[0]
+        self.assertEqual(sorted(c.user for c in report.contributors), ["fan", "other"])
+        self.assertAlmostEqual(report.n_eff, 2.0, places=2)
+        # Two humans disagreeing completely sit at the prior, not near the fan's 100.
+        self.assertAlmostEqual(report.fair_score, 50.0, places=1)
+
+    def test_an_author_who_also_comments_is_still_one_person(self) -> None:
+        # The same account reviewing one thread and pushing another about the same
+        # product used to contribute an author vote and a commenter vote.
+        as_of = datetime(2026, 8, 1, tzinfo=timezone.utc)
+        posts = [
+            Post(id="p1", brand="7-11", product_name="測試飯糰", author="fan",
+                 author_score=100, posted_at=as_of),
+            Post(id="p2", brand="7-11", product_name="測試飯糰", author="other",
+                 author_score=None, posted_at=as_of,
+                 comments=[Comment("推", "fan", "好吃", posted_at=as_of)]),
+        ]
+        reports, _ = run_pipeline(posts, now=as_of)
+        self.assertEqual([c.user for c in reports[0].contributors], ["fan"])
+
+    def test_scores_are_reproducible_from_an_explicit_as_of_time(self) -> None:
+        # Reading the wall clock inside the decay means a rebuild of the same stored
+        # snapshot drifts as time passes, so a published score cannot be reproduced.
+        post = Post(
+            id="p1",
+            brand="7-11",
+            product_name="測試飯糰",
+            author="a1",
+            author_score=100,
+            posted_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+        )
+        early = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        later = early + timedelta(days=math.log(2) / 0.005)  # exactly one half-life
+
+        first, _ = run_pipeline([post], now=early)
+        again, _ = run_pipeline([post], now=early)
+        aged, _ = run_pipeline([post], now=later)
+
+        self.assertEqual(first[0].fair_score, again[0].fair_score)
+        self.assertAlmostEqual(first[0].fair_score, 75.0, places=1)
+        self.assertAlmostEqual(aged[0].fair_score, 66.7, places=1)
 
     def test_public_json_does_not_expose_contributors(self) -> None:
         post = Post(id="p1", brand="7-11", product_name="測試", author="u", author_score=80)
@@ -2187,6 +2291,33 @@ class ProductNameLabelCacheTest(unittest.TestCase):
             product_name_fingerprint("7-11", "[商品] 711 飛燕煉乳炸銀絲卷", "：49"),
             product_name_fingerprint("7-11", "[商品] 711 這不是滷肉飯", "：49"),
         )
+
+    def test_rule_guess_and_prompt_version_are_part_of_the_current_key(self) -> None:
+        # The exported row shows the labeller the rule engine's guess, so changing
+        # the rules changes the question. Leaving the guess out of the key keeps an
+        # answer that was given about a different guess.
+        base = ("7-11", "[商品] 7-11 炸銀絲卷", "：49")
+        digest = product_name_fingerprint_v2(*base, rule_guess="炸銀絲卷#49")
+        self.assertNotEqual(
+            product_name_fingerprint_v2(*base, rule_guess="飛燕煉乳炸銀絲卷#49"), digest
+        )
+        self.assertNotEqual(
+            product_name_fingerprint_v2(*base, rule_guess="炸銀絲卷#49", prompt_version="v2"),
+            digest,
+        )
+
+    def test_labels_stored_under_the_legacy_key_still_apply(self) -> None:
+        # Adding the rule guess to the key must not strand the 868 labels already
+        # collected, which would silently drop extraction back to the rule engine.
+        brand, title, raw = "全家", "[商品] 全家 甜點", "：韓式草莓大福"
+        legacy = product_name_fingerprint(brand, title, raw)
+        with patch(
+            "cvs_radar.scoring.identity._cached_product_name_labels",
+            return_value={legacy: [("韓式草莓大福", 55)]},
+        ):
+            self.assertEqual(
+                extract_products_and_prices(raw, brand, title), [("韓式草莓大福", 55)]
+            )
 
     def test_missing_cache_file_is_not_an_error(self) -> None:
         self.assertEqual(load_product_name_labels("data/labels/does-not-exist.csv"), {})

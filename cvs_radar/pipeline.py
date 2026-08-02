@@ -30,5 +30,8 @@ def run_pipeline(
     preprocessed = preprocess_posts(selected)
     annotated = apply_sentiment_overrides(annotate_posts(preprocessed))
     profiles = build_profiles(annotated)
-    reports = score_all(annotated, profiles)
+    # The same instant drives the time filter and the score decay, so re-running a
+    # pipeline with an explicit `now` reproduces its scores instead of drifting as
+    # the wall clock moves.
+    reports = score_all(annotated, profiles, now)
     return reports, profiles

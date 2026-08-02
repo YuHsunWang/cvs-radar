@@ -98,8 +98,16 @@ python3 scripts/export_llm_backfill.py --posts data/posts.jsonl \
         --out "$WORK/delta.csv" 2>&1 | tail -1 || die "export"
 N="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('$WORK/delta.csv',encoding='utf-8-sig'))))")"
 log "delta unlabeled comments: $N"
-[ "$N" -eq 0 ] && { log "nothing new to label — done."; exit 0; }
-
+# Only the sentiment layer can be empty here. The product-name, excerpt and
+# comment-pick layers can still have a delta (a new post with no comments produces
+# exactly that), and the recompute/publish steps must run either way or a crawled
+# post never reaches the site. So skip the sentiment steps, not the whole run.
+# The steps below are left unindented on purpose: they embed heredocs whose
+# terminators and Python bodies must stay at column 0.
+before=0; after=0
+if [ "$N" -eq 0 ]; then
+log "no new comments to label — skipping the sentiment layer only"
+else
 # --- 3. chunk ---
 python3 - "$WORK/delta.csv" "$WORK/chunks" "$CHUNK" <<'PY' || die "chunk"
 import csv,sys,os
@@ -224,6 +232,7 @@ python3 scripts/import_llm_backfill.py "$WORK/all_labeled.csv" \
         --labels data/labels/sentiment_fingerprint_labels.csv 2>&1 | tail -1 || die "import"
 after="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('data/labels/sentiment_fingerprint_labels.csv',encoding='utf-8-sig'))))")"
 rm -rf rebackfill_work
+fi
 # refresh the persistent seed so the next run continues from here
 cp data/posts.jsonl "$STORE_SEED" 2>/dev/null || true
 
