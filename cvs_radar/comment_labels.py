@@ -19,8 +19,11 @@ import csv
 import hashlib
 import re
 import unicodedata
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
+
+from .models import Post
 
 COMMENT_PICKS_PATH = "data/labels/comment_picks.csv"
 
@@ -70,6 +73,54 @@ def comment_picks_fingerprint(
         for candidates in (positive, negative, body)
     )
     payload = "\x1f".join((_normalize(brand), _normalize(product_name), lists))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def other_products_for_group(posts: Iterable[Post]) -> str:
+    """Render the thread-mates of a product group the way the exported row shows it.
+
+    Both the exporter and the scorer must derive this identically: it is part of the
+    key, so any disagreement would make every lookup miss.
+    """
+    mates: list[str] = []
+    for post in posts:
+        for name in post.sibling_products:
+            if name not in mates:
+                mates.append(name)
+    return " | ".join(mates)
+
+
+def comment_picks_fingerprint_v2(
+    brand: str,
+    product_name: str,
+    positive: list[str],
+    negative: list[str],
+    body: list[str],
+    *,
+    other_products: str = "",
+    prompt_version: str = PROMPT_VERSION,
+) -> str:
+    """Identify a candidate pool over everything the labeller is shown.
+
+    The picks are stored as candidate numbers, so the pool already had to be in the
+    key. The thread-mate list is what tells the labeller which candidates belong to a
+    sibling product; when re-parsing changes it the question changes, and the stored
+    numbers would otherwise keep pointing at a selection made under different
+    exclusions.
+    """
+    lists = "\x1d".join(
+        "\x1e".join(_normalize(item) for item in candidates)
+        for candidates in (positive, negative, body)
+    )
+    payload = "\x1f".join(
+        (
+            _normalize(brand),
+            _normalize(product_name),
+            lists,
+            _normalize(other_products),
+            str(prompt_version or ""),
+        )
+    )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 

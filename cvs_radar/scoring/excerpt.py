@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from __future__ import annotations
 import csv
 import re
 import unicodedata
@@ -12,8 +11,19 @@ from pathlib import Path
 from ..config import (
     BRANDS,
 )
-from ..comment_labels import CommentPicks, comment_picks_fingerprint, load_comment_picks
-from ..excerpt_labels import excerpt_fingerprint, load_excerpt_labels
+from ..comment_labels import (
+    CommentPicks,
+    comment_picks_fingerprint,
+    comment_picks_fingerprint_v2,
+    load_comment_picks,
+    other_products_for_group,
+)
+from ..excerpt_labels import (
+    excerpt_fingerprint,
+    excerpt_fingerprint_v2,
+    format_other_products,
+    load_excerpt_labels,
+)
 from ..models import Post
 from ..sentiment import NEGATIVE_WORDS, POSITIVE_WORDS
 
@@ -82,9 +92,22 @@ def _labelled_excerpt(posts: list[Post], max_len: int) -> str | None:
     chosen: list[str] = []
     seen_any = False
     for post in ordered:
+        # The current key covers the sibling products the labeller was told to keep
+        # out of this excerpt; the legacy key is still consulted so excerpts chosen
+        # before that fix keep applying.
         label = labels.get(
-            excerpt_fingerprint(post.id, post.product_name, post.review_text or "")
+            excerpt_fingerprint_v2(
+                post.id,
+                post.product_name,
+                post.review_text or "",
+                brand=post.brand,
+                other_products=format_other_products(post.sibling_products),
+            )
         )
+        if label is None:
+            label = labels.get(
+                excerpt_fingerprint(post.id, post.product_name, post.review_text or "")
+            )
         if label is None:
             continue
         seen_any = True
@@ -544,14 +567,25 @@ def _rep_comments(
 ) -> tuple[list[str], list[str]]:
     positive, negative = _rep_candidates(posts)
     body = _body_candidates(posts)
-    fingerprint = comment_picks_fingerprint(
-        posts[0].brand if posts else "",
-        representative_product_name(posts),
-        positive,
-        negative,
-        body,
+    brand = posts[0].brand if posts else ""
+    product_name = representative_product_name(posts)
+    # The current key covers the thread-mates the labeller was told to exclude; the
+    # legacy key is still consulted so picks made before that fix keep applying.
+    cache = _cached_comment_picks()
+    picks = cache.get(
+        comment_picks_fingerprint_v2(
+            brand,
+            product_name,
+            positive,
+            negative,
+            body,
+            other_products=other_products_for_group(posts),
+        )
     )
-    picks = _cached_comment_picks().get(fingerprint)
+    if picks is None:
+        picks = cache.get(
+            comment_picks_fingerprint(brand, product_name, positive, negative, body)
+        )
     if picks is None:
         rep_positive = _picked_sentences(positive, tuple(range(k)), excerpt=excerpt, exclude=[])
         rep_negative = _picked_sentences(

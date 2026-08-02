@@ -26,8 +26,17 @@ from cvs_radar.parser import (
 )
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
-from cvs_radar.excerpt_labels import excerpt_fingerprint, load_excerpt_labels
-from cvs_radar.comment_labels import CommentPicks, comment_picks_fingerprint, load_comment_picks
+from cvs_radar.excerpt_labels import (
+    excerpt_fingerprint,
+    excerpt_fingerprint_v2,
+    load_excerpt_labels,
+)
+from cvs_radar.comment_labels import (
+    CommentPicks,
+    comment_picks_fingerprint,
+    comment_picks_fingerprint_v2,
+    load_comment_picks,
+)
 from cvs_radar.product_labels import (
     load_product_name_labels,
     product_name_fingerprint,
@@ -2359,8 +2368,65 @@ class ExcerptLabelCacheTest(unittest.TestCase):
         self.assertIn(digest, labels)
         self.assertEqual(labels[digest], "")
 
+    def test_sibling_products_are_part_of_the_current_key(self) -> None:
+        # Every split item keeps the whole review_text, so the sibling list is the
+        # only thing keeping a thread-mate's sentences out of this excerpt. If
+        # re-parsing changes that list, the old answer was chosen while excluding
+        # something else and must not be reused.
+        review = "涼麵吃起來很清爽。雪糕則是單純的鹹。"
+        digest = excerpt_fingerprint_v2(
+            "M.2", "白醋涼麵", review, brand="全家", other_products="鹹雪糕"
+        )
+        self.assertNotEqual(
+            excerpt_fingerprint_v2(
+                "M.2", "白醋涼麵", review, brand="全家", other_products="鹹雪糕 | 芋泥球"
+            ),
+            digest,
+        )
+        self.assertNotEqual(
+            excerpt_fingerprint_v2(
+                "M.2", "白醋涼麵", review, brand="7-11", other_products="鹹雪糕"
+            ),
+            digest,
+        )
+        self.assertNotEqual(
+            excerpt_fingerprint_v2(
+                "M.2", "白醋涼麵", review, brand="全家", other_products="鹹雪糕",
+                prompt_version="excerpt-v2",
+            ),
+            digest,
+        )
+
     def test_missing_cache_file_is_not_an_error(self) -> None:
         self.assertEqual(load_excerpt_labels("data/labels/does-not-exist.csv"), {})
+
+
+class SiblingProductTest(unittest.TestCase):
+    """Splitting a thread must record which products the split items share it with."""
+
+    def test_split_items_know_their_thread_mates(self) -> None:
+        # Anything that picks sentences out of the shared review_text needs this to
+        # exclude the other product's sentences, and any label keyed on that choice
+        # has to change when the list changes.
+        post = Post(
+            id="p1",
+            brand="全家",
+            title="[商品] 全家 白醋涼麵/鹹雪糕",
+            product_name="白醋涼麵55/鹹雪糕45",
+            author="a1",
+            author_score=80,
+            review_text="涼麵吃起來很清爽。雪糕則是單純的鹹。",
+        )
+        items = preprocess_posts([post])
+        self.assertGreater(len(items), 1)
+        for item in items:
+            others = {other.product_name for other in items if other is not item}
+            self.assertEqual(set(item.sibling_products), others)
+            self.assertNotIn(item.product_name, item.sibling_products)
+
+    def test_single_product_post_has_no_thread_mates(self) -> None:
+        post = Post(id="p1", brand="7-11", product_name="測試飯糰", author="a1", author_score=80)
+        self.assertEqual(preprocess_posts([post])[0].sibling_products, ())
 
 
 class CommentPickCacheTest(unittest.TestCase):
@@ -2493,6 +2559,23 @@ class CommentPickCacheTest(unittest.TestCase):
         )
 
         self.assertNotEqual(original, changed)
+
+    def test_thread_mates_are_part_of_the_current_key(self) -> None:
+        # Picks are stored as candidate numbers, and the thread-mate list is what
+        # tells the labeller which candidates belong to a sibling product. If that
+        # list changes, the stored numbers point at a selection made under different
+        # exclusions.
+        args = ("7-11", "草莓蛋糕", ["外皮很脆"], ["價格太貴"], ["奶味濃"])
+        digest = comment_picks_fingerprint_v2(*args, other_products="巧克力可頌")
+        self.assertNotEqual(
+            comment_picks_fingerprint_v2(*args, other_products="巧克力可頌 | 芋泥球"), digest
+        )
+        self.assertNotEqual(
+            comment_picks_fingerprint_v2(
+                *args, other_products="巧克力可頌", prompt_version="comment-picks-v2"
+            ),
+            digest,
+        )
 
     def test_blank_cells_are_kept_as_a_verdict(self) -> None:
         digest = comment_picks_fingerprint("7-11", "草莓蛋糕", ["外皮很脆"], [], [])

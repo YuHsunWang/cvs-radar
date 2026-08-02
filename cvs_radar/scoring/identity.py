@@ -811,6 +811,7 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
                 push_count=post.push_count,
                 comments=comments,
                 raw=post.raw,
+                sibling_products=tuple(other for other, _ in valid_items if other != name),
             )
             result.append(new_post)
     return result

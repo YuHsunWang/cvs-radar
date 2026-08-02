@@ -16,6 +16,8 @@ from cvs_radar.excerpt_labels import (  # noqa: E402
     EXCERPT_LABELS_PATH,
     PROMPT_VERSION,
     excerpt_fingerprint,
+    excerpt_fingerprint_v2,
+    format_other_products,
     load_excerpt_labels,
 )
 from cvs_radar.store import load_posts  # noqa: E402
@@ -45,13 +47,23 @@ def export_unlabeled_excerpts(posts_path: Path, out_path: Path, labels_path: Pat
     seen: set[str] = set()
     for post in load_posts(str(posts_path)):
         products = preprocess_posts([post])
-        names = [item.product_name for item in products]
         for item in products:
             review = item.review_text or ""
             if not review.strip():
                 continue
-            fingerprint = excerpt_fingerprint(item.id, item.product_name, review)
-            if fingerprint in labelled or fingerprint in seen:
+            # Naming the thread's other products is what lets the labeller keep their
+            # sentences out of this product's excerpt, so it belongs in the key that
+            # stores the answer.
+            other_products = format_other_products(item.sibling_products)
+            fingerprint = excerpt_fingerprint_v2(
+                item.id,
+                item.product_name,
+                review,
+                brand=item.brand,
+                other_products=other_products,
+            )
+            legacy = excerpt_fingerprint(item.id, item.product_name, review)
+            if fingerprint in labelled or legacy in labelled or fingerprint in seen:
                 continue
             seen.add(fingerprint)
             rows.append(
@@ -60,9 +72,7 @@ def export_unlabeled_excerpts(posts_path: Path, out_path: Path, labels_path: Pat
                     "post_id": item.id,
                     "brand": item.brand,
                     "product_name": item.product_name,
-                    # Naming the thread's other products is what lets the labeller
-                    # keep their sentences out of this product's excerpt.
-                    "other_products": " | ".join(n for n in names if n != item.product_name),
+                    "other_products": other_products,
                     "review_text": review,
                     "excerpt": "",
                     "model": "",

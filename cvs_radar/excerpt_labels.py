@@ -20,6 +20,7 @@ import csv
 import hashlib
 import re
 import unicodedata
+from collections.abc import Iterable
 from pathlib import Path
 
 EXCERPT_LABELS_PATH = "data/labels/excerpt_labels.csv"
@@ -55,6 +56,41 @@ def excerpt_fingerprint(post_id: str, product_name: str, review_text: str) -> st
             _normalize(post_id),
             _normalize(product_name),
             _normalize(review_text),
+        )
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def format_other_products(names: Iterable[str]) -> str:
+    """Render a sibling-product list the way the exported row shows it."""
+    return " | ".join(names)
+
+
+def excerpt_fingerprint_v2(
+    post_id: str,
+    product_name: str,
+    review_text: str,
+    *,
+    brand: str = "",
+    other_products: str = "",
+    prompt_version: str = PROMPT_VERSION,
+) -> str:
+    """Identify one product's excerpt over everything the labeller is shown.
+
+    A split post keeps the whole review_text on every item, so the only thing
+    stopping a sibling's sentences from being quoted here is the list of other
+    products handed to the labeller. When re-parsing changes that list the question
+    changes, and the old key would otherwise keep an excerpt chosen while a
+    different sibling set was being excluded.
+    """
+    payload = "\x1f".join(
+        (
+            _normalize(post_id),
+            _normalize(product_name),
+            _normalize(review_text),
+            _normalize(brand),
+            _normalize(other_products),
+            str(prompt_version or ""),
         )
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()

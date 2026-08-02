@@ -39,6 +39,12 @@ class Post:
     push_count: int | None = None
     comments: list[Comment] = field(default_factory=list)
     raw: dict[str, Any] = field(default_factory=dict)
+    # The other products this thread also reviews, set by preprocess_posts when it
+    # splits a multi-product post. Every split item keeps the whole review_text, so
+    # anything that picks sentences out of it needs to know which products' sentences
+    # to leave alone — and any label keyed on that choice has to change when the
+    # sibling list changes. Not persisted: post_to_dict writes an explicit field list.
+    sibling_products: tuple[str, ...] = ()
 
 
 @dataclass(slots=True)

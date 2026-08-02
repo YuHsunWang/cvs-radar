@@ -16,7 +16,9 @@ from cvs_radar.comment_labels import (  # noqa: E402
     COMMENT_PICKS_PATH,
     PROMPT_VERSION,
     comment_picks_fingerprint,
+    comment_picks_fingerprint_v2,
     load_comment_picks,
+    other_products_for_group,
 )
 from cvs_radar.scoring import (  # noqa: E402
     _rep_candidates,
@@ -61,17 +63,6 @@ def export_unlabeled_comment_picks(
     labelled = load_comment_picks(labels_path)
     posts = apply_sentiment_overrides(annotate_posts(preprocess_posts(load_posts(str(posts_path)))))
 
-    # A thread reviewing several products is split into one item per product, but
-    # every split item keeps the whole post body. Naming the thread-mates is what
-    # lets the labeller keep their sentences out of this product's picks — the same
-    # column that fixed cross-product contamination in the excerpt labels.
-    thread_products: dict[str, list[str]] = {}
-    for post in posts:
-        base_id = post.id.split("_", 1)[0]
-        names = thread_products.setdefault(base_id, [])
-        if post.product_name not in names:
-            names.append(post.product_name)
-
     rows: list[dict[str, str]] = []
     seen: set[str] = set()
     for group in group_products(posts).values():
@@ -81,21 +72,23 @@ def export_unlabeled_comment_picks(
             continue
         brand = group[0].brand
         product_name = representative_product_name(group)
-        fingerprint = comment_picks_fingerprint(brand, product_name, positive, negative, body)
-        if fingerprint in labelled or fingerprint in seen:
+        # Naming the thread-mates is what lets the labeller keep their sentences out
+        # of this product's picks — the same column that fixed cross-product
+        # contamination in the excerpt labels, so it belongs in the key too.
+        other_products = other_products_for_group(group)
+        fingerprint = comment_picks_fingerprint_v2(
+            brand, product_name, positive, negative, body, other_products=other_products
+        )
+        legacy = comment_picks_fingerprint(brand, product_name, positive, negative, body)
+        if fingerprint in labelled or legacy in labelled or fingerprint in seen:
             continue
         seen.add(fingerprint)
-        mates: list[str] = []
-        for post in group:
-            for name in thread_products.get(post.id.split("_", 1)[0], ()):
-                if name != post.product_name and name not in mates:
-                    mates.append(name)
         rows.append(
             {
                 "fingerprint": fingerprint,
                 "brand": brand,
                 "product_name": product_name,
-                "other_products": " | ".join(mates),
+                "other_products": other_products,
                 "positive_candidates": _numbered_candidates(positive),
                 "negative_candidates": _numbered_candidates(negative),
                 "body_candidates": _numbered_candidates(body),
