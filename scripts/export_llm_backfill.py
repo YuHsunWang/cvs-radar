@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import json
 import sys
 from pathlib import Path
 
@@ -22,6 +21,7 @@ from cvs_radar.sentiment import (  # noqa: E402
     sentiment_fingerprint,
     sentiment_fingerprint_v2,
 )
+from cvs_radar.store import load_posts  # noqa: E402
 
 DEFAULT_POSTS_PATH = ROOT / "data" / "posts.jsonl"
 DEFAULT_OUT_PATH = ROOT / "artifacts" / "unlabeled-comments.csv"
@@ -63,20 +63,21 @@ def export_unlabeled_comments(
 
     rows: list[dict[str, str]] = []
     seen: set[str] = set()
-    for raw_line in posts_path.read_text(encoding="utf-8").splitlines():
-        if not raw_line.strip():
-            continue
-        post = json.loads(raw_line)
-        source_id = str(post.get("url") or post.get("id") or "")
-        for comment in post.get("comments") or []:
-            text = str(comment.get("text") or "").strip()
+    # Read through the canonical loader, not a second JSON parse. Parsing the file
+    # here produced "" where load_posts fills a default (a post with no 商品名稱 field
+    # gets brand "其他"), so the exporter hashed a context string the scorer never
+    # reconstructs and 229 labels were stranded on keys nothing looks up.
+    for post in load_posts(str(posts_path)):
+        source_id = post.url or post.id
+        for comment in post.comments:
+            text = comment.text.strip()
             normalized = _normalize_override_text(text)
             if not normalized or normalized in known_texts:
                 continue
-            tag = str(comment.get("tag") or "")
-            brand = str(post.get("brand") or "")
-            product_name = str(post.get("product_name") or "")
-            post_title = str(post.get("title") or "")
+            tag = comment.tag
+            brand = post.brand
+            product_name = post.product_name
+            post_title = post.title
             fingerprint = sentiment_fingerprint_v2(
                 source_id,
                 tag,

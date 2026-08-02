@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from __future__ import annotations
 import re
 import unicodedata
 from collections import defaultdict
@@ -716,6 +715,11 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
     """Split multi-product posts and extract prices."""
     result: list[Post] = []
     for post in posts:
+        # Remember the field as crawled before anything rewrites it: the sentiment
+        # label cache is keyed on what the labeller was shown, and the labeller reads
+        # raw JSONL.
+        if not post.source_product_name:
+            post.source_product_name = post.product_name
         extraction_name = (
             _reply_product_extraction_text(post.product_name)
             if post.is_reply
@@ -812,6 +816,7 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
                 comments=comments,
                 raw=post.raw,
                 sibling_products=tuple(other for other, _ in valid_items if other != name),
+                source_product_name=post.source_product_name or post.product_name,
             )
             result.append(new_post)
     return result
@@ -830,6 +835,7 @@ def _strip_product_name_promo_suffix(name: str) -> str:
 
 def _replace_post_product(post: Post, name: str, price: int | None) -> Post:
     return Post(
+        source_product_name=post.source_product_name or post.product_name,
         id=post.id,
         source=post.source,
         board=post.board,

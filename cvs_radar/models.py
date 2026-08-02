@@ -45,6 +45,12 @@ class Post:
     # to leave alone — and any label keyed on that choice has to change when the
     # sibling list changes. Not persisted: post_to_dict writes an explicit field list.
     sibling_products: tuple[str, ...] = ()
+    # The 商品名稱 field exactly as crawled, before preprocess_posts cleaned or split
+    # it. The sentiment exporter reads raw JSONL and shows the labeller this string,
+    # so the key that stores the answer has to be computable from it at scoring time
+    # too — by then product_name has been rewritten for 990 of 991 items. Not
+    # persisted: post_to_dict writes an explicit field list.
+    source_product_name: str = ""
 
 
 @dataclass(slots=True)

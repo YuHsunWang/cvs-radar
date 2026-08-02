@@ -330,13 +330,21 @@ def comment_fingerprint(post: Post, comment: Comment) -> str:
 
 
 def comment_fingerprint_v2(post: Post, comment: Comment) -> str:
-    """Context-complete fingerprint for one parsed comment."""
+    """Context-complete fingerprint for one parsed comment.
+
+    Uses the 商品名稱 field as crawled, not the cleaned/split name. The exporter reads
+    raw JSONL and shows the labeller that raw string, and a key must be computable
+    from what the labeller saw — by scoring time preprocess_posts has rewritten
+    product_name for all but a handful of items, so hashing the rewritten value here
+    would miss every label the exporter wrote. Keeping the raw field also stops a
+    product-name relabel from invalidating unrelated sentiment answers.
+    """
     return sentiment_fingerprint_v2(
         post.url or post.id,
         comment.tag,
         comment.text,
         brand=post.brand,
-        product_name=post.product_name,
+        product_name=post.source_product_name or post.product_name,
         post_title=post.title,
     )
 
