@@ -246,7 +246,13 @@ def test_legacy_relabel_merge_rejects_runtime_normalized_score_collision(
     assert cache.read_bytes() == before
 
 
-def test_sentiment_migration_preserves_last_row_runtime_winner(tmp_path: Path) -> None:
+def test_sentiment_migration_takes_the_majority_not_the_last_row(tmp_path: Path) -> None:
+    """Collapsing punctuation variants must not hand the key to whichever row is last.
+
+    Runtime strips trailing punctuation, so these three rows are one key. Last-row-
+    wins is import order, not a judgement: it scored 「好吃」 — the most common comment
+    in the cache — at 0.6 while two rows agreed on 0.8.
+    """
     cache = tmp_path / "sentiment_overrides.csv"
     _write_csv(
         cache,
@@ -260,6 +266,47 @@ def test_sentiment_migration_preserves_last_row_runtime_winner(tmp_path: Path) -
 
     rows, collisions, conflicts = analyze_sentiment_migration(cache)
 
-    assert rows == [("好吃", "0.6", "正向")]
+    assert rows == [("好吃", "0.8", "正向")]
     assert collisions == 2
     assert conflicts == 1
+
+
+def test_sentiment_migration_breaks_a_tie_on_the_unpunctuated_form(tmp_path: Path) -> None:
+    """With no majority, the form the key actually represents wins.
+
+    Six of the eight real conflicts are two-row ties, so the tie-break decides most
+    of them; falling back to file order would reintroduce the arbitrariness.
+    """
+    cache = tmp_path / "sentiment_overrides.csv"
+    _write_csv(
+        cache,
+        [
+            {"留言內容": "好貴!!", "llm分數": "-0.5", "llm判定": "負向"},
+            {"留言內容": "好貴", "llm分數": "-0.25", "llm判定": "負向"},
+        ],
+        ("留言內容", "llm分數", "llm判定"),
+    )
+
+    rows, _, conflicts = analyze_sentiment_migration(cache)
+
+    assert rows == [("好貴", "-0.25", "負向")]
+    assert conflicts == 1
+
+
+def test_sentiment_migration_keeps_original_row_order(tmp_path: Path) -> None:
+    """Sorting the file would bury the handful of real changes in 4,795 moved lines."""
+    cache = tmp_path / "sentiment_overrides.csv"
+    _write_csv(
+        cache,
+        [
+            {"留言內容": "很雷", "llm分數": "-0.8", "llm判定": "負向"},
+            {"留言內容": "好吃", "llm分數": "0.8", "llm判定": "正向"},
+            {"留言內容": "普通", "llm分數": "0.0", "llm判定": "中性"},
+        ],
+        ("留言內容", "llm分數", "llm判定"),
+    )
+
+    rows, collisions, conflicts = analyze_sentiment_migration(cache)
+
+    assert [row[0] for row in rows] == ["很雷", "好吃", "普通"]
+    assert (collisions, conflicts) == (0, 0)
