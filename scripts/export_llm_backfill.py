@@ -21,6 +21,7 @@ from cvs_radar.sentiment import (  # noqa: E402
     sentiment_fingerprint,
     sentiment_fingerprint_v2,
 )
+from cvs_radar.scoring import preprocess_posts  # noqa: E402
 from cvs_radar.store import load_posts  # noqa: E402
 
 DEFAULT_POSTS_PATH = ROOT / "data" / "posts.jsonl"
@@ -63,11 +64,15 @@ def export_unlabeled_comments(
 
     rows: list[dict[str, str]] = []
     seen: set[str] = set()
-    # Read through the canonical loader, not a second JSON parse. Parsing the file
-    # here produced "" where load_posts fills a default (a post with no 商品名稱 field
-    # gets brand "其他"), so the exporter hashed a context string the scorer never
-    # reconstructs and 229 labels were stranded on keys nothing looks up.
-    for post in load_posts(str(posts_path)):
+    # Export the same comment population the scorer can reach. Multi-product
+    # routing deliberately discards comments that cannot be assigned to exactly
+    # one product: one scalar sentiment cannot safely represent an unmatched
+    # opinion or a comparison that praises one item and criticizes another.
+    # Exporting those comments would pay for labels that scoring never looks up.
+    # Keep hashing/showing source_product_name, though, because that is the raw
+    # context the labeller sees and the scorer preserves for key reconstruction.
+    posts = preprocess_posts(load_posts(str(posts_path)))
+    for post in posts:
         source_id = post.url or post.id
         for comment in post.comments:
             text = comment.text.strip()
@@ -76,7 +81,7 @@ def export_unlabeled_comments(
                 continue
             tag = comment.tag
             brand = post.brand
-            product_name = post.product_name
+            product_name = post.source_product_name or post.product_name
             post_title = post.title
             fingerprint = sentiment_fingerprint_v2(
                 source_id,

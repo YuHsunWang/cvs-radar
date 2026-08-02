@@ -65,6 +65,47 @@ def test_export_only_writes_unlabeled_account_free_comments(tmp_path: Path) -> N
     assert "url" not in rows[0]
 
 
+def test_export_skips_comments_that_split_product_scoring_cannot_reach(
+    tmp_path: Path,
+) -> None:
+    """Do not buy labels for comments that cannot be assigned to one product.
+
+    If this regresses, every labelling run pays for ambiguous multi-product
+    comments whose labels the scorer discards before lookup.
+    """
+    posts_path = tmp_path / "posts.jsonl"
+    out_path = tmp_path / "unlabeled.csv"
+    post = {
+        "id": "M.export-split",
+        "url": "https://example.test/M.export-split",
+        "brand": "7-11",
+        "title": "[商品] 7-11 草莓大福與巧克力泡芙",
+        "product_name": "草莓大福55巧克力泡芙59",
+        "comments": [
+            {"tag": "推", "user": "u1", "text": "草莓大福好吃"},
+            {"tag": "推", "user": "u2", "text": "巧克力泡芙超讚"},
+            {"tag": "推", "user": "u3", "text": "兩個都好吃"},
+            {"tag": "推", "user": "u4", "text": "草莓大福比巧克力泡芙好吃"},
+        ],
+    }
+    posts_path.write_text(json.dumps(post, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    count = export_unlabeled_comments(
+        posts_path,
+        out_path,
+        known_texts=set(),
+        known_fingerprints=set(),
+    )
+
+    assert count == 2
+    with open(out_path, encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    assert [row["comment_text"] for row in rows] == ["草莓大福好吃", "巧克力泡芙超讚"]
+    # Fingerprints and labelling context must remain based on the raw field so
+    # preprocess-time splitting does not strand the two useful labels.
+    assert {row["product_name"] for row in rows} == {"草莓大福55巧克力泡芙59"}
+
+
 def test_import_validates_and_writes_privacy_safe_label_cache(tmp_path: Path) -> None:
     labeled_path = tmp_path / "labeled.csv"
     labels_path = tmp_path / "labels.csv"
