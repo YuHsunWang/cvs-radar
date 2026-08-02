@@ -3,12 +3,19 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from statistics import mean
 import unittest
+from unittest.mock import patch
 
 from cvs_radar.models import Comment, Post
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.preference import _burst_ratio, _template_like_ratio, build_profiles
 from cvs_radar.reporting import render_suspicion_detail
-from cvs_radar.scoring import _decay, _is_shill_comment, _shill_stats
+from cvs_radar.scoring import (
+    _decay,
+    _is_shill_comment,
+    _shill_stats,
+    build_comment_opinions,
+    score_product,
+)
 
 
 class SuspicionSignalTest(unittest.TestCase):
@@ -38,9 +45,70 @@ class SuspicionSignalTest(unittest.TestCase):
             ],
         )
 
-        profile = build_profiles([post])["u1"]
+        profile = build_profiles([post], build_comment_opinions([post]))["u1"]
 
         self.assertEqual(profile.suspicion_features["burst"], 0)
+
+    def test_profile_and_score_share_the_same_eligible_opinions(self) -> None:
+        posted_at = datetime(2026, 6, 10, 14, 0)
+        legitimate = Comment(
+            "推", "u1", "我吃過很好吃會回購", posted_at, 0.9, "fingerprint-cache"
+        )
+        noise = [
+            Comment(
+                "推",
+                "u1",
+                "謝謝分享",
+                posted_at + timedelta(minutes=index + 1),
+                0.9,
+                "fingerprint-cache",
+            )
+            for index in range(5)
+        ]
+        noisy_post = Post(
+            id="eligibility",
+            brand="全家",
+            product_name="草莓蛋糕",
+            author="author",
+            comments=[legitimate, *noise],
+        )
+        control_post = Post(
+            id="control",
+            brand="全家",
+            product_name="草莓蛋糕",
+            author="author",
+            comments=[legitimate],
+        )
+
+        noisy_opinions = build_comment_opinions([noisy_post])
+        noisy_profiles = build_profiles([noisy_post], noisy_opinions)
+        control_opinions = build_comment_opinions([control_post])
+        control_profiles = build_profiles([control_post], control_opinions)
+
+        self.assertEqual(noisy_profiles["u1"].total_comments, 1)
+        self.assertEqual(
+            noisy_profiles["u1"].credibility,
+            control_profiles["u1"].credibility,
+        )
+        self.assertEqual(
+            sum(opinion.include_score for opinion in noisy_opinions.values()),
+            1,
+        )
+        self.assertEqual(
+            score_product(
+                [noisy_post], noisy_profiles, posted_at, noisy_opinions
+            ).fair_score,
+            score_product(
+                [control_post], control_profiles, posted_at, control_opinions
+            ).fair_score,
+        )
+
+        report = score_product(
+            [noisy_post], noisy_profiles, posted_at, noisy_opinions
+        )
+        self.assertEqual(report.n_comments, 6)
+        self.assertEqual(report.n_eligible_comments, 1)
+        self.assertEqual(report.n_unique_commenters, 1)
 
     def test_template_like_ratio_detects_identical_text(self) -> None:
         texts = ["這款真的很好吃會回購"] * 3
@@ -185,8 +253,14 @@ class ShillDetectionTest(unittest.TestCase):
             )
         ]
         reports, _ = run_pipeline(shill_posts)
+        with patch(
+            "cvs_radar.scoring.compute._shill_stats", return_value=(0.0, False)
+        ):
+            control_reports, _ = run_pipeline(shill_posts)
+
         self.assertTrue(reports[0].shill_flag)
         self.assertGreater(reports[0].shill_ratio, 0.0)
+        self.assertLess(reports[0].fair_score, control_reports[0].fair_score)
 
     def test_shill_stats_ignores_too_few_comments(self) -> None:
         posts = [

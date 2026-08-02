@@ -7,6 +7,7 @@ import re
 import sys
 import tempfile
 from datetime import datetime, timedelta, timezone
+from math import sqrt
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -18,6 +19,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from cvs_radar.app_helpers import consensus_distribution, volume_label  # noqa: E402
+from cvs_radar.config import SCORING  # noqa: E402
+from cvs_radar.scoring.compute import _classify, _confidence  # noqa: E402
+from cvs_radar.scoring.identity import categorize_product  # noqa: E402
 from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
 from cvs_radar.store import load_results  # noqa: E402
 
@@ -135,6 +139,19 @@ def _unique_representatives(products: list[dict[str, Any]], field: str) -> list[
     return clean_representatives(list(representatives))
 
 
+def _percentages(weights: tuple[float, float, float]) -> tuple[int, int, int] | None:
+    total = sum(weights)
+    if total <= 0:
+        return None
+    raw = [weight / total * 100 for weight in weights]
+    values = [int(value) for value in raw]
+    for index in sorted(
+        range(3), key=lambda item: raw[item] - values[item], reverse=True
+    )[: 100 - sum(values)]:
+        values[index] += 1
+    return values[0], values[1], values[2]
+
+
 def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Merge products that canonicalize to the same final public ID."""
     grouped: dict[str, list[dict[str, Any]]] = {}
@@ -147,26 +164,78 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
         merged = dict(dominant)
 
         if len(members) > 1:
-            merged["nPosts"] = sum(item.get("nPosts", 0) for item in members)
-            merged["nComments"] = sum(item.get("nComments", 0) for item in members)
+            for field in (
+                "nPosts",
+                "nComments",
+                "rawComments",
+                "eligibleComments",
+                "uniqueEligibleCommenters",
+                "independentThreads",
+            ):
+                if any(field in item for item in members):
+                    merged[field] = sum(item.get(field, 0) for item in members)
 
-            scored = [
-                (item.get("_fairScoreRaw", item.get("fairScore")), _evidence(item))
-                for item in members
-                if item.get("_fairScoreRaw", item.get("fairScore")) is not None
-            ]
-            if scored:
-                total_weight = sum(weight for _, weight in scored)
+            weight_sum = sum(float(item.get("_scoreWeight") or 0) for item in members)
+            weighted_sum = sum(
+                float(item.get("_scoreWeightedSum") or 0) for item in members
+            )
+            weight_square_sum = sum(
+                float(item.get("_scoreWeightSquareSum") or 0) for item in members
+            )
+            if weight_sum > 0:
+                prior_strength = float(SCORING["prior_strength"])
+                prior_mean = float(SCORING["prior_mean"])
                 merged_fair_score = (
-                    sum(float(score) * weight for score, weight in scored) / total_weight
-                    if total_weight > 0
-                    else sum(float(score) for score, _ in scored) / len(scored)
+                    prior_strength * prior_mean + weighted_sum
+                ) / (prior_strength + weight_sum) * 100
+                mean01 = weighted_sum / weight_sum
+                second_moment = sum(
+                    float(item.get("_scoreWeight") or 0)
+                    * (
+                        float(item.get("_scoreStd") or 0) ** 2
+                        + float(item.get("_scoreMean") or 0) ** 2
+                    )
+                    for item in members
+                ) / weight_sum
+                std = sqrt(max(0.0, second_moment - mean01 * mean01))
+                n_eff = (
+                    weight_sum * weight_sum / weight_square_sum
+                    if weight_square_sum > 0
+                    else 0.0
                 )
                 merged["fairScore"] = round(merged_fair_score)
-                merged["recommendationScore"] = calibrate_recommendation_score(merged_fair_score)
+                merged["recommendationScore"] = calibrate_recommendation_score(
+                    merged_fair_score
+                )
+                merged["consensus"] = _classify(mean01, std, n_eff)
+                merged["confidence"] = _confidence(n_eff)
+                if merged["confidence"] == "低" or merged["consensus"] == "資料不足":
+                    distribution = None
+                else:
+                    distribution = _percentages(
+                        tuple(
+                            sum(float(item.get(field) or 0) for item in members)
+                            for field in (
+                                "_positiveWeight",
+                                "_neutralWeight",
+                                "_negativeWeight",
+                            )
+                        )
+                    )
+                if distribution is None:
+                    merged["positivePct"] = merged["neutralPct"] = merged["negativePct"] = None
+                else:
+                    (
+                        merged["positivePct"],
+                        merged["neutralPct"],
+                        merged["negativePct"],
+                    ) = distribution
             else:
                 merged["fairScore"] = None
                 merged["recommendationScore"] = None
+                merged["consensus"] = "資料不足"
+                merged["confidence"] = "低"
+                merged["positivePct"] = merged["neutralPct"] = merged["negativePct"] = None
 
             latest_dates = [item["latestDate"] for item in members if item.get("latestDate")]
             merged["latestDate"] = max(latest_dates) if latest_dates else None
@@ -175,9 +244,40 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 merged["firstDate"] = min(first_dates) if first_dates else None
             merged["likes"] = _unique_representatives(members, "likes")
             merged["cautions"] = _unique_representatives(members, "cautions")
+            merged["postUrls"] = sorted(
+                {url for item in members for url in item.get("postUrls", [])}
+            )
+            merged["category"] = categorize_product(merged["productName"])
+            newest = sorted(
+                members,
+                key=lambda item: (item.get("latestDate") or "", item.get("id") or ""),
+                reverse=True,
+            )
+            merged["price"] = next(
+                (item.get("price") for item in newest if item.get("price") is not None),
+                None,
+            )
+            merged["excerpt"] = next(
+                (item.get("excerpt", "") for item in newest if item.get("excerpt")),
+                "",
+            )
+            merged["volumeLevel"] = clean_volume_label(
+                volume_label(
+                    type(
+                        "MergedVolume",
+                        (),
+                        {
+                            "confidence": merged["confidence"],
+                            "consensus": merged["consensus"],
+                            "n_posts": merged["nPosts"],
+                        },
+                    )()
+                )
+            )
 
-        merged.pop("_nEff", None)
-        merged.pop("_fairScoreRaw", None)
+        for key in tuple(merged):
+            if key.startswith("_"):
+                merged.pop(key)
         merged_products.append(merged)
 
     return merged_products
@@ -234,7 +334,12 @@ def display_confidence(report: Any) -> str:
 def to_product(report: Any, recommendation_score: int | None = None) -> dict[str, Any]:
     distribution = None
     if report.confidence != "低" and report.consensus != "資料不足":
-        distribution = consensus_distribution(report)
+        aggregate_weights = (
+            getattr(report, "positive_weight", 0.0),
+            getattr(report, "neutral_weight", 0.0),
+            getattr(report, "negative_weight", 0.0),
+        )
+        distribution = _percentages(aggregate_weights) or consensus_distribution(report)
     if distribution is None:
         positive_pct = neutral_pct = negative_pct = None
     else:
@@ -257,7 +362,13 @@ def to_product(report: Any, recommendation_score: int | None = None) -> dict[str
         "consensus": report.consensus,
         "confidence": display_confidence(report),
         "nPosts": report.n_posts,
-        "nComments": report.n_comments,
+        "nComments": getattr(report, "n_unique_commenters", report.n_comments),
+        "rawComments": report.n_comments,
+        "eligibleComments": getattr(report, "n_eligible_comments", report.n_comments),
+        "uniqueEligibleCommenters": getattr(
+            report, "n_unique_commenters", report.n_comments
+        ),
+        "independentThreads": report.n_posts,
         "volumeLevel": clean_volume_label(volume_label(report)),
         "positivePct": positive_pct,
         "neutralPct": neutral_pct,
@@ -267,6 +378,14 @@ def to_product(report: Any, recommendation_score: int | None = None) -> dict[str
         "excerpt": report.review_excerpt or "",
         "postUrls": list(report.post_urls or []),
         "latestDate": latest_date,
+        "_scoreWeight": getattr(report, "score_weight_sum", 0.0),
+        "_scoreWeightedSum": getattr(report, "score_weighted_sum", 0.0),
+        "_scoreWeightSquareSum": getattr(report, "score_weight_square_sum", 0.0),
+        "_scoreMean": getattr(report, "score_mean", 0.0),
+        "_scoreStd": getattr(report, "score_std", 0.0),
+        "_positiveWeight": getattr(report, "positive_weight", 0.0),
+        "_neutralWeight": getattr(report, "neutral_weight", 0.0),
+        "_negativeWeight": getattr(report, "negative_weight", 0.0),
     }
 
 
@@ -281,7 +400,9 @@ def validate_payload(payload: dict[str, Any]) -> None:
 
     required_fields = {
         "id", "brand", "productName", "price", "category", "fairScore", "recommendationScore",
-        "consensus", "confidence", "nPosts", "nComments", "volumeLevel", "positivePct",
+        "consensus", "confidence", "nPosts", "nComments", "rawComments",
+        "eligibleComments", "uniqueEligibleCommenters", "independentThreads",
+        "volumeLevel", "positivePct",
         "neutralPct", "negativePct", "likes", "cautions", "excerpt", "postUrls", "latestDate",
     }
     for index, product in enumerate(payload["products"]):
@@ -289,7 +410,15 @@ def validate_payload(payload: dict[str, Any]) -> None:
             raise ValueError(f"public payload product {index} has an invalid shape")
         if not all(isinstance(product[key], str) for key in ("id", "brand", "productName", "category", "consensus", "confidence", "volumeLevel", "excerpt")):
             raise ValueError(f"public payload product {index} has invalid text fields")
-        if not all(isinstance(product[key], int) and product[key] >= 0 for key in ("nPosts", "nComments")):
+        count_fields = (
+            "nPosts",
+            "nComments",
+            "rawComments",
+            "eligibleComments",
+            "uniqueEligibleCommenters",
+            "independentThreads",
+        )
+        if not all(isinstance(product[key], int) and product[key] >= 0 for key in count_fields):
             raise ValueError(f"public payload product {index} has invalid count fields")
         if not all(isinstance(product[key], list) and all(isinstance(item, str) for item in product[key]) for key in ("likes", "cautions", "postUrls")):
             raise ValueError(f"public payload product {index} has invalid list fields")

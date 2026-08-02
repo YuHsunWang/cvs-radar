@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 
 from .filters import normalize_datetime, parse_datetime
 from .parser import parse_ptt_article
+from .store import load_post_rows
 
 
 logger = logging.getLogger(__name__)
@@ -158,14 +159,7 @@ def refresh_recent_posts(
 
 
 def read_jsonl(path: str | Path) -> list[dict]:
-    file_path = Path(path)
-    if not file_path.exists():
-        return []
-    return [
-        json.loads(line)
-        for raw_line in file_path.read_text(encoding="utf-8").splitlines()
-        if (line := raw_line.strip())
-    ]
+    return load_post_rows(path)
 
 
 def write_jsonl_atomic(rows: list[dict], path: str | Path) -> None:

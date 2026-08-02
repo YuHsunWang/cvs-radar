@@ -6,7 +6,8 @@
 ## 爬蟲現況（已具備，不用重寫）
 - F1.1 從 `bbs/CVS/index.html` 往回翻頁，支援 `max_pages` / 日期區間 / `recent_days`
 - F1.4 禮貌爬取：`request_delay_sec`（預設 1s）、`timeout`、失敗**指數退避重試**
-- F1.5 增量：`seen_urls` 快取（`.cvs_radar_seen.json`），重跑只抓新文
+- F1.5 增量：成功解析的 URL 先留在 pending 集合；`crawl_job.py` 只有在
+  `posts.jsonl` flush/fsync 成功後才寫入 `.cvs_radar_seen.json`
 - **over18 cookie 已設**（`over18=1`），不會卡 PTT 年齡牆
 - 自訂 User-Agent
 
@@ -30,8 +31,7 @@ python -m cvs_radar.labeling --source crawl --pages 30 --output data/labels/to_l
 - 增量快取讓你可每天小量累積，不重抓。
 
 ## 重複 / 多段留言：目前處理方式
-- **重複留言（同帳號多則）**：`scoring.per_user_cap=True` → 同帳號在同商品的多則留言**取平均、折成一票**，避免洗版主導。
+- **重複留言（同帳號多則）**：`SCORING.per_user_cap=true` → 同帳號在同商品的作者／留言貢獻先依時間衰減加權成單一立場，再折成一票。
 - **作者自推**：`exclude_self_push` 排除。
 - **代表性留言**：`_dedupe_ranked_comments` 去重後才呈現。
-- **多段留言（同帳號連續多行）**：每行是獨立 Comment，但同帳號 → 一樣被 per_user_cap 折成一票（平均）。
-- ⚠️ **限制（改進點）**：多段是「每行各自算情感分再平均」，**不是把多段文字接起來再算**。若一句話跨行才完整（否定詞/語氣在下一行），單行情感可能誤判。改進＝parser 層把同帳號連續 push 合併成單一 Comment 再算情感（見 beads issue）。
+- **多段留言（同帳號連續多行）**：parser 將相鄰且同帳號的 push 文字直接串接成單一 Comment（不插入分隔符），再做一次情緒判讀。

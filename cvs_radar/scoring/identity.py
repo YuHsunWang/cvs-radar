@@ -942,24 +942,44 @@ def _compact_key(name: str) -> str:
 
 
 def group_products(posts: list[Post]) -> dict[tuple[str, str], list[Post]]:
-    """依品牌與商品鍵分組貼文。"""
-    groups: dict[tuple[str, str], list[Post]] = {}
-    representatives: dict[str, list[str]] = defaultdict(list)
+    """Group deterministically; every member of a cluster must be compatible."""
+    by_brand: dict[str, list[tuple[str, Post]]] = defaultdict(list)
     for post in posts:
-        brand = post.brand
-        name = canonical_product_name(brand, post.product_name)
-        matched_key = None
-        for key, names in representatives.items():
-            key_brand, representative = key.split(":", 1)
-            if key_brand == brand and any(_same_product(brand, name, existing) for existing in names + [representative]):
-                matched_key = key
-                break
-        if matched_key is None:
-            matched_key = f"{brand}:{normalize_product(brand, name)}"
-            groups[(brand, normalize_product(brand, name))] = []
-        groups[(brand, matched_key.split(":", 1)[1])].append(post)
-        representatives[matched_key].append(name)
-    return dict(groups)
+        name = canonical_product_name(post.brand, post.product_name)
+        by_brand[post.brand].append((name, post))
+
+    groups: dict[tuple[str, str], list[Post]] = {}
+    for brand in sorted(by_brand):
+        ordered = sorted(
+            by_brand[brand],
+            key=lambda item: (
+                normalize_product(brand, item[0]),
+                item[0],
+                item[1].id,
+                item[1].url,
+            ),
+        )
+        clusters: list[list[tuple[str, Post]]] = []
+        for name, post in ordered:
+            compatible = next(
+                (
+                    cluster
+                    for cluster in clusters
+                    if all(_same_product(brand, name, existing) for existing, _ in cluster)
+                ),
+                None,
+            )
+            if compatible is None:
+                clusters.append([(name, post)])
+            else:
+                compatible.append((name, post))
+
+        for cluster in clusters:
+            representative_key = min(
+                normalize_product(brand, name) for name, _ in cluster
+            )
+            groups[(brand, representative_key)] = [post for _, post in cluster]
+    return groups
 
 
 def _same_product(brand: str, left: str, right: str) -> bool:

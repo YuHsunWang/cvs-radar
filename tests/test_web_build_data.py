@@ -294,10 +294,31 @@ def test_override_collision_merges_into_one_public_product() -> None:
             "category": "冰品",
             "nPosts": 1,
             "nComments": 2,
+            "rawComments": 3,
+            "eligibleComments": 2,
+            "uniqueEligibleCommenters": 2,
+            "independentThreads": 1,
             "_nEff": 2,
             "_fairScoreRaw": 80.0,
+            "_scoreWeight": 2.0,
+            "_scoreWeightedSum": 2.0,
+            "_scoreWeightSquareSum": 2.0,
+            "_scoreMean": 1.0,
+            "_scoreStd": 0.0,
+            "_positiveWeight": 2.0,
+            "_neutralWeight": 0.0,
+            "_negativeWeight": 0.0,
             "fairScore": 80,
             "recommendationScore": 93,
+            "consensus": "一致好評",
+            "confidence": "低",
+            "positivePct": None,
+            "neutralPct": None,
+            "negativePct": None,
+            "volumeLevel": "不足",
+            "price": 49,
+            "excerpt": "舊貼文好評",
+            "postUrls": ["https://example.test/old"],
             "latestDate": "2026-06-01",
             "firstDate": "2026-05-01",
             "likes": ["甲", "共同"],
@@ -310,10 +331,31 @@ def test_override_collision_merges_into_one_public_product() -> None:
             "category": "甜點",
             "nPosts": 3,
             "nComments": 6,
+            "rawComments": 8,
+            "eligibleComments": 6,
+            "uniqueEligibleCommenters": 6,
+            "independentThreads": 3,
             "_nEff": 6,
             "_fairScoreRaw": 40.0,
+            "_scoreWeight": 6.0,
+            "_scoreWeightedSum": 0.0,
+            "_scoreWeightSquareSum": 6.0,
+            "_scoreMean": 0.0,
+            "_scoreStd": 0.0,
+            "_positiveWeight": 0.0,
+            "_neutralWeight": 0.0,
+            "_negativeWeight": 6.0,
             "fairScore": 40,
             "recommendationScore": 48,
+            "consensus": "一致負評",
+            "confidence": "中",
+            "positivePct": 0,
+            "neutralPct": 0,
+            "negativePct": 100,
+            "volumeLevel": "中等",
+            "price": 60,
+            "excerpt": "新貼文負評",
+            "postUrls": ["https://example.test/new"],
             "latestDate": "2026-06-20",
             "firstDate": "2026-05-10",
             "likes": ["共同", "乙", "丙"],
@@ -331,13 +373,31 @@ def test_override_collision_merges_into_one_public_product() -> None:
     assert merged[0]["id"] == "7-11::促銷商品"
     assert merged[0]["nPosts"] == 4
     assert merged[0]["nComments"] == 8
-    assert merged[0]["fairScore"] == 50
-    assert merged[0]["recommendationScore"] == 50
+    assert merged[0]["rawComments"] == 11
+    assert merged[0]["eligibleComments"] == 8
+    assert merged[0]["uniqueEligibleCommenters"] == 8
+    assert merged[0]["independentThreads"] == 4
+    assert merged[0]["fairScore"] == 28
+    assert merged[0]["recommendationScore"] == 13
+    assert merged[0]["consensus"] == "評價兩極"
+    assert merged[0]["confidence"] == "高"
+    assert (
+        merged[0]["positivePct"],
+        merged[0]["neutralPct"],
+        merged[0]["negativePct"],
+    ) == (25, 0, 75)
+    assert merged[0]["volumeLevel"] == "充足"
     assert merged[0]["latestDate"] == "2026-06-20"
     assert merged[0]["firstDate"] == "2026-05-01"
     assert merged[0]["likes"] == ["甲", "共同", "乙"]
     assert merged[0]["cautions"] == ["太甜", "偏貴", "份量少"]
-    assert merged[0]["category"] == "甜點"
+    assert merged[0]["category"] == "其他"
+    assert merged[0]["price"] == 60
+    assert merged[0]["excerpt"] == "新貼文負評"
+    assert merged[0]["postUrls"] == [
+        "https://example.test/new",
+        "https://example.test/old",
+    ]
     assert "_nEff" not in merged[0]
     assert "_fairScoreRaw" not in merged[0]
 
@@ -385,6 +445,8 @@ def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
         consensus="褒貶不一",
         n_posts=2,
         n_comments=3,
+        n_eligible_comments=2,
+        n_unique_commenters=1,
         rep_positive=["茶香明顯 https://example.com/photo.jpg"],
         rep_negative=["包裝有刮痕 www.example.com/photo.jpg"],
         review_excerpt="",
@@ -397,5 +459,10 @@ def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
 
     assert product["fairScore"] == 47
     assert product["recommendationScore"] == 57
+    assert product["nComments"] == 1
+    assert product["rawComments"] == 3
+    assert product["eligibleComments"] == 2
+    assert product["uniqueEligibleCommenters"] == 1
+    assert product["independentThreads"] == 2
     assert product["likes"] == ["茶香明顯"]
     assert product["cautions"] == ["包裝有刮痕"]

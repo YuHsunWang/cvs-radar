@@ -37,12 +37,18 @@ from __future__ import annotations
 
 import argparse
 import csv
-import re
-import unicodedata
+import os
+import tempfile
 import urllib.request
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from cvs_radar.sentiment import _normalize_override_text
+
 OVERRIDES_PATH = ROOT / "data" / "labels" / "sentiment_overrides.csv"
 LIVE_RESULTS_URL = (
     "https://raw.githubusercontent.com/YuHsunWang/cvs-radar/main/data/results.json"
@@ -50,23 +56,33 @@ LIVE_RESULTS_URL = (
 FRESH_CUTOFF = "2026-07-05"  # only consider reports whose latest post is on/after this
 
 
-def normalize(text: str) -> str:
-    """Match cvs_radar.sentiment._normalize_override_text (NFKC + whitespace collapse)."""
-    s = unicodedata.normalize("NFKC", str(text or ""))
-    s = s.replace("\r", " ").replace("\n", " ").replace("\t", " ")
-    return re.sub(r"\s+", " ", s).strip()
+normalize = _normalize_override_text
+
+
+def _score(row: dict[str, str]) -> float:
+    return float(str(row.get("llm分數") or "").strip())
+
+
+def _load_override_rows() -> dict[str, tuple[str, str, str]]:
+    rows: dict[str, tuple[str, str, str]] = {}
+    if not OVERRIDES_PATH.exists():
+        return rows
+    with open(OVERRIDES_PATH, encoding="utf-8-sig", newline="") as handle:
+        for line_number, row in enumerate(csv.DictReader(handle), start=2):
+            key = normalize(row.get("留言內容", ""))
+            if not key:
+                continue
+            value = (key, row.get("llm分數", ""), row.get("llm判定", ""))
+            if key in rows and _score({"llm分數": rows[key][1]}) != _score(row):
+                raise ValueError(
+                    f"{OVERRIDES_PATH}:{line_number}: conflicting normalized key {key!r}"
+                )
+            rows[key] = value
+    return rows
 
 
 def load_override_keys() -> set[str]:
-    keys: set[str] = set()
-    if not OVERRIDES_PATH.exists():
-        return keys
-    with open(OVERRIDES_PATH, encoding="utf-8-sig", newline="") as f:
-        for row in csv.DictReader(f):
-            key = normalize(row.get("留言內容", ""))
-            if key:
-                keys.add(key)
-    return keys
+    return set(_load_override_rows())
 
 
 def _load_results(source: str):
@@ -102,23 +118,48 @@ def extract(source: str, out_path: Path, cutoff: str) -> int:
 
 
 def merge(labeled_path: Path) -> tuple[int, int]:
-    existing = load_override_keys()
-    before = len(existing)
-    new_rows: list[tuple[str, str, str]] = []
+    existing = _load_override_rows()
+    added = 0
     with open(labeled_path, encoding="utf-8-sig", newline="") as f:
-        for row in csv.DictReader(f):
+        for line_number, row in enumerate(csv.DictReader(f), start=2):
             text = row.get("留言內容", "")
             key = normalize(text)
-            if not key or key in existing:
+            if not key:
                 continue
-            existing.add(key)
-            new_rows.append((text, row.get("llm分數", ""), row.get("llm判定", "")))
-    if new_rows:
-        with open(OVERRIDES_PATH, "a", encoding="utf-8-sig", newline="") as f:
-            writer = csv.writer(f)
-            for row in new_rows:
-                writer.writerow(row)
-    return len(new_rows), before + len(new_rows)
+            value = (key, row.get("llm分數", ""), row.get("llm判定", ""))
+            if key in existing:
+                if _score({"llm分數": existing[key][1]}) != _score(row):
+                    raise ValueError(
+                        f"{labeled_path}:{line_number}: conflicting normalized key {key!r}"
+                    )
+                continue
+            existing[key] = value
+            added += 1
+
+    OVERRIDES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8-sig",
+            newline="",
+            dir=OVERRIDES_PATH.parent,
+            prefix=f".{OVERRIDES_PATH.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            temporary = Path(handle.name)
+            writer = csv.writer(handle)
+            writer.writerow(("留言內容", "llm分數", "llm判定"))
+            writer.writerows(existing[key] for key in sorted(existing))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, OVERRIDES_PATH)
+    except Exception:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+        raise
+    return added, len(existing)
 
 
 def main() -> None:

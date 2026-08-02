@@ -68,6 +68,7 @@ def main() -> None:
         raise
 
     new_count = save_posts(posts, args.store)
+    crawler.commit_seen()
     refresh_attempted = 0
     refresh_updated = 0
     if args.refresh_recent_days > 0:

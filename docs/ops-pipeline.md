@@ -15,12 +15,31 @@ The pipeline scripts are versioned in this repo:
 
 | Script | Role |
 |---|---|
-| [`scripts/ops/rebackfill.sh`](../scripts/ops/rebackfill.sh) | the full refresh: crawl → backfill review text → export unlabeled delta → **Codex LLM sentiment labeling** → verify → import labels → recompute scores → `strip_profiles` (de-identify) → `build_data` → commit (+push) |
+| [`scripts/ops/rebackfill.sh`](../scripts/ops/rebackfill.sh) | the full refresh: crawl → backfill review text → sentiment labeling → product-name labeling → excerpt labeling → representative-comment labeling → atomically save de-identified results → `build_data` → commit (+push) |
 | [`scripts/ops/rebackfill-cron.sh`](../scripts/ops/rebackfill-cron.sh) | scheduled wrapper: full PATH, records last-success, runs the freshness check |
 | [`scripts/check_data_freshness.py`](../scripts/check_data_freshness.py) | freshness SLO check on the **published** `web/public/data.json` |
 
-The **Codex labeling step requires a local Codex CLI subscription** and is not
-reproducible in CI; every other step is standard python + git.
+The four **Codex labeling steps require a local Codex CLI subscription** and are
+not reproducible in CI. Each layer must export, validate and import successfully;
+any failure exits before recompute, commit or push, leaving the raw store for retry.
+Every other step is standard Python + git.
+
+### Semantic cache keys
+
+Each current SHA-256 key includes its prompt version and every value shown to the
+labeler:
+
+| Layer | Fingerprinted input |
+|---|---|
+| sentiment | source URL/ID, tag, comment text, brand, raw product name, post title, prompt version |
+| product name | brand, title, raw product-name field, rule guess, prompt version |
+| excerpt | post ID, product name, review text, brand, sibling products, prompt version |
+| representative comments | brand, product name, ordered positive/negative/body candidates, sibling products, prompt version |
+
+The manual `.github/workflows/refresh-data.yml` fallback runs none of these four
+labelers. It can rebuild only from already committed labels; new rows use rule
+fallbacks, so it is an availability/recovery path, not equivalent to the local
+publisher and must not be treated as a semantically complete refresh.
 
 ### Key environment overrides
 
@@ -31,7 +50,8 @@ Defaults target the author's WSL setup; override them on any other host.
 
 ## Scheduling
 
-Point cron at the **repo copy** so the repo is the single source of truth
+Scheduling is external to this repository. To enable it, point cron at the
+**repo copy** so the repo is the single source of truth
 (avoids drift with any older copy under `~/.claude/tools/`):
 
 ```cron

@@ -17,8 +17,8 @@ Keep every column and the same header, rows in the SAME order, and keep
 `review_text` UNCHANGED. Fill in `excerpt`, and set `model` to `codex`.
 
 `excerpt` rules:
-- Quote the author VERBATIM. You may drop words inside a sentence and join
-  sentences with 「，」 or 「。」, but do not paraphrase, translate, or invent.
+- Quote one contiguous slice of the author's `review_text` VERBATIM. Do not drop,
+  join, paraphrase, translate, or invent words or punctuation.
 - At most 3 sentences and at most 90 characters total. Shorter is fine.
 - Prefer concrete, checkable description: taste, texture, filling/ingredients,
   portion, heat/spice level, sweetness, price-worth, how it compares with a
@@ -40,9 +40,8 @@ Keep every column and the same header, rows in the SAME order, and keep
 <acceptance_criteria>
 - `excerpt_work/chunks/__CHUNK__.labeled.csv` exists, UTF-8 BOM, same header.
 - Exactly __N__ rows, same order, SAME fingerprints; none dropped or added.
-- Every non-empty `excerpt` appears in `review_text` as the author's own wording
-  (allowing dropped words and joined sentences), is <= 90 characters, and contains
-  no URL.
+- Every non-empty `excerpt` is an exact contiguous slice of `review_text`, is <= 90
+  characters, and contains no URL.
 - No excerpt describes a product named in that row's `other_products`.
 </acceptance_criteria>
 

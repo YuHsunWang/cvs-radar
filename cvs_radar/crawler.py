@@ -41,6 +41,7 @@ class PttCrawler:
         self.session.cookies.set("over18", "1", domain="www.ptt.cc")
         self._base_origin = urlparse(self.base_url)
         self.seen_urls = self._load_seen()
+        self.pending_seen_urls: set[str] = set()
         self.last_crawl_counts: Counter[str] = Counter()
 
     def crawl(
@@ -92,7 +93,7 @@ class PttCrawler:
                 counts["parse_success"] += 1
                 post.push_count = parse_push_count(item.get("push_count"))
                 filtered_post = filter_post_by_time(post, window)
-                self.seen_urls.add(article_url)
+                self.pending_seen_urls.add(article_url)
                 if filtered_post is not None:
                     counts["included"] += 1
                     posts.append(filtered_post)
@@ -105,10 +106,15 @@ class PttCrawler:
                 break
             url = prev_url
 
-        self._save_seen()
         self.last_crawl_counts = counts
         logger.info("crawl outcome counts: %s", dict(sorted(counts.items())))
         return posts
+
+    def commit_seen(self) -> None:
+        """Persist successfully parsed URLs after their posts are durably stored."""
+        self.seen_urls.update(self.pending_seen_urls)
+        self._save_seen()
+        self.pending_seen_urls.clear()
 
     def _get(self, url: str) -> str:
         last_error: Exception | None = None

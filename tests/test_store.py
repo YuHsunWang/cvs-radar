@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import unittest
-import warnings
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -10,7 +9,14 @@ from zoneinfo import ZoneInfo
 
 from cvs_radar.models import Comment, Post
 from cvs_radar.pipeline import run_pipeline
-from cvs_radar.store import dict_to_post, load_posts, post_to_dict, save_posts, store_stats
+from cvs_radar.store import (
+    StoreReadError,
+    dict_to_post,
+    load_posts,
+    post_to_dict,
+    save_posts,
+    store_stats,
+)
 
 
 class StoreTest(unittest.TestCase):
@@ -66,7 +72,9 @@ class StoreTest(unittest.TestCase):
     def test_load_from_nonexistent_returns_empty(self) -> None:
         self.assertEqual(load_posts("/tmp/does_not_exist_xyz.jsonl"), [])
 
-    def test_load_skips_corrupt_middle_and_truncated_final_lines_with_diagnostics(self) -> None:
+    def test_all_store_readers_reject_the_same_corrupt_lines(self) -> None:
+        from cvs_radar.backfill import read_jsonl
+
         good_posts = [
             Post(id="good-1", brand="7-11", product_name="One"),
             Post(id="good-2", brand="全家", product_name="Two"),
@@ -81,17 +89,16 @@ class StoreTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            with warnings.catch_warnings(record=True) as caught:
-                warnings.simplefilter("always")
-                loaded = load_posts(path)
+            with self.assertRaises(StoreReadError) as scoring_error:
+                load_posts(path)
+            with self.assertRaises(StoreReadError) as backfill_error:
+                read_jsonl(path)
 
-        self.assertEqual([post.id for post in loaded], ["good-1", "good-2"])
-        diagnostics = "\n".join(str(warning.message) for warning in caught)
-        self.assertIn(f"{path}:2", diagnostics)
-        self.assertIn(f"{path}:4", diagnostics)
-        self.assertIn("skipped 2 invalid JSONL lines", diagnostics)
+        self.assertEqual(str(scoring_error.exception), str(backfill_error.exception))
+        self.assertIn("line 2", str(scoring_error.exception))
+        self.assertIn("line 4", str(scoring_error.exception))
 
-    def test_append_after_truncated_line_preserves_new_record(self) -> None:
+    def test_append_refuses_to_extend_a_corrupt_store(self) -> None:
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "posts.jsonl"
             path.write_text(
@@ -100,12 +107,28 @@ class StoreTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", RuntimeWarning)
-                self.assertEqual(save_posts([Post(id="good-2", product_name="Two")], path), 1)
-                reloaded = load_posts(path)
+            before = path.read_bytes()
+            with self.assertRaises(StoreReadError):
+                save_posts([Post(id="good-2", product_name="Two")], path)
+            self.assertEqual(path.read_bytes(), before)
 
-        self.assertEqual([post.id for post in reloaded], ["good-1", "good-2"])
+    def test_latest_valid_duplicate_snapshot_wins_for_all_readers(self) -> None:
+        from cvs_radar.backfill import read_jsonl
+
+        old = post_to_dict(Post(id="dup", product_name="Old"))
+        new = post_to_dict(Post(id="dup", product_name="New"))
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "posts.jsonl"
+            path.write_text(
+                json.dumps(old, ensure_ascii=False)
+                + "\n"
+                + json.dumps(new, ensure_ascii=False)
+                + "\n",
+                encoding="utf-8",
+            )
+
+            self.assertEqual(load_posts(path)[0].product_name, "New")
+            self.assertEqual(read_jsonl(path)[0]["product_name"], "New")
 
     def test_store_stats_summarizes_posts_comments_brands_and_dates(self) -> None:
         posts = [
@@ -260,7 +283,43 @@ class StoreTest(unittest.TestCase):
             loaded_reports, loaded_profiles = loaded
             self.assertEqual(len(loaded_reports), 1)
             self.assertEqual(loaded_reports[0].fair_score, 70.0)
-            self.assertIn("u1", loaded_profiles)
+            self.assertEqual(loaded_profiles, {})
+
+    def test_save_results_is_atomic_and_never_serializes_identity(self) -> None:
+        from unittest.mock import patch
+
+        from cvs_radar.models import Contributor, ProductReport
+        from cvs_radar.preference import AccountProfile
+        from cvs_radar.store import save_results
+
+        report = ProductReport(
+            brand="全家",
+            product_name="Test",
+            fair_score=70.0,
+            consensus="褒貶不一",
+            confidence="中",
+            n_eff=4.0,
+            score_std=0.2,
+            n_posts=2,
+            n_comments=8,
+            contributors=[Contributor("canary-handle", "commenter", 0.8, 1.0)],
+        )
+        profiles = {"canary-handle": AccountProfile(user="canary-handle")}
+
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "results.json"
+            path.write_text('{"old": true}\n', encoding="utf-8")
+            before = path.read_bytes()
+            with patch("cvs_radar.store.os.replace", side_effect=OSError("disk full")):
+                with self.assertRaisesRegex(OSError, "disk full"):
+                    save_results([report], profiles, path)
+            self.assertEqual(path.read_bytes(), before)
+            self.assertEqual(list(path.parent.glob(f".{path.name}.*.tmp")), [])
+
+            save_results([report], profiles, path)
+            content = path.read_text(encoding="utf-8")
+            self.assertNotIn("canary-handle", content)
+            self.assertEqual(json.loads(content)["profiles"], [])
 
     def test_load_results_nonexistent_returns_none(self) -> None:
         from cvs_radar.store import load_results

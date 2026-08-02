@@ -9,7 +9,7 @@ from statistics import mean
 import unicodedata
 
 from .config import SUSPICION
-from .models import Post
+from .models import CommentOpinion, Post
 
 
 @dataclass(slots=True)
@@ -34,15 +34,25 @@ class AccountProfile:
     total_comments: int = 0
 
 
-def build_profiles(posts: list[Post]) -> dict[str, AccountProfile]:
+def build_profiles(
+    posts: list[Post],
+    opinions: dict[tuple[str, int], CommentOpinion],
+) -> dict[str, AccountProfile]:
     """從貼文留言建立帳號輪廓。"""
     rows: dict[str, list[tuple[str, float, str]]] = defaultdict(list)
     timestamps: dict[str, dict[str, list[datetime]]] = defaultdict(lambda: defaultdict(list))
     for post in posts:
-        for comment in post.comments:
-            if comment.sentiment is None or not comment.user:
+        for index, comment in enumerate(post.comments):
+            opinion = opinions[(post.id, index)]
+            if (
+                not opinion.include_score
+                or opinion.effective_sentiment is None
+                or not comment.user
+            ):
                 continue
-            rows[comment.user].append((post.brand, comment.sentiment, comment.text.strip()))
+            rows[comment.user].append(
+                (post.brand, opinion.effective_sentiment, comment.text.strip())
+            )
             if comment.posted_at is not None:
                 timestamps[comment.user][post.brand].append(comment.posted_at)
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-import warnings
+import tempfile
 from datetime import datetime
 from fcntl import LOCK_EX, LOCK_SH, flock
 from pathlib import Path
@@ -16,6 +16,10 @@ from .preference import AccountProfile, BrandStat
 
 DEFAULT_STORE_PATH = "data/posts.jsonl"
 DEFAULT_RESULTS_PATH = "data/results.json"
+
+
+class StoreReadError(ValueError):
+    """The raw JSONL store contains a line no publishing stage may ignore."""
 
 
 def post_to_dict(post: Post) -> dict:
@@ -115,7 +119,9 @@ def save_posts(posts: list[Post], path: str | Path = DEFAULT_STORE_PATH) -> int:
         flock(handle.fileno(), LOCK_EX)
         handle.seek(0)
         existing_lines = handle.readlines()
-        existing_ids = {post.id for post in _load_posts_from_lines(existing_lines, file_path)}
+        existing_ids = {
+            str(row["id"]) for row in _load_post_rows_from_lines(existing_lines, file_path)
+        }
         needs_separator = bool(existing_lines and not existing_lines[-1].endswith("\n"))
         handle.seek(0, os.SEEK_END)
         new_count = 0
@@ -142,42 +148,46 @@ def load_posts(path: str | Path = DEFAULT_STORE_PATH) -> list[Post]:
 
     with file_path.open(encoding="utf-8") as handle:
         flock(handle.fileno(), LOCK_SH)
-        return _load_posts_from_lines(handle.readlines(), file_path)
+        return [
+            dict_to_post(row)
+            for row in _load_post_rows_from_lines(handle.readlines(), file_path)
+        ]
 
 
-def _load_posts_from_lines(lines: list[str], file_path: Path) -> list[Post]:
-    seen_ids: set[str] = set()
-    posts: list[Post] = []
-    invalid_lines: list[int] = []
+def load_post_rows(path: str | Path = DEFAULT_STORE_PATH) -> list[dict]:
+    """Strictly load validated raw rows, keeping the latest valid duplicate ID."""
+    file_path = Path(path)
+    if not file_path.exists():
+        return []
+    with file_path.open(encoding="utf-8") as handle:
+        flock(handle.fileno(), LOCK_SH)
+        return _load_post_rows_from_lines(handle.readlines(), file_path)
+
+
+def _load_post_rows_from_lines(lines: list[str], file_path: Path) -> list[dict]:
+    latest: dict[str, tuple[int, dict]] = {}
+    errors: list[str] = []
     for line_number, raw_line in enumerate(lines, start=1):
         line = raw_line.strip()
         if not line:
             continue
         try:
             data = json.loads(line)
-            post_id = data["id"]
-            post = dict_to_post(data)
+            if not isinstance(data, dict):
+                raise TypeError("row must be a JSON object")
+            post_id = str(data["id"])
+            dict_to_post(data)
         except (json.JSONDecodeError, KeyError, TypeError, ValueError, AttributeError) as exc:
-            invalid_lines.append(line_number)
             truncated = line_number == len(lines) and not raw_line.endswith("\n")
             description = "truncated final" if truncated else "invalid"
-            warnings.warn(
-                f"{file_path}:{line_number}: skipping {description} JSONL line ({exc})",
-                RuntimeWarning,
-                stacklevel=2,
-            )
+            errors.append(f"line {line_number} ({description}: {exc})")
             continue
-        if post_id in seen_ids:
-            continue
-        seen_ids.add(post_id)
-        posts.append(post)
-    if invalid_lines:
-        warnings.warn(
-            f"{file_path}: skipped {len(invalid_lines)} invalid JSONL lines",
-            RuntimeWarning,
-            stacklevel=2,
+        latest[post_id] = (line_number, data)
+    if errors:
+        raise StoreReadError(
+            f"{file_path}: invalid JSONL store; " + "; ".join(errors)
         )
-    return posts
+    return [row for _, row in sorted(latest.values(), key=lambda item: item[0])]
 
 
 def store_stats(path: str | Path = DEFAULT_STORE_PATH) -> dict:
@@ -209,6 +219,14 @@ def report_to_store_dict(report: ProductReport) -> dict:
         "score_std": report.score_std,
         "n_posts": report.n_posts,
         "n_comments": report.n_comments,
+        "n_eligible_comments": report.n_eligible_comments,
+        "n_unique_commenters": report.n_unique_commenters,
+        "score_weight_sum": report.score_weight_sum,
+        "score_weighted_sum": report.score_weighted_sum,
+        "score_weight_square_sum": report.score_weight_square_sum,
+        "positive_weight": report.positive_weight,
+        "neutral_weight": report.neutral_weight,
+        "negative_weight": report.negative_weight,
         "contributors": [
             {"user": c.user, "role": c.role, "score": c.score, "weight": c.weight}
             for c in report.contributors
@@ -252,6 +270,14 @@ def store_dict_to_report(data: dict) -> ProductReport:
         score_std=data["score_std"],
         n_posts=data["n_posts"],
         n_comments=data["n_comments"],
+        n_eligible_comments=data.get("n_eligible_comments", data["n_comments"]),
+        n_unique_commenters=data.get("n_unique_commenters", data["n_comments"]),
+        score_weight_sum=data.get("score_weight_sum", 0.0),
+        score_weighted_sum=data.get("score_weighted_sum", 0.0),
+        score_weight_square_sum=data.get("score_weight_square_sum", 0.0),
+        positive_weight=data.get("positive_weight", 0.0),
+        neutral_weight=data.get("neutral_weight", 0.0),
+        negative_weight=data.get("negative_weight", 0.0),
         contributors=contributors,
         rep_positive=data.get("rep_positive", []),
         rep_negative=data.get("rep_negative", []),
@@ -311,18 +337,66 @@ def save_results(
     profiles: dict[str, AccountProfile],
     path: str | Path = DEFAULT_RESULTS_PATH,
 ) -> None:
-    """Save computed results (reports + profiles) to a JSON file."""
+    """Atomically save a publishable snapshot without account identities."""
     file_path = Path(path)
-    file_path.parent.mkdir(parents=True, exist_ok=True)
+    public_reports = [report_to_store_dict(report) for report in reports]
+    for report in public_reports:
+        report["contributors"] = []
     payload = {
         "generated_at": datetime.now().isoformat(sep=" ", timespec="seconds"),
-        "reports": [report_to_store_dict(r) for r in reports],
-        "profiles": [profile_to_store_dict(p) for p in profiles.values()],
+        "reports": public_reports,
+        "profiles": [],
     }
-    file_path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    validate_publishable_results(payload)
+    write_json_atomic(file_path, payload)
+
+
+def validate_publishable_results(payload: dict) -> None:
+    """Reject identity-bearing or malformed content before publishing results."""
+    if payload.get("profiles") != [] or not isinstance(payload.get("reports"), list):
+        raise ValueError("publishable results require reports and an empty profiles list")
+
+    def visit(value: object) -> None:
+        if isinstance(value, list):
+            for item in value:
+                visit(item)
+            return
+        if not isinstance(value, dict):
+            return
+        for key, nested in value.items():
+            if key == "user" or key.startswith("suspicion_"):
+                raise ValueError(f"publishable results contain identity field {key!r}")
+            if key in {"contributors", "profiles"} and nested != []:
+                raise ValueError(f"publishable results contain non-empty {key}")
+            visit(nested)
+
+    visit(payload)
+
+
+def write_json_atomic(path: str | Path, payload: dict) -> None:
+    """Write complete JSON to a sibling temp file, fsync, then replace."""
+    file_path = Path(path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=file_path.parent,
+            prefix=f".{file_path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            temporary = Path(handle.name)
+            json.dump(payload, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, file_path)
+    except Exception:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+        raise
 
 
 def load_results(

@@ -1,5 +1,8 @@
 # 超商食物評價雷達 CVS Radar — 產品需求文件 (PRD)
 
+> **歷史文件。** 本文件保留 v0.2 的需求脈絡；目前 runtime 行為以程式與
+> `config.yaml` 為準。下列參數表已同步到目前設定，但未實作的願景仍可能存在於其他章節。
+
 | 項目 | 內容 |
 |---|---|
 | 文件版本 | **v0.2**(取代 v0.1) |
@@ -194,8 +197,8 @@ flowchart TD
 **貢獻者權重**
 - `w = max(w_floor, 1 − suspicion) × role_weight × decay`
   - `w_floor`:信度下限(預設 0.1,確保不歸零)。
-  - `role_weight`:作者 > 留言者(預設 1.5 / 1.0)。
-  - `decay = exp(−λ·Δt)`:時間衰減,Δt 為留言距今天數,λ 預設 0(關閉),供商品改版情境開啟。
+  - `role_weight`:作者 / 留言者皆為 1.0。
+  - `decay = exp(−λ·Δt)`:時間衰減,Δt 為留言距固定 `as_of` 的天數,λ 為 0.005。
 
 **公正分數(貝氏收斂,避免低樣本爆衝)**
 ```
@@ -203,20 +206,20 @@ fair01 = (C·μ0 + Σ wᵢ·s01ᵢ) / (C + Σ wᵢ)
 fair    = 100 × fair01
 ```
 - `μ0`:先驗均值(預設 0.5 或全板均值)。
-- `C`:先驗強度(虛擬票數,預設 3)。樣本越少越被拉向 μ0。
+- `C`:先驗強度(虛擬票數,預設 1)。樣本越少越被拉向 μ0。
 
 **穩健度量**
 - 有效樣本數 `n_eff = (Σ wᵢ)² / Σ wᵢ²`。
 - 加權標準差 `std`(對 s01)。
-- 信心度:`n_eff < 3` 低 / `3–8` 中 / `>8` 高。
+- 信心度:`n_eff < 3` 低 / `3 ≤ n_eff < 8` 中 / `n_eff ≥ 8` 高。
 
 **共識分類(門檻可調)**
 | 條件 | 結論 |
 |---|---|
 | n_eff < 3 | 資料不足 |
-| mean ≥ 0.70 且 std ≤ 0.15 | 一致好評 |
-| mean ≤ 0.40 且 std ≤ 0.15 | 一致負評 |
-| std ≥ 0.25 | 評價兩極 |
+| mean ≥ 0.68 且 std ≤ 0.25 | 一致好評 |
+| mean ≤ 0.45 且 std ≤ 0.25 | 一致負評 |
+| std ≥ 0.26 | 評價兩極 |
 | 其餘 | 褒貶不一 |
 
 **可疑訊號分(F4.3)**:各特徵正規化後加權求和並截到 [0,1];低於活動量門檻者不計;輸出各特徵貢獻以利覆核。明確定位為**弱訊號**,僅降權、不過濾、不公開。
@@ -297,18 +300,18 @@ ProductReport : brand, product_name, fair_score, consensus,
 | `crawl.timeout_sec` / `retries` | 10 / 3 | 逾時與重試 |
 | `sentiment.backend` | lexicon | lexicon / snownlp / llm |
 | `sentiment.tag_prior_weight` (α) | 0.6 | 推噓先驗融合比重 |
-| `scoring.role_weight.author` | 1.5 | 作者角色權重 |
+| `scoring.role_weight.author` | 1.0 | 作者角色權重 |
 | `scoring.role_weight.commenter` | 1.0 | 留言者角色權重 |
 | `scoring.prior_mean` (μ0) | 0.5 | 貝氏先驗均值 |
-| `scoring.prior_strength` (C) | 3 | 貝氏先驗強度 |
-| `scoring.time_decay_lambda` (λ) | 0 | 時間衰減(預設關) |
+| `scoring.prior_strength` (C) | 1.0 | 貝氏先驗強度 |
+| `scoring.time_decay_lambda` (λ) | 0.005 | 時間衰減 |
 | `scoring.per_user_cap` | 1 | 每商品每人折票數 |
 | `suspicion.min_activity` | 5 | 評可疑分的最低留言數 |
 | `suspicion.weight_floor` | 0.1 | 信度權重下限 |
 | `consensus.n_eff_min` | 3 | 資料不足門檻 |
-| `consensus.high_mean / low_mean` | 0.70 / 0.40 | 好評/負評均值門檻 |
-| `consensus.low_std / high_std` | 0.15 / 0.25 | 一致/兩極離散門檻 |
-| `confidence.n_eff` 低/中/高 | <3 / 3–8 / >8 | 信心度分級 |
+| `consensus.high_mean / low_mean` | 0.68 / 0.45 | 好評/負評均值門檻 |
+| `consensus.low_std / high_std` | 0.25 / 0.26 | 一致/兩極離散門檻 |
+| `confidence.n_eff` 低/中/高 | <3 / 3≤n_eff<8 / ≥8 | 信心度分級 |
 
 ---
 

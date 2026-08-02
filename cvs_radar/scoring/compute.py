@@ -11,7 +11,7 @@ from ..config import (
     SHILL_DETECTION,
 )
 from ..filters import normalize_datetime
-from ..models import Contributor, Post, ProductReport
+from ..models import CommentOpinion, Contributor, Post, ProductReport
 from ..preference import AccountProfile
 
 from ._common import (_OFF_TOPIC_COMMENT_RE)
@@ -68,28 +68,51 @@ def _decay(posted_at: datetime | None, now: datetime | None = None) -> float:
     return math.exp(-lam * days)
 
 
+def build_comment_opinions(
+    posts: list[Post],
+) -> dict[tuple[str, int], CommentOpinion]:
+    """Decide eligibility and target attribution once for profiles and scoring."""
+    opinions: dict[tuple[str, int], CommentOpinion] = {}
+    for post in posts:
+        for index, comment in enumerate(post.comments):
+            include = comment.sentiment is not None and bool(comment.user)
+            if include and SCORING["exclude_self_push"] and comment.user == post.author:
+                include = False
+            if include and _OFF_TOPIC_COMMENT_RE.search(comment.text):
+                include = False
+            if include and _is_reaction_echo_comment(comment.text):
+                include = False
+            attribution = _comment_attribution(post.brand, comment)
+            include = bool(
+                include
+                and attribution.include_score
+                and attribution.effective_sentiment is not None
+            )
+            opinions[(post.id, index)] = CommentOpinion(
+                include_score=include,
+                effective_sentiment=(
+                    attribution.effective_sentiment if include else None
+                ),
+            )
+    return opinions
+
+
 def _commenter_contributions(
     posts: list[Post],
     profiles: dict[str, AccountProfile],
     now: datetime | None = None,
+    opinions: dict[tuple[str, int], CommentOpinion] | None = None,
 ) -> list[tuple[str, str, float, float]]:
     """One (user, role, score01, weight) row per eligible comment."""
     role_weight = float(SCORING["role_weight"]["commenter"])
     rows: list[tuple[str, str, float, float]] = []
+    opinions = opinions or build_comment_opinions(posts)
     for post in posts:
-        for comment in post.comments:
-            if comment.sentiment is None:
+        for index, comment in enumerate(post.comments):
+            opinion = opinions[(post.id, index)]
+            if not opinion.include_score or opinion.effective_sentiment is None:
                 continue
-            if SCORING["exclude_self_push"] and comment.user == post.author:
-                continue
-            if _OFF_TOPIC_COMMENT_RE.search(comment.text):
-                continue
-            if _is_reaction_echo_comment(comment.text):
-                continue
-            attribution = _comment_attribution(post.brand, comment)
-            if not attribution.include_score or attribution.effective_sentiment is None:
-                continue
-            score01 = (attribution.effective_sentiment + 1.0) / 2.0
+            score01 = (opinion.effective_sentiment + 1.0) / 2.0
             credibility = _credibility(profiles, comment.user)
             weight = max(
                 0.0,
@@ -128,6 +151,7 @@ def _opinion_pairs(
     posts: list[Post],
     profiles: dict[str, AccountProfile],
     now: datetime | None = None,
+    opinions: dict[tuple[str, int], CommentOpinion] | None = None,
 ) -> tuple[list[tuple[float, float]], list[Contributor]]:
     """Collapse every contribution to one stance per human when per_user_cap is set.
 
@@ -138,7 +162,7 @@ def _opinion_pairs(
     per_user: dict[str, list[tuple[str, float, float]]] = defaultdict(list)
     for user, role, score01, weight in (
         _author_contributions(posts, profiles, now)
-        + _commenter_contributions(posts, profiles, now)
+        + _commenter_contributions(posts, profiles, now, opinions)
     ):
         per_user[user].append((role, score01, weight))
 
@@ -198,6 +222,7 @@ def score_product(
     posts: list[Post],
     profiles: dict[str, AccountProfile],
     now: datetime | None = None,
+    opinions: dict[tuple[str, int], CommentOpinion] | None = None,
 ) -> ProductReport:
     """計算單一商品彙整分數。
 
@@ -213,7 +238,14 @@ def score_product(
     shill_ratio, shill_flag = _shill_stats(posts)
     shill_penalty = float(SHILL_DETECTION["post_weight_penalty"]) if shill_flag else 1.0
 
-    opinion_pairs, opinion_contributors = _opinion_pairs(posts, profiles, now)
+    opinions = opinions or build_comment_opinions(posts)
+    opinion_pairs, opinion_contributors = _opinion_pairs(posts, profiles, now, opinions)
+    eligible_comments = [
+        comment
+        for post in posts
+        for index, comment in enumerate(post.comments)
+        if opinions[(post.id, index)].include_score
+    ]
 
     if shill_flag and opinion_pairs:
         opinion_pairs = [(score, weight * shill_penalty) for score, weight in opinion_pairs]
@@ -221,12 +253,16 @@ def score_product(
     if opinion_pairs:
         weighted_sum = sum(score * weight for score, weight in opinion_pairs)
         weight_sum = sum(weight for _, weight in opinion_pairs)
+        weight_square_sum = sum(weight * weight for _, weight in opinion_pairs)
         fair01 = (prior_strength * mu0 + weighted_sum) / (prior_strength + weight_sum)
         mean01 = _weighted_mean(opinion_pairs)
         std = _weighted_std(opinion_pairs, mean01)
         n_eff = _n_eff([weight for _, weight in opinion_pairs])
     else:
         fair01 = None
+        weighted_sum = 0.0
+        weight_sum = 0.0
+        weight_square_sum = 0.0
         mean01 = 0.0
         std = 0.0
         n_eff = 0.0
@@ -263,6 +299,14 @@ def score_product(
         score_std=round(std, 3),
         n_posts=len(posts),
         n_comments=sum(len(post.comments) for post in posts),
+        n_eligible_comments=len(eligible_comments),
+        n_unique_commenters=len({comment.user for comment in eligible_comments}),
+        score_weight_sum=weight_sum,
+        score_weighted_sum=weighted_sum,
+        score_weight_square_sum=weight_square_sum,
+        positive_weight=sum(weight for score, weight in opinion_pairs if score > 0.6),
+        neutral_weight=sum(weight for score, weight in opinion_pairs if 0.4 <= score <= 0.6),
+        negative_weight=sum(weight for score, weight in opinion_pairs if score < 0.4),
         contributors=contributors,
         rep_positive=rep_pos,
         rep_negative=rep_neg,
@@ -286,9 +330,13 @@ def score_all(
     posts: list[Post],
     profiles: dict[str, AccountProfile],
     now: datetime | None = None,
+    opinions: dict[tuple[str, int], CommentOpinion] | None = None,
 ) -> list[ProductReport]:
     """計算所有商品報告並排序。``now`` is the as-of instant for time decay."""
-    reports = [score_product(group, profiles, now) for group in group_products(posts).values()]
+    reports = [
+        score_product(group, profiles, now, opinions)
+        for group in group_products(posts).values()
+    ]
     reports.sort(
         key=lambda report: (
             report.fair_score is None,

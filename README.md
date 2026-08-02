@@ -44,7 +44,8 @@ CVS Radar 是一個端到端的 NLP 與資料產品專案。系統從公開討�
 - **大家為什麼喜歡或不喜歡？** 展開後依序閱讀作者評價、留言評價與原文。
 - **這個分數可靠嗎？** 低樣本商品不顯示推薦分或百分比分布，避免過度解讀。
 
-公開快照每日自動更新，支援 7-11、全家、萊爾富、OK、美聯社及其他通路。
+公開快照由 repo 外部的排程主機執行本專案的 cron wrapper 後更新；repository
+本身不包含或證明該主機的 crontab。系統支援 7-11、全家、萊爾富、OK、美聯社及其他通路。
 
 ## 核心功能
 
@@ -70,7 +71,7 @@ CVS Radar 不會只看單篇文章，也不會讓模型憑空寫出結論。每�
 
 1. **收集公開心得**：讀取 PTT CVS 板商品文與留言。
 2. **整理成同一商品**：辨識通路、品名與價格，合併名稱不同但實際相同的商品。
-3. **保留真正的使用感受**：作者心得維持原句；留言則辨識正向、中立、負向，排除離題、純附和與只談其他通路的內容。心得摘句、代表留言與商品名稱判讀等需要語意判斷的步驟，由 LLM 判讀一次後以內容指紋快取到版本控制中的 CSV，之後的重新計算與 CI 只讀取快取、不重新呼叫模型，確保結果可重現。
+3. **保留真正的使用感受**：作者心得維持原句；留言則辨識正向、中立、負向，排除離題、純附和與只談其他通路的內容。情緒、心得摘句、代表留言與商品名稱四個語意層由 LLM 判讀後，以包含完整輸入與 prompt version 的指紋快取到版本控制中的 CSV。給定相同 raw store、cache、config 與 `as_of`，重新計算不再呼叫模型並產生相同評分；新而未標註的資料必須先完成四層標註才可發布。
 4. **彙整共識與時效**：同一人不因重複留言而被放大；樣本不足不顯示推薦分。近期推薦兼顧評價與新鮮度，討論熱度則回答「現在大家在聊什麼」。
 5. **回到證據查證**：商品卡先給快速摘要，展開後仍能閱讀作者評價、代表留言與原文連結。
 
@@ -164,8 +165,10 @@ Every push to `main` runs `.github/workflows/pages.yml`:
 3. upload `web/out` as a Pages artifact;
 4. deploy to GitHub Pages.
 
-Both deployments serve the de-identified `web/public/data.json` that the daily
-pipeline run recomputes and commits to `main`, so they stay in sync.
+Both deployments serve the de-identified `web/public/data.json` that the
+externally scheduled local pipeline recomputes and commits to `main`. If that
+external schedule is absent or failing, the repository does not update itself;
+the freshness check is the observable guard.
 
 CI runs backend and frontend checks independently through `.github/workflows/ci.yml`.
 

@@ -10,7 +10,7 @@
 # still-unlabeled delta -> label it with a local subscription Codex CLI
 # (concurrency) -> independently verify -> import into
 # data/labels/sentiment_fingerprint_labels.csv -> recompute scores ->
-# strip_profiles (de-identify) -> build public data.json -> commit (+push).
+# atomically save de-identified results -> build public data.json -> commit (+push).
 # Re-runnable: each run only labels comments not already in the cache/legacy.
 #
 # NOTE: the Codex labeling step (RUNNER) requires a local Codex CLI and is NOT
@@ -247,22 +247,9 @@ cp data/posts.jsonl "$STORE_SEED" 2>/dev/null || true
 # name, so names have to be settled before those two export their deltas. Each script
 # exports its own delta, so it sees the names the step before it just imported.
 #
-# Non-fatal by design. If Codex is down or out of quota, unlabelled data falls back to
-# the rules and the site still publishes; the delta is still there tomorrow. A failure
-# is recorded and surfaced in the final line rather than blocking the run.
-LABEL_WARNINGS=""
-label_layer(){
-  local name="$1" script="$2" fallback="$3"
-  log "label: $name"
-  if bash "scripts/$script" 2>&1 | sed 's/^/  /'; then
-    return 0
-  fi
-  log "WARNING: $name labelling failed — publishing on $fallback"
-  LABEL_WARNINGS="${LABEL_WARNINGS}${LABEL_WARNINGS:+, }$name"
-}
-label_layer "product names"         label_product_names.sh "the extraction rules"
-label_layer "excerpts"              label_excerpts.sh      "the scoring selector"
-label_layer "representative comments" label_comment_picks.sh "the ranking selector"
+# A failure leaves the new raw store available for retry but must not recompute,
+# commit, or publish a rule-fallback snapshot as though semantic labeling succeeded.
+bash scripts/ops/run_required_label_layers.sh || die "required semantic labeling"
 
 # --- 7b. recompute scores (uses fresh labels) + de-identify + build public data ---
 # This is the former GitHub Actions "refresh live data" work, moved local so the
@@ -276,8 +263,6 @@ reports, profiles = run_pipeline(posts)
 save_results(reports, profiles, "data/results.json")
 print(f"[recompute] {len(reports)} reports")
 PY
-# PRIVACY: strip per-account profiles before anything is committed/published.
-python3 scripts/strip_profiles.py data/results.json || die "strip_profiles"
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
 # --- 8. commit (+push): labels + recomputed, de-identified public data ---
@@ -300,4 +285,4 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
   fi
 fi
 
-log "DONE. delta labeled=$N | cache ${before} -> ${after} | pushed=${PUSH}${LABEL_WARNINGS:+ | LABEL FAILURES: ${LABEL_WARNINGS}}"
+log "DONE. delta labeled=$N | cache ${before} -> ${after} | pushed=${PUSH}"

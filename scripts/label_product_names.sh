@@ -123,6 +123,7 @@ print(f"verified {len(combined)} labeled rows -> {out}")
 PY
 
 # --- 6. import into the committed cache ---
-python3 scripts/import_product_names.py "$WORK/all_labeled.csv" --model-tag "$MODEL" 2>&1 | tail -1 || die "import"
+python3 scripts/import_product_names.py "$WORK/all_labeled.csv" --source "$DELTA" \
+        --model-tag "$MODEL" 2>&1 | tail -1 || die "import"
 rm -rf product_name_work
 log "DONE. delta labeled=$N"

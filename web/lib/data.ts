@@ -10,6 +10,10 @@ export type Product = {
   confidence: string
   nPosts: number
   nComments: number
+  rawComments: number
+  eligibleComments: number
+  uniqueEligibleCommenters: number
+  independentThreads: number
   volumeLevel: string
   positivePct: number | null
   neutralPct: number | null

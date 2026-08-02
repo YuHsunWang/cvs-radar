@@ -63,6 +63,14 @@ class Contributor:
     weight: float
 
 
+@dataclass(frozen=True, slots=True)
+class CommentOpinion:
+    """One scorer/profile decision for a routed comment."""
+
+    include_score: bool
+    effective_sentiment: float | None
+
+
 @dataclass(slots=True)
 class ProductReport:
     """表示商品彙整評價報告。"""
@@ -76,6 +84,14 @@ class ProductReport:
     score_std: float
     n_posts: int
     n_comments: int
+    n_eligible_comments: int = 0
+    n_unique_commenters: int = 0
+    score_weight_sum: float = 0.0
+    score_weighted_sum: float = 0.0
+    score_weight_square_sum: float = 0.0
+    positive_weight: float = 0.0
+    neutral_weight: float = 0.0
+    negative_weight: float = 0.0
     contributors: list[Contributor] = field(default_factory=list)
     rep_positive: list[str] = field(default_factory=list)
     rep_negative: list[str] = field(default_factory=list)

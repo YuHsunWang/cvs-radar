@@ -7,6 +7,8 @@ import argparse
 import json
 from pathlib import Path
 
+from cvs_radar.store import validate_publishable_results, write_json_atomic
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RESULTS_PATH = ROOT / "data" / "results.json"
@@ -33,7 +35,8 @@ def strip_profiles(path: Path) -> None:
     payload = json.loads(path.read_text(encoding="utf-8"))
     payload["profiles"] = []
     _strip_identity(payload)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    validate_publishable_results(payload)
+    write_json_atomic(path, payload)
 
 
 def main() -> None:

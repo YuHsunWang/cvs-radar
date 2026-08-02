@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import itertools
+import csv
 import math
 import os
 import tempfile
@@ -8,7 +10,7 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from zoneinfo import ZoneInfo
 
 from cvs_radar import store
@@ -306,7 +308,11 @@ class CrawlerSeenCacheTest(unittest.TestCase):
                 patch("cvs_radar.crawler.parse_ptt_article", return_value=parsed_post),
             ):
                 posts = crawler.crawl(max_pages=1, start_date="2026-06-10", end_date="2026-06-10")
-            cached_urls = json.loads(cache_path.read_text(encoding="utf-8"))
+            cached_urls = (
+                json.loads(cache_path.read_text(encoding="utf-8"))
+                if cache_path.exists()
+                else []
+            )
         return article_url, crawler, cached_urls, posts
 
     def test_crawl_marks_successfully_parsed_out_of_window_post_seen(self) -> None:
@@ -315,8 +321,9 @@ class CrawlerSeenCacheTest(unittest.TestCase):
         article_url, crawler, cached_urls, posts = self._crawl_one(post)
 
         self.assertEqual(posts, [])
-        self.assertIn(article_url, crawler.seen_urls)
-        self.assertIn(article_url, cached_urls)
+        self.assertNotIn(article_url, crawler.seen_urls)
+        self.assertIn(article_url, crawler.pending_seen_urls)
+        self.assertNotIn(article_url, cached_urls)
         self.assertEqual(crawler.last_crawl_counts["date_excluded"], 1)
 
     def test_crawl_leaves_non_product_post_uncached_for_a_future_parse_retry(self) -> None:
@@ -353,8 +360,50 @@ class CrawlerSeenCacheTest(unittest.TestCase):
         article_url, crawler, cached_urls, posts = self._crawl_one(post)
 
         self.assertEqual([post.id for post in posts], ["in"])
-        self.assertIn(article_url, crawler.seen_urls)
-        self.assertIn(article_url, cached_urls)
+        self.assertNotIn(article_url, crawler.seen_urls)
+        self.assertIn(article_url, crawler.pending_seen_urls)
+        self.assertNotIn(article_url, cached_urls)
+
+
+class CrawlJobSeenTransactionTest(unittest.TestCase):
+    def test_seen_cache_is_committed_only_after_store_fsync_succeeds(self) -> None:
+        from crawl_job import main
+
+        crawler = Mock()
+        crawler.crawl.return_value = [Post(id="new", url="https://example.test/M.new")]
+        argv = ["crawl_job.py", "--skip-recompute", "--store", "/tmp/test-posts.jsonl"]
+
+        with (
+            patch("sys.argv", argv),
+            patch("crawl_job.PttCrawler", return_value=crawler),
+            patch("crawl_job.save_posts", side_effect=OSError("disk full")),
+        ):
+            with self.assertRaisesRegex(OSError, "disk full"):
+                main()
+
+        crawler.commit_seen.assert_not_called()
+
+    def test_successful_store_commit_persists_pending_seen_urls(self) -> None:
+        from crawl_job import main
+
+        events: list[str] = []
+        crawler = Mock()
+        crawler.crawl.return_value = [Post(id="new", url="https://example.test/M.new")]
+        crawler.commit_seen.side_effect = lambda: events.append("seen")
+        argv = ["crawl_job.py", "--skip-recompute", "--store", "/tmp/test-posts.jsonl"]
+
+        with (
+            patch("sys.argv", argv),
+            patch("crawl_job.PttCrawler", return_value=crawler),
+            patch("crawl_job.save_posts", side_effect=lambda *_: events.append("store") or 1),
+            patch(
+                "crawl_job.store_stats",
+                return_value={"post_count": 1, "comment_count": 0},
+            ),
+        ):
+            main()
+
+        self.assertEqual(events, ["store", "seen"])
 
 
 class ScoringTest(unittest.TestCase):
@@ -391,6 +440,22 @@ class ScoringTest(unittest.TestCase):
 
     def test_product_normalization_removes_brand(self) -> None:
         self.assertEqual(normalize_product("7-11", "711  測試飯糰"), "測試飯糰")
+
+    def test_product_grouping_is_permutation_stable_and_complete_link(self) -> None:
+        posts = [
+            Post(id="a", brand="其他", product_name="abcdefghij"),
+            Post(id="b", brand="其他", product_name="abcdefghijklmno"),
+            Post(id="bridge", brand="其他", product_name="abcdefghijkl"),
+        ]
+        memberships = []
+        for permutation in itertools.permutations(posts):
+            groups = group_products(list(permutation))
+            memberships.append(
+                sorted(sorted(post.id for post in members) for members in groups.values())
+            )
+
+        self.assertTrue(all(item == memberships[0] for item in memberships))
+        self.assertEqual(memberships[0], [["a", "bridge"], ["b"]])
 
     def test_product_normalization_strips_noise_and_units(self) -> None:
         self.assertEqual(
@@ -2135,7 +2200,10 @@ class CrawlerTest(unittest.TestCase):
             posts = crawler.crawl(max_pages=1, start_date="2026-06-02", end_date="2026-06-03")
 
             self.assertEqual(posts, [])
-            self.assertIn("https://www.ptt.cc/bbs/CVS/M.old.html", crawler.seen_urls)
+            self.assertNotIn("https://www.ptt.cc/bbs/CVS/M.old.html", crawler.seen_urls)
+            self.assertIn(
+                "https://www.ptt.cc/bbs/CVS/M.old.html", crawler.pending_seen_urls
+            )
 
 
 class CliTest(unittest.TestCase):
@@ -2467,16 +2535,50 @@ class CommentPickCacheTest(unittest.TestCase):
         self.assertEqual(rep_positive, ["第三則具體好評", "第一則具體好評"])
         self.assertEqual(rep_negative, ["第一則具體負評"])
 
-    def test_out_of_range_pick_is_dropped_instead_of_raising(self) -> None:
-        post = self._post()
-        positive, negative = _rep_candidates([post])
-        body = _body_candidates([post])
-        digest = comment_picks_fingerprint(post.brand, post.product_name, positive, negative, body)
+    def test_out_of_range_pick_is_rejected_by_the_cache_importer(self) -> None:
+        from scripts.import_comment_picks import import_picks
 
-        with self._with_picks({digest: CommentPicks((99, 1), (), (), ())}):
-            rep_positive, _ = _rep_comments([post])
+        fields = (
+            "fingerprint",
+            "brand",
+            "product_name",
+            "other_products",
+            "positive_candidates",
+            "negative_candidates",
+            "body_candidates",
+            "positive_picks",
+            "negative_picks",
+            "positive_body_picks",
+            "negative_body_picks",
+            "model",
+            "prompt_version",
+        )
+        row = {
+            "fingerprint": "a" * 64,
+            "brand": "7-11",
+            "product_name": "草莓蛋糕",
+            "other_products": "",
+            "positive_candidates": "0. 第一則\n1. 第二則",
+            "negative_candidates": "",
+            "body_candidates": "",
+            "positive_picks": "99|1",
+            "negative_picks": "",
+            "positive_body_picks": "",
+            "negative_body_picks": "",
+            "model": "codex",
+            "prompt_version": "comment-picks-v1",
+        }
+        with TemporaryDirectory() as tmp:
+            labeled = Path(tmp) / "labeled.csv"
+            cache = Path(tmp) / "cache.csv"
+            with labeled.open("w", encoding="utf-8-sig", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fields)
+                writer.writeheader()
+                writer.writerow(row)
 
-        self.assertEqual(rep_positive, ["第二則具體好評"])
+            with self.assertRaisesRegex(ValueError, "outside candidate range"):
+                import_picks(labeled, cache)
+            self.assertFalse(cache.exists())
 
     def test_unlabelled_product_falls_back_to_top_ranked_comments(self) -> None:
         post = self._post()
