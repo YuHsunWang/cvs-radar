@@ -12,7 +12,7 @@ CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.yaml"
 _DEFAULT_CONFIG: dict[str, Any] = {
     "BRANDS": {
         "7-11": ["7-11", "711", "7-eleven", "小7", "小七", "seven", "統一超"],
-        "全家": ["全家", "FamilyMart", "family mart", "fami"],
+        "全家": ["全家", "FamilyMart", "family mart", "Fami!ce", "fami"],
         "萊爾富": ["萊爾富", "Hi-Life", "hilife"],
         "OK": ["OK超商", "OKmart", "OK"],
         "美聯社": ["美聯社"],

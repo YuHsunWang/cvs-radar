@@ -1399,6 +1399,20 @@ class ExtractionRegressionTest(unittest.TestCase):
         self.assertEqual(canonical_product_name("全家", "全家 草莓大福"), "草莓大福")
         self.assertEqual(canonical_product_name("OK", "ok便利商店 廣達香肉鬆飯糰"), "便利商店廣達香肉鬆飯糰")
 
+    def test_the_famice_sub_brand_is_stripped_whole_not_halfway(self) -> None:
+        # Fami!ce 是全家自有霜淇淋品牌。字界規則會放行 fami（後面是驚嘆號），
+        # 只拔掉前半就會讓 !ce 黏在品名開頭——線上出現過「ce霜淇淋」。
+        # 解法是讓完整的 Fami!ce 先被當成品牌比對掉。
+        self.assertEqual(
+            canonical_product_name("全家", "全家Fami!ce霜淇淋 伊藤園抹茶x焦糖蘇打"),
+            "霜淇淋伊藤園抹茶x焦糖蘇打",
+        )
+        # 併回既有商品才是重點：拔一半會讓同一支霜淇淋被拆成兩項。
+        self.assertEqual(
+            canonical_product_name("全家", "Fami!ce 滑爆可樂霜淇淋 買一送一"),
+            canonical_product_name("全家", "滑爆可樂霜淇淋"),
+        )
+
     def test_bracketed_qualifier_survives_but_a_bracketed_promo_does_not(self) -> None:
         # 括號裡的變體標記是識別商品的一部分：整組剝掉會讓無糖與有糖、中杯與大杯
         # 收斂成同一項商品。
