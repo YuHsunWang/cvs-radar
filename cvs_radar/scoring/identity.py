@@ -869,10 +869,7 @@ def canonical_product_name(brand: str, name: str) -> str:
 def _clean_product_name(brand: str, name: str) -> str:
     s = unicodedata.normalize("NFKC", name or "").strip()
     s = unwrap_name_brackets(s)
-    keywords = [*BRANDS.get(brand, []), brand]
-    for kw in sorted(set(keywords), key=len, reverse=True):
-        if kw:
-            s = re.sub(re.escape(kw), " ", s, flags=re.IGNORECASE)
+    s = _strip_brand_keywords(s, brand)
     s = _NAME_SEPARATOR_RE.sub(" ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
@@ -913,10 +910,7 @@ def _apply_product_alias(brand: str, cleaned_name: str) -> str:
 def _clean_product_name_without_alias(brand: str, name: str) -> str:
     s = unicodedata.normalize("NFKC", name or "").strip()
     s = unwrap_name_brackets(s)
-    keywords = [*BRANDS.get(brand, []), brand]
-    for kw in sorted(set(keywords), key=len, reverse=True):
-        if kw:
-            s = re.sub(re.escape(kw), " ", s, flags=re.IGNORECASE)
+    s = _strip_brand_keywords(s, brand)
     s = _NAME_SEPARATOR_RE.sub(" ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)

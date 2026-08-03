@@ -1386,6 +1386,19 @@ class ExtractionRegressionTest(unittest.TestCase):
         # 品名裡本來就沒有點的數字不受影響。
         self.assertEqual(canonical_product_name("萊爾富", "77乳加星球含餡巧克力"), "77乳加星球含餡巧克力")
 
+    def test_an_ascii_brand_alias_is_not_carved_out_of_a_longer_word(self) -> None:
+        # 全家的別名含 "fami"，一旦用無字界的比對就會把 FAMIMA 咬成 MA，
+        # 線上因此出現過「MA托特包」。品牌只有在自己成詞時才算品牌。
+        self.assertEqual(
+            canonical_product_name("全家", "FAMIMA托特包一太陽星星"),
+            "FAMIMA托特包一太陽星星",
+        )
+        # 同一條規則對 OK 更要緊：cookie 裡的 ok 不是超商。
+        self.assertEqual(canonical_product_name("OK", "cookie餅乾"), "cookie餅乾")
+        # 但品牌真的獨立成詞時仍要拔掉，否則整批品名都會多出前綴。
+        self.assertEqual(canonical_product_name("全家", "全家 草莓大福"), "草莓大福")
+        self.assertEqual(canonical_product_name("OK", "ok便利商店 廣達香肉鬆飯糰"), "便利商店廣達香肉鬆飯糰")
+
     def test_bracketed_qualifier_survives_but_a_bracketed_promo_does_not(self) -> None:
         # 括號裡的變體標記是識別商品的一部分：整組剝掉會讓無糖與有糖、中杯與大杯
         # 收斂成同一項商品。
