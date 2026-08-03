@@ -27,7 +27,6 @@ nlp-optional = [
   "SnowNLP>=0.12.3",
   "openai>=2,<3",
 ]
-legacy = ["streamlit>=1.41,<2"]
 dev = [
   "httpx>=0.27,<1",
   "pytest>=8,<10",

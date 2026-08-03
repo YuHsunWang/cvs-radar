@@ -33,9 +33,9 @@
 
 ## Repo 拓撲
 
-- 兩個 local repo 共用同一 remote:`cvs-radar-clean`(main,
-  Next.js 15 + TS,Vercel 部署)與 `cvs-radar`(ui/mobile-redesign,
-  Streamlit 舊版)。
+- 開發用 local repo:`cvs-radar-clean`(main,Next.js 15 + TS,
+  Vercel 部署)。舊 Streamlit 原型已於 2026-08-03 移出本 repo,
+  封存在獨立的 `cvs-radar-streamlit-legacy`。
 - Python 3.12 管線(crawl_job.py 每日抓取)+ 靜態輸出給前端。
 - Issue tracker:Linear(DEV-xx)。
 

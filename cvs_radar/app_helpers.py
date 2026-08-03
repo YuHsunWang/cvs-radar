@@ -1,4 +1,4 @@
-"""Small adapters shared by the Streamlit app and API layer.
+"""Small adapters used by the API layer.
 
 These helpers keep framework code focused on input/output while all filtering,
 scoring, and ranking stays in ``cvs_radar.service``.
@@ -114,7 +114,7 @@ def build_product_query(
 
 
 def product_rows(result: ProductQueryResult) -> list[dict[str, Any]]:
-    """Convert service output into rows suitable for Streamlit tables."""
+    """Convert service output into flat rows suitable for tabular rendering."""
 
     rows: list[dict[str, Any]] = []
     for rank, report in enumerate(result.reports, 1):

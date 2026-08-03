@@ -1,6 +1,8 @@
 # CVS Radar Web — Frontend Design
 
-> Last verified: 2026-07-23 against `components/ProductExplorer.tsx`.
+> Component inventory last verified: 2026-08-03 against `components/ShelfExplorer.tsx`.
+> The "Visual design" section below still describes the retired classic card
+> layout and has **not** been re-verified against the shelf-edge UI.
 
 A mobile-first static web frontend for CVS Radar. It presents the ranked
 convenience-store product reviews as a shopper-facing app you can read standing
@@ -56,14 +58,15 @@ Per-product shape:
 
 ```
 app/layout.tsx          root layout, metadata, global styles
-app/page.tsx            shopper page — owns search / brand / date / sort / expanded state
-components/TopBar        responsive header and data-update notice
-components/SearchBar     persistent live search
-components/CategoryChips intent-based category filter (meal, dessert, drink, etc.)
-components/BrandChips    brand filter pills (single-select)
-components/DateRangeSlider accessible live dual-thumb latest-review-date filter
-components/ProductCard   ranked card with a semantic expand/collapse summary button
+app/page.tsx            shopper page — mounts ShelfExplorer with the built payload
+app/shelf/page.tsx      same UI under an explicit /shelf URL
+app/shelf/shelf.css     the sl-* styles for the shelf-edge label layout
+components/ShelfExplorer owns search / brand / category / sort state, the desktop
+                         filter rail, and the mobile filter sheet
+components/ShelfCard     shelf-edge label row with an expand/collapse detail button
 components/ProductDetail 單品判斷 detail: score, consensus bar, volume, author review, comment summary, source links
+components/SearchBar     persistent live search
+components/CountUp       animated score counter used by ShelfCard
 lib/data.ts             types + loader + pure filter / sort / search helpers
 ```
 

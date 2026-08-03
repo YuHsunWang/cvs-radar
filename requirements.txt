@@ -1,3 +1,2 @@
 # Backwards-compatible install entry point for the active pipeline.
-# Streamlit remains available only through the pyproject's legacy extra.
 .[core,api,nlp-optional]
