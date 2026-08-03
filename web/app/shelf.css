@@ -1,5 +1,5 @@
 /* Shelf-edge label variant — scoped styles (all classes prefixed `sl-`).
-   Imported only by app/shelf/page.tsx so it never touches the default UI. */
+   Imported by app/page.tsx, the only route that renders ShelfExplorer. */
 
 .sl-page {
   --sl-aisle: #e7e4db;

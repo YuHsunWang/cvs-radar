@@ -58,9 +58,8 @@ Per-product shape:
 
 ```
 app/layout.tsx          root layout, metadata, global styles
-app/page.tsx            shopper page — mounts ShelfExplorer with the built payload
-app/shelf/page.tsx      same UI under an explicit /shelf URL
-app/shelf/shelf.css     the sl-* styles for the shelf-edge label layout
+app/page.tsx            the only shopper route — mounts ShelfExplorer with the built payload
+app/shelf.css           the sl-* styles for the shelf-edge label layout
 components/ShelfExplorer owns search / brand / category / sort state, the desktop
                          filter rail, and the mobile filter sheet
 components/ShelfCard     shelf-edge label row with an expand/collapse detail button

@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import ShelfExplorer from '@/components/ShelfExplorer'
 import type { DataPayload } from '@/lib/data'
-import './shelf/shelf.css'
+import './shelf.css'
 
 async function loadInitialPayload(): Promise<DataPayload> {
   const source = await readFile(join(process.cwd(), 'public', 'data.json'), 'utf8')
