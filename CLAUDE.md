@@ -34,8 +34,15 @@ cd web && npm test
 cd web && npm run build
 ```
 
-Two of those are gates people forget:
+Three of those are gates people forget:
 
+- **A docs-only change is not exempt from `pytest`.** `tests/test_docs_runtime.py`
+  reads `README.md`, `CVS-Radar-PRD-v0.2.md`, `docs/ops-pipeline.md` and
+  `docs/crawl_plan.md` as text and asserts specific sentences are present — plus
+  one overclaim (`公開快照每日自動更新`) that must stay absent, because the repo
+  cannot prove the external scheduling host exists. Rewriting prose in any of
+  those four files can turn CI red without a line of code changing. Reasoning
+  "it's only the README, the gates don't apply" is how that happens.
 - **`npm run build:data` + `git diff --exit-code -- web/public/data.json`.** CI
   rebuilds the public payload and fails if the committed one differs. Any change
   to `web/build_data.py`'s output fields *must* land together with a rebuilt
