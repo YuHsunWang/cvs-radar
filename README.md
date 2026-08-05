@@ -16,7 +16,7 @@
 用得上的推薦依據：搜尋、比較、看清楚大家為什麼推或不推，再一鍵回到原文。
 
 站上收錄約 800 項商品，來自近一年、近千篇貼文與上萬則留言。從爬取、語意判讀、統計評分
-到前端網站都是自己蓋的，每天自動更新，線上跑著。
+到前端網站都是自己蓋的，由每日排程重算後發佈，線上跑著。
 
 ## 產品樣貌
 
@@ -81,7 +81,7 @@
 
 - **讓 LLM 參與，但不讓結果變成不可重現。** 四個語意層都由 LLM 判讀，但每筆結果都以內容指紋（含 prompt 版本）快取進版控。相同輸入重算不再呼叫模型，也產生完全相同的分數——CI 因此跑得動，成本也可控。
 - **統計上不逞強。** 貝氏收斂、單人設限、時間衰減，加上樣本不足就不給分。願意在產品上留白，比湊出一個好看的排行難。
-- **端到端自己蓋完並且真的在跑。** 從爬蟲、標記管線、評分到靜態前端，每天自動更新，不是一次性的 demo。
+- **端到端自己蓋完並且真的在跑。** 從爬蟲、標記管線、評分到靜態前端，資料由每日排程重算後發佈，不是一次性的 demo。
 - **驗收方式要對得上想驗的東西。** 管線給定相同輸入是確定性的，所以改動的驗證方式是前後各跑一次完整管線、比對結果集，而不是只看單元測試綠燈。
 
 細節見 [評分決策](docs/DECISIONS.md)、[標註規範](docs/labeling_guideline.md) 與 [Ops 管線](docs/ops-pipeline.md)。
@@ -146,7 +146,7 @@ npm run build
 
 <https://yuhsunwang.github.io/cvs-radar/> 是同一個站的靜態鏡像，由 `.github/workflows/pages.yml` 在每次 push 到 `main` 時重建 payload、以 `/cvs-radar` base path 建置、上傳並部署。
 
-兩邊都讀同一份 `web/public/data.json`。這份資料由 repo 外部的排程主機執行本專案的 cron wrapper 後重算並 commit 回 `main`。排程若停擺，repo 不會自己更新，`scripts/check_data_freshness.py` 是可觀察的守門員。CI 則透過 `.github/workflows/ci.yml` 獨立跑前後端檢查。
+兩邊都讀同一份 `web/public/data.json`。這份資料由 repo 外部的排程主機執行本專案的 cron wrapper 後重算並 commit 回 `main`；repository 本身不包含或證明該主機的 crontab。排程若停擺，repo 不會自己更新，`scripts/check_data_freshness.py` 是可觀察的守門員。CI 則透過 `.github/workflows/ci.yml` 獨立跑前後端檢查。
 
 ## 限制與後續
 

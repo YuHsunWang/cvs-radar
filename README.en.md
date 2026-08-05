@@ -19,7 +19,8 @@ don't, and jump back to the original thread in one tap.
 
 The site covers roughly 800 products, drawn from close to a thousand posts and over ten
 thousand comments across the past year. Crawling, semantic reading, statistical scoring and
-the frontend are all built here, refreshed daily, and running live.
+the frontend are all built here, recomputed and republished by a daily schedule, and
+running live.
 
 ## Product preview
 
@@ -109,7 +110,7 @@ filtering run locally with no backend.
   score at all below the sample threshold. Being willing to leave a gap in the product is
   harder than producing a good-looking ranking.
 - **Built end to end, and actually running.** Crawler, labelling pipeline, scoring and
-  static frontend, refreshed daily — not a one-off demo.
+  static frontend, recomputed and republished on a daily schedule — not a one-off demo.
 - **Acceptance criteria have to match what you actually want to verify.** The pipeline is
   deterministic given the same input, so a change is validated by running the full pipeline
   before and after and diffing the result set, not by watching unit tests go green.
@@ -186,9 +187,9 @@ production deployment. The app is a Next.js static export (`output: 'export'`).
 export with the `/cvs-radar` base path, upload and deploy.
 
 Both serve the same `web/public/data.json`. That file is recomputed and committed to `main`
-by an externally scheduled host running this project's cron wrapper. If the schedule stalls,
-the repository does not update itself; `scripts/check_data_freshness.py` is the observable
-guard. CI runs backend and frontend checks independently through `.github/workflows/ci.yml`.
+by an externally scheduled host running this project's cron wrapper; the repository neither
+contains nor proves that host's crontab. If the schedule stalls, the repository does not
+update itself; `scripts/check_data_freshness.py` is the observable guard. CI runs backend and frontend checks independently through `.github/workflows/ci.yml`.
 
 ## Limitations and next steps
 
