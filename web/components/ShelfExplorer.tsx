@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import Link from 'next/link'
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
@@ -393,6 +394,9 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <span>上架更新 {formatDisplayDate(initialPayload.generatedAt)}</span>
         <span className="sl-ab-sep">·</span>
         <span>分數＝綜合評分／滿分 100</span>
+        <Link href="/soft-serve/" className="sl-zonelink">
+          🍦 霜淇淋專區
+        </Link>
       </div>
 
       <div className="sl-searchwrap">
