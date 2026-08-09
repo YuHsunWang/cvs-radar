@@ -104,6 +104,20 @@ export function buildFlavorGroups(products: Product[]): FlavorGroup[] {
   })
 }
 
+/**
+ * Flavours that earned a card. A swirl row only links to its partner when the
+ * partner is in here — the other half of most swirls was never sold on its own,
+ * so there is no card to jump to.
+ */
+export function comparableFlavors(groups: FlavorGroup[]): Set<string> {
+  return new Set(groups.map((group) => group.flavor))
+}
+
+/** Anchor id for a flavour card, shared by the card and the rows linking to it. */
+export function flavorAnchorId(flavor: string): string {
+  return `ss-f-${flavor}`
+}
+
 /** Products already shown in the comparison section, keyed by product id. */
 export function groupedProductIds(groups: FlavorGroup[]): Set<string> {
   const ids = new Set<string>()

@@ -52,7 +52,21 @@
   border: 1px solid var(--sl-hair);
   border-radius: 3px;
   padding: 13px 14px 12px;
+  scroll-margin-top: 14px;
 }
+/* Jumping between the two halves of a swirl lands on a card that looks like
+   every other card, so mark the one that was asked for. */
+.ss-group:target {
+  border-color: var(--sl-ink);
+  box-shadow: 0 0 0 3px var(--sl-pop);
+}
+
+.ss-r-jump {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.ss-r-jump:hover { color: var(--sl-ink); text-decoration-style: solid; }
 
 .ss-g-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .ss-g-flavor { font-size: 16px; font-weight: 800; color: var(--sl-ink); min-width: 0; }

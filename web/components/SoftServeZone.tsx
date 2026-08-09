@@ -17,6 +17,8 @@ import {
   FlavorGroup,
   SoftServeItem,
   buildFlavorGroups,
+  comparableFlavors,
+  flavorAnchorId,
   flavorVerdict,
   freshness,
   freshnessLabel,
@@ -58,6 +60,7 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
   )
 
   const groups = useMemo(() => buildFlavorGroups(products), [products])
+  const linkable = useMemo(() => comparableFlavors(groups), [groups])
 
   const leftovers = useMemo(() => {
     const grouped = groupedProductIds(groups)
@@ -166,7 +169,7 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
         ) : (
           <div className="ss-groups">
             {groups.map((group) => (
-              <FlavorCard key={group.flavor} group={group} />
+              <FlavorCard key={group.flavor} group={group} linkable={linkable} />
             ))}
           </div>
         )}
@@ -194,12 +197,12 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
   )
 }
 
-function FlavorCard({ group }: { group: FlavorGroup }) {
+function FlavorCard({ group, linkable }: { group: FlavorGroup; linkable: Set<string> }) {
   const verdict = flavorVerdict(group)
   const rows = group.single ? [group.single, ...group.duals] : group.duals
 
   return (
-    <article className="ss-group">
+    <article className="ss-group" id={flavorAnchorId(group.flavor)}>
       <header className="ss-g-head">
         <h3 className="ss-g-flavor">{group.flavor}</h3>
         <span className="ss-g-count">{rows.length} 種吃法</span>
@@ -207,7 +210,7 @@ function FlavorCard({ group }: { group: FlavorGroup }) {
 
       <ul className="ss-rows">
         {rows.map((item) => (
-          <FlavorRow key={item.product.id} item={item} flavor={group.flavor} />
+          <FlavorRow key={item.product.id} item={item} flavor={group.flavor} linkable={linkable} />
         ))}
       </ul>
 
@@ -222,18 +225,35 @@ function FlavorCard({ group }: { group: FlavorGroup }) {
   )
 }
 
-function FlavorRow({ item, flavor }: { item: SoftServeItem; flavor: string }) {
+function FlavorRow({
+  item,
+  flavor,
+  linkable,
+}: {
+  item: SoftServeItem
+  flavor: string
+  linkable: Set<string>
+}) {
   const score = comprehensiveScore(item.product)
   const badge = freshnessLabel(freshness(item.product.latestDate))
   // Full date, not MM/DD: the zone spans more than a year, so a bare 08/04 is
   // ambiguous between a product from this summer and one from the last.
   const date = item.product.latestDate ? item.product.latestDate.replaceAll('-', '/') : '—'
+  const partner = item.isDual ? partnerFlavor(item, flavor) : ''
 
   return (
     <li className="ss-row" title={item.product.productName}>
       <div className="ss-r-top">
         <span className={`ss-r-kind${item.isDual ? ' ss-dual' : ''}`}>
-          {item.isDual ? `× ${partnerFlavor(item, flavor)}` : '單吃'}
+          {!item.isDual ? (
+            '單吃'
+          ) : linkable.has(partner) ? (
+            <a className="ss-r-jump" href={`#${flavorAnchorId(partner)}`} title={`看 ${partner} 的對照`}>
+              × {partner}
+            </a>
+          ) : (
+            `× ${partner}`
+          )}
         </span>
         <span className={`ss-r-score ${scoreTone(score)}`}>
           {score === null ? '暫無' : score}

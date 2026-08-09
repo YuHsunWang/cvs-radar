@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { Product } from './data'
 import {
   buildFlavorGroups,
+  comparableFlavors,
   flavorVerdict,
   freshness,
   groupedProductIds,
@@ -135,6 +136,25 @@ describe('groupedProductIds', () => {
     expect(ids.has('全家::梨山水蜜桃霜淇淋')).toBe(true)
     expect(ids.has('全家::梨山水蜜桃x小農牛奶霜淇淋')).toBe(true)
     expect(ids.has('全家::澎湖仙人掌霜淇淋')).toBe(false)
+  })
+})
+
+describe('comparableFlavors', () => {
+  it('covers a swirl partner that has its own card but not one that does not', () => {
+    // The zone links a swirl row to its partner's card. 莊園牛奶 was also sold
+    // on its own so it has a card; 小農牛奶 only ever appeared inside a swirl,
+    // and linking to it would point at nothing.
+    const groups = buildFlavorGroups([
+      softServe('起司蛋糕霜淇淋', 67),
+      softServe('莊園牛奶霜淇淋', 77),
+      softServe('起司蛋糕x莊園牛奶霜淇淋', 80),
+      softServe('梨山水蜜桃霜淇淋', 69),
+      softServe('梨山水蜜桃x小農牛奶霜淇淋', 54),
+    ])
+    const flavors = comparableFlavors(groups)
+
+    expect(flavors.has('莊園牛奶')).toBe(true)
+    expect(flavors.has('小農牛奶')).toBe(false)
   })
 })
 
