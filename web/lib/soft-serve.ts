@@ -15,11 +15,7 @@ const DUAL_FLAVOR_OVERRIDES: Record<string, [string, string]> = {
   起司蛋糕比利時巧克力霜淇淋: ['起司蛋糕', '比利時巧克力'],
 }
 
-export const HOT_WITHIN_DAYS = 30
-export const QUIET_AFTER_DAYS = 180
 export const VERDICT_MIN_GAP = 5
-
-const millisecondsPerDay = 24 * 60 * 60 * 1000
 
 export function isSoftServe(product: Product): boolean {
   return product.productName.includes(SOFT_SERVE_KEYWORD)
@@ -164,23 +160,3 @@ export function flavorVerdict(group: FlavorGroup): FlavorVerdict | null {
   return { winner: 'single', text: `單吃評價較好（${singleScore} 分 vs 配${partner} ${dualScore} 分）` }
 }
 
-// The site has no on-shelf / off-shelf data, only the date of the most recent
-// PTT discussion. These buckets describe discussion activity and deliberately
-// stop short of claiming a product is still being sold.
-export type Freshness = 'hot' | 'steady' | 'quiet' | 'unknown'
-
-export function freshness(latestDate: string | null, now = Date.now()): Freshness {
-  if (!latestDate) return 'unknown'
-  const latestMs = Date.parse(`${latestDate}T00:00:00+08:00`)
-  if (!Number.isFinite(latestMs)) return 'unknown'
-  const ageDays = (now - latestMs) / millisecondsPerDay
-  if (ageDays <= HOT_WITHIN_DAYS) return 'hot'
-  if (ageDays <= QUIET_AFTER_DAYS) return 'steady'
-  return 'quiet'
-}
-
-export function freshnessLabel(value: Freshness): string | null {
-  if (value === 'hot') return '熱議中'
-  if (value === 'quiet') return '已沉寂'
-  return null
-}

@@ -18,18 +18,6 @@
 }
 .ss-back:hover { background: rgba(246, 243, 234, 0.12); }
 
-.ss-note {
-  margin: 12px 2px 0;
-  padding: 9px 11px;
-  font-size: 12px;
-  line-height: 1.65;
-  color: var(--sl-soft);
-  background: var(--sl-tag);
-  border: 1px dashed var(--sl-hair);
-  border-radius: 3px;
-}
-.ss-note b { color: var(--sl-ink); }
-
 .ss-section { margin-top: 26px; }
 
 .ss-h2 {
@@ -104,15 +92,6 @@
   color: var(--sl-soft);
 }
 .ss-m-brand { font-weight: 700; color: var(--sl-ink); }
-.ss-m-badge {
-  font-family: var(--sl-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  padding: 1px 5px;
-  border-radius: 2px;
-}
-.ss-b-hot { color: #fff; background: var(--sl-hot); }
-.ss-b-quiet { color: var(--sl-soft); background: #e9e6dd; }
 .ss-m-warn { color: var(--sl-mid); font-weight: 700; }
 
 .ss-verdict {

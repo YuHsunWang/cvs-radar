@@ -4,7 +4,6 @@ import {
   buildFlavorGroups,
   comparableFlavors,
   flavorVerdict,
-  freshness,
   groupedProductIds,
   isSoftServe,
   splitFlavors,
@@ -210,19 +209,3 @@ describe('flavorVerdict', () => {
   })
 })
 
-describe('freshness', () => {
-  // Midnight so the bucket boundaries land on whole days.
-  const now = Date.parse('2026-08-09T00:00:00+08:00')
-
-  it('separates recent discussion from long-dormant products', () => {
-    expect(freshness('2026-08-04', now)).toBe('hot')
-    expect(freshness('2026-06-15', now)).toBe('steady')
-    expect(freshness('2025-09-28', now)).toBe('quiet')
-    expect(freshness(null, now)).toBe('unknown')
-  })
-
-  it('keeps the boundary days inside the friendlier bucket', () => {
-    expect(freshness('2026-07-10', now)).toBe('hot')
-    expect(freshness('2026-07-09', now)).toBe('steady')
-  })
-})

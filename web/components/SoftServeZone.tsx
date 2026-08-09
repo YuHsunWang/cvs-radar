@@ -20,8 +20,6 @@ import {
   comparableFlavors,
   flavorAnchorId,
   flavorVerdict,
-  freshness,
-  freshnessLabel,
   groupedProductIds,
   partnerFlavor,
   softServeItems,
@@ -114,11 +112,6 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
         <span className="sl-ab-sep">·</span>
         <span>分數＝綜合評分／滿分 100</span>
       </div>
-
-      <p className="ss-note">
-        霜淇淋幾乎都是期間限定,但本站沒有官方上下架資料。這裡的日期是
-        <b> PTT 最新討論日</b>,「熱議中／已沉寂」描述的是討論熱度,不等於現在買不買得到。
-      </p>
 
       {/* ss-controls, not sl-controls: the shelf hides its inline filter bar on
           phones in favour of a sheet, and one brand row does not need one. */}
@@ -235,7 +228,6 @@ function FlavorRow({
   linkable: Set<string>
 }) {
   const score = comprehensiveScore(item.product)
-  const badge = freshnessLabel(freshness(item.product.latestDate))
   // Full date, not MM/DD: the zone spans more than a year, so a bare 08/04 is
   // ambiguous between a product from this summer and one from the last.
   const date = item.product.latestDate ? item.product.latestDate.replaceAll('-', '/') : '—'
@@ -270,7 +262,6 @@ function FlavorRow({
       <div className="ss-r-meta">
         <span className="ss-m-brand">{displayBrand(item.product.brand)}</span>
         <span>最新討論 {date}</span>
-        {badge ? <span className={`ss-m-badge ss-b-${badge === '熱議中' ? 'hot' : 'quiet'}`}>{badge}</span> : null}
         {item.product.confidence === '低' ? <span className="ss-m-warn">樣本少</span> : null}
       </div>
     </li>
