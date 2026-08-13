@@ -107,4 +107,5 @@ class ProductReport:
     shill_flag: bool = False
     latest_post_date: datetime | None = None
     review_excerpt: str = ""
+    review_provisional: bool = False
     post_urls: list[str] = field(default_factory=list)

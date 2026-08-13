@@ -15,11 +15,11 @@ if str(ROOT) not in sys.path:
 from cvs_radar.excerpt_labels import (  # noqa: E402
     EXCERPT_LABELS_PATH,
     PROMPT_VERSION,
-    excerpt_fingerprint,
     excerpt_fingerprint_v2,
     format_other_products,
     load_excerpt_labels,
 )
+from cvs_radar.scoring import _body_candidates  # noqa: E402
 from cvs_radar.store import load_posts  # noqa: E402
 
 DEFAULT_POSTS_PATH = ROOT / "data" / "posts.jsonl"
@@ -32,10 +32,16 @@ FIELDNAMES = (
     "product_name",
     "other_products",
     "review_text",
-    "excerpt",
+    "body_candidates",
+    "source_indices",
+    "rewrite",
     "model",
     "prompt_version",
 )
+
+
+def _numbered_candidates(candidates: list[str]) -> str:
+    return "\n".join(f"{index}. {text}" for index, text in enumerate(candidates))
 
 
 def export_unlabeled_excerpts(posts_path: Path, out_path: Path, labels_path: Path) -> int:
@@ -51,6 +57,9 @@ def export_unlabeled_excerpts(posts_path: Path, out_path: Path, labels_path: Pat
             review = item.review_text or ""
             if not review.strip():
                 continue
+            body = _body_candidates([item])
+            if not body:
+                continue
             # Naming the thread's other products is what lets the labeller keep their
             # sentences out of this product's excerpt, so it belongs in the key that
             # stores the answer.
@@ -61,9 +70,9 @@ def export_unlabeled_excerpts(posts_path: Path, out_path: Path, labels_path: Pat
                 review,
                 brand=item.brand,
                 other_products=other_products,
+                candidate_sentences=body,
             )
-            legacy = excerpt_fingerprint(item.id, item.product_name, review)
-            if fingerprint in labelled or legacy in labelled or fingerprint in seen:
+            if fingerprint in labelled or fingerprint in seen:
                 continue
             seen.add(fingerprint)
             rows.append(
@@ -74,7 +83,9 @@ def export_unlabeled_excerpts(posts_path: Path, out_path: Path, labels_path: Pat
                     "product_name": item.product_name,
                     "other_products": other_products,
                     "review_text": review,
-                    "excerpt": "",
+                    "body_candidates": _numbered_candidates(body),
+                    "source_indices": "",
+                    "rewrite": "",
                     "model": "",
                     "prompt_version": PROMPT_VERSION,
                 }

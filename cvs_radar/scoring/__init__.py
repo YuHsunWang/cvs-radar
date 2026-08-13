@@ -5,7 +5,7 @@ from ._common import (AccountProfile, BRANDS, BRAND_COMPARISON, CONFIDENCE_BANDS
 from .identity import (_apply_product_alias, _best_price_from_text, _both_ice_forms, _bundle_adjusted_price, _candidate_product_lines, _char_jaccard, _clean_extracted_product_name, _clean_product_name, _clean_product_name_without_alias, _compact_key, _extract_first_line_with_price_anywhere, _extract_multiline_products, _extract_multiple_price_segments, _extract_products_and_prices_from_text, _extract_shared_prefix_flavors, _extract_slash_same_price_products, _extract_space_separated_parallel_products, _has_distinctive_difference, _is_bare_form_name, _is_junk_extracted_product_name, _is_price_context_line, _is_price_label_name, _matched_flavor_terms, _matched_product_forms, _name_bigrams, _name_continuation, _normalize_marketing_text, _normalize_product_pattern_text, _price_from_text, _primary_price_from_text, _replace_post_product, _reply_product_extraction_text, _route_comments_by_product, _same_combo_flavor_product, _same_product, _strip_brand_keywords, _strip_payment_asides, _strip_product_item_promo_suffix, _strip_product_name_promo_suffix, _strip_trailing_noise, _title_fallback_product_name, canonical_product_name, categorize_product, extract_products_and_prices, extract_products_and_prices_by_rules, group_products, normalize_product, preprocess_posts)
 from .attribution import (_CommentAttribution, _all_brand_spans, _brand_aliases, _brand_positions, _canonical_brand, _comment_attribution, _competitor_stats, _favored_brand, _favored_by_bi_comparison, _favored_by_nearby_positive, _favored_by_still_pattern, _favored_by_win_loss, _has_comparison_tone, _has_positive_after, _has_positive_before, _is_reaction_echo_comment, _mentioned_other_brands, _nearest_after, _nearest_before, _positive_terms, _term_indexes, _text_token)
 from .compute import (_author_contributions, _classify, _commenter_contributions, _confidence, _decay, _is_shill_comment, _n_eff, _shill_stats, _weighted_mean, _weighted_std, build_comment_opinions, score_all, score_product)
-from .excerpt import (BODY_CANDIDATE_LIMIT, REP_CANDIDATE_LIMIT, _ReviewCandidate, _body_candidates, _body_highlights, _chunk_review_fragment, _clean_representative_comment, _dedupe_ranked_comments, _load_review_excerpt_overrides, _looks_hard_wrapped, _merge_wrapped_review_lines, _remove_unmatched_parentheses, _render_review_sentences, _rep_candidates, _rep_comments, _review_candidates, _review_excerpt, _review_sentences, _review_sentences_similar, representative_product_name)
+from .excerpt import (BODY_CANDIDATE_LIMIT, REP_CANDIDATE_LIMIT, _ReviewCandidate, _body_candidates, _body_highlights, _chunk_review_fragment, _clean_representative_comment, _dedupe_ranked_comments, _load_review_excerpt_overrides, _looks_hard_wrapped, _merge_wrapped_review_lines, _remove_unmatched_parentheses, _render_review_sentences, _rep_candidates, _rep_comments, _review_candidates, _review_excerpt, _review_excerpt_with_provenance, _review_sentences, _review_sentences_similar, representative_product_name)
 
 __all__ = [
     'AccountProfile',
@@ -152,6 +152,7 @@ __all__ = [
     '_reply_product_extraction_text',
     '_review_candidates',
     '_review_excerpt',
+    '_review_excerpt_with_provenance',
     '_review_sentences',
     '_review_sentences_similar',
     '_route_comments_by_product',

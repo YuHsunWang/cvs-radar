@@ -16,7 +16,12 @@ from ..preference import AccountProfile
 
 from ._common import (_OFF_TOPIC_COMMENT_RE)
 from .attribution import (_comment_attribution, _competitor_stats, _is_reaction_echo_comment)
-from .excerpt import (_load_review_excerpt_overrides, _rep_comments, _review_excerpt, representative_product_name)
+from .excerpt import (
+    _load_review_excerpt_overrides,
+    _rep_comments_with_provenance,
+    _review_excerpt_with_provenance,
+    representative_product_name,
+)
 from .identity import (categorize_product, group_products, normalize_product)
 
 
@@ -270,8 +275,15 @@ def score_product(
     contributors = sorted(opinion_contributors, key=lambda c: -c.weight)
     product_name = representative_product_name(posts)
     product_key = f"{posts[0].brand}:{normalize_product(posts[0].brand, product_name)}"
-    review_excerpt = _load_review_excerpt_overrides().get(product_key) or _review_excerpt(posts)
-    rep_pos, rep_neg = _rep_comments(posts, excerpt=review_excerpt)
+    override = _load_review_excerpt_overrides().get(product_key)
+    if override:
+        review_excerpt = override
+        review_excerpt_provisional = False
+    else:
+        review_excerpt, review_excerpt_provisional = _review_excerpt_with_provenance(posts)
+    rep_pos, rep_neg, rep_provisional = _rep_comments_with_provenance(
+        posts, excerpt=review_excerpt
+    )
     (
         competitor_mention_count,
         competitor_preference_count,
@@ -322,6 +334,7 @@ def score_product(
         shill_flag=shill_flag,
         latest_post_date=latest_post_date,
         review_excerpt=review_excerpt,
+        review_provisional=review_excerpt_provisional or rep_provisional,
         post_urls=post_urls,
     )
 

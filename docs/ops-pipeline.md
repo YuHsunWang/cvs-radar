@@ -19,10 +19,44 @@ The pipeline scripts are versioned in this repo:
 | [`scripts/ops/rebackfill-cron.sh`](../scripts/ops/rebackfill-cron.sh) | scheduled wrapper: full PATH, records last-success, runs the freshness check |
 | [`scripts/check_data_freshness.py`](../scripts/check_data_freshness.py) | freshness SLO check on the **published** `web/public/data.json` |
 
-The four **Codex labeling steps require a local Codex CLI subscription** and are
+The **Codex labeling steps require a local Codex CLI subscription** and are
 not reproducible in CI. Each layer must export, validate and import successfully;
 any failure exits before recompute, commit or push, leaving the raw store for retry.
 Every other step is standard Python + git.
+
+### Labeling runs in two passes (since 2026-08-13)
+
+`run_required_label_layers.sh` runs all three layers, then — if anything was held
+— adjudicates and runs them again:
+
+```
+product names -> excerpts -> representative comments      (pass 1)
+        |  any rewrite the overlap screen could not clear
+        v
+   verify_grounding.sh    (a model judges rewrite vs cited source)
+        |  verdicts cached in data/labels/grounding_verdicts.csv
+        v
+product names -> excerpts -> representative comments      (pass 2)
+```
+
+The importers have **three** outcomes per row, not two:
+
+| Outcome | When | Where it goes |
+|---|---|---|
+| accepted | passes every check | the label cache |
+| quarantined | definitely wrong: cross-product rewrite, bad source index, model-confirmed hallucination | `artifacts/rejected-*.csv`; above a 2% failure rate the whole file is refused instead |
+| **held** | only the character-overlap screen failed | `artifacts/pending-grounding-*.csv`, awaiting a verdict |
+
+Nothing is ever repaired. A quarantined or held row simply stays out of the cache,
+so the next export sees it as unlabelled again and re-labels it.
+
+`artifacts/` and the `*_work/` scratch directories are gitignored: quarantine and
+adjudication files carry raw comment/review text, same rule as `data/posts.jsonl`.
+
+**Known behaviour:** a row whose rewrite is cached as `ungrounded` is re-labelled
+on every full run, very likely produces the same rewrite, and is rejected again by
+the cached verdict. It churns rather than converging. Bounded and harmless at the
+current scale (6 rows as of 2026-08-13); fixing it needs a per-row attempt counter.
 
 ### Semantic cache keys
 
@@ -33,8 +67,9 @@ labeler:
 |---|---|
 | sentiment | source URL/ID, tag, comment text, brand, raw product name, post title, prompt version |
 | product name | brand, title, raw product-name field, rule guess, prompt version |
-| excerpt | post ID, product name, review text, brand, sibling products, prompt version |
-| representative comments | brand, product name, ordered positive/negative/body candidates, sibling products, prompt version |
+| excerpt | post ID, product name, review text, brand, sibling products, candidate sentences, prompt version |
+| representative comments | brand, product name, ordered comment/body candidates, sibling products, prompt version |
+| grounding verdict | rewrite text, cited source text, prompt version |
 
 The manual `.github/workflows/refresh-data.yml` fallback runs none of these four
 labelers. It can rebuild only from already committed labels; new rows use rule

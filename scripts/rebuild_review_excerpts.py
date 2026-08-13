@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from cvs_radar.scoring import (
-    _review_excerpt,
+    _review_excerpt_with_provenance,
     group_products,
     normalize_product,
     preprocess_posts,
@@ -34,11 +34,11 @@ def main() -> None:
     if not posts:
         parser.error(f"No posts found in {args.posts}")
 
-    excerpts: dict[str, str] = {}
+    excerpts: dict[str, tuple[str, bool]] = {}
     for group in group_products(posts).values():
         product_name = representative_product_name(group)
         product_key = f"{group[0].brand}:{normalize_product(group[0].brand, product_name)}"
-        excerpts[product_key] = _review_excerpt(group)
+        excerpts[product_key] = _review_excerpt_with_provenance(group)
 
     results_path = Path(args.results)
     payload = json.loads(results_path.read_text(encoding="utf-8"))
@@ -54,10 +54,11 @@ def main() -> None:
     changed = 0
     blank = 0
     for report in reports:
-        excerpt = excerpts[report["product_key"]]
+        excerpt, provisional = excerpts[report["product_key"]]
         changed += excerpt != report.get("review_excerpt", "")
         blank += not excerpt
         report["review_excerpt"] = excerpt
+        report["review_provisional"] = provisional or report.get("review_provisional", False)
 
     if not args.dry_run:
         payload["generated_at"] = datetime.now().isoformat(sep=" ", timespec="seconds")

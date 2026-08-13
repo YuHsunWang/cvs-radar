@@ -1,42 +1,38 @@
-"""LLM-picked representative comments, cached by fingerprint.
+"""Model-written representative comments, cached by candidate-pool fingerprint.
 
-Choosing the comments a shopper actually benefits from is judgement, not a
-sentiment-magnitude calculation. The old ranking kept promoting contentless
-verdicts ("好吃", "推") over comments that explain why a product is worth buying.
-
-So the choice is made once per product's candidate pool and cached, mirroring
-`excerpt_labels.py` and `product_labels.py`. The cache stores candidate indices,
-never comment text: candidates already live in the local post store, and putting
-them in the fingerprint means a changed crawl invalidates a stale pick.
-
-Downstream stays deterministic — a rebuild, and CI, read labels rather than
-re-deciding. The sentiment ranking remains the fallback for unlabelled products.
+The model receives one mechanically cleaned pool of comments and one pool of
+author sentences. It decides whether an item is a positive or negative product
+review and writes a short Traditional-Chinese rewrite. The cache stores source
+indices with each rewrite so the answer remains auditable without displaying a
+verbatim comment to shoppers.
 """
 
 from __future__ import annotations
 
 import csv
 import hashlib
+import json
 import re
 import unicodedata
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
+from .label_validation import Rewrite, parse_rewrites
 from .models import Post
 
 COMMENT_PICKS_PATH = "data/labels/comment_picks.csv"
 
-PROMPT_VERSION = "comment-picks-v1"
+PROMPT_VERSION = "comment-picks-v2-rewrite"
 
 FIELDNAMES = (
     "fingerprint",
     "brand",
     "product_name",
-    "positive_picks",
-    "negative_picks",
-    "positive_body_picks",
-    "negative_body_picks",
+    "positive_rewrites",
+    "negative_rewrites",
+    "positive_body_rewrites",
+    "negative_body_rewrites",
     "model",
     "prompt_version",
 )
@@ -44,10 +40,10 @@ FIELDNAMES = (
 
 @dataclass(frozen=True, slots=True)
 class CommentPicks:
-    positive: tuple[int, ...]
-    negative: tuple[int, ...]
-    positive_body: tuple[int, ...]
-    negative_body: tuple[int, ...]
+    positive: tuple[Rewrite, ...]
+    negative: tuple[Rewrite, ...]
+    positive_body: tuple[Rewrite, ...]
+    negative_body: tuple[Rewrite, ...]
 
 
 def _normalize(text: str) -> str:
@@ -59,58 +55,17 @@ def _normalize(text: str) -> str:
 def comment_picks_fingerprint(
     brand: str,
     product_name: str,
-    positive: list[str],
-    negative: list[str],
-    body: list[str],
-) -> str:
-    """Identify one product's representative-comment candidate pool.
-
-    Candidate text is part of the key so that a re-crawl which changes the pool
-    invalidates old indices instead of silently applying them to new comments.
-    """
-    lists = "\x1d".join(
-        "\x1e".join(_normalize(item) for item in candidates)
-        for candidates in (positive, negative, body)
-    )
-    payload = "\x1f".join((_normalize(brand), _normalize(product_name), lists))
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
-
-
-def other_products_for_group(posts: Iterable[Post]) -> str:
-    """Render the thread-mates of a product group the way the exported row shows it.
-
-    Both the exporter and the scorer must derive this identically: it is part of the
-    key, so any disagreement would make every lookup miss.
-    """
-    mates: list[str] = []
-    for post in posts:
-        for name in post.sibling_products:
-            if name not in mates:
-                mates.append(name)
-    return " | ".join(mates)
-
-
-def comment_picks_fingerprint_v2(
-    brand: str,
-    product_name: str,
-    positive: list[str],
-    negative: list[str],
+    comments: list[str],
     body: list[str],
     *,
     other_products: str = "",
     prompt_version: str = PROMPT_VERSION,
 ) -> str:
-    """Identify a candidate pool over everything the labeller is shown.
+    """Fingerprint exactly the two pools and context shown to the labeller."""
 
-    The picks are stored as candidate numbers, so the pool already had to be in the
-    key. The thread-mate list is what tells the labeller which candidates belong to a
-    sibling product; when re-parsing changes it the question changes, and the stored
-    numbers would otherwise keep pointing at a selection made under different
-    exclusions.
-    """
     lists = "\x1d".join(
         "\x1e".join(_normalize(item) for item in candidates)
-        for candidates in (positive, negative, body)
+        for candidates in (comments, body)
     )
     payload = "\x1f".join(
         (
@@ -124,42 +79,94 @@ def comment_picks_fingerprint_v2(
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def _parse_picks(raw: str | None) -> tuple[int, ...]:
-    picks: list[int] = []
-    for item in str(raw or "").split("|"):
-        item = item.strip()
-        if not item:
-            continue
-        try:
-            picks.append(int(item))
-        except ValueError:
-            continue
-    return tuple(picks)
+def comment_picks_fingerprint_v2(
+    brand: str,
+    product_name: str,
+    comments: list[str],
+    body: list[str],
+    *,
+    other_products: str = "",
+    prompt_version: str = PROMPT_VERSION,
+) -> str:
+    """Named v2 entry point used by exporters and scoring."""
+
+    return comment_picks_fingerprint(
+        brand,
+        product_name,
+        comments,
+        body,
+        other_products=other_products,
+        prompt_version=prompt_version,
+    )
+
+
+def other_products_for_group(posts: Iterable[Post]) -> str:
+    """Render the thread-mates of a product group deterministically."""
+
+    mates: list[str] = []
+    for post in posts:
+        for name in post.sibling_products:
+            if name not in mates:
+                mates.append(name)
+    return " | ".join(mates)
+
+
+def _parse_cached_rewrites(raw: str | None, field: str) -> tuple[Rewrite, ...] | None:
+    try:
+        return parse_rewrites(raw, field=field)
+    except ValueError:
+        return None
 
 
 def load_comment_picks(
     path: str | Path = COMMENT_PICKS_PATH,
 ) -> dict[str, CommentPicks]:
-    """Load representative-comment picks keyed by product fingerprint.
+    """Load only the current rewrite schema and prompt version.
 
-    A blank pick cell is a real verdict — "nothing in this polarity is worth
-    showing" — and is kept, so the caller can tell it apart from an unlabelled
-    product.
+    Old v1 rows deliberately return no labels: prompt-version bumps are the cache
+    invalidation mechanism, so the next export re-labels every product.
     """
+
     file_path = Path(path)
     if not file_path.exists():
         return {}
 
     labels: dict[str, CommentPicks] = {}
     with open(file_path, encoding="utf-8-sig", newline="") as handle:
-        for row in csv.DictReader(handle):
+        reader = csv.DictReader(handle)
+        if not reader.fieldnames or any(field not in reader.fieldnames for field in FIELDNAMES):
+            return {}
+        for row in reader:
             fingerprint = str(row.get("fingerprint") or "").strip().lower()
             if not re.fullmatch(r"[0-9a-f]{64}", fingerprint):
                 continue
+            if str(row.get("prompt_version") or "").strip() != PROMPT_VERSION:
+                continue
+            parsed = [
+                _parse_cached_rewrites(row.get(field), field)
+                for field in (
+                    "positive_rewrites",
+                    "negative_rewrites",
+                    "positive_body_rewrites",
+                    "negative_body_rewrites",
+                )
+            ]
+            if any(item is None for item in parsed):
+                continue
             labels[fingerprint] = CommentPicks(
-                positive=_parse_picks(row.get("positive_picks")),
-                negative=_parse_picks(row.get("negative_picks")),
-                positive_body=_parse_picks(row.get("positive_body_picks")),
-                negative_body=_parse_picks(row.get("negative_body_picks")),
+                positive=parsed[0] or (),
+                negative=parsed[1] or (),
+                positive_body=parsed[2] or (),
+                negative_body=parsed[3] or (),
             )
     return labels
+
+
+def rewrites_json(rewrites: Iterable[Rewrite]) -> str:
+    """Serialise cache rows in the same shape the importer validates."""
+
+    return json.dumps(
+        [{"source_index": item.source_index, "text": item.text} for item in rewrites],
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )

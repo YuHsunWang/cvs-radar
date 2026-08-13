@@ -450,6 +450,7 @@ def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
         rep_positive=["茶香明顯 https://example.com/photo.jpg"],
         rep_negative=["包裝有刮痕 www.example.com/photo.jpg"],
         review_excerpt="",
+        review_provisional=True,
         post_urls=[],
         latest_post_date=None,
     )
@@ -466,3 +467,4 @@ def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
     assert product["independentThreads"] == 2
     assert product["likes"] == ["茶香明顯"]
     assert product["cautions"] == ["包裝有刮痕"]
+    assert product["reviewProvisional"] is True

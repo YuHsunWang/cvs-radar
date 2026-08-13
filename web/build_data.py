@@ -107,6 +107,8 @@ def apply_product_override(
     for field in ("brand", "productName", "category", "excerpt"):
         if field in override:
             corrected[field] = "" if override[field] == CLEAR_VALUE else override[field]
+            if field == "excerpt" and "reviewProvisional" in corrected:
+                corrected["reviewProvisional"] = False
     if "price" in override:
         corrected["price"] = None if override["price"] == CLEAR_VALUE else int(override["price"])
     corrected["id"] = f"{corrected['brand']}::{corrected['productName']}"
@@ -261,6 +263,9 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 (item.get("excerpt", "") for item in newest if item.get("excerpt")),
                 "",
             )
+            merged["reviewProvisional"] = any(
+                bool(item.get("reviewProvisional", False)) for item in members
+            )
             merged["volumeLevel"] = clean_volume_label(
                 volume_label(
                     type(
@@ -376,6 +381,7 @@ def to_product(report: Any, recommendation_score: int | None = None) -> dict[str
         "likes": clean_representatives(list(report.rep_positive or [])),
         "cautions": clean_representatives(list(report.rep_negative or [])),
         "excerpt": report.review_excerpt or "",
+        "reviewProvisional": bool(getattr(report, "review_provisional", False)),
         "postUrls": list(report.post_urls or []),
         "latestDate": latest_date,
         "_scoreWeight": getattr(report, "score_weight_sum", 0.0),
@@ -403,13 +409,15 @@ def validate_payload(payload: dict[str, Any]) -> None:
         "consensus", "confidence", "nPosts", "nComments", "rawComments",
         "eligibleComments", "uniqueEligibleCommenters", "independentThreads",
         "volumeLevel", "positivePct",
-        "neutralPct", "negativePct", "likes", "cautions", "excerpt", "postUrls", "latestDate",
+        "neutralPct", "negativePct", "likes", "cautions", "excerpt", "reviewProvisional", "postUrls", "latestDate",
     }
     for index, product in enumerate(payload["products"]):
         if not isinstance(product, dict) or set(product) != required_fields:
             raise ValueError(f"public payload product {index} has an invalid shape")
         if not all(isinstance(product[key], str) for key in ("id", "brand", "productName", "category", "consensus", "confidence", "volumeLevel", "excerpt")):
             raise ValueError(f"public payload product {index} has invalid text fields")
+        if not isinstance(product["reviewProvisional"], bool):
+            raise ValueError(f"public payload product {index} has invalid excerpt provenance")
         count_fields = (
             "nPosts",
             "nComments",

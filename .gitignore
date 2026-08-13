@@ -10,3 +10,10 @@ __pycache__/
 data/posts.jsonl
 .cvs_radar_seen.json
 data/labels/*draft*.csv
+# Labelling working output: exports, quarantined rows and adjudication queues all
+# carry raw comment/review text, same reason as posts.jsonl above.
+artifacts/
+excerpt_work/
+comment_pick_work/
+product_name_work/
+grounding_work/

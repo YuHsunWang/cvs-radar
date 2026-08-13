@@ -13,22 +13,22 @@ from ..config import (
 )
 from ..comment_labels import (
     CommentPicks,
-    comment_picks_fingerprint,
     comment_picks_fingerprint_v2,
     load_comment_picks,
     other_products_for_group,
 )
 from ..excerpt_labels import (
-    excerpt_fingerprint,
     excerpt_fingerprint_v2,
+    ExcerptLabel,
     format_other_products,
     load_excerpt_labels,
 )
+from ..label_validation import Rewrite
 from ..models import Post
 from ..sentiment import NEGATIVE_WORDS, POSITIVE_WORDS
 
 from ._common import (DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH, _FULL_URL_RE, _BRACKET_RE, _COMMENT_NOISE_RE, _EXCERPT_ASPECT_TERMS, _EXCERPT_CONTINUATION_RE, _EXCERPT_DECISION_TERMS, _EXCERPT_DROP_RE, _EXCERPT_FIRST_HAND_RE, _EXCERPT_INTRO_RE, _EXCERPT_LABEL_RE, _EXCERPT_PRODUCT_FORM_TERMS, _EXCERPT_REPORTED_OPINION_RE, _EXCERPT_SENTENCE_RE, _EXCERPT_SENTENCE_START_RE, _EXCERPT_SIGNATURE_RE, _OFF_TOPIC_COMMENT_RE, _URL_RE)
-from .attribution import (_comment_attribution, _is_reaction_echo_comment)
+from .attribution import _comment_attribution, _is_reaction_echo_comment
 from .identity import (canonical_product_name)
 
 
@@ -58,12 +58,21 @@ class _ReviewCandidate:
     decisive: bool = False
 
 
-REP_CANDIDATE_LIMIT = 12
-BODY_CANDIDATE_LIMIT = 12
+# The pool is intentionally generous: the model, rather than a sentiment score,
+# decides which items are useful. If a thread is unusually large, preserve its
+# post/comment order and cap only after that mechanical ordering.
+REP_CANDIDATE_LIMIT = 300
+BODY_CANDIDATE_LIMIT = 300
+
+# One rewrite per reviewing post, so a multi-post product concatenates several
+# independent takes. A plain space ran them into one sentence; the rewrites use
+# 「，」 internally, so 「；」 keeps the hierarchy readable: comma within one
+# reviewer's summary, semicolon between reviewers.
+EXCERPT_JOINER = "；"
 
 
 @lru_cache(maxsize=1)
-def _cached_excerpt_labels() -> dict[str, str]:
+def _cached_excerpt_labels() -> dict[str, ExcerptLabel]:
     return load_excerpt_labels()
 
 
@@ -91,10 +100,13 @@ def _labelled_excerpt(posts: list[Post], max_len: int) -> str | None:
     )
     chosen: list[str] = []
     seen_any = False
+    missing_label = False
     for post in ordered:
-        # The current key covers the sibling products the labeller was told to keep
-        # out of this excerpt; the legacy key is still consulted so excerpts chosen
-        # before that fix keep applying.
+        candidates = _body_candidates([post])
+        if not candidates:
+            continue
+        # The current key covers the candidate pool and sibling products the
+        # labeller was shown. Old verbatim-cache keys are intentionally ignored.
         label = labels.get(
             excerpt_fingerprint_v2(
                 post.id,
@@ -102,35 +114,53 @@ def _labelled_excerpt(posts: list[Post], max_len: int) -> str | None:
                 post.review_text or "",
                 brand=post.brand,
                 other_products=format_other_products(post.sibling_products),
+                candidate_sentences=candidates,
             )
         )
         if label is None:
-            label = labels.get(
-                excerpt_fingerprint(post.id, post.product_name, post.review_text or "")
-            )
-        if label is None:
+            missing_label = True
             continue
         seen_any = True
-        if not label or any(_review_sentences_similar(label, item) for item in chosen):
+        if any(index >= len(candidates) for index in label.source_indices):
+            missing_label = True
             continue
-        candidate = " ".join([*chosen, label])
+        rewrite = label.rewrite
+        if not rewrite or any(_review_sentences_similar(rewrite, item) for item in chosen):
+            continue
+        candidate = EXCERPT_JOINER.join([*chosen, rewrite])
         if len(candidate) > max_len:
             break
-        chosen.append(label)
+        chosen.append(rewrite)
 
-    if not seen_any:
+    if not seen_any or missing_label:
         return None
-    return " ".join(chosen)
+    return EXCERPT_JOINER.join(chosen)
 
 
-def _review_excerpt(posts: list[Post], max_len: int = 180, max_sentences: int = 3) -> str:
-    """Select diverse, purchase-relevant sentences from every author review."""
+def _review_excerpt_with_provenance(
+    posts: list[Post], max_len: int = 180, max_sentences: int = 3
+) -> tuple[str, bool]:
+    """Return (text, provisional) for model labels or the rule fallback."""
 
     labelled = _labelled_excerpt(posts, max_len)
     if labelled is not None:
-        return labelled
+        return labelled, False
 
-    candidates = _review_candidates(posts)
+    return _rule_review_excerpt(posts, max_len=max_len, max_sentences=max_sentences), True
+
+
+def _review_excerpt(posts: list[Post], max_len: int = 180, max_sentences: int = 3) -> str:
+    """Select a model rewrite, or a clearly provisional rule fallback."""
+
+    return _review_excerpt_with_provenance(posts, max_len, max_sentences)[0]
+
+
+def _rule_review_excerpt(
+    posts: list[Post], max_len: int = 180, max_sentences: int = 3
+) -> str:
+    """Legacy selector retained only for newly crawled, unlabelled products."""
+
+    candidates = _rule_review_candidates(posts)
     # Prefer sentences that either describe the product or state a verdict. Only
     # fall back to contentless praise when the post offers nothing else —
     # merchandise reviews (福袋, 鑰匙圈) have no taste/texture/portion to report.
@@ -181,14 +211,18 @@ def _review_excerpt(posts: list[Post], max_len: int = 180, max_sentences: int = 
 
 
 def _review_candidates(posts: list[Post]) -> list[_ReviewCandidate]:
-    """Build excerpt candidates, never letting the filters starve a product.
+    """Build every mechanically cleaned author-sentence candidate.
 
-    The cross-product and product-name-aspect suppressions are heuristics: a
-    comparison ("吃起來就是奶油餅乾") reads as another product, and a name like
-    椒香皮蛋香菜冷麵 makes every 香 look like part of the name. When they remove
-    everything, fall back to the unsuppressed pass so the product keeps an
-    excerpt rather than going blank.
+    Aspects and sentiment remain metadata for the provisional fallback only. They
+    never decide whether a sentence reaches the model's candidate pool.
     """
+
+    return _build_review_candidates(posts, suppress=False)
+
+
+def _rule_review_candidates(posts: list[Post]) -> list[_ReviewCandidate]:
+    """Use heuristic suppression only for the clearly provisional fallback."""
+
     strict = _build_review_candidates(posts, suppress=True)
     return strict if strict else _build_review_candidates(posts, suppress=False)
 
@@ -223,9 +257,8 @@ def _build_review_candidates(posts: list[Post], *, suppress: bool) -> list[_Revi
                 for term in {*POSITIVE_WORDS, *NEGATIVE_WORDS}
                 if len(term) >= 2
             )
-            if not aspects and not decision_hits and not sentiment_hits:
+            if suppress and not aspects and not decision_hits and not sentiment_hits:
                 continue
-
             score = 3.0 * len(aspects) + 2.5 * min(decision_hits, 2) + 1.25 * min(sentiment_hits, 3)
             # Contentless praise ("超級好吃", "我很愛") tells a reader nothing about the
             # product. Penalise rather than drop it: merchandise posts (福袋, 鑰匙圈)
@@ -329,7 +362,7 @@ def _review_sentences(review_text: str) -> list[str]:
             continue
         line = _EXCERPT_LABEL_RE.sub("", line).strip()
         line = re.sub(r"\(\s*[?!？]?\s*\)", "", line)
-        if len(line) >= 4:
+        if line:
             block.append(line)
     flush_block()
 
@@ -339,7 +372,7 @@ def _review_sentences(review_text: str) -> list[str]:
             for match in _EXCERPT_SENTENCE_RE.finditer(source):
                 fragment = re.sub(r"\s+", " ", match.group(0)).strip(" ：:、-—─")
                 for sentence in _chunk_review_fragment(fragment):
-                    if 6 <= len(sentence) <= 140:
+                    if sentence:
                         sentences.append(sentence)
     return sentences
 
@@ -383,9 +416,6 @@ def _chunk_review_fragment(fragment: str, target_len: int = 70) -> list[str]:
     clauses = [clause.strip() for clause in re.split(r"[,，]", fragment) if clause.strip()]
     if len(clauses) <= 1:
         return [fragment]
-    if len(clauses) >= 3 and _EXCERPT_INTRO_RE.search(clauses[0]):
-        clauses = clauses[1:]
-
     chunks: list[str] = []
     current = ""
     for clause in clauses:
@@ -437,46 +467,80 @@ def _render_review_sentences(candidates: list[_ReviewCandidate]) -> str:
     return " ".join(rendered)
 
 
-def _rep_candidates(posts: list[Post]) -> tuple[list[str], list[str]]:
-    """Build the ranked, deduplicated comment pool used by label fingerprints."""
-    positive: list[tuple[float, str]] = []
-    negative: list[tuple[float, str]] = []
+def _comment_pool(posts: list[Post]) -> list[str]:
+    """Return the single polarity-neutral, mechanically cleaned comment pool."""
+
+    selected: list[str] = []
+    seen: set[str] = set()
     for post in posts:
         for comment in post.comments:
-            if comment.sentiment is None or not comment.text.strip():
-                continue
             attribution = _comment_attribution(post.brand, comment)
-            if not attribution.include_score or attribution.effective_sentiment is None:
-                continue
-            if _OFF_TOPIC_COMMENT_RE.search(comment.text):
-                continue
-            if _is_reaction_echo_comment(comment.text):
+            # Attribution answers only whether the text belongs to this product
+            # (for example, not a clearly favoured competing brand). It does not
+            # decide whether the comment is useful or which polarity it has.
+            if not attribution.include_score:
                 continue
             text = _clean_representative_comment(post.brand, comment.text)
-            if not text:
+            if not text or _is_structural_comment_noise(text):
                 continue
-            item = (attribution.effective_sentiment, text)
-            if attribution.effective_sentiment > 0.2:
-                positive.append(item)
-            elif attribution.effective_sentiment < -0.2:
-                negative.append(item)
-    positive.sort(key=lambda item: -item[0])
-    negative.sort(key=lambda item: item[0])
-    return (
-        _dedupe_ranked_comments(positive, REP_CANDIDATE_LIMIT),
-        _dedupe_ranked_comments(negative, REP_CANDIDATE_LIMIT),
-    )
+            key = re.sub(r"\s+", "", unicodedata.normalize("NFKC", text).casefold())
+            if key in seen:
+                continue
+            seen.add(key)
+            selected.append(text)
+            if len(selected) >= REP_CANDIDATE_LIMIT:
+                return selected
+    return selected
+
+
+def _rule_comment_candidates_with_sentiment(
+    posts: list[Post],
+) -> list[tuple[str, float | None]]:
+    """Attach polarity only after pool construction for the provisional fallback."""
+
+    pool = _comment_pool(posts)
+    pool_keys = {
+        re.sub(r"\s+", "", unicodedata.normalize("NFKC", text).casefold())
+        for text in pool
+    }
+    selected: list[tuple[str, float | None]] = []
+    seen: set[str] = set()
+    for post in posts:
+        for comment in post.comments:
+            attribution = _comment_attribution(post.brand, comment)
+            if not attribution.include_score:
+                continue
+            raw_text = _clean_representative_comment(post.brand, comment.text)
+            text = _COMMENT_NOISE_RE.sub(" ", raw_text).strip()
+            key = re.sub(r"\s+", "", unicodedata.normalize("NFKC", text).casefold())
+            if (
+                re.sub(r"\s+", "", unicodedata.normalize("NFKC", raw_text).casefold())
+                not in pool_keys
+                or key in seen
+                or not text
+                or _OFF_TOPIC_COMMENT_RE.search(text)
+                or _is_reaction_echo_comment(text)
+            ):
+                continue
+            seen.add(key)
+            selected.append((text, attribution.effective_sentiment))
+    return selected
+
+
+def _rep_candidates(posts: list[Post]) -> list[str]:
+    """Build the complete, polarity-neutral comment pool for the labeler."""
+
+    return _comment_pool(posts)
 
 
 def _body_candidates(posts: list[Post]) -> list[str]:
-    """Build the stable author-sentence pool used by body-pick labels."""
+    """Build every stable, mechanically cleaned author-sentence candidate."""
+
     selected: list[str] = []
     for candidate in sorted(
         _review_candidates(posts),
         key=lambda item: (item.post_index, item.sentence_index),
     ):
-        if not candidate.aspects:
-            continue
         rendered = _render_review_sentences([candidate])
         if not rendered or any(_review_sentences_similar(rendered, item) for item in selected):
             continue
@@ -484,6 +548,15 @@ def _body_candidates(posts: list[Post]) -> list[str]:
         if len(selected) >= BODY_CANDIDATE_LIMIT:
             break
     return selected
+
+
+def _is_structural_comment_noise(text: str) -> bool:
+    """Drop only empty, pure-symbol, or explicit board-admin comment noise."""
+
+    without_emoji = re.sub(r"[\U0001F000-\U0001FAFF\u2600-\u27BF]", "", text)
+    if not re.search(r"[\u3400-\u9fffA-Za-z0-9]", without_emoji):
+        return True
+    return bool(re.fullmatch(r"(?:板務|版務|公告|置底|板規|版規|推文標記)", text))
 
 
 def _body_highlights(
@@ -494,7 +567,7 @@ def _body_highlights(
     excerpt: str,
     k: int,
 ) -> list[str]:
-    """Return standalone, aspect-bearing author sentences for one polarity.
+    """Return provisional rule-selected author sentences for one polarity.
 
     This rule fallback can select a sentence about a thread-mate because split
     products retain the whole post body. The per-product body label is the fix;
@@ -504,11 +577,9 @@ def _body_highlights(
         return []
     highlights: list[str] = []
     for candidate in sorted(
-        _review_candidates(posts),
+        _rule_review_candidates(posts),
         key=lambda item: (-item.score, item.post_index, item.sentence_index, item.text),
     ):
-        if not candidate.aspects:
-            continue
         text = candidate.text
         positive_hits = sum(
             text.casefold().count(word.casefold())
@@ -559,66 +630,114 @@ def _picked_sentences(
     return selected
 
 
+def _rule_comment_highlights(
+    posts: list[Post],
+    *,
+    positive: bool,
+    exclude: list[str],
+    excerpt: str,
+    k: int,
+) -> list[str]:
+    """Choose comments by sentiment only as a provisional no-label fallback."""
+
+    if k <= 0:
+        return []
+    highlights: list[str] = []
+    excluded_keys = {
+        re.sub(r"\s+", "", unicodedata.normalize("NFKC", item).casefold())
+        for item in exclude
+    }
+    for text, sentiment in _rule_comment_candidates_with_sentiment(posts):
+        if sentiment is None or sentiment == 0 or (sentiment > 0) != positive:
+            continue
+        key = re.sub(r"\s+", "", unicodedata.normalize("NFKC", text).casefold())
+        if _review_sentences_similar(text, excerpt) or key in excluded_keys:
+            continue
+        highlights.append(text)
+        excluded_keys.add(key)
+        if len(highlights) >= k:
+            break
+    return highlights
+
+
+def _rewritten_texts(
+    rewrites: tuple[Rewrite, ...], *, excerpt: str, exclude: list[str]
+) -> list[str]:
+    """Render validated model rewrites while keeping UI de-duplication."""
+
+    selected: list[str] = []
+    for item in rewrites:
+        text = item.text
+        if not text or _review_sentences_similar(text, excerpt) or any(
+            _review_sentences_similar(text, other) for other in exclude + selected
+        ):
+            continue
+        selected.append(text)
+    return selected
+
+
+def _rep_comments_with_provenance(
+    posts: list[Post],
+    k: int = 3,
+    *,
+    excerpt: str = "",
+) -> tuple[list[str], list[str], bool]:
+    comments = _rep_candidates(posts)
+    body = _body_candidates(posts)
+    brand = posts[0].brand if posts else ""
+    product_name = representative_product_name(posts)
+    cache = _cached_comment_picks()
+    picks = cache.get(
+        comment_picks_fingerprint_v2(
+            brand,
+            product_name,
+            comments,
+            body,
+            other_products=other_products_for_group(posts),
+        )
+    )
+
+    if picks is not None:
+        rep_positive = _rewritten_texts(picks.positive, excerpt=excerpt, exclude=[])
+        rep_negative = _rewritten_texts(
+            picks.negative, excerpt=excerpt, exclude=rep_positive
+        )
+        if not rep_positive:
+            rep_positive = _rewritten_texts(
+                picks.positive_body, excerpt=excerpt, exclude=rep_negative
+            )
+        if not rep_negative:
+            rep_negative = _rewritten_texts(
+                picks.negative_body,
+                excerpt=excerpt,
+                exclude=rep_positive,
+            )
+        return rep_positive, rep_negative, False
+
+    rep_positive = _rule_comment_highlights(
+        posts, positive=True, exclude=[], excerpt=excerpt, k=k
+    )
+    rep_negative = _rule_comment_highlights(
+        posts, positive=False, exclude=rep_positive, excerpt=excerpt, k=k
+    )
+    if not rep_positive:
+        rep_positive = _body_highlights(
+            posts, positive=True, exclude=rep_negative, excerpt=excerpt, k=k
+        )
+    if not rep_negative:
+        rep_negative = _body_highlights(
+            posts, positive=False, exclude=rep_positive, excerpt=excerpt, k=k
+        )
+    return rep_positive, rep_negative, True
+
+
 def _rep_comments(
     posts: list[Post],
     k: int = 3,
     *,
     excerpt: str = "",
 ) -> tuple[list[str], list[str]]:
-    positive, negative = _rep_candidates(posts)
-    body = _body_candidates(posts)
-    brand = posts[0].brand if posts else ""
-    product_name = representative_product_name(posts)
-    # The current key covers the thread-mates the labeller was told to exclude; the
-    # legacy key is still consulted so picks made before that fix keep applying.
-    cache = _cached_comment_picks()
-    picks = cache.get(
-        comment_picks_fingerprint_v2(
-            brand,
-            product_name,
-            positive,
-            negative,
-            body,
-            other_products=other_products_for_group(posts),
-        )
-    )
-    if picks is None:
-        picks = cache.get(
-            comment_picks_fingerprint(brand, product_name, positive, negative, body)
-        )
-    if picks is None:
-        rep_positive = _picked_sentences(positive, tuple(range(k)), excerpt=excerpt, exclude=[])
-        rep_negative = _picked_sentences(
-            negative, tuple(range(k)), excerpt=excerpt, exclude=rep_positive
-        )
-    else:
-        rep_positive = _picked_sentences(
-            positive, picks.positive, excerpt=excerpt, exclude=[]
-        )
-        rep_negative = _picked_sentences(
-            negative, picks.negative, excerpt=excerpt, exclude=rep_positive
-        )
-        if not rep_positive:
-            rep_positive = _picked_sentences(
-                body, picks.positive_body, excerpt=excerpt, exclude=rep_negative
-            )
-        if not rep_negative:
-            rep_negative = _picked_sentences(
-                body,
-                picks.negative_body,
-                excerpt=excerpt,
-                exclude=rep_positive,
-            )
-
-    if picks is None and not rep_positive:
-        rep_positive = _body_highlights(
-            posts, positive=True, exclude=rep_negative, excerpt=excerpt, k=k
-        )
-    if picks is None and not rep_negative:
-        rep_negative = _body_highlights(
-            posts, positive=False, exclude=rep_positive, excerpt=excerpt, k=k
-        )
-    return rep_positive, rep_negative
+    return _rep_comments_with_provenance(posts, k=k, excerpt=excerpt)[:2]
 
 
 def representative_product_name(posts: list[Post]) -> str:
@@ -644,7 +763,6 @@ def _clean_representative_comment(brand: str, text: str) -> str:
             pattern = rf"^{re.escape(kw)}(?=[\s:：])[\s:：]*"
             s = re.sub(pattern, "", s, count=1, flags=re.IGNORECASE)
     s = _BRACKET_RE.sub(" ", s)
-    s = _COMMENT_NOISE_RE.sub(" ", s)
     s = re.sub(r"\s+", " ", s)
     s = re.sub(r"^[\s:：,，.。!！?？~～\-]+|[\s:：,，.。!！?？~～\-]+$", "", s)
     return s.strip()

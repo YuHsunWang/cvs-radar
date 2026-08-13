@@ -121,6 +121,25 @@ fingerprints both contain the product name, so names must be settled before
 those layers export their deltas. `scripts/ops/run_required_label_layers.sh`
 encodes the order; don't reorder it casually.
 
+**8. Importer tests must never use the importers' default output paths.**
+`import_excerpts`/`import_picks` write quarantine and adjudication queues under
+`artifacts/` by default. A test that calls them without overriding
+`rejects_path`/`pending_path` drops fixture rows into the real `artifacts/`, and
+the next `verify_grounding.sh` run picks those up and adjudicates them as if they
+were real products — a fabricated verdict then lands in the committed cache. This
+has happened. `tests/test_label_importers.py` has an autouse fixture that
+redirects the module-level defaults into `tmp_path`; keep it, and note those
+defaults are resolved *inside* the functions rather than as default arguments
+precisely so the fixture can reach them.
+
+**9. A character-overlap check cannot judge a Chinese paraphrase.** 「太貴了」→
+「價格偏高」 is faithful and shares zero characters. If you find yourself tuning
+`MIN_MEANINGFUL_OVERLAP` to fix false positives or false negatives, you are only
+trading one for the other — the distinction is semantic and a character statistic
+cannot see it. That threshold is a *screen* that routes uncertain rewrites to
+model adjudication; it is not the verdict. `docs/DECISIONS.md` (2026-08-13) has
+the measured false-positive rate.
+
 ## Verifying a claim about behaviour
 
 The pipeline is deterministic given the same posts and labels, so the honest way

@@ -15,7 +15,6 @@ if str(ROOT) not in sys.path:
 from cvs_radar.comment_labels import (  # noqa: E402
     COMMENT_PICKS_PATH,
     PROMPT_VERSION,
-    comment_picks_fingerprint,
     comment_picks_fingerprint_v2,
     load_comment_picks,
     other_products_for_group,
@@ -27,7 +26,6 @@ from cvs_radar.scoring import (  # noqa: E402
     preprocess_posts,
     representative_product_name,
 )
-from cvs_radar.sentiment import annotate_posts, apply_sentiment_overrides  # noqa: E402
 from cvs_radar.store import load_posts  # noqa: E402
 
 DEFAULT_POSTS_PATH = ROOT / "data" / "posts.jsonl"
@@ -38,13 +36,12 @@ FIELDNAMES = (
     "brand",
     "product_name",
     "other_products",
-    "positive_candidates",
-    "negative_candidates",
+    "comments",
     "body_candidates",
-    "positive_picks",
-    "negative_picks",
-    "positive_body_picks",
-    "negative_body_picks",
+    "positive_rewrites",
+    "negative_rewrites",
+    "positive_body_rewrites",
+    "negative_body_rewrites",
     "model",
     "prompt_version",
 )
@@ -61,14 +58,17 @@ def export_unlabeled_comment_picks(
 ) -> int:
     """Write one row per unlabelled product with comment or body candidates."""
     labelled = load_comment_picks(labels_path)
-    posts = apply_sentiment_overrides(annotate_posts(preprocess_posts(load_posts(str(posts_path)))))
+    # Sentiment is deliberately not needed to build this pool. Product identity
+    # resolution still happens in preprocess_posts/group_products, but the model
+    # receives all remaining comments and assigns polarity itself.
+    posts = preprocess_posts(load_posts(str(posts_path)))
 
     rows: list[dict[str, str]] = []
     seen: set[str] = set()
     for group in group_products(posts).values():
-        positive, negative = _rep_candidates(group)
+        comments = _rep_candidates(group)
         body = _body_candidates(group)
-        if not positive and not negative and not body:
+        if not comments and not body:
             continue
         brand = group[0].brand
         product_name = representative_product_name(group)
@@ -77,10 +77,9 @@ def export_unlabeled_comment_picks(
         # contamination in the excerpt labels, so it belongs in the key too.
         other_products = other_products_for_group(group)
         fingerprint = comment_picks_fingerprint_v2(
-            brand, product_name, positive, negative, body, other_products=other_products
+            brand, product_name, comments, body, other_products=other_products
         )
-        legacy = comment_picks_fingerprint(brand, product_name, positive, negative, body)
-        if fingerprint in labelled or legacy in labelled or fingerprint in seen:
+        if fingerprint in labelled or fingerprint in seen:
             continue
         seen.add(fingerprint)
         rows.append(
@@ -89,13 +88,12 @@ def export_unlabeled_comment_picks(
                 "brand": brand,
                 "product_name": product_name,
                 "other_products": other_products,
-                "positive_candidates": _numbered_candidates(positive),
-                "negative_candidates": _numbered_candidates(negative),
+                "comments": _numbered_candidates(comments),
                 "body_candidates": _numbered_candidates(body),
-                "positive_picks": "",
-                "negative_picks": "",
-                "positive_body_picks": "",
-                "negative_body_picks": "",
+                "positive_rewrites": "",
+                "negative_rewrites": "",
+                "positive_body_rewrites": "",
+                "negative_body_rewrites": "",
                 "model": "",
                 "prompt_version": PROMPT_VERSION,
             }

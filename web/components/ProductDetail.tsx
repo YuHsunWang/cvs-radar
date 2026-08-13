@@ -16,6 +16,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           <UserRound size={20} className="text-[#0F7C7C]" aria-hidden="true" />
           作者評價
         </h3>
+        {product.reviewProvisional ? (
+          <p className="mt-2 text-xs font-bold text-amber-700">
+            暫定整理，模型標註完成後會更新
+          </p>
+        ) : null}
         <blockquote className="mt-3 rounded-r-md border-l-4 border-[#0F7C7C] bg-slate-50 px-3 py-2.5 text-sm font-semibold leading-6 text-slate-700">
           {product.excerpt || '未擷取到足夠的作者評價，請查看原文。'}
         </blockquote>

@@ -21,6 +21,7 @@ export type Product = {
   likes: string[]
   cautions: string[]
   excerpt: string
+  reviewProvisional: boolean
   postUrls: string[]
   latestDate: string | null
 }

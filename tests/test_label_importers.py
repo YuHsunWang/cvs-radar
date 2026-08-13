@@ -7,14 +7,46 @@ from pathlib import Path
 import pytest
 
 from cvs_radar.product_labels import PROMPT_VERSION, product_name_fingerprint_v2
+from cvs_radar.comment_labels import (
+    PROMPT_VERSION as COMMENT_PROMPT_VERSION,
+    comment_picks_fingerprint_v2,
+)
 from cvs_radar.excerpt_labels import (
     PROMPT_VERSION as EXCERPT_PROMPT_VERSION,
     excerpt_fingerprint_v2,
 )
+from cvs_radar.grounding_verdicts import (
+    FIELDNAMES as VERDICT_FIELDNAMES,
+    PROMPT_VERSION as GROUNDING_PROMPT_VERSION,
+    grounding_fingerprint,
+)
+from cvs_radar.label_validation import MIN_MEANINGFUL_OVERLAP
+from scripts import import_comment_picks as import_comment_picks_module
+from scripts import import_excerpts as import_excerpts_module
+from scripts.import_comment_picks import import_picks as import_comment_picks
 from scripts.import_excerpts import import_labels as import_excerpts
 from scripts.import_product_names import import_labels as import_product_names
 from scripts.migrate_sentiment_overrides import analyze as analyze_sentiment_migration
 from scripts import relabel_delta
+
+
+@pytest.fixture(autouse=True)
+def _never_write_into_the_repo(tmp_path, monkeypatch):
+    """Redirect every importer's default output path into tmp.
+
+    The importers write quarantine and adjudication queues next to the repo by
+    default, and a test that forgets to override those paths silently drops
+    fixture rows into artifacts/ — where a later adjudication run will pick them
+    up as if they were real data. That happened once; this makes it impossible.
+    """
+
+    for module in (import_excerpts_module, import_comment_picks_module):
+        monkeypatch.setattr(
+            module, "DEFAULT_REJECTS_PATH", tmp_path / "default-rejects.csv"
+        )
+        monkeypatch.setattr(
+            module, "DEFAULT_PENDING_PATH", tmp_path / "default-pending.csv"
+        )
 
 
 PRODUCT_FIELDS = (
@@ -105,21 +137,28 @@ EXCERPT_FIELDS = (
     "product_name",
     "other_products",
     "review_text",
-    "excerpt",
+    "body_candidates",
+    "source_indices",
+    "rewrite",
     "model",
     "prompt_version",
 )
 
 
-def _excerpt_row(review_text: str, excerpt: str) -> dict[str, str]:
+def _excerpt_row(review_text: str, rewrite: str = "", row_index: int = 0) -> dict[str, str]:
+    body_candidates = "\n".join(
+        f"{index}. {text}" for index, text in enumerate(review_text.split("\n")) if text
+    )
     row = {
-        "post_id": "M.1",
+        "post_id": "M.1" if row_index == 0 else f"M.1.{row_index}",
         "brand": "全家",
         "product_name": "草莓蛋糕",
         "other_products": "抹茶布丁",
         "review_text": review_text,
-        "excerpt": excerpt,
-        "model": "codex" if excerpt else "",
+        "body_candidates": body_candidates,
+        "source_indices": "0" if rewrite else "",
+        "rewrite": rewrite,
+        "model": "codex" if rewrite else "",
         "prompt_version": EXCERPT_PROMPT_VERSION,
     }
     row["fingerprint"] = excerpt_fingerprint_v2(
@@ -128,40 +167,307 @@ def _excerpt_row(review_text: str, excerpt: str) -> dict[str, str]:
         row["review_text"],
         brand=row["brand"],
         other_products=row["other_products"],
+        candidate_sentences=[
+            line.split(". ", 1)[1]
+            for line in body_candidates.splitlines()
+        ],
         prompt_version=row["prompt_version"],
     )
     return row
 
 
-def test_excerpt_import_rejects_hallucinated_quote_before_cache_write(tmp_path: Path) -> None:
-    source_row = _excerpt_row("蛋糕酸甜，奶油很輕盈。", "")
-    labeled_row = dict(source_row, excerpt="作者說一定會回購。", model="codex")
+def _low_overlap_excerpt(tmp_path: Path) -> tuple[Path, Path, Path, dict]:
+    """A rewrite the character screen cannot clear — 0 shared meaningful chars."""
+
+    source_row = _excerpt_row("蛋糕酸甜，奶油很輕盈。")
+    labeled_row = dict(
+        source_row,
+        source_indices="0",
+        rewrite="作者說一定會回購",
+        model="codex",
+    )
     source = tmp_path / "source.csv"
     labeled = tmp_path / "labeled.csv"
-    cache = tmp_path / "cache.csv"
     _write_csv(source, [source_row], EXCERPT_FIELDS)
     _write_csv(labeled, [labeled_row], EXCERPT_FIELDS)
+    return source, labeled, tmp_path / "cache.csv", labeled_row
 
-    with pytest.raises(ValueError, match="exact slice of review_text"):
-        import_excerpts(labeled, source, cache)
 
+def test_excerpt_import_holds_unscreenable_rewrite_instead_of_guessing(
+    tmp_path: Path,
+) -> None:
+    """Below the overlap threshold the screen defers; it does not reject."""
+
+    source, labeled, cache, labeled_row = _low_overlap_excerpt(tmp_path)
+    pending = tmp_path / "pending.csv"
+
+    added, _, _, rejected, held = import_excerpts(
+        labeled,
+        source,
+        cache,
+        rejects_path=tmp_path / "rejects.csv",
+        pending_path=pending,
+        verdicts_path=tmp_path / "verdicts.csv",
+    )
+    assert (added, rejected, held) == (0, 0, 1)
+    assert "作者說一定會回購" not in cache.read_text(encoding="utf-8-sig")
+
+    queued = list(csv.DictReader(pending.open(encoding="utf-8-sig")))
+    assert len(queued) == 1
+    assert queued[0]["rewrite"] == "作者說一定會回購"
+    assert queued[0]["source_text"] == "蛋糕酸甜，奶油很輕盈。"
+    assert queued[0]["verdict"] == ""
+
+
+def _write_verdict(path: Path, rewrite: str, source_text: str, verdict: str) -> None:
+    with path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=VERDICT_FIELDNAMES)
+        writer.writeheader()
+        writer.writerow(
+            {
+                "fingerprint": grounding_fingerprint(rewrite, source_text),
+                "rewrite": rewrite,
+                "source_text": source_text,
+                "verdict": verdict,
+                "model": "codex",
+                "prompt_version": GROUNDING_PROMPT_VERSION,
+            }
+        )
+
+
+def test_excerpt_import_rejects_when_model_judged_it_ungrounded(tmp_path: Path) -> None:
+    source, labeled, cache, _ = _low_overlap_excerpt(tmp_path)
+    verdicts = tmp_path / "verdicts.csv"
+    _write_verdict(verdicts, "作者說一定會回購", "蛋糕酸甜，奶油很輕盈。", "ungrounded")
+
+    with pytest.raises(ValueError, match="judged the rewrite ungrounded"):
+        import_excerpts(
+            labeled,
+            source,
+            cache,
+            rejects_path=tmp_path / "rejects.csv",
+            pending_path=tmp_path / "pending.csv",
+            verdicts_path=verdicts,
+        )
     assert not cache.exists()
 
 
-def test_excerpt_import_enforces_prompt_limit_of_90_characters(tmp_path: Path) -> None:
-    review = "酸" * 91
+def test_excerpt_import_accepts_low_overlap_paraphrase_the_model_cleared(
+    tmp_path: Path,
+) -> None:
+    """The 「太貴了」→「價格偏高」 case: zero shared characters, still faithful."""
+
+    source, labeled, cache, _ = _low_overlap_excerpt(tmp_path)
+    verdicts = tmp_path / "verdicts.csv"
+    _write_verdict(verdicts, "作者說一定會回購", "蛋糕酸甜，奶油很輕盈。", "grounded")
+
+    added, _, _, rejected, held = import_excerpts(
+        labeled,
+        source,
+        cache,
+        rejects_path=tmp_path / "rejects.csv",
+        pending_path=tmp_path / "pending.csv",
+        verdicts_path=verdicts,
+    )
+    assert (added, rejected, held) == (1, 0, 0)
+    assert "作者說一定會回購" in cache.read_text(encoding="utf-8-sig")
+
+
+def test_excerpt_import_enforces_prompt_limit_of_30_characters(tmp_path: Path) -> None:
+    review = "酸" * 31
     source_row = _excerpt_row(review, "")
-    labeled_row = dict(source_row, excerpt=review, model="codex")
+    labeled_row = dict(source_row, source_indices="0", rewrite=review, model="codex")
     source = tmp_path / "source.csv"
     labeled = tmp_path / "labeled.csv"
     cache = tmp_path / "cache.csv"
     _write_csv(source, [source_row], EXCERPT_FIELDS)
     _write_csv(labeled, [labeled_row], EXCERPT_FIELDS)
 
-    with pytest.raises(ValueError, match="longer than 90"):
+    with pytest.raises(ValueError, match="longer than 30"):
         import_excerpts(labeled, source, cache)
 
     assert not cache.exists()
+
+
+COMMENT_FIELDS = (
+    "fingerprint",
+    "brand",
+    "product_name",
+    "other_products",
+    "comments",
+    "body_candidates",
+    "positive_rewrites",
+    "negative_rewrites",
+    "positive_body_rewrites",
+    "negative_body_rewrites",
+    "model",
+    "prompt_version",
+)
+
+
+def _comment_row(row_index: int = 0) -> dict[str, str]:
+    comments = ["舒跑款可愛", "本體高十公分"]
+    body = ["造型可愛", "尺寸不小"]
+    product_name = "飲料小夥伴吊飾" if row_index == 0 else f"飲料小夥伴吊飾{row_index}"
+    return {
+        "fingerprint": comment_picks_fingerprint_v2(
+            "7-11", product_name, comments, body, other_products="另一款吊飾"
+        ),
+        "brand": "7-11",
+        "product_name": product_name,
+        "other_products": "另一款吊飾",
+        "comments": "0. 舒跑款可愛\n1. 本體高十公分",
+        "body_candidates": "0. 造型可愛\n1. 尺寸不小",
+        "positive_rewrites": "",
+        "negative_rewrites": "",
+        "positive_body_rewrites": "",
+        "negative_body_rewrites": "",
+        "model": "",
+        "prompt_version": COMMENT_PROMPT_VERSION,
+    }
+
+
+def test_comment_import_accepts_grounded_non_verbatim_rewrite(tmp_path: Path) -> None:
+    source_row = _comment_row()
+    labeled_row = dict(
+        source_row,
+        positive_rewrites='[{"source_index":0,"text":"舒跑款很可愛"}]',
+        model="codex",
+    )
+    source = tmp_path / "source.csv"
+    labeled = tmp_path / "labeled.csv"
+    cache = tmp_path / "cache.csv"
+    _write_csv(source, [source_row], COMMENT_FIELDS)
+    _write_csv(labeled, [labeled_row], COMMENT_FIELDS)
+
+    assert import_comment_picks(labeled, source, cache) == (1, 0, 0, 0, 0)
+    assert "舒跑款很可愛" in cache.read_text(encoding="utf-8-sig")
+
+
+def _bulk_comment_rows(total: int, bad_indexes: set[int]) -> tuple[list[dict], list[dict]]:
+    """Build ``total`` rows where ``bad_indexes`` carry an ungrounded rewrite."""
+
+    sources, labeled = [], []
+    for index in range(total):
+        source_row = _comment_row(index)
+        text = "另一款吊飾做工精細" if index in bad_indexes else "舒跑款很可愛"
+        sources.append(source_row)
+        labeled.append(
+            dict(
+                source_row,
+                positive_rewrites=f'[{{"source_index":0,"text":"{text}"}}]',
+                model="codex",
+            )
+        )
+    return sources, labeled
+
+
+def test_comment_import_quarantines_an_isolated_bad_row(tmp_path: Path) -> None:
+    """One hallucination must not discard the other 59 rows of a labelling run."""
+
+    sources, labeled_rows = _bulk_comment_rows(60, {7})
+    source = tmp_path / "source.csv"
+    labeled = tmp_path / "labeled.csv"
+    cache = tmp_path / "cache.csv"
+    rejects = tmp_path / "rejects.csv"
+    _write_csv(source, sources, COMMENT_FIELDS)
+    _write_csv(labeled, labeled_rows, COMMENT_FIELDS)
+
+    result = import_comment_picks(labeled, source, cache, rejects_path=rejects)
+    assert result == (59, 0, 0, 1, 0)
+
+    cached = cache.read_text(encoding="utf-8-sig")
+    assert sources[7]["fingerprint"] not in cached
+    assert "另一款吊飾做工精細" not in cached
+
+    quarantined = rejects.read_text(encoding="utf-8-sig")
+    assert sources[7]["fingerprint"] in quarantined
+    assert "names other product" in quarantined
+
+
+def test_comment_import_refuses_file_when_failures_look_systematic(tmp_path: Path) -> None:
+    """Above the ceiling the model output is broken, not unlucky — refuse everything."""
+
+    sources, labeled_rows = _bulk_comment_rows(60, set(range(10)))
+    source = tmp_path / "source.csv"
+    labeled = tmp_path / "labeled.csv"
+    cache = tmp_path / "cache.csv"
+    _write_csv(source, sources, COMMENT_FIELDS)
+    _write_csv(labeled, labeled_rows, COMMENT_FIELDS)
+
+    with pytest.raises(ValueError, match="exceeds the 2% ceiling"):
+        import_comment_picks(labeled, source, cache, rejects_path=tmp_path / "r.csv")
+    assert not cache.exists()
+
+
+def test_excerpt_import_quarantines_an_isolated_bad_row(tmp_path: Path) -> None:
+    review = "菠蘿皮是軟的\n內餡奶酥很好吃"
+    sources, labeled_rows = [], []
+    for index in range(60):
+        source_row = _excerpt_row(review, row_index=index)
+        rewrite = "抹茶布丁綿密" if index == 3 else "菠蘿皮偏軟"
+        sources.append(source_row)
+        labeled_rows.append(
+            dict(source_row, source_indices="0", rewrite=rewrite, model="codex")
+        )
+    source = tmp_path / "source.csv"
+    labeled = tmp_path / "labeled.csv"
+    cache = tmp_path / "cache.csv"
+    rejects = tmp_path / "rejects.csv"
+    _write_csv(source, sources, EXCERPT_FIELDS)
+    _write_csv(labeled, labeled_rows, EXCERPT_FIELDS)
+
+    assert import_excerpts(labeled, source, cache, rejects_path=rejects) == (59, 0, 0, 1, 0)
+    assert sources[3]["fingerprint"] not in cache.read_text(encoding="utf-8-sig")
+    assert sources[3]["fingerprint"] in rejects.read_text(encoding="utf-8-sig")
+
+
+def test_comment_import_rejects_hallucinated_rewrite_before_cache_write(tmp_path: Path) -> None:
+    source_row = _comment_row()
+    labeled_row = dict(
+        source_row,
+        positive_rewrites='[{"source_index":0,"text":"另一款吊飾做工精細"}]',
+        model="codex",
+    )
+    source = tmp_path / "source.csv"
+    labeled = tmp_path / "labeled.csv"
+    cache = tmp_path / "cache.csv"
+    _write_csv(source, [source_row], COMMENT_FIELDS)
+    _write_csv(labeled, [labeled_row], COMMENT_FIELDS)
+
+    with pytest.raises(ValueError, match="other product|insufficient source overlap"):
+        import_comment_picks(labeled, source, cache)
+    assert not cache.exists()
+
+
+def test_comment_import_rejects_one_source_in_both_polarities(tmp_path: Path) -> None:
+    source_row = _comment_row()
+    labeled_row = dict(
+        source_row,
+        positive_rewrites='[{"source_index":0,"text":"舒跑款很可愛"}]',
+        negative_rewrites='[{"source_index":0,"text":"舒跑款不夠可愛"}]',
+        model="codex",
+    )
+    source = tmp_path / "source.csv"
+    labeled = tmp_path / "labeled.csv"
+    cache = tmp_path / "cache.csv"
+    _write_csv(source, [source_row], COMMENT_FIELDS)
+    _write_csv(labeled, [labeled_row], COMMENT_FIELDS)
+
+    with pytest.raises(ValueError, match="both polarities"):
+        import_comment_picks(labeled, source, cache)
+    assert not cache.exists()
+
+
+def test_importers_document_the_permissive_grounding_threshold() -> None:
+    assert MIN_MEANINGFUL_OVERLAP == 0.25
+
+
+def test_label_scripts_forward_optional_effort_to_runner() -> None:
+    for name in ("label_comment_picks.sh", "label_excerpts.sh"):
+        script = (Path(__file__).parents[1] / "scripts" / name).read_text()
+        assert 'effort_args=(--effort "$EFFORT")' in script
+        assert '"${effort_args[@]}"' in script
 
 
 @pytest.mark.parametrize(
