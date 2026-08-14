@@ -36,6 +36,7 @@ from cvs_radar.excerpt_labels import (
     load_excerpt_labels,
 )
 from cvs_radar.comment_labels import (
+    PROMPT_VERSION as COMMENT_PICKS_PROMPT_VERSION,
     CommentPicks,
     comment_picks_fingerprint,
     comment_picks_fingerprint_v2,
@@ -2672,7 +2673,7 @@ class CommentPickCacheTest(unittest.TestCase):
             "positive_body_rewrites": "",
             "negative_body_rewrites": "",
             "model": "codex",
-            "prompt_version": "comment-picks-v2-rewrite",
+            "prompt_version": COMMENT_PICKS_PROMPT_VERSION,
         }
         with TemporaryDirectory() as tmp:
             source = Path(tmp) / "source.csv"
@@ -2798,7 +2799,7 @@ class CommentPickCacheTest(unittest.TestCase):
         with open(path, "w", encoding="utf-8", newline="") as handle:
             handle.write(
                 "fingerprint,brand,product_name,positive_rewrites,negative_rewrites,positive_body_rewrites,negative_body_rewrites,model,prompt_version\n"
-                f"{digest},7-11,草莓蛋糕,,,,,codex,comment-picks-v2-rewrite\n"
+                f"{digest},7-11,草莓蛋糕,,,,,codex,{COMMENT_PICKS_PROMPT_VERSION}\n"
             )
 
         self.assertEqual(load_comment_picks(path)[digest], CommentPicks((), (), (), ()))

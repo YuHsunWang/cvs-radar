@@ -23,7 +23,7 @@ from .models import Post
 
 COMMENT_PICKS_PATH = "data/labels/comment_picks.csv"
 
-PROMPT_VERSION = "comment-picks-v2-rewrite"
+PROMPT_VERSION = "comment-picks-v3-aspect-coverage"
 
 FIELDNAMES = (
     "fingerprint",

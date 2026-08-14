@@ -46,6 +46,27 @@ than 30 characters per item:
 - never merge two different products into one item;
 - prefer 「內餡奶酥好吃」 over 「超好吃推推」.
 
+Select for aspect coverage, not just for the three individually strongest comments:
+
+- Within each polarity, treat an aspect as one shopper-relevant dimension. For
+  food this can be flavour, texture, portion, price/value, aftertaste, serving or
+  preparation, ingredients/additives, batch consistency, or repurchase intent.
+  For non-food it can be appearance, build quality, size/fit, usefulness,
+  durability, ease of use, or value. Use other category-specific dimensions when
+  the source makes them concrete.
+- Choose up to 3 items whose useful points cover different aspects, so the set
+  tells a shopper different things. Do not count a rewording, a stronger/weaker
+  version, or another example of the same aspect as new coverage. A genuine
+  disagreement about one aspect can be more useful than a third restatement of
+  the majority view, so a clear contrary observation may earn a slot when it adds
+  actionable information. Keep disputed observations source-specific (for
+  example, 「有留言覺得像杏仁茶」) and never present one comment as consensus.
+- If candidates tie on aspect coverage, prefer the more concrete and checkable
+  wording: a named flavour, texture, size, ingredient, price, visible feature,
+  or reproducible behaviour beats vague praise or criticism.
+- Stop with fewer than 3 when the remaining defensible items repeat an aspect or
+  are too weak/vague. Do not pad a set merely to reach the cap.
+
 Do not use a fixed food-only rejection list. For food, taste, texture, portion,
 price, spice, repurchase, and preparation details can be concrete. For 吊飾、周
 邊、生活用品、飲料、雜貨, words such as 「可愛」「質感好」「做工細」「實用」
