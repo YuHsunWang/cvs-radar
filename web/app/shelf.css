@@ -602,3 +602,350 @@
   .sl-sheet-backdrop,
   .sl-sheet { animation: none; transition: none; }
 }
+
+/* ---- expanded detail: the back of the shelf label ----------------------
+   The collapsed row is a price tag; opened, it reads as the reverse side of
+   that same tag — a stock docket. Same ink, hairlines and mono micro-labels,
+   but the ground flips to a faint ruled paper so open and closed are told
+   apart by surface rather than by a different design language. */
+
+.sl-d {
+  border-top: 1.5px solid var(--sl-ink);
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, rgba(23, 19, 14, 0.045) 27px 28px),
+    #fbfaf6;
+  padding: 12px 12px 14px;
+}
+
+/* section header: mono kicker + rule, like a docket line item */
+.sl-d-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-family: var(--sl-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--sl-soft);
+  text-transform: uppercase;
+}
+.sl-d-head::after {
+  content: "";
+  flex: 1;
+  height: 0;
+  border-top: 1px dashed var(--sl-hair);
+}
+.sl-d-head b {
+  font-family: var(--sl-cjk);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--sl-ink);
+}
+.sl-d-count {
+  font-family: var(--sl-mono);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--sl-soft);
+}
+
+.sl-d-sec + .sl-d-sec { margin-top: 14px; }
+
+/* evidence rows: a colour-keyed spine echoing the brand rail on the card */
+.sl-d-ev {
+  display: grid;
+  gap: 5px;
+}
+.sl-d-item {
+  display: grid;
+  grid-template-columns: 3px minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+  background: var(--sl-tag);
+  border: 1px solid var(--sl-hair);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sl-d-item i {
+  display: block;
+  background: var(--sl-key, var(--sl-hair));
+}
+.sl-d-item span {
+  display: block;
+  padding: 7px 9px 7px 1px;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1.5;
+  color: var(--sl-ink);
+  overflow-wrap: anywhere;
+}
+.sl-d-like { --sl-key: var(--sl-good); }
+.sl-d-warn { --sl-key: var(--sl-hot); }
+
+/* the empty half: a struck-through docket line, deliberately quiet */
+.sl-d-none {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 2px;
+  font-family: var(--sl-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--sl-na);
+}
+.sl-d-none::before {
+  content: "";
+  width: 14px;
+  border-top: 1.5px solid currentColor;
+}
+
+/* author summary: the tag's own handwriting, on the paper ground */
+.sl-d-sum { display: grid; gap: 6px; }
+.sl-d-take {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+.sl-d-take em {
+  font-family: var(--sl-mono);
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--sl-soft);
+  background: #f2efe6;
+  border: 1px solid var(--sl-hair);
+  border-radius: 2px;
+  padding: 2px 5px;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.sl-d-take p {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.62;
+  color: var(--sl-ink);
+  overflow-wrap: anywhere;
+}
+.sl-d-prov {
+  display: inline-block;
+  font-family: var(--sl-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--sl-mid);
+  border: 1px dashed currentColor;
+  border-radius: 2px;
+  padding: 1px 5px;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+
+/* source links: perforated stub at the foot of the docket */
+.sl-d-src {
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1.5px dashed var(--sl-hair);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+.sl-d-src > span {
+  font-family: var(--sl-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sl-soft);
+}
+.sl-d-src a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--sl-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sl-ink);
+  background: var(--sl-tag);
+  border: 1.5px solid var(--sl-ink);
+  border-radius: 3px;
+  padding: 3px 9px;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.sl-d-src a:hover { background: var(--sl-pop); }
+.sl-d-src a:focus-visible { outline: 3px solid #35e0a1; outline-offset: 2px; }
+
+/* ---- compact detail: same docket, boxes removed --------------------------
+   The content is tiny — evidence items are at most 19 characters and the median
+   summary is 17 — so the height was going into containers, not text. Each item
+   drops its own border and padding and is carried by a coloured polarity glyph
+   instead, which also lets the two polarities share one heading. */
+
+.sl-k { border-top: 1.5px solid var(--sl-ink); background: #fbfaf6; padding: 9px 12px 11px; }
+
+.sl-k-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--sl-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--sl-soft);
+}
+.sl-k-head::after { content: ""; flex: 1; border-top: 1px dashed var(--sl-hair); }
+.sl-k-head b {
+  font-family: var(--sl-cjk);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--sl-ink);
+}
+.sl-k-head i {
+  font-style: normal;
+  font-family: var(--sl-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--sl-soft);
+}
+
+.sl-k-list { display: grid; gap: 1px; margin: 5px 0 0; padding: 0; list-style: none; }
+.sl-k-row {
+  display: grid;
+  grid-template-columns: 13px minmax(0, 1fr);
+  gap: 7px;
+  align-items: baseline;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.54;
+  color: var(--sl-ink);
+  padding: 2px 0;
+  overflow-wrap: anywhere;
+}
+/* the glyph is the only thing carrying polarity, so it must not be decorative */
+.sl-k-row b {
+  font-family: var(--sl-mono);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+}
+.sl-k-up b { color: var(--sl-good); }
+.sl-k-dn b { color: var(--sl-hot); }
+/* a hairline only where the polarity actually turns over */
+.sl-k-dn:first-of-type { margin-top: 4px; padding-top: 5px; border-top: 1px dotted var(--sl-hair); }
+
+.sl-k-none {
+  margin: 4px 0 0;
+  font-family: var(--sl-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sl-na);
+}
+
+.sl-k-sec { margin-top: 9px; }
+.sl-k-sum { margin: 4px 0 0; font-size: 13px; font-weight: 600; line-height: 1.6; color: var(--sl-ink); overflow-wrap: anywhere; }
+.sl-k-sum span { color: var(--sl-soft); font-family: var(--sl-mono); font-size: 10.5px; font-weight: 700; margin-right: 4px; }
+.sl-k-prov {
+  font-family: var(--sl-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--sl-mid);
+  border: 1px dashed currentColor;
+  border-radius: 2px;
+  padding: 0 4px;
+  margin-left: 5px;
+}
+
+.sl-k-src { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 9px; }
+.sl-k-src > span {
+  font-family: var(--sl-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sl-soft);
+}
+.sl-k-src a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--sl-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--sl-ink);
+  border: 1.5px solid var(--sl-ink);
+  border-radius: 3px;
+  padding: 2px 7px;
+  background: var(--sl-tag);
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.sl-k-src a:hover { background: var(--sl-pop); }
+.sl-k-src a:focus-visible { outline: 3px solid #35e0a1; outline-offset: 2px; }
+
+/* ---- polarity treatments -------------------------------------------------
+   The compact layout is settled; these only change how fast the eye tells a
+   like from a caution. Each keeps the row height of `.sl-k-row`, so the panel
+   does not grow. Colour never carries the meaning alone — a glyph or icon
+   always rides with it, for colour-blind readers and for greyscale. */
+
+/* T1 — tinted group block with a colour rail */
+.sl-t1-grp {
+  border-left: 3px solid var(--sl-key);
+  background: var(--sl-key-bg);
+  border-radius: 0 3px 3px 0;
+  padding: 4px 8px 5px;
+}
+.sl-t1-grp + .sl-t1-grp { margin-top: 4px; }
+.sl-t1-up { --sl-key: var(--sl-good); --sl-key-bg: #eef6f0; }
+.sl-t1-dn { --sl-key: var(--sl-hot); --sl-key-bg: #fdf0ed; }
+.sl-t1-cap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--sl-mono);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sl-key);
+  margin-bottom: 1px;
+}
+
+/* T2 — solid glyph chips, no background */
+.sl-t2 b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  color: #fff;
+  font-family: var(--sl-mono);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+.sl-t2.sl-k-up b { background: var(--sl-good); }
+.sl-t2.sl-k-dn b { background: var(--sl-hot); }
+.sl-t2 { grid-template-columns: 15px minmax(0, 1fr); align-items: start; }
+.sl-t2 span { padding-top: 1px; }
+
+/* T3 — icon in the polarity colour, caution rows also weighted */
+.sl-t3 { grid-template-columns: 16px minmax(0, 1fr); align-items: start; }
+.sl-t3 b { display: inline-flex; padding-top: 2px; }
+.sl-t3.sl-k-up b { color: var(--sl-good); }
+.sl-t3.sl-k-dn b { color: var(--sl-hot); }
+.sl-t3.sl-k-dn span { font-weight: 700; }
+.sl-t3.sl-k-dn:first-of-type { border-top: 1px solid var(--sl-hair); }
