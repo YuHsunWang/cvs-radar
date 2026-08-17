@@ -1,4 +1,6 @@
-import { ExternalLink, MessageSquareText, ThumbsUp, TriangleAlert, UserRound } from 'lucide-react'
+'use client'
+
+import { ExternalLink, ThumbsUp, TriangleAlert } from 'lucide-react'
 import { trackOutboundPttClick } from '@/lib/analytics'
 import { Product } from '@/lib/data'
 
@@ -6,81 +8,117 @@ type ProductDetailProps = {
   product: Product
 }
 
+/**
+ * The back of the shelf label: evidence first, then the model's summary.
+ *
+ * Styled with the `sl-*` system the collapsed card uses rather than in Tailwind
+ * utilities, because the two sat side by side and read as different apps.
+ *
+ * Kept deliberately short. Evidence items are at most 19 characters and the
+ * median summary is 17, so the height this panel used to have was going into
+ * per-item containers, not text — and an inline expander that pushes the next
+ * product off a 360×800 screen defeats its own purpose. Both polarities share one
+ * heading and one list; each row is carried by an icon in the polarity colour,
+ * which keeps the distinction legible in greyscale and for colour-blind readers,
+ * where colour alone would not be.
+ */
 export default function ProductDetail({ product }: ProductDetailProps) {
-  const hasPosts = product.postUrls.length > 0
+  // One rewrite per reviewing post, joined with 「；」 upstream. Splitting them
+  // back out is the honest reading: they are separate people, not one sentence.
+  const takes = (product.excerpt || '')
+    .split('；')
+    .map((part) => part.trim())
+    .filter(Boolean)
+
+  const hasEvidence = product.likes.length > 0 || product.cautions.length > 0
 
   return (
-    <div className="mt-4 rounded-lg border border-slate-200 bg-[#FFFDF8] p-3">
-      <section>
-        <h3 className="flex items-center gap-2 font-black text-slate-950">
-          <UserRound size={20} className="text-[#0F7C7C]" aria-hidden="true" />
-          作者評價
-        </h3>
-        {product.reviewProvisional ? (
-          <p className="mt-2 text-xs font-bold text-amber-700">
-            暫定整理，模型標註完成後會更新
-          </p>
-        ) : null}
-        <blockquote className="mt-3 rounded-r-md border-l-4 border-[#0F7C7C] bg-slate-50 px-3 py-2.5 text-sm font-semibold leading-6 text-slate-700">
-          {product.excerpt || '未擷取到足夠的作者評價，請查看原文。'}
-        </blockquote>
-      </section>
+    <div className="sl-k">
+      <h3 className="sl-k-head">
+        EVIDENCE
+        <b>評價重點</b>
+      </h3>
 
-      <section className="mt-4 border-t border-slate-200 pt-4">
-        <h3 className="flex items-center gap-2 font-black text-slate-950">
-          <MessageSquareText size={20} className="text-[#0F7C7C]" aria-hidden="true" />
-          評價重點
-        </h3>
-        <div className="mt-3 grid grid-cols-1 gap-3 rounded-lg border border-slate-200 p-3 min-[380px]:grid-cols-2">
-          <div>
-            <h4 className="mb-2 flex items-center gap-1.5 font-black text-[#0F7C7C]">
-              <ThumbsUp size={17} aria-hidden="true" />
-              大家喜歡的點
-            </h4>
-            <ul className="space-y-1 text-sm font-semibold text-slate-700">
-              {(product.likes.length ? product.likes : ['無']).slice(0, 4).map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="border-t border-slate-200 pt-3 min-[380px]:border-l min-[380px]:border-t-0 min-[380px]:pl-3 min-[380px]:pt-0">
-            <h4 className="mb-2 flex items-center gap-1.5 font-black text-red-700">
-              <TriangleAlert size={17} aria-hidden="true" />
-              需要留意的點
-            </h4>
-            <ul className="space-y-1 text-sm font-semibold text-slate-700">
-              {(product.cautions.length ? product.cautions : ['無']).slice(0, 4).map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
+      {hasEvidence ? (
+        <ul className="sl-k-list">
+          {product.likes.map((item) => (
+            <EvidenceRow key={`+${item}`} tone="up" text={item} />
+          ))}
+          {product.cautions.map((item) => (
+            <EvidenceRow key={`-${item}`} tone="dn" text={item} />
+          ))}
+        </ul>
+      ) : (
+        <p className="sl-k-none">留言沒有集中的優缺點</p>
+      )}
 
-      {hasPosts ? (
-        <section className="mt-4 border-t border-slate-200 pt-4">
-          <h3 className="flex items-center gap-2 font-black text-slate-950">
-            <ExternalLink size={20} className="text-[#0F7C7C]" aria-hidden="true" />
-            原文連結
+      {/* Rendered when there is a summary OR the row is provisional: a provisional
+          row with no summary still has to admit it is a rule fallback, otherwise
+          it is presented as though a model had labelled it. */}
+      {takes.length > 0 || product.reviewProvisional ? (
+        <section className="sl-k-sec">
+          <h3 className="sl-k-head">
+            SUMMARY
+            <b>
+              作者評價
+              {product.reviewProvisional ? <span className="sl-k-prov">暫定</span> : null}
+            </b>
+            {takes.length > 1 ? <i>{takes.length} 篇</i> : null}
           </h3>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {product.postUrls.map((url, index) => (
-              <a
-                key={url}
-                href={url}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => trackOutboundPttClick(product.id)}
-                aria-label={`${product.productName}原文 ${index + 1}，另開新分頁`}
-                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-bold text-[#0F7C7C] underline decoration-[#0F7C7C]/30 underline-offset-4 hover:bg-[#0F7C7C]/5"
-              >
-                原文 {index + 1}
-                <ExternalLink size={14} aria-hidden="true" />
-              </a>
-            ))}
-          </div>
+          {takes.length > 0 ? (
+            takes.map((take, index) => (
+              <p key={take} className="sl-k-sum">
+                {/* Numbering only earns its place when there are several
+                    reviewers to tell apart. */}
+                {takes.length > 1 ? <span>{String(index + 1).padStart(2, '0')}</span> : null}
+                {take}
+              </p>
+            ))
+          ) : (
+            <p className="sl-k-none">尚未完成模型整理，請看原文</p>
+          )}
         </section>
       ) : null}
+
+      {product.postUrls.length > 0 ? (
+        <div className="sl-k-src">
+          <span>原文</span>
+          {product.postUrls.map((url, index) => (
+            <a
+              key={url}
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackOutboundPttClick(product.id)}
+              aria-label={`${product.productName}原文 ${index + 1}，另開新分頁`}
+            >
+              PTT {String(index + 1).padStart(2, '0')}
+              <ExternalLink size={11} aria-hidden="true" />
+            </a>
+          ))}
+        </div>
+      ) : null}
     </div>
+  )
+}
+
+function EvidenceRow({ tone, text }: { tone: 'up' | 'dn'; text: string }) {
+  const isUp = tone === 'up'
+  return (
+    <li className={`sl-k-row sl-k-${tone} sl-t3`}>
+      <b aria-hidden="true">
+        {isUp ? (
+          <ThumbsUp size={13} strokeWidth={2.6} />
+        ) : (
+          <TriangleAlert size={13} strokeWidth={2.6} />
+        )}
+      </b>
+      <span>
+        {/* The icon is the only visual carrier of polarity, so screen readers
+            need it spelled out. */}
+        <span className="sr-only">{isUp ? '優點：' : '缺點：'}</span>
+        {text}
+      </span>
+    </li>
   )
 }

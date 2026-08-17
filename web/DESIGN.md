@@ -87,11 +87,26 @@ Each collapsed card shows rank, brand, name, recommendation score, consensus,
 volume and price·category. Low-confidence scores carry a 樣本少 label.
 Tapping anywhere on the card expands an inline 單品判斷 block with the large
 recommendation score, original fair score, a green/amber/red consensus
-distribution bar, and a volume indicator. Evidence follows the source order:
-作者評價, 留言評價 ("大家喜歡的點" / "需要留意的點"), then source links.
+distribution bar, and a volume indicator.
+
+The expanded panel (`ProductDetail`, styled with the `sl-k-*` block in
+`shelf.css`) reads as the back of the same shelf label rather than as a separate
+surface. Order is 評價重點 → 作者評價 → 原文. Both polarities share one heading
+and one list, each row carried by a 讚/警告 icon in the polarity colour so the
+distinction survives greyscale; likes come first, then cautions. An empty list
+says what was found rather than rendering 無 as though it were a review point,
+and a `reviewProvisional` row is marked 暫定 even when it has no summary at all.
+Multi-reviewer summaries arrive joined with 「；」 and are split back into numbered
+takes.
+
+It is built for vertical economy: evidence items are ≤19 characters and the
+median summary is 17, so per-item containers, not text, are what make this panel
+tall — and an inline expander that pushes the next product off a 360×800 screen
+defeats its own purpose. Typical panels run 150–300px.
 
 Palette: primary teal `#0F7C7C`; consensus bar green `#2E9E5B` / amber `#E0A417`
-/ red `#D64545`; brand colours per the chips above.
+/ red `#D64545`; brand colours per the chips above. The expanded panel uses the
+`sl-*` tokens instead (`--sl-ink`, `--sl-good`, `--sl-hot`, `--sl-mono`).
 
 ## Interaction
 
