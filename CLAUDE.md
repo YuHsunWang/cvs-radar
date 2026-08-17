@@ -140,6 +140,17 @@ cannot see it. That threshold is a *screen* that routes uncertain rewrites to
 model adjudication; it is not the verdict. `docs/DECISIONS.md` (2026-08-13) has
 the measured false-positive rate.
 
+**10. Test a labelling-prompt change on a small batch before the corpus, and
+count the items.** Prompt rules are global: one aimed at a single product changes
+every product. Twice now a rule written to fix one商品 measurably damaged others —
+the second attempt cut item counts across an 8-product batch by 20% while still
+not fixing its target. Build a chunk of the products where the behaviour is
+visible, run it, and diff the picks against the live cache *before* spending an
+hour of `EFFORT=max` on 826 rows. Watch total item count, not just the case you
+were aiming at. Imperative phrasing (`drop the item`, `this rule outranks…`) is
+what turns a judgement rule into a blunt one; prefer describing what good output
+looks like. `docs/DECISIONS.md` (2026-08-14) has both failed attempts.
+
 ## Verifying a claim about behaviour
 
 The pipeline is deterministic given the same posts and labels, so the honest way
