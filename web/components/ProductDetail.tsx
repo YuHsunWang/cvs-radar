@@ -14,6 +14,11 @@ type ProductDetailProps = {
  * Styled with the `sl-*` system the collapsed card uses rather than in Tailwind
  * utilities, because the two sat side by side and read as different apps.
  *
+ * The author's summary leads, then the like/caution evidence: the summary is one
+ * short sentence that frames what follows, so reading it first costs almost
+ * nothing and makes the bullets land as detail rather than as a list to parse
+ * cold.
+ *
  * Kept deliberately short. Evidence items are at most 19 characters and the
  * median summary is 17, so the height this panel used to have was going into
  * per-item containers, not text — and an inline expander that pushes the next
@@ -34,29 +39,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="sl-k">
-      <h3 className="sl-k-head">
-        EVIDENCE
-        <b>評價重點</b>
-      </h3>
-
-      {hasEvidence ? (
-        <ul className="sl-k-list">
-          {product.likes.map((item) => (
-            <EvidenceRow key={`+${item}`} tone="up" text={item} />
-          ))}
-          {product.cautions.map((item) => (
-            <EvidenceRow key={`-${item}`} tone="dn" text={item} />
-          ))}
-        </ul>
-      ) : (
-        <p className="sl-k-none">留言沒有集中的優缺點</p>
-      )}
-
       {/* Rendered when there is a summary OR the row is provisional: a provisional
           row with no summary still has to admit it is a rule fallback, otherwise
           it is presented as though a model had labelled it. */}
       {takes.length > 0 || product.reviewProvisional ? (
-        <section className="sl-k-sec">
+        <section>
           <h3 className="sl-k-head">
             SUMMARY
             <b>
@@ -79,6 +66,26 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           )}
         </section>
       ) : null}
+
+      <section className={takes.length > 0 || product.reviewProvisional ? 'sl-k-sec' : ''}>
+        <h3 className="sl-k-head">
+          EVIDENCE
+          <b>評價重點</b>
+        </h3>
+
+        {hasEvidence ? (
+          <ul className="sl-k-list">
+            {product.likes.map((item) => (
+              <EvidenceRow key={`+${item}`} tone="up" text={item} />
+            ))}
+            {product.cautions.map((item) => (
+              <EvidenceRow key={`-${item}`} tone="dn" text={item} />
+            ))}
+          </ul>
+        ) : (
+          <p className="sl-k-none">留言沒有集中的優缺點</p>
+        )}
+      </section>
 
       {product.postUrls.length > 0 ? (
         <div className="sl-k-src">

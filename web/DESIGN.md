@@ -95,7 +95,7 @@ surface. It spans the full card width and joins the row above it with a dashed
 hairline — a perforation on one ticket, not the edge of a second object. (It
 previously cut with a near-black rule while also being inset 12px and tinted:
 three devices all saying "separate block", which is what made an open card look
-like two stacked things.) Order is 評價重點 → 作者評價 → 原文. Both polarities share one heading
+like two stacked things.) Order is 作者評價 → 評價重點 → 原文: the summary is one short sentence that frames the bullets, so reading it first makes them land as detail rather than as a cold list. Both polarities share one heading
 and one list, each row carried by a 讚/警告 icon in the polarity colour so the
 distinction survives greyscale; likes come first, then cautions. An empty list
 says what was found rather than rendering 無 as though it were a review point,
