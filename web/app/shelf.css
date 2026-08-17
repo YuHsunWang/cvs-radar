@@ -389,7 +389,9 @@
 }
 .sl-chevron { margin-top: 8px; color: var(--sl-soft); }
 
-.sl-detail { padding: 0 12px 12px; }
+/* Full bleed: the open panel is the lower half of the label, not a card
+   floated inside one. */
+.sl-detail { padding: 0; }
 
 .sl-loadmore {
   grid-column: 1 / -1;
@@ -609,7 +611,13 @@
    drops its own border and padding and is carried by a coloured polarity glyph
    instead, which also lets the two polarities share one heading. */
 
-.sl-k { border-top: 1.5px solid var(--sl-ink); background: #fbfaf6; padding: 9px 12px 11px; }
+/* A perforation, not a cut: the boundary still reads, but as a tear line on
+   one ticket rather than the edge of a second object. */
+.sl-k {
+  border-top: 1px dashed var(--sl-hair);
+  background: #fbfaf6;
+  padding: 9px 12px 11px;
+}
 
 .sl-k-head {
   display: flex;
