@@ -64,6 +64,12 @@ Three of those are gates people forget:
 - **`data/posts.jsonl` never enters the repo.** It holds real PTT accounts and
   is gitignored. The repo's history was rewritten once to purge identity data;
   don't undo that.
+- **Category comes from the label cache, not from `config.yaml`.**
+  `data/labels/product_category_labels.csv` decides; the `PRODUCT_CATEGORIES`
+  keywords are a frozen fallback for unlabelled products only. Adding a keyword
+  to fix a miscategorised product does nothing — every published product already
+  has a label, and the label wins. Fix it with a label (or, for a one-off,
+  `product_overrides.csv`, which outranks both).
 - **Low-sample products don't show a recommendation score** or a percentage
   distribution. The gating is deliberate, not a rendering bug.
 

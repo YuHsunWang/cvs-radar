@@ -140,6 +140,13 @@ CONFIDENCE_BANDS:
   - [3.0, "低"]
   - [8.0, "中"]
 
+# FROZEN (2026-08-18). Categories are decided by the label layer in
+# data/labels/product_category_labels.csv; these keywords are only the fallback
+# for a product nobody has labelled yet. Do not add words here to fix a
+# miscategorised product — the fix is a label, and a keyword edit cannot reach
+# any product that already has one. The category NAMES are load-bearing beyond
+# categorisation: cvs_radar/scoring/identity.py uses them to spot a 商品名稱
+# field that is a bare category word ("甜點") rather than a product.
 PRODUCT_CATEGORIES:
   "周邊":
     - "捏捏球"

@@ -651,7 +651,13 @@ def _strip_brand_keywords(text: str, brand: str) -> str:
 
 
 def categorize_product(name: str) -> str:
-    """Assign a category to a product name based on keyword matching."""
+    """Assign a category to a product name based on keyword matching.
+
+    The fallback, not the answer: `cvs_radar.product_categories.resolve_category`
+    calls this only for a product with no label. The keyword list is frozen — see
+    config.yaml — because a whitelist cannot cover the long tail, which is what
+    put 125 products in 其他 (docs/DECISIONS.md, 2026-08-18).
+    """
     text = unicodedata.normalize("NFKC", name or "").lower()
     matches: list[tuple[tuple[int, int, int, int], str]] = []
     for index, (category, keywords) in enumerate(PRODUCT_CATEGORIES.items()):
