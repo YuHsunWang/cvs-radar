@@ -21,7 +21,7 @@ if str(ROOT) not in sys.path:
 from cvs_radar.app_helpers import consensus_distribution, volume_label  # noqa: E402
 from cvs_radar.config import SCORING  # noqa: E402
 from cvs_radar.scoring.compute import _classify, _confidence  # noqa: E402
-from cvs_radar.scoring.identity import categorize_product  # noqa: E402
+from cvs_radar.product_categories import resolve_category  # noqa: E402
 from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
 from cvs_radar.store import load_results  # noqa: E402
 
@@ -249,7 +249,6 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
             merged["postUrls"] = sorted(
                 {url for item in members for url in item.get("postUrls", [])}
             )
-            merged["category"] = categorize_product(merged["productName"])
             newest = sorted(
                 members,
                 key=lambda item: (item.get("latestDate") or "", item.get("id") or ""),
@@ -361,7 +360,12 @@ def to_product(report: Any, recommendation_score: int | None = None) -> dict[str
         "brand": report.brand,
         "productName": report.product_name,
         "price": report.price,
-        "category": report.category or "",
+        # Resolved here, not just taken from the report: results.json may predate
+        # the category label cache, and a manual override in product_overrides.csv
+        # is applied after this and still wins.
+        "category": resolve_category(
+            report.brand, report.product_name, fallback=report.category or ""
+        ),
         "fairScore": round(fair_score) if fair_score is not None else None,
         "recommendationScore": recommendation_score,
         "consensus": report.consensus,

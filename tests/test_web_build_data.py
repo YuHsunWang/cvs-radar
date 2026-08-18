@@ -214,6 +214,34 @@ def test_load_and_apply_product_overrides(tmp_path: Path) -> None:
     assert product["productName"] == "錯誤名稱"
 
 
+def test_merge_keeps_a_category_override_that_the_keyword_rule_would_undo() -> None:
+    """A 分類 fix must survive merging.
+
+    The two rows below carry the same public id, so they merge — and 促銷組合 hits
+    no category keyword, so anything that re-derives the category on merge answers
+    其他 and throws the override away.
+    """
+    overridden = {
+        "id": "7-11::促銷組合",
+        "brand": "7-11",
+        "productName": "促銷組合",
+        "category": "鹹食",
+        "nPosts": 1,
+        "nComments": 4,
+        "_nEff": 4,
+        "likes": [],
+        "cautions": [],
+        "postUrls": [],
+        "latestDate": "2026-06-01",
+    }
+    weaker = dict(overridden, nComments=1, _nEff=1, latestDate="2026-05-01")
+
+    merged = merge_products([overridden, weaker])
+
+    assert len(merged) == 1
+    assert merged[0]["category"] == "鹹食"
+
+
 def test_blank_override_fields_preserve_generated_values(tmp_path: Path) -> None:
     path = tmp_path / "overrides.csv"
     path.write_text(
@@ -391,7 +419,11 @@ def test_override_collision_merges_into_one_public_product() -> None:
     assert merged[0]["firstDate"] == "2026-05-01"
     assert merged[0]["likes"] == ["甲", "共同", "乙"]
     assert merged[0]["cautions"] == ["太甜", "偏貴", "份量少"]
-    assert merged[0]["category"] == "其他"
+    # The merge keeps the dominant member's category rather than re-deriving one
+    # from the renamed product. Re-deriving it meant a keyword guess overwrote
+    # both the LLM label and any 分類 fix in product_overrides.csv, silently, on
+    # every product that happened to merge.
+    assert merged[0]["category"] == "甜點"
     assert merged[0]["price"] == 60
     assert merged[0]["excerpt"] == "新貼文負評"
     assert merged[0]["postUrls"] == [
