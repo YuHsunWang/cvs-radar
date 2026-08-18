@@ -175,5 +175,17 @@ grounded，判決快取在 `data/labels/grounding_verdicts.csv`。裁決 prompt 
 **順帶修掉的靜默覆蓋**：`web/build_data.py` 的 merge 分支原本無條件
 `merged["category"] = categorize_product(merged["productName"])`，而 override 在
 merge 之前套用 —— 任何發生合併的商品，其 `product_overrides.csv` 分類修正都會被關鍵字
-猜測蓋回去。目前 41 筆分類 override 剛好都沒落在多成員群組裡，所以還沒咬到人。
+猜測蓋回去。當時 41 筆分類 override 剛好都沒落在多成員群組裡，所以還沒咬到人。
+
+**分類 override 已全數清空（2026-08-18）**：把 40 筆帶分類的 override 逐筆與標籤對照，
+38 筆完全一致 —— 等於用先前的人工判斷對這批標註做了一次獨立交叉驗證。兩筆不一致：
+
+- `優菓甜坊可可玉米片奶酪`：**標註錯的是我們**（漏判，沿用了規則的「零食」，但可可玉米片
+  奶酪是甜點）。override 擋下了這個錯誤。標籤已修正為甜點。
+- `阜杭豆漿饅頭夾豬排蛋`：override 便當 vs 標籤 鹹食。`displayCategory()` 把兩者都
+  收攏成「正餐」chip，使用者看不出差別，因此以標籤為準。
+
+清理後 `product_overrides.csv` 不再含任何 `category` 值（33 列整列刪除、7 列只清空該欄
+因為同列還有 excerpt/productName/exclude 修正）。分類的單一來源從此是標籤快取；override
+仍然壓得過標籤，但要用它就代表標籤真的錯了，值得順手把標籤也修掉。
 
