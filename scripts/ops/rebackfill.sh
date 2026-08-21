@@ -263,6 +263,15 @@ reports, profiles = run_pipeline(posts)
 save_results(reports, profiles, "data/results.json")
 print(f"[recompute] {len(reports)} reports")
 PY
+# --- 7c. categories: label the products the recompute just settled on ---
+# This layer is not in run_required_label_layers.sh because it cannot run there:
+# its fingerprint is keyed to the final product name, which only exists once the
+# recompute above has written results.json. build_data resolves each category
+# through the cache, so labels imported here reach the snapshot without a second
+# recompute. Like the layers above it, a failure stops the run rather than
+# shipping a snapshot whose categories quietly fell back to the keyword rule.
+bash scripts/label_product_categories.sh || die "category labeling"
+
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
 # --- 8. commit (+push): labels + recomputed, de-identified public data ---
@@ -274,6 +283,7 @@ if [ "$DO_COMMIT" = "1" ]; then
           data/labels/product_name_labels.csv \
           data/labels/excerpt_labels.csv \
           data/labels/comment_picks.csv \
+          data/labels/product_category_labels.csv \
           data/results.json web/public/data.json
   if git diff --cached --quiet; then
     log "no data change to commit"

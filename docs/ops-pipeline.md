@@ -15,7 +15,7 @@ The pipeline scripts are versioned in this repo:
 
 | Script | Role |
 |---|---|
-| [`scripts/ops/rebackfill.sh`](../scripts/ops/rebackfill.sh) | the full refresh: crawl → backfill review text → sentiment labeling → product-name labeling → excerpt labeling → representative-comment labeling → atomically save de-identified results → `build_data` → commit (+push) |
+| [`scripts/ops/rebackfill.sh`](../scripts/ops/rebackfill.sh) | the full refresh: crawl → backfill review text → sentiment labeling → product-name labeling → excerpt labeling → representative-comment labeling → atomically save de-identified results → category labeling → `build_data` → commit (+push) |
 | [`scripts/ops/rebackfill-cron.sh`](../scripts/ops/rebackfill-cron.sh) | scheduled wrapper: full PATH, records last-success, runs the freshness check |
 | [`scripts/check_data_freshness.py`](../scripts/check_data_freshness.py) | freshness SLO check on the **published** `web/public/data.json` |
 
@@ -23,6 +23,25 @@ The **Codex labeling steps require a local Codex CLI subscription** and are
 not reproducible in CI. Each layer must export, validate and import successfully;
 any failure exits before recompute, commit or push, leaving the raw store for retry.
 Every other step is standard Python + git.
+
+### Category labeling runs after the recompute (since 2026-08-18)
+
+`scripts/label_product_categories.sh` is the fifth Codex-labelled layer
+(`data/labels/product_category_labels.csv`). It is **not** part of
+`run_required_label_layers.sh`, because its fingerprint is keyed to the product
+name the pipeline settled on — that name only exists once the recompute has
+written `data/results.json`. So it runs between the recompute and `build_data`:
+
+```
+recompute -> results.json -> label_product_categories.sh -> build_data -> data.json
+```
+
+`web/build_data.py` resolves every product's category through the cache when it
+projects the public payload, so labels imported at that point reach the snapshot
+without a second recompute. Products with no label keep the `config.yaml`
+keyword result, which is what makes a CI rebuild deterministic; a manual
+`category` in `data/labels/product_overrides.csv` is applied afterwards and
+still outranks both.
 
 ### Labeling runs in two passes (since 2026-08-13)
 

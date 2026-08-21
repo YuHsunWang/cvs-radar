@@ -22,7 +22,8 @@ from .excerpt import (
     _review_excerpt_with_provenance,
     representative_product_name,
 )
-from .identity import (categorize_product, group_products, normalize_product)
+from ..product_categories import resolve_category
+from .identity import (group_products, normalize_product)
 
 
 def _weighted_mean(pairs: list[tuple[float, float]]) -> float:
@@ -325,7 +326,7 @@ def score_product(
         product_key=product_key,
         score_mean=round(mean01, 4),
         price=price,
-        category=categorize_product(product_name),
+        category=resolve_category(posts[0].brand, product_name),
         competitor_mention_count=competitor_mention_count,
         competitor_preference_count=competitor_preference_count,
         competitor_own_preference_count=competitor_own_preference_count,

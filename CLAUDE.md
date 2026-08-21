@@ -64,6 +64,12 @@ Three of those are gates people forget:
 - **`data/posts.jsonl` never enters the repo.** It holds real PTT accounts and
   is gitignored. The repo's history was rewritten once to purge identity data;
   don't undo that.
+- **Category comes from the label cache, not from `config.yaml`.**
+  `data/labels/product_category_labels.csv` decides; the `PRODUCT_CATEGORIES`
+  keywords are a frozen fallback for unlabelled products only. Adding a keyword
+  to fix a miscategorised product does nothing — every published product already
+  has a label, and the label wins. Fix it with a label (or, for a one-off,
+  `product_overrides.csv`, which outranks both).
 - **Low-sample products don't show a recommendation score** or a percentage
   distribution. The gating is deliberate, not a rendering bug.
 
@@ -97,10 +103,11 @@ comment to this one. The working fix is to export an `other_products` column so
 the LLM can exclude them — both the excerpt and comment-pick layers depend on it.
 
 **4. The label CSVs don't share an encoding.** There is no `.gitattributes`, so
-whatever you write is what lands. As of 2026-08-03, all five label caches are
+whatever you write is what lands. As of 2026-08-18, all six label caches are
 **CRLF**; `product_overrides.csv` has **no BOM** while `comment_picks.csv`,
-`excerpt_labels.csv`, `product_name_labels.csv` and
-`sentiment_fingerprint_labels.csv` are **BOM-prefixed**. Check the file you're
+`excerpt_labels.csv`, `product_name_labels.csv`,
+`product_category_labels.csv` and `sentiment_fingerprint_labels.csv` are
+**BOM-prefixed**. Check the file you're
 about to touch and write it back the same way — rewriting a whole CSV with
 different settings produces a diff where every line changed and hides the one
 line you meant to change. For small fixes, edit rows in place.
@@ -119,7 +126,11 @@ applied. Comparing the two produces a flood of fake differences. Compare
 **7. Ordering matters in the label pipeline.** Excerpt and comment-pick
 fingerprints both contain the product name, so names must be settled before
 those layers export their deltas. `scripts/ops/run_required_label_layers.sh`
-encodes the order; don't reorder it casually.
+encodes the order; don't reorder it casually. The category layer is the one
+exception and deliberately sits *outside* that script, after the recompute in
+`rebackfill.sh`: it keys on the final product name, which only exists once
+`results.json` is written. `build_data.py` resolves categories through the cache
+at publish time, so a label imported there lands without a second recompute.
 
 **8. Importer tests must never use the importers' default output paths.**
 `import_excerpts`/`import_picks` write quarantine and adjudication queues under
