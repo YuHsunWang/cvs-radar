@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import Link from 'next/link'
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
@@ -265,6 +266,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             {key}
           </button>
         ))}
+        {/* Navigation, not a filter — the zone is its own page. */}
+        <Link href="/soft-serve/" className="sl-zonelink">
+          🍦 霜淇淋專區
+        </Link>
       </nav>
     </div>
   )

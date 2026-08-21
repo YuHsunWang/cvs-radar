@@ -1,0 +1,119 @@
+/* Soft-serve zone. Rides on the .sl-page shell (palette, type, shelf cards) and
+   only adds what the flavour comparison needs. */
+
+.ss-controls { margin-top: 18px; }
+
+.ss-back {
+  flex: none;
+  align-self: center;
+  font-family: var(--sl-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #f6f3ea;
+  text-decoration: none;
+  border: 1px solid rgba(246, 243, 234, 0.35);
+  border-radius: 2px;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+.ss-back:hover { background: rgba(246, 243, 234, 0.12); }
+
+.ss-section { margin-top: 26px; }
+
+.ss-h2 {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--sl-ink);
+  border-left: 4px solid var(--sl-ink);
+  padding-left: 9px;
+}
+.ss-sub { margin: 6px 2px 0; font-size: 12px; color: var(--sl-soft); }
+
+.ss-groups { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+@media (min-width: 900px) {
+  .ss-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.ss-group {
+  background: var(--sl-tag);
+  border: 1px solid var(--sl-hair);
+  border-radius: 3px;
+  padding: 13px 14px 12px;
+  scroll-margin-top: 14px;
+}
+/* Jumping between the two halves of a swirl lands on a card that looks like
+   every other card, so mark the one that was asked for. */
+.ss-group:target {
+  border-color: var(--sl-ink);
+  box-shadow: 0 0 0 3px var(--sl-pop);
+}
+
+.ss-r-jump {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.ss-r-jump:hover { color: var(--sl-ink); text-decoration-style: solid; }
+
+.ss-g-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ss-g-flavor { font-size: 16px; font-weight: 800; color: var(--sl-ink); min-width: 0; }
+.ss-g-count {
+  flex: none;
+  font-family: var(--sl-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--sl-soft);
+}
+
+.ss-rows { list-style: none; margin: 11px 0 0; padding: 0; display: grid; gap: 11px; }
+
+.ss-r-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ss-r-kind { font-size: 13px; font-weight: 700; color: var(--sl-ink); min-width: 0; }
+.ss-r-kind.ss-dual { color: var(--sl-soft); }
+.ss-r-score { flex: none; font-family: var(--sl-mono); font-size: 17px; font-weight: 800; }
+
+.ss-bar {
+  margin-top: 5px;
+  height: 6px;
+  border-radius: 3px;
+  background: #e9e6dd;
+  overflow: hidden;
+}
+.ss-bar-fill { display: block; height: 100%; width: var(--ss-w); border-radius: 3px; }
+
+.ss-r-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--sl-soft);
+}
+.ss-m-brand { font-weight: 700; color: var(--sl-ink); }
+.ss-m-warn { color: var(--sl-mid); font-weight: 700; }
+
+.ss-verdict {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--sl-hair);
+  font-size: 13px;
+  font-weight: 700;
+}
+.ss-v-single { color: var(--sl-good); }
+.ss-v-dual { color: var(--sl-good); }
+.ss-v-tie { color: var(--sl-soft); }
+.ss-v-none { color: var(--sl-na); font-weight: 600; }
+
+.ss-t-good { color: var(--sl-good); }
+.ss-t-mid { color: var(--sl-mid); }
+.ss-t-low { color: var(--sl-low); }
+.ss-t-na { color: var(--sl-na); font-size: 13px; }
+
+.ss-bar-fill.ss-t-good { background: var(--sl-good); }
+.ss-bar-fill.ss-t-mid { background: var(--sl-mid); }
+.ss-bar-fill.ss-t-low { background: var(--sl-low); }
+.ss-bar-fill.ss-t-na { background: transparent; }
+
+.ss-page .sl-shelf { margin-top: 14px; }
