@@ -123,7 +123,13 @@ SHILL_DETECTION:
     - "葉菜"
     - "葉片"
   min_comments: 3
-  ratio_threshold: 0.25
+  # An accusation discounts the accused post's AUTHOR, not everyone who spoke
+  # about the product (2026-08-21). Two distinct accounts are required because
+  # 業配 is cheap to shout: 12 of the 16 accused posts in the corpus carry
+  # exactly one accusation. The ratio floor stops a couple of shouts in a very
+  # long thread from reading as a verdict.
+  author_ratio_threshold: 0.05
+  author_min_accusers: 2
   post_weight_penalty: 0.3
 
 # Recalibrated 2026-07-20 against the live score distribution (median mean

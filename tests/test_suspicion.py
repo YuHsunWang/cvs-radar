@@ -9,7 +9,9 @@ from cvs_radar.models import Comment, Post
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.preference import _burst_ratio, _template_like_ratio, build_profiles
 from cvs_radar.reporting import render_suspicion_detail
+from cvs_radar.config import SHILL_DETECTION
 from cvs_radar.scoring import (
+    _author_shill_flagged,
     _decay,
     _is_shill_comment,
     _shill_stats,
@@ -235,7 +237,15 @@ class ShillDetectionTest(unittest.TestCase):
         self.assertFalse(flag)
         self.assertEqual(ratio, 0.0)
 
-    def test_shill_flag_reduces_score_via_pipeline(self) -> None:
+    def test_shill_accusation_discounts_the_author_and_nobody_else(self) -> None:
+        """The accusation is aimed at whoever wrote the review, so only that vote moves.
+
+        Scaling every opinion instead punishes the accusers along with the accused,
+        and because mu/sigma/n_eff all divide by the total weight, a uniform scale
+        only pulls fair01 toward the prior — which raises the score of a product
+        people are calling a paid promo. Asserting the commenters keep their exact
+        weights is what makes this test fail if the penalty ever goes group-wide.
+        """
         start = datetime(2026, 6, 10, 14, 0)
         shill_posts = [
             Post(
@@ -254,13 +264,41 @@ class ShillDetectionTest(unittest.TestCase):
         ]
         reports, _ = run_pipeline(shill_posts)
         with patch(
-            "cvs_radar.scoring.compute._shill_stats", return_value=(0.0, False)
+            "cvs_radar.scoring.compute._author_shill_flagged", return_value=False
         ):
             control_reports, _ = run_pipeline(shill_posts)
 
         self.assertTrue(reports[0].shill_flag)
         self.assertGreater(reports[0].shill_ratio, 0.0)
-        self.assertLess(reports[0].fair_score, control_reports[0].fair_score)
+
+        weights = {c.user: c.weight for c in reports[0].contributors}
+        control = {c.user: c.weight for c in control_reports[0].contributors}
+        penalty = float(SHILL_DETECTION["post_weight_penalty"])
+        self.assertAlmostEqual(weights["promo"], control["promo"] * penalty, places=4)
+        for commenter in ("a", "b", "c", "d"):
+            self.assertAlmostEqual(weights[commenter], control[commenter], places=4)
+
+    def test_one_accuser_does_not_discount_the_author(self) -> None:
+        """業配 is cheap to shout, so a lone accusation is not a verdict.
+
+        12 of the 16 accused posts in the corpus carry exactly one accusation; if a
+        single account could halve a reviewer's vote, the cheapest way to sink a
+        review would be to shout at it once.
+        """
+        start = datetime(2026, 6, 10, 14, 0)
+        post = Post(
+            id="one-accuser",
+            brand="全家",
+            product_name="單人指控",
+            author="reviewer",
+            author_score=95,
+            comments=[
+                Comment("推", "a", "好吃", start),
+                Comment("推", "b", "不錯吃", start + timedelta(minutes=1)),
+                Comment("噓", "c", "業配", start + timedelta(minutes=2)),
+            ],
+        )
+        self.assertFalse(_author_shill_flagged(post))
 
     def test_shill_stats_ignores_too_few_comments(self) -> None:
         posts = [

@@ -135,6 +135,7 @@ def _author_contributions(
 ) -> list[tuple[str, str, float, float]]:
     """One (user, role, score01, weight) row per scored post."""
     role_weight = float(SCORING["role_weight"]["author"])
+    penalty = float(SHILL_DETECTION["post_weight_penalty"])
     rows: list[tuple[str, str, float, float]] = []
     for post in posts:
         if post.author_score is None:
@@ -144,6 +145,14 @@ def _author_contributions(
         # the same per-user cap apply. Leaving authors uncapped let one account post
         # ten reviews of one product and carry ten full votes.
         weight = max(0.0, _credibility(profiles, post.author) * role_weight * _decay(post.posted_at, now))
+        # A shill accusation is aimed at whoever wrote the review, so it discounts
+        # that one vote. Scaling every opinion on the product instead — what this
+        # did until 2026-08-21 — punished the accusers alongside the accused, and
+        # since mu, sigma and n_eff all divide by the total weight, a uniform
+        # scale left them untouched and only pulled fair01 toward the 0.5 prior:
+        # a badly reviewed product scored *higher* for being called a paid promo.
+        if _author_shill_flagged(post):
+            weight *= penalty
         rows.append((post.author, "author", score01, weight))
     return rows
 
@@ -206,8 +215,30 @@ def _is_shill_comment(text: str) -> bool:
     return False
 
 
+def _author_shill_flagged(post: Post) -> bool:
+    """Whether this post's own thread accuses its author of writing a paid promo.
+
+    Two distinct accounts are required because 業配 costs nothing to shout on PTT:
+    12 of the 16 accused posts in the corpus carry exactly one accusation, and one
+    person's suspicion should not discount someone's review. The ratio floor keeps
+    a couple of shouts inside a very long thread from reading as a verdict.
+    """
+    comments = [comment for comment in post.comments if comment.text.strip()]
+    if len(comments) < int(SHILL_DETECTION["min_comments"]):
+        return False
+    accusations = [comment for comment in comments if _is_shill_comment(comment.text)]
+    accusers = {comment.user for comment in accusations if comment.user}
+    if len(accusers) < int(SHILL_DETECTION["author_min_accusers"]):
+        return False
+    return len(accusations) / len(comments) >= float(SHILL_DETECTION["author_ratio_threshold"])
+
+
 def _shill_stats(posts: list[Post]) -> tuple[float, bool]:
-    """計算貼文群組的業配喊聲比例與是否標記。"""
+    """業配喊聲比例（群組層）與是否有作者被指控。
+
+    Reported for observability only — the score effect lives in
+    ``_author_contributions``, on the accused author's own vote.
+    """
     total = 0
     shill_count = 0
     for post in posts:
@@ -219,9 +250,8 @@ def _shill_stats(posts: list[Post]) -> tuple[float, bool]:
                 shill_count += 1
     if total < int(SHILL_DETECTION["min_comments"]):
         return 0.0, False
-    ratio = shill_count / total
-    flag = ratio >= float(SHILL_DETECTION["ratio_threshold"])
-    return round(ratio, 4), flag
+    flag = any(_author_shill_flagged(post) for post in posts)
+    return round(shill_count / total, 4), flag
 
 
 def score_product(
@@ -242,7 +272,6 @@ def score_product(
     mu0 = float(SCORING["prior_mean"])
     prior_strength = float(SCORING["prior_strength"])
     shill_ratio, shill_flag = _shill_stats(posts)
-    shill_penalty = float(SHILL_DETECTION["post_weight_penalty"]) if shill_flag else 1.0
 
     opinions = opinions or build_comment_opinions(posts)
     opinion_pairs, opinion_contributors = _opinion_pairs(posts, profiles, now, opinions)
@@ -252,9 +281,6 @@ def score_product(
         for index, comment in enumerate(post.comments)
         if opinions[(post.id, index)].include_score
     ]
-
-    if shill_flag and opinion_pairs:
-        opinion_pairs = [(score, weight * shill_penalty) for score, weight in opinion_pairs]
 
     if opinion_pairs:
         weighted_sum = sum(score * weight for score, weight in opinion_pairs)
