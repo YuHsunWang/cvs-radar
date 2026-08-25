@@ -1,45 +1,156 @@
 ﻿fingerprint,rewrite,source_text,verdict,model,prompt_version
+0005a467337d58317f00d18bfb1ee539537d67857b236f1a4655b40c206016ac,吃起來很乾,我覺得超乾耶~~被包裝吸引了,grounded,gpt-5.6-luna,grounding-v1
+0327fb81d66139a2640e800a8fe4fdd8447325a0febd2a5155e78a1e86454ee5,無糖奶青茶香較重，奶味偏淡,但口味就沒有那種韓式辣醬味還是我醬加太多吃不出來QQ但酸黃瓜醬真的好好吃XD。,ungrounded,gpt-5.6-luna,grounding-v1
 04a4e8b1c1329d71dd2824215a8213ac30b921cd22c963940b44ce6aba7097ef,巧克力味太淡,"吃了個寂寞..QAQ 好淡,不知道是不是我這家的關係",grounded,gpt-5.6-luna,grounding-v1
+084be1e25c489a37aa0fef8cc5a49f34f013bc1648094d9edc2dc5164781aa76,鈉含量讓人猶豫,"椒麻很好吃,可是那個鈉看了都要思考好幾下",grounded,gpt-5.6-luna,grounding-v1
+08f833027c39c6b21b483a32e063949b9b9824b7cb9e0135db7df1895d91af0a,咖哩醬充足，雞肉口感不錯,我覺得很好吃耶~但肉是真的少而且你把他倒扣了馬鈴薯跟紅蘿蔔被蓋住了啊 我在店裡微波的開蓋他們就在那 雖然切很小款 但不會懷疑消失,ungrounded,gpt-5.6-luna,grounding-v1
+0a3e755125d2c3af8a1d4c9d924cd7d30576794b3206c9cad042c89f44989611,雞肉口感偏柴,這家我覺得柴耶,grounded,gpt-5.6-luna,grounding-v1
 0a7141d102152d776a560f51a78d68e1ad968b9c43ed84f1e373c84ed76b699e,六五折時值得買,"個人認為,友善6.5折=36nt,才有80",grounded,gpt-5.6-luna,grounding-v1
+0dead6012bc2a4c2e3729aeac1bdbffea16bb77eb7b328636949f1a530ff846b,芋泥甜度偏低,但個人比較喜歡甜的口感。,grounded,gpt-5.6-luna,grounding-v1
 0e1ac96bf6aeca2f0593aa69edf2652fb37c2620cd9a93c93927a7bdff6906c1,起司口味偏鹹,這好吃但蠻鹹的,grounded,gpt-5.6-luna,grounding-v1
 0e4f2db2bbeb1b8ec3237c7d09cf45cf665cd34b5ca695a8f46f32c2e90587ed,CP值偏低,感覺cp 太低,grounded,gpt-5.6-luna,grounding-v1
+10273bfebb8def022894324caaf087c6fde41404a3e1a5ff631d730210d04761,價格微妙，買其他飲料更滿足,推,ungrounded,gpt-5.6-luna,grounding-v1
+145b8b8c29d6c280fd4e44e29ef6629d6978d5a7658045d5021a390de3dc97cc,價格偏高,為何涼麵現在會這麼貴,grounded,gpt-5.6-luna,grounding-v1
+1ab5166ff709c7eabb5c3414451772657aeaf05d5b4f616371239280c45eadc6,兩種口味分開比較好,"沒有不好吃但蜂蜜味為主要,有單吃芋頭芋頭味本身也不重",ungrounded,gpt-5.6-luna,grounding-v1
+1ac8af74247fec4d89efd3bbfd4fde7bd08c880db3568fa093f76ad453d1a9d3,葡萄奶酥聞起來很香,昨天搭車碰到在吃的人 超~香XD,grounded,gpt-5.6-luna,grounding-v1
+1b04e6e7698fd346f3c1ed0e09bb0c534d79cbb6c65dd2344bd474031b6c4334,肉嫩，帶微微酒香且夠味,肉很好吃 這種飯糰可以直接不拆加熱嗎,ungrounded,gpt-5.6-luna,grounding-v1
 1bcb12794a6cdcd08ce631c42140ddf2a3f7735935262428a2c7b806e3f8ec15,價格偏高,有夠貴,grounded,gpt-5.6-luna,grounding-v1
+1f6a587c6e2283a8e6374b83626fa735a71b39b3c69264906045e071f2b368af,荔枝香氣明顯,很香。,grounded,gpt-5.6-luna,grounding-v1
+24a30774a7f463f9cf98f0beef569bb13a9dcf952c3caba709a9a6bd8fc88e7d,乳酪餡帶淡花香，麵包有些鹹味,"可頌外型看起來胖胖的有點可愛。
+吃的時候一直在想鹽可頌的”鹽” 在哪。",ungrounded,gpt-5.6-luna,grounding-v1
+25ca1611c494a501ca098d0741237a28a7ba332c21bec567135a488b02bab4cf,外觀很像炒麵,先不論味道，實際擺在店裡的實品是真的很接近模仿的食物。,grounded,gpt-5.6-luna,grounding-v1
+273eb053099d98bc451df3c6555ea7293f4d022d3fdc59c6bd0af359ffe541fb,芝麻牛奶濃郁，喝到第三口覺得膩,馬來貘包裝太可愛忍不住買來試試。,ungrounded,gpt-5.6-luna,grounding-v1
+295c66181eba8437cedbacebc6f470687d9c543e6545dc1acb322e8e84fa3d7b,調味不錯，米飯表現合預期,餡料部分蠻濕濡，有加洋蔥提味，醬汁部分甜鹹甜鹹的，也有小小微辣肉的份量也很對得起價格，吃起來不柴，好吃。,ungrounded,gpt-5.6-luna,grounding-v1
 2975a4ba6ba0bb869f3c68b1fb71bee46f57ab3630425accd5829f66b15cdd91,價格偏高,好貴,grounded,gpt-5.6-luna,grounding-v1
+29bef6185381f6c8d9b869f7f37d0f0638b52d2a692f160081f9f7ece65b3d4d,封膜難撕，蓋子也難蓋,然後這種飲料包裝真的超討厭...。,ungrounded,gpt-5.6-luna,grounding-v1
 2b6a43ab2dc48ae9f90edd0024fe78ffc80dd61cd231bf5b7cfbfaff9f27b28b,杯子蛋糕份量小,小小一個 很簡。,grounded,gpt-5.6-luna,grounding-v1
 2cbeecbc17b44024ca172ca0db69fb98543683dfa6166c6035b18cbd6a4edd7f,加價5元也能接受,多五元還行,grounded,gpt-5.6-luna,grounding-v1
+33dcc222954e7cbbbfaabff8ceff90a4f18d3e423cf9ba930329c04acf5348da,三入份量剛好，能應付下午嘴饞,這款也是不錯 第一次吃有驚豔到,ungrounded,gpt-5.6-luna,grounding-v1
+344b068edc9591b6ed29b75667061abe7b0ff4b33787faa6be59803ba04cb6cb,烤過口感不錯,這個烤一下 螞蟻人喜歡,ungrounded,gpt-5.6-luna,grounding-v1
 36631f699a2a83634ce9e9237adba986e195041146afde1e24263a3500a34173,適合特殊口感愛好者嘗鮮,有興趣的很推薦買來吃吃XDD。,ungrounded,gpt-5.6-luna,grounding-v1
+3790a16eb154913afc8999f186b6d6cda2b65219bd4f0dac8ec093e31f2272d5,巧克力偏甜,吃起來頗甜 中間薄荷夾層如想像中。,grounded,gpt-5.6-luna,grounding-v1
 38b9f54d24f2cfd84770b6b34046384f2c7e32eec11e188db758098f6ff12f5c,每支霜淇淋份量不一,為什麼有的冰淇淋肥肥的有的瘦瘦的,grounded,gpt-5.6-luna,grounding-v1
+3ab5498c0f3750183c437bc03492b4d96049bc970bb966cfd4d6a877e6e1f00d,酒感低、很好喝，但很難買,"內容物有義大利麵 幾根紫高麗菜絲 南瓜塊。
+小番茄 重點。
+就其實還滿夠。",ungrounded,gpt-5.6-luna,grounding-v1
 3adb04b8a50edb57b4b2ab0ac928e2df69620bc4e4fec695a99e52497edfe4ea,奶霜油膩，上顎黏膩,倒是口感非常膩口。,ungrounded,gpt-5.6-luna,grounding-v1
 3d6f55de48e67afbceb7cc5a602655ec22e76f12f1febdef819c935ab646b2c5,泡芙份量太小,超小顆 有夠慘,grounded,gpt-5.6-luna,grounding-v1
+3f246341ae664552d21ecbc6139df797956afd9b885db492f93bb504ba765ba0,味道怪，不像四季春,真的難喝 山苦瓜還有甘甜感 這款不知喝三小,ungrounded,gpt-5.6-luna,grounding-v1
+480c2b4d51191747fe848bf2ad80b61bc66baa375e411b52411d6f08d8bb5944,喝起來偏甜,好甜,grounded,gpt-5.6-luna,grounding-v1
+495035ae9b9331170a508481d7ba9a9a04c9e1a5d1dca36ae1997a6dd9e3d307,豆漿口感濃郁,濃。,grounded,gpt-5.6-luna,grounding-v1
+4a13dd05672d04e0a0b1edc48ee8ae107113e51ae5bab95347649b160d927988,芋泥有顆粒，搭肉鬆鹹甜,好吃推 兩邊芋泥不一樣 一邊吃得到塊狀 另一邊感覺混奶油比較多,ungrounded,gpt-5.6-luna,grounding-v1
+4bb42983e34696a2318c3172b67adca22cf4e575600ce8acd9ed505131aa1d84,飯糰口味偏鹹,711這款對我來說稍鹹。,grounded,gpt-5.6-luna,grounding-v1
+4d0eed0b57fbf62358c09c6e8e8ed020ee237d1a7c7b18d77e355f6c7991aba0,喝不出特別的生可樂感，代糖味重,"第一口就是 哪裡生。
+第二口就是 啊是代糖啊。
+以及太代糖。",grounded,gpt-5.6-luna,grounding-v1
+4f957554846852347a9727703fd3f257e8a261401ffec704e99b99c8db8b2183,六十九元太貴,好貴欸,ungrounded,gpt-5.6-luna,grounding-v1
+530f23392b281eb773d0eefc0488b9d39623cc5072af1e9f27a556ab0e54f757,價格高且尺寸大，適合分食,它真的貴又大 兩人一起吃比較剛好,grounded,gpt-5.6-luna,grounding-v1
+57324df932628e4b6b32793c0c48c07f0c321804209c5d4f79ca8510bb844c6c,用點數加購很划算,好吃! 全家app裡1000點+29元便宜,grounded,gpt-5.6-luna,grounding-v1
+57d9cdb0cdafb79a9a13e60d43868cdfa99042f9b952f85354ef815dad90312f,一次抽到飲料、獎品和購物金,舒服 都是10罐 獎品各中1個 剛開賣機率還很不錯,ungrounded,gpt-5.6-luna,grounding-v1
+586485bd37ad7811ba88873e5f35ad7579268532e4592ba37c5f05206f05fa6d,價格讓人覺得太貴,看店員掃完條碼發現這麼貴。,grounded,gpt-5.6-luna,grounding-v1
+5a508516ac9483bc446fb2ea4dc641d4028a1c10f423a86acb37613fed31ca46,售價99元，讓人想跳過,99 pass,grounded,gpt-5.6-luna,grounding-v1
+5b1aa81708473a7a247b2ec844bdd16729453c7af6fc97373f7dfcbc21036150,椒麻每百克蛋白質較高,椒麻(13.5)>金門(12.5)=花雕(12.5)。,ungrounded,gpt-5.6-luna,grounding-v1
 5d218dae0293d4791e5b794345ffac720a711903717ddad4e31f077d741c77db,價格偏高,太貴了,grounded,gpt-5.6-luna,grounding-v1
 5d4ebf8773b669ebd221a87dc263d73005f9bc243c1be2e19108080f1687f1f5,卡士達餡比較不膩,而且吃到會爆餡那種，我整個完食。,ungrounded,gpt-5.6-luna,grounding-v1
+5da4b0852e25526965b634b564861d3f41e4bc64ed0f1a282c4bcf3a630fdd61,不加熱焦糖較重；加熱後堅果香更濃,"第一片我沒加熱直接吃。
+第二片我拿去烤一下。
+甜度也變低。",ungrounded,gpt-5.6-luna,grounding-v1
 5e48172f15d3c0acbcd76fab85758c15b93a88046ef3354d2cd9d62182f5ea45,價格偏高,好貴 有沒有內容物照片,grounded,gpt-5.6-luna,grounding-v1
 5f4efdcf6c067eeb63d50a152dbbbf1bca5c16ce4fad20e654d846fd4c5d87e0,沒有優惠就較難回購,不喜歡裏面加椰奶,ungrounded,gpt-5.6-luna,grounding-v1
+5fe16f81bb96c5e7d9933615a07f97382a1e306e6efa9ee6dca9f0b7a11aeefc,75元以用料來說可接受,外面一杯楊枝甘露都要80以上了 這個還行,ungrounded,gpt-5.6-luna,grounding-v1
 6046b08ce7529df8030fdc3993566ee48a9431cc918fabd10405d8a46fc1bbed,原子筆不太能接受,整體來講~除了筆我無法之外QQ。,grounded,gpt-5.6-luna,grounding-v1
+66aababe902ebd0606c0b27aa539581d3fb2afd67c3df28699b9c3623d38549c,在小七雞胸中表現中上,此口味算是中上成績。,ungrounded,gpt-5.6-luna,grounding-v1
+685a9c3fc510c05c1007aea12ec7bbb2ca8cbdb4c859fc38894d3c981e2fa5f2,每口都有滑蛋和培根，花生醬也有味道,這組合本身就很好吃。,ungrounded,gpt-5.6-luna,grounding-v1
 6aaf0ac7c3c2f7b4806250aba6df653a932c8fbade99c1b49067425fe55ae116,湯頭很濃郁,這個真的好喝蠻濃的,grounded,gpt-5.6-luna,grounding-v1
+6ab0612f4568cca03b0400d5a0dea840174f74d38b831efaff40af7ebaf8a630,無內餡僅蛋黃醬，麵包體柔軟且味道特別好吃,沒有餡 只有表面的蛋黃 醬。,ungrounded,gpt-5.6-luna,grounding-v1
+6e106f7c2db19c2d2743887a01c80a9ec1b66e2e85b01f38ab552647e5ea6938,價格偏高,太貴了嘗過就好齁...主要還是愛之味&麥萃值得一買再買!=,grounded,gpt-5.6-luna,grounding-v1
+6f4d4dc650bde1c38485c80f7a7f2c98af2ef5faff6a2b44a8af5471856a4697,蘋果與果菜汁混合後表現普通,兩種味道我都很喜歡，但Mix在一起就還好了。,grounded,gpt-5.6-luna,grounding-v1
+73ef0dd51ad2b3a09181696531369da1ac02339476eb2df30869e02db0531c42,無籽吃起來很方便,沒有籽也太讚了吧,grounded,gpt-5.6-luna,grounding-v1
+7a4da63727378242ece002e172c7c33a974c065a6a0081bd87339409d6c1e14e,除餅乾和外包裝外都普通,其他對我來說普普通通。,ungrounded,gpt-5.6-luna,grounding-v1
+7c4eef5a70f7e9b4a0f57730e625307bb07d3b582c18a7eaaca1f18168b1277a,不愛甜的人也覺得甜度剛好,今天這種天喝剛剛好,ungrounded,gpt-5.6-luna,grounding-v1
+7e210f4d2b1b525cd662135dbc87d6ef8ba9918ceb4214b47c71b130a6bde56e,豆漿喝起來很濃,濃。,grounded,gpt-5.6-luna,grounding-v1
+7eac6577b0d59221e61043f59d481047da147eedd292a990275e61964cf1bf2c,甜度非常高,看起來超級爆炸甜,grounded,gpt-5.6-luna,grounding-v1
+7fd56a08f80ba520c318166fdebd085bd80d02f7891d720be1b28eb2294e32c5,醬汁入口偏苦,"這款覺得難吃,醬有夠鹹",ungrounded,gpt-5.6-luna,grounding-v1
 83b65400577f31eeae789483bfd6f3fd05ada15da3a5b2d65b3a4ef03812d615,蔥鹽雞肉串調味不濃,則是感覺沒有想像中的那麼強烈。,grounded,gpt-5.6-luna,grounding-v1
+83d5443bca567398a687e7a9fd7e6b3f755dda3dc9957924fe03ae1ffe08832b,酒香淡淡，醬量剛好,"有白蘭地的味道,醬不多不少",grounded,gpt-5.6-luna,grounding-v1
+8427b106b7600542f45c6996343c60d2aacb7dccabaa2bcb2851ef172adce344,單賣杯子，讓人有興趣卻猶豫,圖案好醜很像媽媽那一輩的人會喜歡的,ungrounded,gpt-5.6-luna,grounding-v1
 861af88ebdd1bc570923093e85310da2a24ea264fa8328a54e76dbb1c4eedf84,外觀不吸引人,看起來就不太會想點進去看的內容,grounded,gpt-5.6-luna,grounding-v1
+861de761dd97015c78a6736157701eecc8688c3fa269395e21b56116c54971a5,配料份量偏少,這款和花雕雞麵都不錯 適合夏天吃 只是料給得很寒酸,grounded,gpt-5.6-luna,grounding-v1
+88821c14bf750c1a6c454df11bb1c8b2f19d0a43c65b856737f83733ac2b1261,啤酒味反而勝過荔枝味,結果是相反。,ungrounded,gpt-5.6-luna,grounding-v1
 8a6777a008752ab8fe0bc9f1dfeec48611a1976d1c5f44b31b1cc72eaae293d9,份量偏少，可能要吃兩個才飽,"100/44生的吧? 台式滷到出膠的,脂肪附著量超高的",ungrounded,gpt-5.6-luna,grounding-v1
+8ceb40be0aff79de86da0f69fcc19c3e908071cb9db4a95ac38ba528d0234b1c,霜淇淋份量很大,好大喔,grounded,gpt-5.6-luna,grounding-v1
+8d4eedda654d913db4d23fe317cc2c244afc73dd13c3cfa164d8876ae58dbea0,份量小且價格高,有夠貴.....記得鄉下老家隨便買都大又便宜。昨天看實體超小捏QQ,grounded,gpt-5.6-luna,grounding-v1
 9099a50b52562a69ae1ac1517a96eab1bffbc621517d836da53f850088c0d5cd,雞胸肉很柴,吃起來真的蠻柴的,grounded,gpt-5.6-luna,grounding-v1
 92e717a4db7f3a0cc0b5c169d3b49b8462c5b51695342df7b22164cf69d04f4b,摸起來很Q,"我是抽到這隻,有夠Q",grounded,gpt-5.6-luna,grounding-v1
+980cbd39fcd081dc61c12590de1e430a2e32c13dfc16a1f870431c1903e895fe,蠟筆小新提袋很可愛,超可愛的。,grounded,gpt-5.6-luna,grounding-v1
+9a8def8c834edfbb97bce238258558f00fc1fb5563b14c0dab4828e05c1f4bc5,霜淇淋份量偏少,點太少是硬傷,grounded,gpt-5.6-luna,grounding-v1
+9b10ee9b7c616022516cb2c76f746df4df793d75ff192c5302f215a14e501639,只打折才會考慮,"友善65折下去堪吃啦,原價請pass",grounded,gpt-5.6-luna,grounding-v1
+9e0c4c2df51996290d0b4ed4040d6cece5972688af18da4d692609686b633f83,不用自己泡，喝起來很好喝,"抹茶感覺就很容易翻車,原味比較經典",ungrounded,gpt-5.6-luna,grounding-v1
+9f15c2cb1d4eb2df87e41a6af5f56a1007cd38aea39b4483caa0bd4358ca4ab4,蛋糕吃起來偏乾,覺得很乾不推,grounded,gpt-5.6-luna,grounding-v1
+9fa994a438bad1ff19d8ef9d797195a8bb5b7d136877e1c483e4b27dd9156e92,泰味打拋雞拌麵好吃,我覺得好吃,grounded,gpt-5.6-luna,grounding-v1
+a1ba499906015858c755f0656e1907e4cab05f6f79a232536671b0b1074fca55,價格偏高,貴死,grounded,gpt-5.6-luna,grounding-v1
+a6205b1785e681019d14c2910e8109eb39e979268742a72794e6ae9d9bd7a3b3,豬排厚，醬飯分開設計；咖哩馬鈴薯很少,"肉是真的蠻厚的。
+醬跟白飯一人一邊。
+只有一點點點在醬裡面。",ungrounded,gpt-5.6-luna,grounding-v1
 a7aa61e2259fa1c215ca7d76be9d135c8747ee43ce2f5f81cacee8db6f1dc207,玉子只有四分之一顆,品名寫玉子結果放1/4蛋好意思嗎==,grounded,gpt-5.6-luna,grounding-v1
+a85f1aa24d80e0a8a8fa5560c57eb339f0be1fc59b7ec0d1705c2e65d8c0038e,餃子個頭很小,缺點就是超小顆,grounded,gpt-5.6-luna,grounding-v1
+a9a21e6c83c93ce4d605b7f21e954c100ee88f429d244a2eef913b30dc35efbd,造型可愛，尺寸看來不小,好可愛~好像還滿大,grounded,gpt-5.6-luna,grounding-v1
 aa96934a958b50e1892f8340be2c55d6b982f424f2ef7578f88107da8090904b,茶包式咖啡方便冷泡,嗯 這熱門程度可以等特價,ungrounded,gpt-5.6-luna,grounding-v1
+ae758539bd16ec2b2760b9843b95005d642017efecf058adab2515c5477eb54e,135元不如去咖啡廳吃,吃多有點膩 原味我可以,ungrounded,gpt-5.6-luna,grounding-v1
+af28ca120b3fdd5c666f4eefd7b6406bb955d02f2db957910faf57e1b905bf04,咖啡價格偏高,真的很貴,grounded,gpt-5.6-luna,grounding-v1
 afd305a6d2375b987ff2ed8ad3916755a75e2f569383da06f991fbf96279863d,價格偏高,買了 小貴 明天再來吃,grounded,gpt-5.6-luna,grounding-v1
+b0b9f03d6c55997c0811d611b7414e93e8ed1f1d85ad6aa23f484421876aea1c,辣但讓人一口接一口,(因為很涮嘴wwwww)。,ungrounded,gpt-5.6-luna,grounding-v1
 b140eb92903de83826efb2cde7c9c0879bbc0f9c5572afb4ce3946d3bece2a36,口感有點怪,感覺還可以 下次吃吃看,ungrounded,gpt-5.6-luna,grounding-v1
+b14a598e1e075613da37f3fd682b67cb42385624c002c938b3d70b4a3135896f,ibon購買方便，但代碼印刷錯誤，客服協助後可兌換,"是很方便的服務。
+可惜這次怎麼輸都不對。
+真的對了。",ungrounded,gpt-5.6-luna,grounding-v1
+b4b3fdf4f99f53426124c8f38780a7c9c9f9ad6ea656aeb4f94e5e5c061986b3,有人覺得辣度較低，且吃後腹瀉,"這款吃起來比辣起司還不辣,但吃完隔天狂拉肚子美國辣奇多完全不辣好嗎...一堆人吹成那樣",grounded,gpt-5.6-luna,grounding-v1
+b6104d8eafd7b523afb1a8466b92760394d3d377bb9b782c845b791ba9e37439,三十元才比較合理,30塊不能更多了,grounded,gpt-5.6-luna,grounding-v1
+b85d637890290c57b7eb2a7ebda83bf78fe4225306ce17a982e6bdf85d6e3798,冷熱皆好吃，加熱後剝皮辣椒辣度降低，重口味可回購,冷的熱的都好吃。,ungrounded,gpt-5.6-luna,grounding-v1
+b9d87c3dfbcf074003bf2b1af1d8b255e3290551f1d392642cdede0db36ee565,霜淇淋融得很快，滿手都是,"上次買一隻拿到手轉身走兩步就直接倒在我身上,狼狽的清理後在店內吃時,又看到一個剛拿到走不到門口直接整坨往前掉到地上,這款真的很軟",ungrounded,gpt-5.6-luna,grounding-v1
 bba02a469bd28e7a87498c55056c95a0c26fc37ab80a6009d229e4023dfba7f6,原子筆較難接受,整體來講~除了筆我無法之外QQ。,grounded,gpt-5.6-luna,grounding-v1
 bd8a3800636a258949543569fabd30b1cb38cb22a8b43014a9b0c5de8a2d75cb,吃到後面覺得膩,還很膩,ungrounded,gpt-5.6-luna,grounding-v1
+bdd7b6170697aea1b2dcd04bf7d652f15aed26324eefee3b8aa0e23e39417cc0,特價時買很划算,這款不錯 上次康康5有兩件79元,grounded,gpt-5.6-luna,grounding-v1
 c0eb88a5bf013f9e37cf8bdfb7bebc12648a2847f77f508e3f9ec53bedd3dae4,甜度非常高,這超級甜 吃過覺得我還是吃一般剉冰店就好XD店員是給我粗吸管哈哈,grounded,gpt-5.6-luna,grounding-v1
+c1d58d35fb490b5742839ff2f772b089e845aa899ad06756d96d766d41bd5f25,霜淇淋份量很大,好大隻,grounded,gpt-5.6-luna,grounding-v1
+c4f74ed7dfabd87802596a8589dd5de9ef226512d5f67d51ce8841d2446b5379,外觀很可愛,滿好看的耶,grounded,gpt-5.6-luna,grounding-v1
+c53c69d7b098deffba42cd953b803b2e11dc961c3167e05edcf1f20975ee01d4,喝起來偏甜,覺得太甜,grounded,gpt-5.6-luna,grounding-v1
 c653754dc51fee6c429972b4abb921a922ad61bdae9f02411410e07b1f9fee84,霜淇淋偏小，還會滴水,這次咖啡的都擠很小 不知道是不好擠還是店員的問題,ungrounded,gpt-5.6-luna,grounding-v1
+c848d9d625cd16ed4a8a475b40cd04ca237531988c1aeaa0cccccf23efab8c3f,價格實惠，肉鬆沙拉經典,"說真的全家的肉鬆麵包28很佛了,有些連鎖店都賣4x了",ungrounded,gpt-5.6-luna,grounding-v1
+cac814a4c2a8927817331d6eb78e0b0b9cce8c8d7b4efc56baeecf96b2fadb0f,花生麥茶餡味淡，整體只有餅乾味，不會回購,不喜歡，但沒有加香料給肯定。,ungrounded,gpt-5.6-luna,grounding-v1
+cf30297f8e4c6bacd5e213ea86d78b92edc350f821cc1a682937fd4e300a4c22,曾有留言反映豬肉有異味,萬物齊漲分量變小我都沒問題。 但最近一次吃發現豬肉變臭了,ungrounded,gpt-5.6-luna,grounding-v1
+d296266d826397c30781be429081507352e68cb7fbdf696cc3ee7fd2b4439a62,吃起來很油,這款滿油的,grounded,gpt-5.6-luna,grounding-v1
 d615c7c5b3880e4ba376bd243cdbffbcabdd9dacfb6066b2f7654519120d92de,餡料太少，52元偏貴,"52塊給那一丁點...,難怪很容易被貼上友善時光貼紙",grounded,gpt-5.6-luna,grounding-v1
+df0861cf2cea2a9261e3db6b0bec7cc45bf8e7c3478f9e110a2908f7c5fe46a6,折扣後吃起來還可以,"i珍食買過還行,我家這邊的人好像比較不愛,常看到特價",grounded,gpt-5.6-luna,grounding-v1
+e19787f528b96acebe378310826e6b41c36cad527269d686f5062abcc9b5b281,酒精濃度偏低，紹興感不足,"那可能會比較符合""紹興""一點。",ungrounded,gpt-5.6-luna,grounding-v1
 e1d33ed78c2f46963c2f1d18bb577d11a95ca306d83778e23844e880e9dc91d8,不喜歡香菜者會難以接受,這味道無法想像XD 對討厭香菜的人來說簡直邪魔歪道,grounded,gpt-5.6-luna,grounding-v1
 e37936ea9ed4578aac94e8f0a49c70cf311edecb686b17263bd60f26d785fc74,喝起來偏甜,覺得很甜,grounded,gpt-5.6-luna,grounding-v1
+e3f9cce49eef066e43c1925d96bbfff808769ca14ca69358cf80b521eba126dc,剝皮辣蝦滑蛋味道好吃,"我覺得這款好吃,但飯真的有點少",ungrounded,gpt-5.6-luna,grounding-v1
 e40717e3a2a2079ff4892e354cc881d9ed59d6a0162359bdffad4942b6466802,拿來當手機架很怪,我覺得怪怪的XD。,ungrounded,gpt-5.6-luna,grounding-v1
 e5044b645673fc7226baa00b8608872d3db4c87590353f29e08ec7b45b84077b,蔥鹽調味不如預期濃,則是感覺沒有想像中的那麼強烈。,grounded,gpt-5.6-luna,grounding-v1
+e616b2db1edc39202e8d7a30dbcb0db23987044e84ab2b5c794e67652228c5cc,味道普通且價格偏高,很普 太貴,grounded,gpt-5.6-luna,grounding-v1
+e65a3a36a4b982ade1d8099cd4a1df5b66e16870d3e9e27dc59c9d76f0ae1b61,90元偏貴,好貴哦,ungrounded,gpt-5.6-luna,grounding-v1
+e6efede0f48aa9ee5ef6ad49e433c47e9a25c69a602ac1ef361258c69a002e38,甜味很明顯,甜，就是甜，還是甜。,grounded,gpt-5.6-luna,grounding-v1
+eb2058ad117860a317edd4fb19504e6f1adf8250452e07930ead9a31b5df6312,整體甜度偏高,但基本上就是很甜哈。,grounded,gpt-5.6-luna,grounding-v1
 ebee5a5f2be9bf83d62f1a8d58a222d609df3d9310eb0b0758bb2575148ba323,吃了容易胖,胖起來,grounded,gpt-5.6-luna,grounding-v1
 ec4cbf7f1c1eae41a313af2f14def9dfeb3698cc8d6a7135896e56c0c2948cf2,有留言反映尺寸偏小,"不錯吃,缺點就是我拿到的超小隻",grounded,gpt-5.6-luna,grounding-v1
+ed599eb0ad262535b19901109606fc917c513876370399041c08a12e6360ee18,內餡甜度太高,沒想到會很甜欸感謝滅火,ungrounded,gpt-5.6-luna,grounding-v1
+ee7a314d7ed806a7c36b54b3759cf4eb0a8b7b95dd3393bd2813f37bce1c5667,七九折購買較划算,79折不錯耶,grounded,gpt-5.6-luna,grounding-v1
 ef49a30197dc2a000edca62b628b2e02c78ffedaff02e26f79b977272dfb7bdc,價格偏高,這款有點貴,grounded,gpt-5.6-luna,grounding-v1
+f09f8d46ff03db1c53221c120a79bf665cfd203f1f93fd3ee11fb8f6a3a2bc5b,爆米花脆，甜中帶鹹，適合配電影,延世大學竟然也有出爆米花。,ungrounded,gpt-5.6-luna,grounding-v1
 f0e4cb81bcb179705fe73c57cacd7010f0f7c644cac6325a6672db422031cff0,酒感不明顯,說有7趴倒是沒感覺。,grounded,gpt-5.6-luna,grounding-v1
 f3e8eb868420f6806079b86ff6f34d739866d268a0719e323a8cd81296d9c819,價格偏高,但就是有一點太貴了 所以有扣分。,grounded,gpt-5.6-luna,grounding-v1
 f4e50b835fbd71de37e93ab574b7962a6614d36241f09a6ea2c73067e730cb1b,標示7%卻喝不出酒感,說有7趴倒是沒感覺。,grounded,gpt-5.6-luna,grounding-v1
 f50b86efd1ba07f91de9b5d5362ff2c99c9da914688cf73f6e7b6d9774a83186,每層都有奶油,吃起來不會膩。,ungrounded,gpt-5.6-luna,grounding-v1
+f8be6f1aaa16e20894cffbde1e00fca88176958f2aa28abb5cd610daad2775cc,份量小且價格高,超小超貴,grounded,gpt-5.6-luna,grounding-v1
+f9c2f3974c21d11563fd2cc06dfd573c018f1aac26886fac9becfab87718c3a5,梅子蕃茄果昔值得試試,果昔可以喝喝看 確實挺不錯的,grounded,gpt-5.6-luna,grounding-v1
+fa9232cce727d253dfcbad2962cbbd445e93b1fec0b6fcbdbb922c426320cfb2,吃起來偏甜,"今天終於買到,但覺得好甜,就還可以",grounded,gpt-5.6-luna,grounding-v1
 fb1e4416427d0d004109985be0b73f7128195c331e42d3635005fc894f11bb75,企鵝造型很醜,太醜了吧XD,grounded,gpt-5.6-luna,grounding-v1
+fc38336689c0668da069debf20c30298cf5896c2bc698ff2a6eac9c3604d1397,起司更多、重量更重,我吃沒有拔絲但是口味喜歡,ungrounded,gpt-5.6-luna,grounding-v1
+fd3a4fda9b91b01c94d89931bc10c8e15d7d0cc018286a1953a7dfe112a287fc,香蕉牛奶風味符合預期，甜度較低,"吃起來就是差不多想像中的味道。
+只是7-11的甜度似乎沒那麼高。",grounded,gpt-5.6-luna,grounding-v1
+fd6a028dd6acb2c80bc26b1d0d24729de7d15a24a31b551d7fd0bfcd06fcbab1,內容物不值249元,是不是賣不掉啊,ungrounded,gpt-5.6-luna,grounding-v1
+fe5391e747f3cdcfe0183b361222e219315db395615061083a23d2b04002bac9,份量少又貴，打折仍不划算,"就這麼一點點料 要賣您99元。
+乞丐時光65折也要64元。
+不如爪蛙咖哩跟佛蒙特咖哩 咖哩好歹還有肉塊。",grounded,gpt-5.6-luna,grounding-v1
+ff71e18fb01e159e7c705da5a43693c7aa7d4cb1df46c9d9b765c06be38fee85,熱量高,好肥,grounded,gpt-5.6-luna,grounding-v1

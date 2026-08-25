@@ -109,7 +109,8 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         "keywords": ["業配", "葉配", "業", "葉"],
         "false_positive_contexts": ["茶葉", "葉子", "樹葉", "葉菜", "葉片"],
         "min_comments": 3,
-        "ratio_threshold": 0.25,
+        "author_ratio_threshold": 0.05,
+        "author_min_accusers": 2,
         "post_weight_penalty": 0.3,
     },
     "CONSENSUS": {
