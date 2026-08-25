@@ -88,12 +88,25 @@ labeler:
 | product name | brand, title, raw product-name field, rule guess, prompt version |
 | excerpt | post ID, product name, review text, brand, sibling products, candidate sentences, prompt version |
 | representative comments | brand, product name, ordered comment/body candidates, sibling products, prompt version |
+| category | brand, final product name, keyword rule guess, prompt version |
 | grounding verdict | rewrite text, cited source text, prompt version |
 
-The manual `.github/workflows/refresh-data.yml` fallback runs none of these four
+The manual `.github/workflows/refresh-data.yml` fallback runs none of these five
 labelers. It can rebuild only from already committed labels; new rows use rule
 fallbacks, so it is an availability/recovery path, not equivalent to the local
 publisher and must not be treated as a semantically complete refresh.
+
+### Where the prompts live
+
+Four of the five prompts are files under `scripts/prompts/`
+(`product-name-labeling.md`, `excerpt-labeling.md`, `comment-picks-labeling.md`,
+`product-category-labeling.md`, plus `grounding-verification.md`). **The sentiment
+prompt is not one of them** — it is an inline heredoc in
+[`scripts/ops/rebackfill.sh`](../scripts/ops/rebackfill.sh) (`prompt_template.md`,
+around line 126). Looking only in `scripts/prompts/` and concluding the sentiment
+prompt was never versioned is a mistake that has been made; grep the `scripts/ops/*.sh`
+heredocs too before reconstructing one from scratch. A reconstructed prompt scores
+the same comments differently, which silently splits the cache into two conventions.
 
 ### Key environment overrides
 

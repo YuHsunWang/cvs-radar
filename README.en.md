@@ -17,8 +17,8 @@ reviews and replies on Taiwan's PTT CVS board. CVS Radar turns that into somethi
 use while standing in the aisle: search it, compare it, see *why* people recommend it or
 don't, and jump back to the original thread in one tap.
 
-The site covers roughly 800 products, drawn from close to a thousand posts and over ten
-thousand comments across the past year. Crawling, semantic reading, statistical scoring and
+The site covers roughly 2,300 products, drawn from more than 2,700 posts and 46,000
+comments going back to June 2024. Crawling, semantic reading, statistical scoring and
 the frontend are all built here, recomputed and republished by a daily schedule, and
 running live.
 
@@ -93,7 +93,7 @@ filtering run locally with no backend.
 | Layer | Technology |
 |---|---|
 | Data collection | Python, Requests, Beautiful Soup |
-| Semantic labelling | Four LLM layers (sentiment, product name, excerpt, representative comments), each cached by content fingerprint in `data/labels/*.csv` |
+| Semantic labelling | Five LLM layers (sentiment, product name, excerpt, representative comments, category), each cached by content fingerprint in `data/labels/*.csv` |
 | Scoring | Rule-based sentiment, SnowNLP adapter, Bayesian shrinkage, time decay |
 | Service layer | Framework-independent query API with a FastAPI adapter |
 | Web | Next.js 15, React 19, TypeScript, Tailwind CSS, Lucide |
@@ -102,10 +102,13 @@ filtering run locally with no backend.
 
 ## What this project is meant to show
 
-- **Use an LLM without making the results irreproducible.** All four semantic layers are
+- **Use an LLM without making the results irreproducible.** All five semantic layers are
   LLM-judged, but every result is cached into version control under a content fingerprint
   that includes the prompt version. The same input recomputes without calling the model
   again and yields identical scores — which is what makes CI viable and the cost bounded.
+  It also makes growing the corpus nearly free: when the archive went from 800 to 2,700
+  posts in August 2026, the re-crawled older threads hit the existing cache exactly, so
+  only genuinely new material had to be paid for.
 - **Don't overreach statistically.** Bayesian shrinkage, per-user caps, time decay, and no
   score at all below the sample threshold. Being willing to leave a gap in the product is
   harder than producing a good-looking ranking.
