@@ -17,8 +17,8 @@ reviews and replies on Taiwan's PTT CVS board. CVS Radar turns that into somethi
 use while standing in the aisle: search it, compare it, see *why* people recommend it or
 don't, and jump back to the original thread in one tap.
 
-The site covers roughly 800 products, drawn from close to a thousand posts and over ten
-thousand comments across the past year. Crawling, semantic reading, statistical scoring and
+The site covers roughly 2,300 products, drawn from more than 2,700 posts and 46,000
+comments going back to June 2024. Crawling, semantic reading, statistical scoring and
 the frontend are all built here, recomputed and republished by a daily schedule, and
 running live.
 
@@ -36,12 +36,13 @@ running live.
 <p align="center">
   <img src="docs/screenshots/app-mobile.png" width="260" alt="Mobile home: shelf header, search, ranked cards and a floating filter button" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/product-detail.png" width="520" alt="Expanded product card: author verdict, pros and cons distilled from comments, links to the source thread" />
+  <img src="docs/screenshots/product-detail.png" width="560" alt="Expanded product card: numbered per-review summaries, positive and negative evidence, links to each source thread" />
 </p>
 
 <p align="center">
-  A mobile-first ranked card list. Expand any card to read the author's verdict, the pros
-  and cons distilled from comments, and links back to the original thread.
+  A mobile-first ranked card list. Expand any card to read a numbered summary of every
+  review, the positive and negative points drawn from comments, and a link back to each
+  original thread.
 </p>
 
 ## The problem
@@ -51,8 +52,9 @@ replies. Reading a single review means inheriting one person's palate; reading t
 means judging sarcasm, off-topic tangents and sample size yourself. CVS Radar consolidates
 those signals into comparable, product-level information:
 
-- **What should I eat today?** Narrow down by bento, dessert, ice cream, drinks, bread or
-  snacks.
+- **What should I eat today?** Narrow down by hot food, dessert, ice cream, drinks, bread
+  or snacks. (The labelling layer is finer-grained — 11 categories including bento, instant
+  noodles, dairy and merchandise — which the frontend folds into these six plus "other".)
 - **Is it worth buying?** The collapsed card already shows score, consensus, volume, date
   and price.
 - **Why do people like or dislike it?** Expand to read the author's verdict, then comment
@@ -93,7 +95,7 @@ filtering run locally with no backend.
 | Layer | Technology |
 |---|---|
 | Data collection | Python, Requests, Beautiful Soup |
-| Semantic labelling | Four LLM layers (sentiment, product name, excerpt, representative comments), each cached by content fingerprint in `data/labels/*.csv` |
+| Semantic labelling | Five LLM layers (sentiment, product name, excerpt, representative comments, category), each cached by content fingerprint in `data/labels/*.csv` |
 | Scoring | Rule-based sentiment, SnowNLP adapter, Bayesian shrinkage, time decay |
 | Service layer | Framework-independent query API with a FastAPI adapter |
 | Web | Next.js 15, React 19, TypeScript, Tailwind CSS, Lucide |
@@ -102,10 +104,13 @@ filtering run locally with no backend.
 
 ## What this project is meant to show
 
-- **Use an LLM without making the results irreproducible.** All four semantic layers are
+- **Use an LLM without making the results irreproducible.** All five semantic layers are
   LLM-judged, but every result is cached into version control under a content fingerprint
   that includes the prompt version. The same input recomputes without calling the model
   again and yields identical scores — which is what makes CI viable and the cost bounded.
+  It also makes growing the corpus nearly free: when the archive went from 800 to 2,700
+  posts in August 2026, the re-crawled older threads hit the existing cache exactly, so
+  only genuinely new material had to be paid for.
 - **Don't overreach statistically.** Bayesian shrinkage, per-user caps, time decay, and no
   score at all below the sample threshold. Being willing to leave a gap in the product is
   harder than producing a good-looking ranking.

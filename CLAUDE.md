@@ -103,14 +103,21 @@ comment to this one. The working fix is to export an `other_products` column so
 the LLM can exclude them — both the excerpt and comment-pick layers depend on it.
 
 **4. The label CSVs don't share an encoding.** There is no `.gitattributes`, so
-whatever you write is what lands. As of 2026-08-18, all six label caches are
-**CRLF**; `product_overrides.csv` has **no BOM** while `comment_picks.csv`,
-`excerpt_labels.csv`, `product_name_labels.csv`,
-`product_category_labels.csv` and `sentiment_fingerprint_labels.csv` are
-**BOM-prefixed**. Check the file you're
-about to touch and write it back the same way — rewriting a whole CSV with
-different settings produces a diff where every line changed and hides the one
-line you meant to change. For small fixes, edit rows in place.
+whatever you write is what lands. As of 2026-08-25:
+
+| Encoding | Files |
+|---|---|
+| **BOM + CRLF** | `sentiment_fingerprint_labels.csv`, `product_name_labels.csv`, `excerpt_labels.csv`, `comment_picks.csv`, `product_category_labels.csv`, `grounding_verdicts.csv`, `sentiment_overrides.csv` |
+| CRLF, no BOM | `product_overrides.csv`, `gold_v1.csv`, `to_label_v1.csv` |
+| LF, no BOM | `gold_smoke.csv`, `sentiment_corrections.csv` |
+
+Check the file you're about to touch and write it back the same way — rewriting a
+whole CSV with different settings produces a diff where every line changed and
+hides the one line you meant to change. For small fixes, edit rows in place.
+Verify by raw bytes (`raw[:3] == b'\xef\xbb\xbf'`, `b'\r\n' in raw[:8000]`), not by
+eye. Also note `wc -l` **overcounts** these files: `raw_name` and the pick columns
+contain embedded newlines inside quoted fields, so `product_name_labels.csv` reads
+as ~9,300 lines for ~3,100 records. Count with `csv.reader`, never with `wc`.
 
 **5. The cron worktree resets hard to `origin/main` on every run.** Step 0 of
 `scripts/ops/rebackfill.sh` runs `git reset --hard`, so any uncommitted label
@@ -161,6 +168,42 @@ hour of `EFFORT=max` on 826 rows. Watch total item count, not just the case you
 were aiming at. Imperative phrasing (`drop the item`, `this rule outranks…`) is
 what turns a judgement rule into a blunt one; prefer describing what good output
 looks like. `docs/DECISIONS.md` (2026-08-14) has both failed attempts.
+
+**11. The sentiment prompt is not in `scripts/prompts/`.** The other four layers
+have prompt files there; sentiment's canonical prompt is an inline heredoc in
+`scripts/ops/rebackfill.sh` (~line 126). Searching `scripts/prompts/`, finding
+nothing, and concluding it was never versioned leads to reconstructing it — and a
+reconstruction scores the same comments differently, which splits the cache into
+two disagreeing conventions that no test catches. This has happened; it was caught
+only because a cron commit had labelled 13 of the same comments and 10 disagreed.
+**If two label rows for the same kind of input disagree in style, go find the
+cron's prompt before writing your own.** Grep the `scripts/ops/*.sh` heredocs.
+
+**12. A long-lived branch will conflict with the daily cron on all seven data
+files, and six of them must not be hand-merged.** The cron commits to `main`
+nightly, so any branch open for more than a day comes back to conflicts in the
+five label CSVs plus `data/results.json` and `web/public/data.json`. They split
+into two kinds, and the fix differs:
+
+- **The five label CSVs are append-only caches keyed by fingerprint** → resolve by
+  **union**, not by picking a side. Neither side is "the" version; both are
+  partial.
+- **`results.json` and `data.json` are derived artifacts** → **never merge them at
+  all.** Take either side to clear the conflict, then regenerate from
+  `data/posts.jsonl` (`run_pipeline` → `save_results` → `web/build_data.py`). A
+  textually merged JSON can be internally inconsistent in ways that still parse.
+
+The trap inside the trap: the same fingerprint can carry **different values** on
+the two sides, because the fingerprint keys the model's *input* and the model is
+non-deterministic. A blind row-union then produces a result worse than either
+branch. Seen 2026-08-25: `main` had `紫桑果粒紅茶/青茶` as one product with a real
+excerpt, the branch had it split into two blank-shell products; unioning the rows
+yielded the merged name *plus* one of the splits — a duplicate that existed on
+neither side. **Diff the colliding rows and judge them on content**, and for
+`product_name_labels.csv` replace the whole item-set for a fingerprint rather than
+merging row by row, since one fingerprint maps to N products and N differs between
+sides. Rebase is worse than merge here: every data commit touches `results.json`,
+so a rebase re-fights the same conflict once per commit.
 
 ## Verifying a claim about behaviour
 
