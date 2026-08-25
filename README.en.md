@@ -36,12 +36,13 @@ running live.
 <p align="center">
   <img src="docs/screenshots/app-mobile.png" width="260" alt="Mobile home: shelf header, search, ranked cards and a floating filter button" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/product-detail.png" width="520" alt="Expanded product card: author verdict, pros and cons distilled from comments, links to the source thread" />
+  <img src="docs/screenshots/product-detail.png" width="560" alt="Expanded product card: numbered per-review summaries, positive and negative evidence, links to each source thread" />
 </p>
 
 <p align="center">
-  A mobile-first ranked card list. Expand any card to read the author's verdict, the pros
-  and cons distilled from comments, and links back to the original thread.
+  A mobile-first ranked card list. Expand any card to read a numbered summary of every
+  review, the positive and negative points drawn from comments, and a link back to each
+  original thread.
 </p>
 
 ## The problem
@@ -51,8 +52,9 @@ replies. Reading a single review means inheriting one person's palate; reading t
 means judging sarcasm, off-topic tangents and sample size yourself. CVS Radar consolidates
 those signals into comparable, product-level information:
 
-- **What should I eat today?** Narrow down by bento, dessert, ice cream, drinks, bread or
-  snacks.
+- **What should I eat today?** Narrow down by hot food, dessert, ice cream, drinks, bread
+  or snacks. (The labelling layer is finer-grained — 11 categories including bento, instant
+  noodles, dairy and merchandise — which the frontend folds into these six plus "other".)
 - **Is it worth buying?** The collapsed card already shows score, consensus, volume, date
   and price.
 - **Why do people like or dislike it?** Expand to read the author's verdict, then comment
