@@ -528,6 +528,41 @@ def test_rebackfill_requires_all_label_layers_before_recompute() -> None:
     assert "publishing on" not in script
 
 
+def test_rebackfill_commits_every_label_cache_a_run_can_write() -> None:
+    """Step 0 resets the worktree, so an unstaged label file is destroyed nightly.
+
+    Whatever the run paid a model to decide is then decided again the next day.
+    grounding_verdicts.csv sat outside the staged list and was re-adjudicated daily
+    until 2026-08-27.
+    """
+    script = Path("scripts/ops/rebackfill.sh").read_text(encoding="utf-8")
+
+    staged = script[script.index("git add data/labels/") : script.index("if git diff --cached")]
+    for cache in (
+        "sentiment_fingerprint_labels.csv",
+        "product_name_labels.csv",
+        "excerpt_labels.csv",
+        "comment_picks.csv",
+        "product_category_labels.csv",
+        "grounding_verdicts.csv",
+    ):
+        assert cache in staged, f"{cache} can be written by a run but is never committed"
+
+
+def test_rebackfill_refuses_a_branch_it_could_not_check_out() -> None:
+    """git will not check out a branch another worktree holds, and fails quietly.
+
+    The reset that follows still succeeds and moves whatever branch the worktree is
+    on, so without this guard the run commits its data onto the wrong branch — which
+    is how a 2026-08-27 run landed its refresh on a feature branch's ref.
+    """
+    script = Path("scripts/ops/rebackfill.sh").read_text(encoding="utf-8")
+
+    guard = script.index('[ "$on_branch" = "$BRANCH" ] || die')
+    reset = script.index('git -C "$WT" reset -q --hard "origin/$BRANCH"')
+    assert guard < reset, "the branch check must run before the reset moves a ref"
+
+
 def test_legacy_relabel_merge_rejects_runtime_normalized_score_collision(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
