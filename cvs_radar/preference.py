@@ -41,6 +41,12 @@ def build_profiles(
     """從貼文留言建立帳號輪廓。"""
     rows: dict[str, list[tuple[str, float, str]]] = defaultdict(list)
     timestamps: dict[str, dict[str, list[datetime]]] = defaultdict(lambda: defaultdict(list))
+    # A comment that evaluates several products of one article is routed to each of
+    # them, but it is still one act by one account. Letting every copy through would
+    # show the account posting the same text at the same minute — exactly what the
+    # template_like and burst features are built to punish — so each source comment
+    # counts towards its author once, no matter how many products it reached.
+    counted_once: set[tuple[str, str, str, str]] = set()
     for post in posts:
         for index, comment in enumerate(post.comments):
             opinion = opinions[(post.id, index)]
@@ -50,6 +56,11 @@ def build_profiles(
                 or not comment.user
             ):
                 continue
+            if comment.attributed_product:
+                source = (post.url or post.id, comment.user, comment.tag, comment.text)
+                if source in counted_once:
+                    continue
+                counted_once.add(source)
             rows[comment.user].append(
                 (post.brand, opinion.effective_sentiment, comment.text.strip())
             )

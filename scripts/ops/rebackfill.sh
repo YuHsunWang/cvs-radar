@@ -56,10 +56,53 @@ _excl="$(git rev-parse --git-path info/exclude 2>/dev/null)"
 [ -n "$_excl" ] && { grep -qxF 'rebackfill_work/' "$_excl" 2>/dev/null || echo 'rebackfill_work/' >> "$_excl"; }
 
 # --- persistent posts.jsonl so we only ever crawl the delta ---
+# The worktree store is the working copy; the seed is its mirror, refreshed from
+# it at the end of every successful run. Reconcile BOTH ways before crawling.
+# Seeding only when the worktree store was missing meant a seed replaced out of
+# band -- a corpus backfill published straight into $REPO/data -- sat unused
+# while the run recomputed and published from the older worktree copy, dropping
+# every post the backfill had added (2026-08-26: 2,342 products -> 812) and then
+# mirroring the smaller store back over the seed at the end. The reconcile is
+# append-only on post id, so the worktree's fresher comment snapshots always win
+# and neither side can lose posts.
 mkdir -p data
 if [ ! -s data/posts.jsonl ] && [ -s "$STORE_SEED" ]; then
   cp "$STORE_SEED" data/posts.jsonl
   log "seeded posts.jsonl from $STORE_SEED ($(wc -l < data/posts.jsonl) posts)"
+elif [ -s "$STORE_SEED" ]; then
+  python3 - "$STORE_SEED" data/posts.jsonl <<'PY' || die "seed reconcile"
+import json, os, sys
+
+seed, store = sys.argv[1], sys.argv[2]
+
+
+def rows(path):
+    with open(path, encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if line:
+                yield json.loads(line)
+
+
+have = {row["id"] for row in rows(store)}
+missing = [row for row in rows(seed) if row["id"] not in have]
+if not missing:
+    print("seed reconcile: store already covers the seed")
+else:
+    with open(store, encoding="utf-8") as handle:
+        body = handle.read()
+    if body and not body.endswith("\n"):
+        body += "\n"
+    tmp = store + ".reconcile"
+    with open(tmp, "w", encoding="utf-8") as handle:
+        handle.write(body)
+        for row in missing:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(tmp, store)
+    print(f"seed reconcile: appended {len(missing)} post(s) from {seed}")
+PY
 fi
 [ -s data/posts.jsonl ] || die "no posts.jsonl seed available (set STORE_SEED)"
 

@@ -295,6 +295,15 @@ _SYNONYM_MAP = {
     "吐司": "土司",
     "哈蜜瓜": "哈密瓜",
     "贅澤": "贅沢",
+    # Same word, different character. Commenters routinely write these forms
+    # while the product name uses the other, and the routing match is exact on
+    # characters, so an unfolded variant reads as a different word entirely.
+    # Only same-word pairs belong here: a general one-character fuzzy match is
+    # not viable, because 綜合/組合, 起司/起來 and 可可/可以 are one character
+    # apart too and mean nothing alike.
+    "板條": "粄條",
+    "東波": "東坡",
+    "蕃茄": "番茄",
 }
 
 _DISTINCTIVE_TERMS = {

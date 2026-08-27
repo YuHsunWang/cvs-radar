@@ -65,23 +65,35 @@ def export_unlabeled_comments(
     rows: list[dict[str, str]] = []
     seen: set[str] = set()
     # Export the same comment population the scorer can reach. Multi-product
-    # routing deliberately discards comments that cannot be assigned to exactly
-    # one product: one scalar sentiment cannot safely represent an unmatched
-    # opinion or a comparison that praises one item and criticizes another.
-    # Exporting those comments would pay for labels that scoring never looks up.
-    # Keep hashing/showing source_product_name, though, because that is the raw
-    # context the labeller sees and the scorer preserves for key reconstruction.
+    # routing still discards comments that name none of the split products: one
+    # scalar sentiment cannot safely represent an unmatched opinion, and paying
+    # for those labels buys rows scoring never looks up. A comment that names
+    # several of them is no longer discarded — routing hands it to each as a copy
+    # tagged with that product, so each copy exports and is labelled separately,
+    # which is what lets "糰子不好吃 蕨餅還可以" say opposite things about the two.
+    # Everything else shows and hashes source_product_name, the raw context the
+    # labeller sees and the scorer preserves for key reconstruction; the tagged
+    # copies show and hash the product they carry instead.
     posts = preprocess_posts(load_posts(str(posts_path)))
     for post in posts:
         source_id = post.url or post.id
         for comment in post.comments:
             text = comment.text.strip()
             normalized = _normalize_override_text(text)
-            if not normalized or normalized in known_texts:
+            if not normalized:
+                continue
+            # A reviewed correction has the final say for a comment that belongs to
+            # one product, so that comment needs no label. It cannot speak for a
+            # tagged copy: corrections are keyed on text alone, and the scorer
+            # refuses to put one scalar on every product a comment evaluates, so
+            # the copy would end up with no usable verdict at all.
+            if normalized in known_texts and not comment.attributed_product:
                 continue
             tag = comment.tag
             brand = post.brand
-            product_name = post.source_product_name or post.product_name
+            product_name = (
+                comment.attributed_product or post.source_product_name or post.product_name
+            )
             post_title = post.title
             fingerprint = sentiment_fingerprint_v2(
                 source_id,
@@ -92,9 +104,16 @@ def export_unlabeled_comments(
                 post_title=post_title,
             )
             # A row already answered under the legacy key stays answered; only rows
-            # covered by neither key are worth paying a labelling run for.
+            # covered by neither key are worth paying a labelling run for. The
+            # legacy key carries no product context, though, so it cannot answer
+            # for a tagged copy that has to be judged against one specific product
+            # — the scorer refuses it there, so honouring it here would strand the
+            # copy with no verdict at all.
             legacy = sentiment_fingerprint(source_id, tag, text)
-            if fingerprint in known_fingerprints or legacy in known_fingerprints:
+            answered = fingerprint in known_fingerprints or (
+                legacy in known_fingerprints and not comment.attributed_product
+            )
+            if answered:
                 continue
             if fingerprint in seen:
                 continue
