@@ -43,7 +43,17 @@ cd "$REPO" || die "no repo at $REPO"
 git fetch -q origin "$BRANCH" || die "git fetch $BRANCH"
 if git worktree list --porcelain | grep -q "worktree $WT"; then
   git -C "$WT" fetch -q origin "$BRANCH"
-  git -C "$WT" checkout -q "$BRANCH" 2>/dev/null || git -C "$WT" checkout -q -B "$BRANCH" "origin/$BRANCH"
+  git -C "$WT" checkout -q "$BRANCH" 2>/dev/null \
+    || git -C "$WT" checkout -q -B "$BRANCH" "origin/$BRANCH" 2>/dev/null
+  # git refuses to check out a branch another worktree already holds, and both
+  # attempts above then fail quietly. The reset below would still succeed — it
+  # would move whichever branch this worktree is on to BRANCH's commit — and the
+  # run would crawl, label, recompute and commit onto that branch without a word.
+  # A 2026-08-27 run put its data commit on the main clone's feature branch that
+  # way. Confirm the checkout took before anything writes.
+  on_branch="$(git -C "$WT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
+  [ "$on_branch" = "$BRANCH" ] || die \
+    "worktree $WT is on '$on_branch', not '$BRANCH' (another worktree probably holds that branch)"
   git -C "$WT" reset -q --hard "origin/$BRANCH"
 else
   rm -rf "$WT"
@@ -322,11 +332,14 @@ if [ "$DO_COMMIT" = "1" ]; then
   # Every label cache this run may have written has to be committed. Step 0 resets the
   # worktree to origin, so an uncommitted label file is silently destroyed before the
   # next run — and the layer would be paid for and re-labelled every single day.
+  # grounding_verdicts.csv was missing from this list until 2026-08-27 and was being
+  # re-adjudicated daily for exactly that reason.
   git add data/labels/sentiment_fingerprint_labels.csv \
           data/labels/product_name_labels.csv \
           data/labels/excerpt_labels.csv \
           data/labels/comment_picks.csv \
           data/labels/product_category_labels.csv \
+          data/labels/grounding_verdicts.csv \
           data/results.json web/public/data.json
   if git diff --cached --quiet; then
     log "no data change to commit"
