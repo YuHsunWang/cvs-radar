@@ -121,6 +121,43 @@ def test_export_covers_exactly_what_split_product_scoring_can_reach(
     assert len({r["fingerprint"] for r in compared}) == 2
 
 
+def test_legacy_answer_cannot_suppress_a_per_product_export(tmp_path: Path) -> None:
+    """A legacy text-keyed label must not stand in for a two-product comment.
+
+    The legacy key hashes only the article and the text, so one answer would have
+    to speak for both products. The scorer refuses it for exactly that reason, so
+    letting it suppress the export leaves the comment scoring nothing at all —
+    64 of the corpus's 314 routed copies were in that position.
+    """
+    posts_path = tmp_path / "posts.jsonl"
+    out_path = tmp_path / "unlabeled.csv"
+    url = "https://example.test/M.export-legacy"
+    texts = ["草莓大福好吃", "草莓大福比巧克力泡芙好吃"]
+    post = {
+        "id": "M.export-legacy",
+        "url": url,
+        "brand": "7-11",
+        "title": "[商品] 7-11 草莓大福與巧克力泡芙",
+        "product_name": "草莓大福55巧克力泡芙59",
+        "comments": [{"tag": "推", "user": f"u{i}", "text": t} for i, t in enumerate(texts)],
+    }
+    posts_path.write_text(json.dumps(post, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    count = export_unlabeled_comments(
+        posts_path,
+        out_path,
+        known_texts=set(),
+        known_fingerprints={sentiment_fingerprint(url, "推", t) for t in texts},
+    )
+
+    with open(out_path, encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    # 草莓大福好吃 belongs to one product, so its legacy answer still stands.
+    assert count == 2
+    assert {row["comment_text"] for row in rows} == {"草莓大福比巧克力泡芙好吃"}
+    assert {row["product_name"] for row in rows} == {"草莓大福", "巧克力泡芙"}
+
+
 def test_import_validates_and_writes_privacy_safe_label_cache(tmp_path: Path) -> None:
     labeled_path = tmp_path / "labeled.csv"
     labels_path = tmp_path / "labels.csv"

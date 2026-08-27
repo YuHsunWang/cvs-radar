@@ -104,9 +104,16 @@ def export_unlabeled_comments(
                 post_title=post_title,
             )
             # A row already answered under the legacy key stays answered; only rows
-            # covered by neither key are worth paying a labelling run for.
+            # covered by neither key are worth paying a labelling run for. The
+            # legacy key carries no product context, though, so it cannot answer
+            # for a tagged copy that has to be judged against one specific product
+            # — the scorer refuses it there, so honouring it here would strand the
+            # copy with no verdict at all.
             legacy = sentiment_fingerprint(source_id, tag, text)
-            if fingerprint in known_fingerprints or legacy in known_fingerprints:
+            answered = fingerprint in known_fingerprints or (
+                legacy in known_fingerprints and not comment.attributed_product
+            )
+            if answered:
                 continue
             if fingerprint in seen:
                 continue
