@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from collections import defaultdict
+from dataclasses import replace
 from difflib import SequenceMatcher
 from functools import lru_cache
 from ..config import (
@@ -683,20 +684,31 @@ def categorize_product(name: str) -> str:
 
 def _name_bigrams(text: str) -> set[str]:
     chars = re.sub(r"[^\w\u4e00-\u9fff]", "", text)
+    # Fold alternative writings of the same term before slicing, on product names
+    # and comment text alike, so the two sides meet on one spelling: a commenter
+    # who types \u677f\u689d still matches a product named \u7c84\u689d.
+    for old, new in _SYNONYM_MAP.items():
+        if old in chars:
+            chars = chars.replace(old, new)
     if len(chars) < 2:
         return {chars} if chars else set()
     return {chars[i : i + 2] for i in range(len(chars) - 1)}
 
 
 def _route_comments_by_product(comments: list[Comment], names: list[str]) -> list[list[Comment]]:
-    """Route each comment to the split product whose name it distinctly matches.
+    """Route each comment to the split product(s) whose name fragments it matches.
 
-    Only comments that distinctly single out exactly one split product's name
-    fragments are attributed. Ambiguous comments — those matching none or more
-    than one product's distinctive fragments — are dropped rather than shared
-    across every split product, so a comment about one item no longer pollutes
-    the fair score, consensus and excerpt of the other products in the same
-    multi-product post (review #21).
+    A comment that singles out exactly one split product is attributed to it.
+    A comment that names several — "糰子不好吃 蕨餅還可以" — holds a separate
+    verdict for each one, so it goes to every product it names, as a copy tagged
+    with that product in ``attributed_product``. The tag moves the sentiment key
+    to (comment, product), so each copy is labelled against the item it is about
+    instead of one scalar standing for opposite opinions (see
+    :func:`cvs_radar.sentiment.comment_fingerprint_v2`).
+
+    Comments that name none of them are still dropped rather than shared across
+    every split product, which polluted the others' fair score, consensus and
+    excerpt (review #21).
     """
     bigrams = [_name_bigrams(name) for name in names]
     distinctive: list[set[str]] = []
@@ -713,7 +725,10 @@ def _route_comments_by_product(comments: list[Comment], names: list[str]) -> lis
         hits = [i for i, dset in enumerate(distinctive) if dset and (comment_grams & dset)]
         if len(hits) == 1:
             routed[hits[0]].append(comment)
-        # else: ambiguous (no distinct match, or matches several) -> drop it.
+        elif hits:
+            for index in hits:
+                routed[index].append(replace(comment, attributed_product=names[index]))
+        # else: names none of them -> drop it.
     return routed
 
 

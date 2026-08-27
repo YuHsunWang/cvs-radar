@@ -72,9 +72,11 @@ from cvs_radar.scoring import (
 )
 from cvs_radar.sentiment import (
     LlmBackend,
+    _normalize_override_text,
     annotate_posts,
     apply_sentiment_overrides,
     clamp,
+    comment_fingerprint_v2,
     llm_has_key,
     resolve_backend,
     score_comment,
@@ -505,24 +507,128 @@ class ScoringTest(unittest.TestCase):
         )
 
     def test_ambiguous_comment_not_shared_across_split_products(self) -> None:
-        # review #21: in a multi-product post, a comment that does not distinctly
-        # single out exactly one split product must be dropped, not copied into
-        # every product's bucket (which polluted the others' fair score /
-        # consensus / excerpt). Comments that DO distinctly match are still
-        # attributed to that one product.
+        # review #21: in a multi-product post, a comment that names none of the
+        # split products must be dropped, not copied into every product's bucket
+        # (which polluted the others' fair score / consensus / excerpt). Comments
+        # that DO distinctly match are still attributed to that one product.
         from cvs_radar.scoring import _route_comments_by_product
 
         names = ["草莓大福", "巧克力泡芙"]
         comments = [
             Comment("推", "a", "草莓大福好好吃"),
             Comment("推", "b", "巧克力泡芙超讚"),
-            Comment("推", "c", "好吃推薦"),  # ambiguous -> must be dropped
+            Comment("推", "c", "好吃推薦"),  # names neither -> must be dropped
         ]
         routed = _route_comments_by_product(comments, names)
         self.assertEqual([c.text for c in routed[0]], ["草莓大福好好吃"])
         self.assertEqual([c.text for c in routed[1]], ["巧克力泡芙超讚"])
-        # the ambiguous comment must land in NEITHER bucket
+        # the unattributable comment must land in NEITHER bucket
         self.assertNotIn("好吃推薦", [c.text for bucket in routed for c in bucket])
+        # a comment about exactly one product carries no attribution tag, so its
+        # existing sentiment label keeps answering to the same key
+        self.assertEqual([c.attributed_product for c in routed[0]], [""])
+
+    def test_comment_naming_both_products_goes_to_each_with_its_own_key(self) -> None:
+        # "糰子不好吃 蕨餅還可以" holds an opposite verdict for each product, so
+        # dropping it lost both, and one shared scalar could only ever be right
+        # about one. Route it to each product tagged with that product, which is
+        # what moves the sentiment key from (comment, post) to (comment, product).
+        from cvs_radar.scoring import _route_comments_by_product
+
+        names = ["抹茶紅豆串糰子", "和風蕨餅小盛"]
+        comment = Comment("推", "a", "糰子不好吃 蕨餅還可以")
+        routed = _route_comments_by_product([comment], names)
+
+        self.assertEqual([c.text for c in routed[0]], ["糰子不好吃 蕨餅還可以"])
+        self.assertEqual([c.text for c in routed[1]], ["糰子不好吃 蕨餅還可以"])
+        self.assertEqual(routed[0][0].attributed_product, "抹茶紅豆串糰子")
+        self.assertEqual(routed[1][0].attributed_product, "和風蕨餅小盛")
+
+        post = Post(id="p1", brand="全家", product_name="抹茶紅豆串糰子", author="a1")
+        post.source_product_name = "抹茶紅豆串糰子/和風蕨餅小盛"
+        self.assertNotEqual(
+            comment_fingerprint_v2(post, routed[0][0]),
+            comment_fingerprint_v2(post, routed[1][0]),
+        )
+
+    def test_shared_comment_never_takes_a_text_keyed_score(self) -> None:
+        # Legacy text labels and reviewed corrections are keyed on the comment
+        # alone. Letting either answer for a comment that evaluates two products
+        # would put one scalar on both — the pollution routing exists to prevent.
+        # Without a per-product label the copy stays out of the score entirely.
+        post = Post(id="p1", brand="全家", product_name="抹茶紅豆串糰子", author="a1")
+        post.source_product_name = "抹茶紅豆串糰子/和風蕨餅小盛"
+        post.comments = [
+            Comment("推", "a", "糰子不好吃 蕨餅還可以", attributed_product="抹茶紅豆串糰子")
+        ]
+        post.comments[0].sentiment = 0.8  # whatever the rule backend guessed
+
+        text_key = _normalize_override_text("糰子不好吃 蕨餅還可以")
+        apply_sentiment_overrides(
+            [post],
+            overrides={text_key: 0.9},
+            fingerprint_labels={},
+            corrections={text_key: 0.9},
+        )
+        self.assertIsNone(post.comments[0].sentiment)
+        self.assertEqual(post.comments[0].backend, "unattributed")
+
+        # the per-product label, and only that, decides it
+        apply_sentiment_overrides(
+            [post],
+            overrides={text_key: 0.9},
+            fingerprint_labels={comment_fingerprint_v2(post, post.comments[0]): (-0.7, True)},
+            corrections={text_key: 0.9},
+        )
+        self.assertEqual(post.comments[0].sentiment, -0.7)
+
+    def test_shared_comment_counts_once_towards_its_author(self) -> None:
+        # The copies routing makes are one act by one account. Counting each would
+        # show the account posting identical text at the same minute, which is what
+        # the template_like and burst suspicion features exist to punish — so the
+        # author of a single multi-product comment would lose credibility for it.
+        from cvs_radar.models import CommentOpinion
+        from cvs_radar.preference import build_profiles
+
+        text = "糰子不好吃 蕨餅還可以"
+        posted = datetime(2026, 8, 24, 11, 6, tzinfo=timezone.utc)
+        url = "https://example.test/M.shared"
+        left = Post(id="p1_a", url=url, brand="全家", product_name="抹茶紅豆串糰子", author="x")
+        right = Post(id="p1_b", url=url, brand="全家", product_name="和風蕨餅小盛", author="x")
+        left.comments = [Comment("推", "u1", text, posted, attributed_product="抹茶紅豆串糰子")]
+        right.comments = [Comment("推", "u1", text, posted, attributed_product="和風蕨餅小盛")]
+
+        profiles = build_profiles(
+            [left, right],
+            {
+                ("p1_a", 0): CommentOpinion(True, -0.6),
+                ("p1_b", 0): CommentOpinion(True, 0.3),
+            },
+        )
+        self.assertEqual(profiles["u1"].total_comments, 1)
+
+    def test_variant_spelling_routes_to_the_product_it_names(self) -> None:
+        # Half the commenters on 慢燉滷肉油蔥粄條 write 板條. The routing match is
+        # exact on characters, so the variant matched nothing and every one of
+        # those comments — most of them the "太油" complaints — was dropped, while
+        # a comparison like 喜歡板條勝過意麵 matched only 意麵 and was counted as
+        # praise for the product it ranks second.
+        from cvs_radar.scoring import _route_comments_by_product
+
+        names = ["慢燉滷肉油蔥粄條", "府城鹽水意麵"]
+        comments = [
+            Comment("推", "a", "板條好吃，但超油"),
+            Comment("推", "b", "喜歡板條勝過意麵 肉燥味很香"),
+        ]
+        routed = _route_comments_by_product(comments, names)
+
+        self.assertEqual([c.text for c in routed[0]], ["板條好吃，但超油", "喜歡板條勝過意麵 肉燥味很香"])
+        self.assertEqual([c.text for c in routed[1]], ["喜歡板條勝過意麵 肉燥味很香"])
+        # the plain 板條 comment is now this product's alone, no attribution tag
+        self.assertEqual(routed[0][0].attributed_product, "")
+        # the comparison names both, so each side gets its own labelled copy
+        self.assertEqual(routed[0][1].attributed_product, "慢燉滷肉油蔥粄條")
+        self.assertEqual(routed[1][0].attributed_product, "府城鹽水意麵")
 
     def test_product_synonym_normalization(self) -> None:
         self.assertEqual(

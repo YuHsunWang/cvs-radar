@@ -65,13 +65,16 @@ def test_export_only_writes_unlabeled_account_free_comments(tmp_path: Path) -> N
     assert "url" not in rows[0]
 
 
-def test_export_skips_comments_that_split_product_scoring_cannot_reach(
+def test_export_covers_exactly_what_split_product_scoring_can_reach(
     tmp_path: Path,
 ) -> None:
-    """Do not buy labels for comments that cannot be assigned to one product.
+    """Buy one label per (comment, product) the scorer will actually look up.
 
-    If this regresses, every labelling run pays for ambiguous multi-product
-    comments whose labels the scorer discards before lookup.
+    A comment naming none of the split products stays unbought — if that
+    regresses, every labelling run pays for comments whose labels the scorer
+    discards before lookup. A comment naming several is bought once per product,
+    under that product's name: it carries a separate verdict for each, so a
+    single row could only ever be right about one of them.
     """
     posts_path = tmp_path / "posts.jsonl"
     out_path = tmp_path / "unlabeled.csv"
@@ -97,13 +100,25 @@ def test_export_skips_comments_that_split_product_scoring_cannot_reach(
         known_fingerprints=set(),
     )
 
-    assert count == 2
+    assert count == 4
     with open(out_path, encoding="utf-8-sig", newline="") as f:
         rows = list(csv.DictReader(f))
-    assert [row["comment_text"] for row in rows] == ["草莓大福好吃", "巧克力泡芙超讚"]
-    # Fingerprints and labelling context must remain based on the raw field so
-    # preprocess-time splitting does not strand the two useful labels.
-    assert {row["product_name"] for row in rows} == {"草莓大福55巧克力泡芙59"}
+
+    # "兩個都好吃" names neither product and is still not bought.
+    assert "兩個都好吃" not in [row["comment_text"] for row in rows]
+
+    # A comment about one product keeps the raw 商品名稱 field as its context, so
+    # preprocess-time splitting does not strand labels already collected under it.
+    single = [r for r in rows if r["comment_text"] in {"草莓大福好吃", "巧克力泡芙超讚"}]
+    assert [r["comment_text"] for r in single] == ["草莓大福好吃", "巧克力泡芙超讚"]
+    assert {r["product_name"] for r in single} == {"草莓大福55巧克力泡芙59"}
+
+    # The comparison names both, so it is asked once per product, each row showing
+    # the labeller the product that row is about and hashing to its own key.
+    compared = [r for r in rows if r["comment_text"] == "草莓大福比巧克力泡芙好吃"]
+    assert len(compared) == 2
+    assert {r["product_name"] for r in compared} == {"草莓大福", "巧克力泡芙"}
+    assert len({r["fingerprint"] for r in compared}) == 2
 
 
 def test_import_validates_and_writes_privacy_safe_label_cache(tmp_path: Path) -> None:

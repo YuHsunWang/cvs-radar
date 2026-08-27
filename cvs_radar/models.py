@@ -17,6 +17,12 @@ class Comment:
     posted_at: datetime | None = None
     sentiment: float | None = None
     backend: str = ""
+    # Set only on the copies routing makes when one comment evaluates several
+    # products of the same post; names the product THIS copy is about, so its
+    # sentiment key becomes (comment, product) instead of (comment, post).
+    # Empty for every comment that belongs to a single product, and never
+    # serialized: the crawl store holds posts as crawled, before routing.
+    attributed_product: str = ""
 
 
 @dataclass(slots=True)
