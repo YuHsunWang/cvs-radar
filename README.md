@@ -9,7 +9,6 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
 **[線上試用](https://cvs-radar.vercel.app/)** ·
-**[GitHub Pages 鏡像](https://yuhsunwang.github.io/cvs-radar/)** ·
 **[English](README.en.md)**
 
 超商新品好不好吃，答案散在 PTT CVS 板的上千篇心得和推文裡。CVS Radar 把它整理成貨架前用得上的推薦依據：搜尋、比較、看清楚大家為什麼推或不推，再一鍵回到原文。

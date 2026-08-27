@@ -9,7 +9,6 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
 **[Live demo](https://cvs-radar.vercel.app/)** ·
-**[GitHub Pages mirror](https://yuhsunwang.github.io/cvs-radar/)** ·
 **[繁體中文](README.md)**
 
 Whether a new convenience-store product is any good is an answer buried in a thousand-odd
