@@ -136,6 +136,24 @@
   letter-spacing: 0.02em;
 }
 .sl-ab-sep { opacity: 0.5; }
+/* Sits in the category chip row but navigates instead of filtering, so it
+   keeps the chip's shape and takes a solid outline to read as its own thing. */
+.sl-zonelink {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-family: var(--sl-cjk);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--sl-ink);
+  text-decoration: none;
+  background: var(--sl-tag);
+  border: 1.5px solid var(--sl-ink);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.sl-zonelink:hover { background: var(--sl-pop); }
 
 /* ---- controls ---- */
 .sl-controls { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }

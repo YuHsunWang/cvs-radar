@@ -7,9 +7,10 @@ file is only the things that will break something if you don't know them.
 ## What actually ships
 
 The live product is the **Next.js app in `web/`**, deployed to Vercel with a
-GitHub Pages mirror. It has exactly one route (`/`), rendering
-`components/ShelfExplorer.tsx` over `web/public/data.json`. There is no server
-at runtime and no API in production.
+GitHub Pages mirror. It has two static routes over the same
+`web/public/data.json`: `/` renders `components/ShelfExplorer.tsx`, and
+`/soft-serve/` renders `components/SoftServeZone.tsx`. There is no server at
+runtime and no API in production.
 
 The Python side is a batch pipeline: `crawl_job.py` fetches PTT posts into the
 local `data/posts.jsonl` store, `cvs_radar/pipeline.py` scores them into
@@ -204,6 +205,25 @@ neither side. **Diff the colliding rows and judge them on content**, and for
 merging row by row, since one fingerprint maps to N products and N differs between
 sides. Rebase is worse than merge here: every data commit touches `results.json`,
 so a rebase re-fights the same conflict once per commit.
+
+**8. The soft-serve zone reads flavour count out of the product name.** There is
+no flavour field anywhere in the pipeline, so `web/lib/soft-serve.ts` decides
+single-vs-swirl by splitting the name on `x`/`X`/`×`. Consequences:
+
+- A swirl whose name shipped **without** the separator (`起司蛋糕比利時巧克力霜
+  淇淋`) reads as one flavour, and both of its comparisons quietly vanish — no
+  error, just a card that never appears. `DUAL_FLAVOR_OVERRIDES` names those by
+  hand, and the list only grows when someone notices.
+- Trap 1 applies here too: product-name extraction feeds this split, so a change
+  there silently adds or removes whole comparison cards.
+- A swirl is filed under **both** of its flavours on purpose, so the same
+  product renders on two cards, and its verdict can differ between them (a
+  swirl can beat one half's solo score while tying the other's). The leftover
+  list below is a set-difference over product ids; "deduplicating" the two
+  appearances breaks that split.
+
+The zone derives everything at render time from fields already in `data.json` —
+no pipeline stage, no new data file, nothing to rebuild.
 
 ## Verifying a claim about behaviour
 
