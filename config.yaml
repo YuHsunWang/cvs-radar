@@ -35,7 +35,7 @@ CRAWL:
   timeout_sec: 10
   retries: 3
   user_agent: "CVS-Radar/0.2 (+https://github.com/local/cvs-radar)"
-  cache_path: ".cvs_radar_seen.json"
+  cache_path: "data/raw/crawl_seen.json"
 
 SENTIMENT:
   backend: "lexicon"

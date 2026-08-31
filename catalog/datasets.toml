@@ -1,0 +1,370 @@
+catalog_version = 1
+
+[[datasets]]
+name = "crawl_posts"
+layer = "raw"
+path = "data/posts.jsonl"
+format = "jsonl"
+producing_owner = "crawl_job.py"
+partition_columns = []
+primary_key = ["id"]
+timezone = "Asia/Taipei"
+update_frequency = "daily scheduled crawl and ad hoc backfill"
+retention = "operational history; weekly backups retain 8 snapshots"
+optional = true
+
+[[datasets]]
+name = "legacy_backfill_store"
+layer = "raw"
+path = "data/raw/backfill_store.jsonl"
+format = "jsonl"
+producing_owner = "unknown (legacy manual backfill; no current in-repo reference)"
+partition_columns = []
+primary_key = ["id"]
+timezone = "Asia/Taipei"
+update_frequency = "inactive legacy snapshot"
+retention = "retain until reconciled and explicitly decommissioned"
+optional = true
+
+[[datasets]]
+name = "crawl_seen_urls"
+layer = "raw"
+path = "data/raw/crawl_seen.json"
+format = "json"
+producing_owner = "cvs_radar/crawler.py:PttCrawler"
+partition_columns = []
+primary_key = ["url"]
+timezone = "not_applicable"
+update_frequency = "after each successful crawl-store write"
+retention = "retain while the local crawl store is active"
+optional = true
+
+[[datasets]]
+name = "sentiment_fingerprint_labels"
+layer = "curated"
+path = "data/labels/sentiment_fingerprint_labels.csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/import_llm_backfill.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "daily when unlabeled comments exist"
+retention = "indefinite model-decision cache"
+optional = false
+
+[[datasets]]
+name = "product_name_labels"
+layer = "curated"
+path = "data/labels/product_name_labels.csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/import_product_names.py"
+partition_columns = []
+primary_key = ["fingerprint", "item_index"]
+timezone = "not_applicable"
+update_frequency = "daily when unlabeled products exist"
+retention = "indefinite model-decision cache"
+optional = false
+
+[[datasets]]
+name = "excerpt_labels"
+layer = "curated"
+path = "data/labels/excerpt_labels.csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/import_excerpts.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "daily when unlabeled excerpts exist"
+retention = "indefinite model-decision cache"
+optional = false
+
+[[datasets]]
+name = "comment_picks"
+layer = "curated"
+path = "data/labels/comment_picks.csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/import_comment_picks.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "daily when unlabeled products exist"
+retention = "indefinite model-decision cache"
+optional = false
+
+[[datasets]]
+name = "product_category_labels"
+layer = "curated"
+path = "data/labels/product_category_labels.csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/import_product_categories.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "daily after result recompute"
+retention = "indefinite model-decision cache"
+optional = false
+
+[[datasets]]
+name = "grounding_verdicts"
+layer = "curated"
+path = "data/labels/grounding_verdicts.csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/import_grounding_verdicts.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "daily when pending rewrites exist"
+retention = "indefinite adjudication cache"
+optional = false
+
+[[datasets]]
+name = "product_overrides"
+layer = "curated"
+path = "data/labels/product_overrides.csv"
+format = "csv"
+producing_owner = "manual review; consumed by web/build_data.py"
+partition_columns = []
+primary_key = []
+known_gap = "product_id is intended as the lookup key, but two conflicting duplicate pairs exist; the last row silently wins"
+timezone = "not_applicable"
+update_frequency = "ad hoc manual review"
+retention = "indefinite reviewed correction history"
+optional = false
+
+[[datasets]]
+name = "sentiment_corrections"
+layer = "curated"
+path = "data/labels/sentiment_corrections.csv"
+format = "csv"
+producing_owner = "manual review; consumed by cvs_radar/sentiment.py"
+partition_columns = []
+primary_key = ["留言內容"]
+timezone = "not_applicable"
+update_frequency = "ad hoc manual review"
+retention = "indefinite reviewed corrections"
+optional = false
+
+[[datasets]]
+name = "sentiment_overrides"
+layer = "curated"
+path = "data/labels/sentiment_overrides.csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/relabel_delta.py"
+partition_columns = []
+primary_key = ["留言內容"]
+timezone = "not_applicable"
+update_frequency = "ad hoc legacy relabeling"
+retention = "indefinite legacy fallback cache"
+optional = false
+
+[[datasets]]
+name = "gold_smoke"
+layer = "curated"
+path = "data/labels/gold_smoke.csv"
+format = "csv"
+producing_owner = "manual annotation; no in-repo writer"
+partition_columns = []
+primary_key = ["comment_id"]
+timezone = "Asia/Taipei"
+update_frequency = "ad hoc manual annotation"
+retention = "indefinite evaluation fixture"
+optional = false
+
+[[datasets]]
+name = "gold_v1"
+layer = "curated"
+path = "data/labels/gold_v1.csv"
+format = "csv"
+producing_owner = "manual annotation; no in-repo writer"
+partition_columns = []
+primary_key = ["comment_id"]
+timezone = "Asia/Taipei"
+update_frequency = "ad hoc manual annotation"
+retention = "indefinite evaluation dataset"
+optional = false
+
+[[datasets]]
+name = "to_label_v1"
+layer = "staging"
+path = "data/labels/to_label_v1.csv"
+format = "csv"
+producing_owner = "manual annotation workflow; no in-repo writer"
+partition_columns = []
+primary_key = ["comment_id"]
+timezone = "Asia/Taipei"
+update_frequency = "inactive v1 labeling batch"
+retention = "retain with gold_v1 provenance"
+optional = false
+
+[[datasets]]
+name = "scored_results"
+layer = "generated"
+path = "data/results.json"
+format = "json"
+producing_owner = "cvs_radar/store.py:save_results"
+partition_columns = []
+primary_key = ["reports.product_key"]
+timezone = "Asia/Taipei"
+update_frequency = "daily after crawl and label refresh"
+retention = "latest snapshot plus Git history"
+optional = false
+
+[[datasets]]
+name = "public_web_payload"
+layer = "generated"
+path = "web/public/data.json"
+format = "json"
+producing_owner = "web/build_data.py"
+partition_columns = []
+primary_key = ["products.id"]
+timezone = "ISO-8601 offsets; generatedAt is Asia/Taipei"
+update_frequency = "daily after scored results"
+retention = "latest snapshot plus Git history"
+optional = false
+
+[[datasets]]
+name = "static_export_payload_copy"
+layer = "generated"
+path = "web/out/data.json"
+format = "json"
+producing_owner = "Next.js static export configured by web/package.json"
+partition_columns = []
+primary_key = ["products.id"]
+timezone = "ISO-8601 offsets; generatedAt is Asia/Taipei"
+update_frequency = "on local static-site build"
+retention = "replaceable build output"
+optional = true
+
+[[datasets]]
+name = "backend_comparison"
+layer = "generated"
+path = "outputs/eval/backend_comparison.csv"
+format = "csv"
+producing_owner = "cvs_radar/evaluation.py"
+partition_columns = []
+primary_key = ["dataset", "backend"]
+timezone = "not_applicable"
+update_frequency = "ad hoc evaluation"
+retention = "indefinite tracked evaluation result"
+optional = false
+
+[[datasets]]
+name = "gold_v1_comparison"
+layer = "generated"
+path = "outputs/eval/gold_v1_comparison.csv"
+format = "csv"
+producing_owner = "cvs_radar/evaluation.py"
+partition_columns = []
+primary_key = ["dataset", "backend"]
+timezone = "not_applicable"
+update_frequency = "ad hoc evaluation"
+retention = "indefinite tracked evaluation result"
+optional = false
+
+[[datasets]]
+name = "pending_grounding_comment_picks"
+layer = "staging"
+path = "artifacts/pending-grounding-comment-picks.csv"
+format = "csv"
+producing_owner = "scripts/import_comment_picks.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "on comment-pick import validation"
+retention = "until adjudicated; preserve on failed runs"
+optional = true
+
+[[datasets]]
+name = "pending_grounding_excerpts"
+layer = "staging"
+path = "artifacts/pending-grounding-excerpts.csv"
+format = "csv"
+producing_owner = "scripts/import_excerpts.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "on excerpt import validation"
+retention = "until adjudicated; preserve on failed runs"
+optional = true
+
+[[datasets]]
+name = "rejected_comment_picks"
+layer = "staging"
+path = "artifacts/rejected-comment-picks.csv"
+format = "csv"
+producing_owner = "scripts/import_comment_picks.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "on comment-pick import validation"
+retention = "until manually reviewed"
+optional = true
+
+[[datasets]]
+name = "rejected_excerpts"
+layer = "staging"
+path = "artifacts/rejected-excerpts.csv"
+format = "csv"
+producing_owner = "scripts/import_excerpts.py"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "on excerpt import validation"
+retention = "until manually reviewed"
+optional = true
+
+[[datasets]]
+name = "rebackfill_chunks_batch1"
+layer = "staging"
+path = "data/staging/rebackfill_work/chunks"
+file_pattern = "chunk_[0-9][0-9][0-9].csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/ops/rebackfill.sh"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "per rebackfill run"
+retention = "scratch; remove only after successful import"
+optional = true
+
+[[datasets]]
+name = "rebackfill_labeled_chunks_batch1"
+layer = "staging"
+path = "data/staging/rebackfill_work/chunks"
+file_pattern = "chunk_[0-9][0-9][0-9].labeled.csv"
+format = "csv_utf8_bom"
+producing_owner = "scripts/ops/rebackfill.sh labeling worker"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "per rebackfill run"
+retention = "scratch; remove only after successful import"
+optional = true
+
+[[datasets]]
+name = "rebackfill_chunks_batch2"
+layer = "staging"
+path = "data/staging/rebackfill_work/chunks2"
+file_pattern = "chunk_[0-9][0-9][0-9].csv"
+format = "csv_utf8_bom"
+producing_owner = "unknown (legacy working batch; no current in-repo producer reference)"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "inactive legacy working batch"
+retention = "retain until manually reconciled"
+optional = true
+
+[[datasets]]
+name = "rebackfill_labeled_chunks_batch2"
+layer = "staging"
+path = "data/staging/rebackfill_work/chunks2"
+file_pattern = "chunk_[0-9][0-9][0-9].labeled.csv"
+format = "csv_utf8_bom"
+producing_owner = "unknown (legacy working batch; no current in-repo producer reference)"
+partition_columns = []
+primary_key = ["fingerprint"]
+timezone = "not_applicable"
+update_frequency = "inactive legacy working batch"
+retention = "retain until manually reconciled"
+optional = true

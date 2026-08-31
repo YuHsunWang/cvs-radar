@@ -60,11 +60,6 @@ else
   git worktree add -f "$WT" "$BRANCH" >/dev/null 2>&1 || die "worktree add"
 fi
 cd "$WT" || die "cd worktree"
-# keep the scratch working dir out of git without touching the repo .gitignore
-# (in a worktree .git is a file, so resolve the real info/exclude path)
-_excl="$(git rev-parse --git-path info/exclude 2>/dev/null)"
-[ -n "$_excl" ] && { grep -qxF 'rebackfill_work/' "$_excl" 2>/dev/null || echo 'rebackfill_work/' >> "$_excl"; }
-
 # --- persistent posts.jsonl so we only ever crawl the delta ---
 # The worktree store is the working copy; the seed is its mirror, refreshed from
 # it at the end of every successful run. Reconcile BOTH ways before crawling.
@@ -117,7 +112,7 @@ fi
 [ -s data/posts.jsonl ] || die "no posts.jsonl seed available (set STORE_SEED)"
 
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/rebackfill.XXXXXX")" || die "mktemp"
-mkdir -p "$WORK/chunks" "$WORK/prompts" "$WORK/logs" rebackfill_work/chunks
+mkdir -p "$WORK/chunks" "$WORK/prompts" "$WORK/logs" data/staging/rebackfill_work/chunks
 # On failure, preserve the Codex chunk logs before cleaning up — otherwise the
 # "see $WORK/logs" hint in die() points at a directory this trap just deleted.
 cleanup(){
@@ -173,17 +168,17 @@ for i in range(0,len(rows),size):
         w=csv.writer(g); w.writerow(h); w.writerows(rows[i:i+size])
 print("chunks", (len(rows)+size-1)//size)
 PY
-cp "$WORK"/chunks/*.csv rebackfill_work/chunks/
+cp "$WORK"/chunks/*.csv data/staging/rebackfill_work/chunks/
 
 # --- 4. write prompt template + per-chunk prompts (in $WORK, NOT codex-direct root) ---
 cat > "$WORK/prompt_template.md" <<'TPL'
 <task>
 Label the sentiment of PTT convenience-store product comments in ONE CSV file:
-`rebackfill_work/chunks/__CHUNK__.csv` (__N__ data rows). Read
+`data/staging/rebackfill_work/chunks/__CHUNK__.csv` (__N__ data rows). Read
 `docs/labeling_guideline.md` first — that is the authoritative rubric. For EVERY
 row read `comment_text` (context: `brand`, `product_name`, `post_title`, `tag`)
 and judge its sentiment toward the product. Write
-`rebackfill_work/chunks/__CHUNK__.labeled.csv`.
+`data/staging/rebackfill_work/chunks/__CHUNK__.labeled.csv`.
 
 Judge each comment YOURSELF. Do NOT write a keyword/lexicon script or heuristic —
 that defeats the purpose. Reason about irony, mixed sentiment, context per rubric.
@@ -205,11 +200,11 @@ rows in the SAME order. Fill:
 - `reason`: SHORT (<=15 chars) zh-TW note. `model`: set to `codex`.
 </how_to_fill_each_row>
 <acceptance_criteria>
-- `rebackfill_work/chunks/__CHUNK__.labeled.csv` exists, UTF-8 BOM, same header.
+- `data/staging/rebackfill_work/chunks/__CHUNK__.labeled.csv` exists, UTF-8 BOM, same header.
 - Exactly __N__ rows, same order, SAME fingerprints.
 - is_relevant in {true,false}; llm_label in {正向,中性,負向}; if relevant then
   llm_score float in [-1,1] with matching sign, else empty. No row skipped/dup.
-- Verify: `python scripts/import_llm_backfill.py rebackfill_work/chunks/__CHUNK__.labeled.csv --labels rebackfill_work/__VALIDATE__.csv`
+- Verify: `python scripts/import_llm_backfill.py data/staging/rebackfill_work/chunks/__CHUNK__.labeled.csv --labels data/staging/rebackfill_work/__VALIDATE__.csv`
   must print 0 errors; then delete that validate file.
 </acceptance_criteria>
 <scope_constraints>
@@ -248,7 +243,7 @@ bad="$(awk -F'\t' '$2!=0' "$WORK/manifest.tsv" | wc -l)"
 [ "$bad" -eq 0 ] || die "$bad chunk(s) had non-zero Codex exit — see $WORK/logs"
 
 # --- 6. independent verify + combine ---
-python3 - "$WT/rebackfill_work/chunks" "$WORK/all_labeled.csv" <<'PY' || die "verification failed"
+python3 - "$WT/data/staging/rebackfill_work/chunks" "$WORK/all_labeled.csv" <<'PY' || die "verification failed"
 import csv,sys,glob,os
 d,out=sys.argv[1],sys.argv[2]
 VALID={"正向","中性","負向"}; errs=[]; header=None; combined=[]
@@ -284,7 +279,7 @@ before="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('data/
 python3 scripts/import_llm_backfill.py "$WORK/all_labeled.csv" \
         --labels data/labels/sentiment_fingerprint_labels.csv 2>&1 | tail -1 || die "import"
 after="$(python3 -c "import csv;print(sum(1 for _ in csv.DictReader(open('data/labels/sentiment_fingerprint_labels.csv',encoding='utf-8-sig'))))")"
-rm -rf rebackfill_work
+rm -rf data/staging/rebackfill_work
 fi
 # refresh the persistent seed so the next run continues from here
 cp data/posts.jsonl "$STORE_SEED" 2>/dev/null || true

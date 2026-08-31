@@ -7,7 +7,7 @@
 - F1.1 從 `bbs/CVS/index.html` 往回翻頁，支援 `max_pages` / 日期區間 / `recent_days`
 - F1.4 禮貌爬取：`request_delay_sec`（預設 1s）、`timeout`、失敗**指數退避重試**
 - F1.5 增量：成功解析的 URL 先留在 pending 集合；`crawl_job.py` 只有在
-  `posts.jsonl` flush/fsync 成功後才寫入 `.cvs_radar_seen.json`
+  `posts.jsonl` flush/fsync 成功後才寫入 `data/raw/crawl_seen.json`
 - **over18 cookie 已設**（`over18=1`），不會卡 PTT 年齡牆
 - 自訂 User-Agent
 

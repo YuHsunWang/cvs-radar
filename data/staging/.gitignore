@@ -1,0 +1,3 @@
+# Keep the staging-data home in fresh checkouts without committing working data.
+*
+!.gitignore

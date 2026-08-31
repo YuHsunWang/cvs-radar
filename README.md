@@ -155,9 +155,14 @@ web/
   public/data.json         瀏覽器讀取的商品層級 payload
 data/results.json          預先計算的商品層級快照
 data/labels/               以指紋為 key 的 LLM 標記快取
+data/raw/                  本機原始備份與爬取狀態（忽略於 Git）
+data/staging/              可重建的標記工作檔（忽略於 Git）
+catalog/datasets.toml      持久化資料集目錄與契約
 docs/screenshots/          由 production build 產生的截圖
 .github/workflows/         CI 與 GitHub Pages 鏡像部署
 ```
+
+新資料檔的分層、位置與不可變契約請見 [Data layout](docs/architecture/data-layout.md)。
 
 ## 在本地執行
 

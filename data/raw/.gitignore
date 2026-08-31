@@ -1,0 +1,3 @@
+# Keep the raw-data home in fresh checkouts without committing its contents.
+*
+!.gitignore
