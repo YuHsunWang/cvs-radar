@@ -8,6 +8,7 @@ __pycache__/
 
 # Raw crawl output & local caches (never commit real PTT data)
 data/posts.jsonl
+data/family_food/
 .cvs_radar_seen.json
 data/labels/*draft*.csv
 # Labelling working output: exports, quarantined rows and adjudication queues all
