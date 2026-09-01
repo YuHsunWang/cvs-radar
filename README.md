@@ -181,6 +181,33 @@ python run.py --demo
 python -m uvicorn cvs_radar.api:app --reload
 ```
 
+### 全家食品安全資料（獨立批次工具）
+
+`scripts/crawl_family_food.py` 僅讀取全家食品安全專區的公開頁面，不共用限定
+PTT URL 的 `PttCrawler`。使用前請再次查看該站的 `robots.txt` 與使用條款；尊重
+網站負載（預設請求間隔 1 秒），不得繞過 CAPTCHA、登入或其他存取控制。照片預設
+只保留官方 URL，只有明確傳入 `--download-images` 才會下載，且輸出目錄已忽略版控。
+
+```bash
+python scripts/crawl_family_food.py --start-page 1 --max-pages 3 \
+  --request-delay 1.5 --output data/family_food/products.jsonl
+python scripts/crawl_family_food.py --max-pages 1 --download-images \
+  --image-dir data/family_food/images
+```
+
+JSONL 每行是一項商品，包含 `product_id`、`name`、`detail_url`、`image_urls`、
+`serving_size`、`servings_per_container`、八項營養欄位（`calories`、`protein`、
+`fat`、`saturated_fat`、`trans_fat`、`carbohydrates`、`sugar`、`sodium`）、
+`ingredients`、`allergens` 與 UTC `crawled_at`。數值欄位均為
+`{"value", "unit", "raw_text"}`；缺漏或無法解析者為 `null`，不會誤填為零。
+
+截至本功能開發時，執行環境的網路代理拒絕連到該主機，因此無法可靠宣稱現場頁面
+是 server-rendered HTML 或 XHR/Fetch，也無法代為確認當下的 robots/條款內容。
+實際執行前應在瀏覽器 Network 面板確認 `/Web_FFD_2022/results/{page}` 的分頁、
+商品 ID、詳情 URL 與 JSON envelope；若網站 HTML 或 API 改版，請先保存不含個資的
+新回應為本機 fixture，再同步更新 `parse_list_html`、`parse_api_response` 或
+`parse_product_html` selector 與測試。測試不得直接連線官方網站。
+
 `--demo` 使用離線的合成範例貼文。實際爬取需要網路，並應遵守來源站台的速率限制與使用條款。
 
 ## 驗證
