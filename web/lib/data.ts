@@ -63,10 +63,10 @@ export function normalizeText(value: string): string {
   return value.normalize('NFKC').toLocaleLowerCase('zh-TW')
 }
 
-export function formatDisplayDate(value: string): string {
-  if (!value) return '載入中'
+export function formatDisplayDate(value: string | null | undefined): string {
+  if (!value) return '更新時間不明'
   const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value.slice(0, 10).replaceAll('-', '/')
+  if (Number.isNaN(date.getTime())) return '更新時間不明'
   return new Intl.DateTimeFormat('zh-TW', {
     timeZone: 'Asia/Taipei',
     year: 'numeric',
@@ -238,8 +238,8 @@ export function displayBrand(brand: string): string {
   return brands.includes(brand as (typeof brands)[number]) ? brand : '其他'
 }
 
-export function displayCategory(category: string): string {
-  const rawCategory = category.trim() || '其他'
+export function displayCategory(category: string | null | undefined): string {
+  const rawCategory = category?.trim() || '其他'
   return categoryKeys.find((key) => {
     const groupedCategories: readonly string[] = categoryGroups[key]
     return groupedCategories.includes(rawCategory)
