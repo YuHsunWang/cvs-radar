@@ -8,28 +8,7 @@ type ProductDetailProps = {
   product: Product
 }
 
-/**
- * The back of the shelf label: evidence first, then the model's summary.
- *
- * Styled with the `sl-*` system the collapsed card uses rather than in Tailwind
- * utilities, because the two sat side by side and read as different apps.
- *
- * The author's summary leads, then the like/caution evidence: the summary is one
- * short sentence that frames what follows, so reading it first costs almost
- * nothing and makes the bullets land as detail rather than as a list to parse
- * cold.
- *
- * Kept deliberately short. Evidence items are at most 19 characters and the
- * median summary is 17, so the height this panel used to have was going into
- * per-item containers, not text — and an inline expander that pushes the next
- * product off a 360×800 screen defeats its own purpose. Both polarities share one
- * heading and one list; each row is carried by an icon in the polarity colour,
- * which keeps the distinction legible in greyscale and for colour-blind readers,
- * where colour alone would not be.
- */
 export default function ProductDetail({ product }: ProductDetailProps) {
-  // One rewrite per reviewing post, joined with 「；」 upstream. Splitting them
-  // back out is the honest reading: they are separate people, not one sentence.
   const takes = (product.excerpt || '')
     .split('；')
     .map((part) => part.trim())
@@ -39,72 +18,94 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="sl-k">
-      <h3 className="sl-detail-name">{product.productName?.trim() || '商品名稱待確認'}</h3>
-      {/* Rendered when there is a summary OR the row is provisional: a provisional
-          row with no summary still has to admit it is a rule fallback, otherwise
-          it is presented as though a model had labelled it. */}
-      {takes.length > 0 || product.reviewProvisional ? (
-        <section>
-          <h3 className="sl-k-head">
-            SUMMARY
-            <b>
-              作者評價
-              {product.reviewProvisional ? <span className="sl-k-prov">暫定</span> : null}
-            </b>
-            {takes.length > 1 ? <i>{takes.length} 篇</i> : null}
+      <div className="sl-k-tickethead">
+        <div>
+          <span className="sl-k-kicker">PRODUCT INFO CARD</span>
+          <h3 className="sl-detail-name">{product.productName?.trim() || '商品名稱待確認'}</h3>
+        </div>
+        <span className="sl-k-count">{takes.length || product.nPosts} 篇心得</span>
+      </div>
+
+      <div className="sl-k-grid">
+        <section className="sl-k-panel sl-k-summary">
+          <h3 className="sl-k-title">
+            <span>大家怎麼說</span>
+            {product.reviewProvisional ? <em>暫定</em> : null}
           </h3>
           {takes.length > 0 ? (
-            takes.map((take, index) => (
-              <p key={take} className="sl-k-sum">
-                {/* Numbering only earns its place when there are several
-                    reviewers to tell apart. */}
-                {takes.length > 1 ? <span>{String(index + 1).padStart(2, '0')}</span> : null}
-                {take}
-              </p>
-            ))
+            <div className="sl-k-takes">
+              {takes.map((take, index) => (
+                <p key={`${index}-${take}`} className="sl-k-sum">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  {take}
+                </p>
+              ))}
+            </div>
           ) : (
-            <p className="sl-k-none">尚未完成模型整理，請看原文</p>
+            <p className="sl-k-none">
+              {product.reviewProvisional ? '尚未完成模型整理，請看原文' : '目前沒有可整理的作者摘要'}
+            </p>
           )}
         </section>
-      ) : null}
 
-      <section className={takes.length > 0 || product.reviewProvisional ? 'sl-k-sec' : ''}>
-        <h3 className="sl-k-head">
-          EVIDENCE
-          <b>評價重點</b>
-        </h3>
+        <section className="sl-k-panel sl-k-positive">
+          <h3 className="sl-k-title">
+            <ThumbsUp size={16} aria-hidden="true" />
+            <span>推薦點</span>
+          </h3>
+          {product.likes.length > 0 ? (
+            <ul className="sl-k-list">
+              {product.likes.map((item) => (
+                <EvidenceRow key={`+${item}`} tone="up" text={item} />
+              ))}
+            </ul>
+          ) : (
+            <p className="sl-k-none">留言沒有集中的推薦點</p>
+          )}
+        </section>
 
-        {hasEvidence ? (
-          <ul className="sl-k-list">
-            {product.likes.map((item) => (
-              <EvidenceRow key={`+${item}`} tone="up" text={item} />
-            ))}
-            {product.cautions.map((item) => (
-              <EvidenceRow key={`-${item}`} tone="dn" text={item} />
-            ))}
-          </ul>
-        ) : (
-          <p className="sl-k-none">留言沒有集中的優缺點</p>
-        )}
-      </section>
+        <section className="sl-k-panel sl-k-negative">
+          <h3 className="sl-k-title">
+            <TriangleAlert size={16} aria-hidden="true" />
+            <span>踩雷點</span>
+          </h3>
+          {product.cautions.length > 0 ? (
+            <ul className="sl-k-list">
+              {product.cautions.map((item) => (
+                <EvidenceRow key={`-${item}`} tone="dn" text={item} />
+              ))}
+            </ul>
+          ) : (
+            <p className="sl-k-none">留言沒有集中的踩雷點</p>
+          )}
+        </section>
+      </div>
+
+      {hasEvidence ? <p className="sr-only">評價重點已分為推薦點與踩雷點</p> : null}
 
       {product.postUrls.length > 0 ? (
-        <div className="sl-k-src">
-          <span>原文</span>
-          {product.postUrls.map((url, index) => (
-            <a
-              key={url}
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => trackOutboundPttClick(product.id)}
-              aria-label={`${product.productName}原文 ${index + 1}，另開新分頁`}
-            >
-              PTT {String(index + 1).padStart(2, '0')}
-              <ExternalLink size={11} aria-hidden="true" />
-            </a>
-          ))}
-        </div>
+        <section className="sl-k-sources" aria-label="原文來源">
+          <div className="sl-k-sourcehead">
+            <span>原文來源</span>
+            <small>可回看公開討論脈絡</small>
+          </div>
+          <div className="sl-k-src">
+            {product.postUrls.map((url, index) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackOutboundPttClick(product.id)}
+                aria-label={`${product.productName}原文 ${index + 1}，另開新分頁`}
+              >
+                <span className="sl-k-barcode" aria-hidden="true" />
+                PTT {String(index + 1).padStart(2, '0')}
+                <ExternalLink size={11} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+        </section>
       ) : null}
     </div>
   )
@@ -113,17 +114,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 function EvidenceRow({ tone, text }: { tone: 'up' | 'dn'; text: string }) {
   const isUp = tone === 'up'
   return (
-    <li className={`sl-k-row sl-k-${tone} sl-t3`}>
+    <li className={`sl-k-row sl-k-${tone}`}>
       <b aria-hidden="true">
-        {isUp ? (
-          <ThumbsUp size={13} strokeWidth={2.6} />
-        ) : (
-          <TriangleAlert size={13} strokeWidth={2.6} />
-        )}
+        {isUp ? <ThumbsUp size={13} strokeWidth={2.6} /> : <TriangleAlert size={13} strokeWidth={2.6} />}
       </b>
       <span>
-        {/* The icon is the only visual carrier of polarity, so screen readers
-            need it spelled out. */}
         <span className="sr-only">{isUp ? '優點：' : '缺點：'}</span>
         {text}
       </span>
