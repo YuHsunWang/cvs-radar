@@ -9,11 +9,10 @@ import {
   displayCategory,
 } from '@/lib/data'
 
-// Shelf-edge label palette: brand-colour rails.
 const RAIL: Record<string, string> = {
   '7-11': '#F26522',
-  全家: '#009B4C',
-  萊爾富: '#E51F26',
+  全家: '#00A651',
+  萊爾富: '#E60012',
   OK: '#F5A623',
   美聯社: '#6C3DBF',
   其他: '#6B7280',
@@ -43,12 +42,12 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
   const brand = displayBrand(product.brand)
   const score = comprehensiveScore(product)
   const volume = product.nPosts + product.nComments
-  const pop = (product.likes[0] ?? '').replace(/\s+/g, ' ').trim().slice(0, 16)
+  const pop = (product.likes[0] ?? '').replace(/\s+/g, ' ').trim().slice(0, 22)
   const date = product.latestDate ? `最新心得 ${product.latestDate.replaceAll('-', '/')}` : '心得日期不明'
   const detailId = useId()
 
   return (
-    <article className="sl-label">
+    <article className={`sl-label${isExpanded ? ' sl-expanded' : ''}`}>
       <button
         type="button"
         aria-expanded={isExpanded}
@@ -64,6 +63,7 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
           <div className="sl-body">
             <div className="sl-slotline">
               <span className="sl-slot">{String(rank).padStart(2, '0')}</span>
+              <span className="sl-shelf-code">SHELF PICK</span>
             </div>
 
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
