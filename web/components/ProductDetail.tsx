@@ -39,6 +39,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="sl-k">
+      <h3 className="sl-detail-name">{product.productName?.trim() || '商品名稱待確認'}</h3>
       {/* Rendered when there is a summary OR the row is provisional: a provisional
           row with no summary still has to admit it is a rule fallback, otherwise
           it is presented as though a model had labelled it. */}

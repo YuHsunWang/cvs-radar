@@ -210,6 +210,7 @@
 
 .sl-count {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin-top: 4px;
@@ -221,6 +222,27 @@
   color: var(--sl-soft);
 }
 .sl-count b { color: var(--sl-ink); font-family: var(--sl-mono); }
+.sl-count p { margin: 0; }
+.sl-context-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--sl-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.sl-filter-context { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.sl-filter-context > button { flex: none; }
+.sl-active-context {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sl-active-context button { margin-right: 8px; }
 
 /* ---- shelf ---- */
 .sl-shelf { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
@@ -236,7 +258,6 @@
   overflow: hidden;
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
-.sl-label.sl-top { border-color: var(--sl-ink); }
 .sl-rowbtn {
   display: block;
   width: 100%;
@@ -280,23 +301,6 @@
   letter-spacing: 0.06em;
 }
 .sl-slot { font-weight: 700; color: var(--sl-ink); }
-.sl-medal {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  font-family: var(--sl-mono);
-  font-weight: 800;
-  font-size: 15px;
-  line-height: 1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.55), inset 0 -2px 3px rgba(0, 0, 0, 0.18);
-}
-.sl-medal b { transform: translateY(0.5px); }
-.sl-medal.sl-gold { background: radial-gradient(circle at 34% 28%, #fff3b0, #ffd23f 46%, #e3a100); border: 1.5px solid #bc8600; color: #4a3600; }
-.sl-medal.sl-silver { background: radial-gradient(circle at 34% 28%, #fcfdff, #d3d8df 46%, #a6adb6); border: 1.5px solid #8a929c; color: #2b3138; }
-.sl-medal.sl-bronze { background: radial-gradient(circle at 34% 28%, #f7cda0, #db8c4c 46%, #b0602a); border: 1.5px solid #96501f; color: #3a2410; }
 .sl-pname {
   margin: 6px 0 0;
   font-size: 18px;
@@ -307,7 +311,11 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
+.sl-review-date { margin: 6px 0 0; font-size: 11px; color: var(--sl-soft); }
+.sl-mobile-na { display: none; }
+.sl-detail-name { margin: 0 0 8px; font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
 .sl-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
 .sl-tag {
   font-family: var(--sl-mono);
@@ -462,6 +470,26 @@
 .sl-sheet-backdrop { display: none; }
 
 @media (max-width: 640px) {
+  .sl-filter-context { flex-basis: 100%; justify-content: space-between; }
+  .sl-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 12px; }
+  .sl-body, .sl-stampline { display: contents; }
+  .sl-rail { grid-row: 1; grid-column: 1 / -1; justify-self: start; padding: 3px 8px; border-radius: 3px; }
+  .sl-rail span { writing-mode: horizontal-tb; letter-spacing: 0.04em; }
+  .sl-slotline { grid-row: 1; grid-column: 1 / -1; justify-self: end; min-height: 0; }
+  .sl-pname { grid-row: 2; grid-column: 1 / -1; margin: 0; font-size: 18px; -webkit-line-clamp: 3; }
+  .sl-review-date { grid-row: 3; grid-column: 1 / -1; margin: 0; }
+  .sl-tags { grid-row: 4; grid-column: 1 / -1; margin: 0; }
+  .sl-stamp { grid-row: 5; grid-column: 1; justify-self: start; align-self: center; }
+  .sl-pop { grid-row: 6; grid-column: 1 / -1; }
+  .sl-pricebox { grid-row: 5; grid-column: 2; flex-direction: row; align-items: center; gap: 6px; border: 0; padding: 0; background: none; }
+  .sl-pb-top { flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: flex-end; gap: 4px; }
+  .sl-pb-label { display: none; }
+  .sl-score, .sl-chip-warn, .sl-chevron { margin-top: 0; }
+  .sl-s-num { font-size: 24px; }
+  .sl-s-na { font-size: 12px; }
+  .sl-mobile-na { display: inline; }
+  .sl-null-warn { display: none; }
+
   /* Inline filter bar is replaced by the sheet on phones. */
   .sl-controls { display: none; }
 
