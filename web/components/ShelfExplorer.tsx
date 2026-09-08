@@ -30,16 +30,14 @@ import {
 
 const PAGE_SIZE = 30
 
-// Rail colours mirror ShelfCard so an active brand chip wears its shelf colour.
 const BRAND_RAIL: Record<string, string> = {
   '7-11': '#F26522',
-  全家: '#009B4C',
-  萊爾富: '#E51F26',
+  全家: '#00A651',
+  萊爾富: '#E60012',
   OK: '#F5A623',
   美廉社: '#6C3DBF',
   其他: '#6B7280',
 }
-// 美聯社 in lib/data is a typo for 美廉社 and has no products — hide it for now.
 const HIDDEN_BRANDS = new Set(['美聯社'])
 
 function isoDaysAgo(days: number): string {
@@ -67,7 +65,6 @@ const SORT_OPTIONS: readonly { key: SortKey; label: string }[] = [
   { key: 'comprehensiveAsc', label: '評分低→高' },
 ]
 
-// Drag distance (px) past which a downward flick on the sheet handle closes it.
 const SHEET_CLOSE_THRESHOLD = 110
 
 type ShelfExplorerProps = {
@@ -89,15 +86,11 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [sheetSection, setSheetSection] = useState('category')
   const sheetBody = useRef<HTMLDivElement>(null)
   const inlineControls = useRef<HTMLDivElement>(null)
-  // Drag-to-dismiss: track finger offset while dragging the sheet's grab handle.
   const [dragY, setDragY] = useState(0)
   const [dragging, setDragging] = useState(false)
   const dragStartY = useRef(0)
   const dragYRef = useRef(0)
-  // Ref mirrors `dragging` so move/end read it synchronously (state closure is
-  // stale for the first pointermove fired before React re-renders).
   const draggingRef = useRef(false)
-  // Client-only store clock (24h konbini). Starts blank so SSR/CSR markup matches.
   const [clock, setClock] = useState<{ time: string; day: string }>({ time: '--:--:--', day: '' })
 
   function openSheet(section = 'category') {
@@ -106,8 +99,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     setDragY(0)
     setSheetOpen(true)
   }
-  // Phones reach the filters through the sheet; wider screens already show the
-  // inline bar, so send them there rather than open a surface CSS keeps hidden.
+
   function revealSection(section = 'category') {
     const bar = inlineControls.current
     if (bar && getComputedStyle(bar).display !== 'none') {
@@ -131,9 +123,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     setDragging(true)
     try {
       event.currentTarget.setPointerCapture(event.pointerId)
-    } catch {
-      // Pointer capture is best-effort; drag still works without it.
-    }
+    } catch {}
   }
   function onSheetDragMove(event: ReactPointerEvent<HTMLDivElement>) {
     if (!draggingRef.current) return
@@ -145,22 +135,15 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     if (!draggingRef.current) return
     draggingRef.current = false
     setDragging(false)
-    if (dragYRef.current > SHEET_CLOSE_THRESHOLD) {
-      closeSheet()
-    } else {
-      setDragY(0)
-    }
+    if (dragYRef.current > SHEET_CLOSE_THRESHOLD) closeSheet()
+    else setDragY(0)
     dragYRef.current = 0
   }
 
   useEffect(() => {
     const tick = () => {
       const timeFmt = new Intl.DateTimeFormat('zh-TW', {
-        timeZone: 'Asia/Taipei',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
+        timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
       })
       const dayFmt = new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', weekday: 'short' })
       const now = new Date()
@@ -171,7 +154,6 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     return () => window.clearInterval(id)
   }, [])
 
-  // Lock body scroll and wire Escape-to-close while the filter sheet is open.
   useEffect(() => {
     if (!sheetOpen) return
     const previousOverflow = document.body.style.overflow
@@ -188,8 +170,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
 
   useEffect(() => {
     if (!sheetOpen) return
-    sheetBody.current?.querySelector(`[data-section="${sheetSection}"]`)
-      ?.scrollIntoView({ block: 'nearest' })
+    sheetBody.current?.querySelector(`[data-section="${sheetSection}"]`)?.scrollIntoView({ block: 'nearest' })
   }, [sheetOpen, sheetSection])
 
   const visibleProducts = useMemo(() => {
@@ -215,12 +196,9 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
 
   const displayedProducts = visibleProducts.slice(0, visibleCount)
   const remainingCount = visibleProducts.length - displayedProducts.length
-  const activeFilterCount =
-    (category ? 1 : 0) + (brand ? 1 : 0) + (datePreset !== 'all' ? 1 : 0) + (hideNoScore ? 1 : 0)
+  const activeFilterCount = (category ? 1 : 0) + (brand ? 1 : 0) + (datePreset !== 'all' ? 1 : 0) + (hideNoScore ? 1 : 0)
 
-  function resetPage() {
-    setVisibleCount(PAGE_SIZE)
-  }
+  function resetPage() { setVisibleCount(PAGE_SIZE) }
 
   function applyDatePreset(preset: (typeof DATE_PRESETS)[number]) {
     setDatePreset(preset.key)
@@ -232,16 +210,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   function toggleProduct(product: Product) {
     setExpanded((current) => {
       const next = new Set(current)
-      if (next.has(product.id)) {
-        next.delete(product.id)
-      } else {
+      if (next.has(product.id)) next.delete(product.id)
+      else {
         next.add(product.id)
-        trackProductExpand({
-          productId: product.id,
-          brand: product.brand,
-          category: product.category,
-          fairScore: product.fairScore,
-        })
+        trackProductExpand({ productId: product.id, brand: product.brand, category: product.category, fairScore: product.fairScore })
       }
       return next
     })
@@ -257,36 +229,16 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     resetPage()
   }
 
-  // Filter groups defined once, then placed both in the desktop bar and the
-  // mobile sheet (same element rendered in two parents = two live instances).
   const categoryGroup = (
     <div className="sl-filterrow" data-section="category">
       <span className="sl-eyebrow">分類</span>
       <nav className="sl-chips" aria-label="分類">
-        <button
-          type="button"
-          className={`sl-chip-btn${category === null ? ' sl-on' : ''}`}
-          onClick={() => {
-            setCategory(null)
-            resetPage()
-          }}
-        >
-          全部
-        </button>
+        <button type="button" className={`sl-chip-btn${category === null ? ' sl-on' : ''}`} onClick={() => { setCategory(null); resetPage() }}>全部</button>
         {categoryKeys.map((key) => (
-          <button
-            key={key}
-            type="button"
-            className={`sl-chip-btn${category === key ? ' sl-on' : ''}`}
-            onClick={() => {
-              const next = category === key ? null : key
-              setCategory(next)
-              resetPage()
-              if (next) trackFilterApply('category', next)
-            }}
-          >
-            {key}
-          </button>
+          <button key={key} type="button" className={`sl-chip-btn${category === key ? ' sl-on' : ''}`} onClick={() => {
+            const next = category === key ? null : key
+            setCategory(next); resetPage(); if (next) trackFilterApply('category', next)
+          }}>{key}</button>
         ))}
       </nav>
     </div>
@@ -296,38 +248,19 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     <div className="sl-filterrow" data-section="brand">
       <span className="sl-eyebrow">品牌</span>
       <nav className="sl-chips" aria-label="品牌">
-        <button
-          type="button"
-          className={`sl-chip-btn${brand === null ? ' sl-on' : ''}`}
-          onClick={() => {
-            setBrand(null)
-            resetPage()
-          }}
-        >
-          全部
-        </button>
-        {brands
-          .filter((name) => !HIDDEN_BRANDS.has(name))
-          .map((name) => (
-            <button
-              key={name}
-              type="button"
-              className={`sl-chip-btn sl-brand${brand === name ? ' sl-on' : ''}`}
-              style={
-                brand === name
-                  ? ({ '--sl-brand': BRAND_RAIL[displayBrand(name)] } as CSSProperties)
-                  : undefined
-              }
-              onClick={() => {
-                const next = brand === name ? null : name
-                setBrand(next)
-                resetPage()
-                if (next) trackFilterApply('brand', next)
-              }}
-            >
-              {name}
-            </button>
-          ))}
+        <button type="button" className={`sl-chip-btn${brand === null ? ' sl-on' : ''}`} onClick={() => { setBrand(null); resetPage() }}>全部</button>
+        {brands.filter((name) => !HIDDEN_BRANDS.has(name)).map((name) => (
+          <button
+            key={name}
+            type="button"
+            className={`sl-chip-btn sl-brand${brand === name ? ' sl-on' : ''}`}
+            style={brand === name ? ({ '--sl-brand': BRAND_RAIL[displayBrand(name)] } as CSSProperties) : undefined}
+            onClick={() => {
+              const next = brand === name ? null : name
+              setBrand(next); resetPage(); if (next) trackFilterApply('brand', next)
+            }}
+          >{name}</button>
+        ))}
       </nav>
     </div>
   )
@@ -337,14 +270,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       <span className="sl-eyebrow">日期</span>
       <nav className="sl-chips" aria-label="最新發文日期">
         {DATE_PRESETS.map((preset) => (
-          <button
-            key={preset.key}
-            type="button"
-            className={`sl-datebtn${datePreset === preset.key ? ' sl-on' : ''}`}
-            onClick={() => applyDatePreset(preset)}
-          >
-            {preset.label}
-          </button>
+          <button key={preset.key} type="button" className={`sl-datebtn${datePreset === preset.key ? ' sl-on' : ''}`} onClick={() => applyDatePreset(preset)}>{preset.label}</button>
         ))}
       </nav>
     </div>
@@ -355,19 +281,9 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       <span className="sl-eyebrow">排序</span>
       <nav className="sl-chips" aria-label="排序方式">
         {SORT_OPTIONS.map((option) => (
-          <button
-            key={option.key}
-            type="button"
-            className={`sl-datebtn${sortKey === option.key ? ' sl-on' : ''}`}
-            aria-pressed={sortKey === option.key}
-            onClick={() => {
-              setSortKey(option.key)
-              resetPage()
-              trackSortChange(option.key)
-            }}
-          >
-            {option.label}
-          </button>
+          <button key={option.key} type="button" className={`sl-datebtn${sortKey === option.key ? ' sl-on' : ''}`} aria-pressed={sortKey === option.key} onClick={() => {
+            setSortKey(option.key); resetPage(); trackSortChange(option.key)
+          }}>{option.label}</button>
         ))}
       </nav>
     </div>
@@ -375,15 +291,9 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
 
   const hideToggle = (
     <label className="sl-check" data-section="score">
-      <input
-        type="checkbox"
-        checked={hideNoScore}
-        onChange={(event) => {
-          setHideNoScore(event.target.checked)
-          resetPage()
-          if (event.target.checked) trackFilterApply('hide_no_score', 'on')
-        }}
-      />
+      <input type="checkbox" checked={hideNoScore} onChange={(event) => {
+        setHideNoScore(event.target.checked); resetPage(); if (event.target.checked) trackFilterApply('hide_no_score', 'on')
+      }} />
       隱藏暫無綜合評分
     </label>
   )
@@ -392,20 +302,14 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     <div className="sl-page">
       <header className="sl-sign">
         <div className="sl-sign-main">
-          <div className="sl-sign-mark" aria-hidden="true">
-            <span className="sl-sweep" />
-          </div>
+          <div className="sl-sign-mark" aria-hidden="true"><span className="sl-sweep" /></div>
           <div>
             <p className="sl-sign-kicker">便利商店・新品貨架</p>
-            <h1 className="sl-sign-title">
-              貨架雷達 <span>CVS&nbsp;RADAR</span>
-            </h1>
+            <h1 className="sl-sign-title">貨架雷達 <span>CVS&nbsp;RADAR</span></h1>
           </div>
         </div>
         <div className="sl-sign-stamp">
-          <span className="sl-clock-time" aria-label={`目前時間 ${clock.time}`}>
-            {clock.time}
-          </span>
+          <span className="sl-clock-time" aria-label={`目前時間 ${clock.time}`}>{clock.time}</span>
           <span className="sl-st-line">24H 營業中{clock.day ? ` · ${clock.day}` : ''}</span>
         </div>
       </header>
@@ -418,33 +322,27 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <span>分數＝綜合評分／滿分 100</span>
       </div>
 
+      <section className="sl-intro" aria-label="探索新品">
+        <div>
+          <span className="sl-intro-kicker">DISCOVER THE SHELF</span>
+          <strong>發現生活中的新味道</strong>
+          <p>把公開心得整理成價格、聲量、評分與可追溯的選購線索。</p>
+        </div>
+        <span className="sl-intro-mark" aria-hidden="true">新品</span>
+      </section>
+
       <div className="sl-searchwrap">
-        <SearchBar
-          value={query}
-          onChange={(value) => {
-            setQuery(value)
-            resetPage()
-          }}
-        />
+        <SearchBar value={query} onChange={(value) => { setQuery(value); resetPage() }} />
       </div>
 
-      {/* Desktop / wide screens: filters inline. Hidden on mobile (sheet used). */}
       <div className="sl-controls" ref={inlineControls}>
-        {categoryGroup}
-        {brandGroup}
-        {dateGroup}
-        {sortGroup}
+        {categoryGroup}{brandGroup}{dateGroup}{sortGroup}
         <div className="sl-toolbar-row">{hideToggle}</div>
       </div>
 
       <div className="sl-count">
         <p aria-live="polite">找到 <b>{visibleProducts.length}</b> 項商品</p>
-        <button
-          type="button"
-          className="sl-context-button"
-          title={sortKey === 'recentRecommendationDesc' ? '綜合評分結合心得新近程度與討論量' : undefined}
-          onClick={() => revealSection('sort')}
-        >
+        <button type="button" className="sl-context-button" title={sortKey === 'recentRecommendationDesc' ? '綜合評分結合心得新近程度與討論量' : undefined} onClick={() => revealSection('sort')}>
           排序：{SORT_OPTIONS.find((option) => option.key === sortKey)?.label}
         </button>
         <div className="sl-filter-context">
@@ -455,9 +353,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             {datePreset !== 'all' ? <button type="button" className="sl-context-button" onClick={() => revealSection('date')}>最新心得：{DATE_PRESETS.find((preset) => preset.key === datePreset)?.label}</button> : null}
             {hideNoScore ? <button type="button" className="sl-context-button" onClick={() => revealSection('score')}>隱藏暫無綜合評分</button> : null}
           </span>
-          <button type="button" className="sl-context-button" onClick={() => revealSection()}>
-            篩選 {activeFilterCount}
-          </button>
+          <button type="button" className="sl-context-button" onClick={() => revealSection()}>篩選 {activeFilterCount}</button>
         </div>
       </div>
 
@@ -465,29 +361,17 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         {visibleProducts.length === 0 ? (
           <div className="sl-empty">
             <p>沒有符合條件的商品</p>
-            <button type="button" onClick={clearAll}>
-              清除搜尋與篩選
-            </button>
+            <button type="button" onClick={clearAll}>清除搜尋與篩選</button>
           </div>
         ) : (
           <>
             {displayedProducts.map((product, index) => (
-              <ShelfCard
-                key={product.id}
-                product={product}
-                rank={index + 1}
-                isExpanded={expanded.has(product.id)}
-                onToggle={() => toggleProduct(product)}
-              />
+              <ShelfCard key={product.id} product={product} rank={index + 1} isExpanded={expanded.has(product.id)} onToggle={() => toggleProduct(product)} />
             ))}
             {remainingCount > 0 ? (
               <div className="sl-loadmore">
-                <p>
-                  已顯示 {displayedProducts.length} / {visibleProducts.length} 項
-                </p>
-                <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}>
-                  再顯示 {Math.min(PAGE_SIZE, remainingCount)} 項
-                </button>
+                <p>已顯示 {displayedProducts.length} / {visibleProducts.length} 項</p>
+                <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}>再顯示 {Math.min(PAGE_SIZE, remainingCount)} 項</button>
               </div>
             ) : null}
           </>
@@ -495,69 +379,29 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </main>
 
       <footer className="sl-foot">
-        <p>資料來自公開使用者內容，僅供選購參考；本頁為 CVS Radar 的介面設計試作，非官方評鑑。</p>
-        <p className="sl-foot-mono">
-          SHELF-EDGE LABEL VARIANT · 資料更新 {formatDisplayDate(initialPayload.generatedAt)}
-        </p>
+        <p>資料來自公開使用者內容，僅供選購參考；分數與摘要不是門市庫存或官方評鑑。</p>
+        <p className="sl-foot-mono">CONVENIENCE STORE × REAL VOICE × BETTER CHOICE · 資料更新 {formatDisplayDate(initialPayload.generatedAt)}</p>
       </footer>
 
-      {/* Mobile only: floating filter button + bottom sheet. */}
-      <button
-        type="button"
-        className="sl-fab"
-        aria-label={`篩選${activeFilterCount ? `（已套用 ${activeFilterCount} 項）` : ''}`}
-        aria-expanded={sheetOpen}
-        onClick={() => openSheet()}
-      >
+      <button type="button" className="sl-fab" aria-label={`篩選${activeFilterCount ? `（已套用 ${activeFilterCount} 項）` : ''}`} aria-expanded={sheetOpen} onClick={() => openSheet()}>
         <SlidersHorizontal size={22} aria-hidden="true" />
         {activeFilterCount > 0 ? <span className="sl-fab-badge">{activeFilterCount}</span> : null}
       </button>
 
       {sheetOpen ? (
         <div className="sl-sheet-backdrop" onClick={closeSheet}>
-          <div
-            className={`sl-sheet${dragging ? ' sl-dragging' : ''}`}
-            role="dialog"
-            aria-modal="true"
-            aria-label="篩選"
-            onClick={(event) => event.stopPropagation()}
-            style={dragY ? ({ transform: `translateY(${dragY}px)` } as CSSProperties) : undefined}
-          >
-            {/* Grab handle — drag it down past the threshold to dismiss. */}
-            <div
-              className="sl-sheet-head"
-              onPointerDown={onSheetDragStart}
-              onPointerMove={onSheetDragMove}
-              onPointerUp={onSheetDragEnd}
-              onPointerCancel={onSheetDragEnd}
-            >
+          <div className={`sl-sheet${dragging ? ' sl-dragging' : ''}`} role="dialog" aria-modal="true" aria-label="篩選" onClick={(event) => event.stopPropagation()} style={dragY ? ({ transform: `translateY(${dragY}px)` } as CSSProperties) : undefined}>
+            <div className="sl-sheet-head" onPointerDown={onSheetDragStart} onPointerMove={onSheetDragMove} onPointerUp={onSheetDragEnd} onPointerCancel={onSheetDragEnd}>
               <span className="sl-grabber" aria-hidden="true" />
               <div className="sl-sheet-headrow">
-                <span className="sl-sheet-title">篩選</span>
-                <button
-                  type="button"
-                  className="sl-sheet-x"
-                  aria-label="關閉篩選"
-                  onClick={closeSheet}
-                >
-                  <X size={20} aria-hidden="true" />
-                </button>
+                <span className="sl-sheet-title">掃貨條件</span>
+                <button type="button" className="sl-sheet-x" aria-label="關閉篩選" onClick={closeSheet}><X size={20} aria-hidden="true" /></button>
               </div>
             </div>
-            <div className="sl-sheet-body" ref={sheetBody}>
-              {categoryGroup}
-              {brandGroup}
-              {dateGroup}
-              {sortGroup}
-              {hideToggle}
-            </div>
+            <div className="sl-sheet-body" ref={sheetBody}>{categoryGroup}{brandGroup}{dateGroup}{sortGroup}{hideToggle}</div>
             <div className="sl-sheet-foot">
-              <button type="button" className="sl-sheet-clear" onClick={clearAll}>
-                清除
-              </button>
-              <button type="button" className="sl-sheet-apply" onClick={closeSheet}>
-                看 {visibleProducts.length} 項結果
-              </button>
+              <button type="button" className="sl-sheet-clear" onClick={clearAll}>清除</button>
+              <button type="button" className="sl-sheet-apply" onClick={closeSheet}>看 {visibleProducts.length} 項結果</button>
             </div>
           </div>
         </div>
