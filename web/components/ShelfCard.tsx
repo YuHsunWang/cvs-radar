@@ -12,8 +12,8 @@ import {
 // Shelf-edge label palette: brand-colour rails.
 const RAIL: Record<string, string> = {
   '7-11': '#F26522',
-  全家: '#009B4C',
-  萊爾富: '#E51F26',
+  全家: '#00A651',
+  萊爾富: '#E60012',
   OK: '#F5A623',
   美聯社: '#6C3DBF',
   其他: '#6B7280',
