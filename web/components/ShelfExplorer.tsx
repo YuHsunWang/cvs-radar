@@ -33,8 +33,8 @@ const PAGE_SIZE = 30
 // Rail colours mirror ShelfCard so an active brand chip wears its shelf colour.
 const BRAND_RAIL: Record<string, string> = {
   '7-11': '#F26522',
-  全家: '#009B4C',
-  萊爾富: '#E51F26',
+  全家: '#00A651',
+  萊爾富: '#E60012',
   OK: '#F5A623',
   美廉社: '#6C3DBF',
   其他: '#6B7280',
