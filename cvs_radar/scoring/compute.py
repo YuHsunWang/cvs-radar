@@ -23,7 +23,7 @@ from .excerpt import (
     representative_product_name,
 )
 from ..product_categories import resolve_category
-from .identity import (group_products, normalize_product)
+from .identity import (_AUTHOR_SHILL_FLAG_KEY, group_products, normalize_product)
 
 
 def _weighted_mean(pairs: list[tuple[float, float]]) -> float:
@@ -223,6 +223,9 @@ def _author_shill_flagged(post: Post) -> bool:
     person's suspicion should not discount someone's review. The ratio floor keeps
     a couple of shouts inside a very long thread from reading as a verdict.
     """
+    preserved = post.raw.get(_AUTHOR_SHILL_FLAG_KEY)
+    if post.sibling_products and isinstance(preserved, bool):
+        return preserved
     comments = [comment for comment in post.comments if comment.text.strip()]
     if len(comments) < int(SHILL_DETECTION["min_comments"]):
         return False
@@ -248,9 +251,9 @@ def _shill_stats(posts: list[Post]) -> tuple[float, bool]:
             total += 1
             if _is_shill_comment(comment.text):
                 shill_count += 1
-    if total < int(SHILL_DETECTION["min_comments"]):
-        return 0.0, False
     flag = any(_author_shill_flagged(post) for post in posts)
+    if total < int(SHILL_DETECTION["min_comments"]):
+        return 0.0, flag
     return round(shill_count / total, 4), flag
 
 

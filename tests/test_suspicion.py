@@ -16,6 +16,7 @@ from cvs_radar.scoring import (
     _is_shill_comment,
     _shill_stats,
     build_comment_opinions,
+    preprocess_posts,
     score_product,
 )
 
@@ -277,6 +278,52 @@ class ShillDetectionTest(unittest.TestCase):
         self.assertAlmostEqual(weights["promo"], control["promo"] * penalty, places=4)
         for commenter in ("a", "b", "c", "d"):
             self.assertAlmostEqual(weights[commenter], control[commenter], places=4)
+
+    def test_multi_product_shill_accusation_discounts_author_on_every_split(self) -> None:
+        """Post-level accusations must survive product-specific comment routing."""
+        start = datetime(2026, 6, 10, 14, 0)
+
+        def split_posts(accusation: str) -> list[Post]:
+            return preprocess_posts([
+                Post(
+                    id="multi-product-shill",
+                    brand="全家",
+                    product_name="草莓大福/巧克力泡芙 各49元",
+                    author="promo",
+                    author_score=80,
+                    posted_at=start,
+                    comments=[
+                        Comment("推", "fan-a", "草莓大福很好吃", start),
+                        Comment("推", "fan-b", "巧克力泡芙很好吃", start),
+                        Comment("噓", "accuser-a", accusation, start),
+                        Comment("噓", "accuser-b", accusation, start),
+                        Comment("噓", "accuser-c", accusation, start),
+                    ],
+                )
+            ])
+
+        accused = split_posts("業配文吧")
+        control = split_posts("先觀望")
+        self.assertEqual(len(accused), 2)
+        self.assertEqual([len(post.comments) for post in accused], [1, 1])
+
+        accused_reports, _ = run_pipeline(accused, now=start)
+        control_reports, _ = run_pipeline(control, now=start)
+        penalty = float(SHILL_DETECTION["post_weight_penalty"])
+        for report in accused_reports:
+            matching_control = next(
+                item for item in control_reports
+                if item.product_name == report.product_name
+            )
+            author_weight = next(
+                item.weight for item in report.contributors if item.user == "promo"
+            )
+            control_weight = next(
+                item.weight for item in matching_control.contributors
+                if item.user == "promo"
+            )
+            self.assertTrue(report.shill_flag)
+            self.assertAlmostEqual(author_weight, control_weight * penalty, places=4)
 
     def test_one_accuser_does_not_discount_the_author(self) -> None:
         """業配 is cheap to shout, so a lone accusation is not a verdict.
