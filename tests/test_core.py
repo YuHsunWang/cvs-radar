@@ -1374,6 +1374,24 @@ class ExtractionRegressionTest(unittest.TestCase):
             with self.subTest(raw_name=raw_name):
                 self.assertEqual(extract_products_and_prices_by_rules(raw_name, brand), [expected])
 
+    def test_stamp_count_is_not_a_price(self) -> None:
+        # 集點活動的「集20章免費換」寫的是章數，不是價格；商品本身沒有標價，
+        # price 必須留空而不是 20。金額仍要照抽。
+        self.assertEqual(
+            extract_products_and_prices_by_rules(
+                "：嚕嚕米夥伴3入組咖啡磚\n集20章免費換", "全家"
+            ),
+            [("嚕嚕米夥伴3入組咖啡磚", None)],
+        )
+        # 但真正的金額還是要抽得到：同一欄位裡的「原價$99」不能被集點守則波及
+        # （這一列後半的「贈20點」另有既有的拆項行為，這裡只鎖第一項）。
+        self.assertEqual(
+            extract_products_and_prices_by_rules(
+                "：GODIVA醇濃熱巧克力 原價$99 指定期間再贈20點OPNEPOINT點數", "7-11"
+            )[0],
+            ("GODIVA醇濃熱巧克力", 99),
+        )
+
     def test_combo_bundle_keeps_only_first_product(self) -> None:
         # "A3入+B3入/75元" 是併購組合，第二項是比較對象；報告只以第一個商品為
         # key，而非把兩個品名黏成「翻轉布丁統一布丁」。
