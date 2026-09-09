@@ -24,6 +24,9 @@ from ..product_labels import (
 from ._common import (unwrap_name_brackets, _NAME_SEPARATOR_RE, _PURCHASE_CONDITION_RE, _GIVEAWAY_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _STAMP_COUNT_UNIT_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
 
 
+_AUTHOR_SHILL_FLAG_KEY = "_author_shill_flagged"
+
+
 def _extract_space_separated_parallel_products(
     text: str, brand: str = ""
 ) -> list[tuple[str, int | None]] | None:
@@ -815,10 +818,16 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
                     expanded_items.append((name, price))
             valid_items = expanded_items
         if len(valid_items) > 1:
+            # Shill accusations target the post's author, not one routed product.
+            # Preserve that thread-level verdict before hit-0 comments are dropped.
+            from .compute import _author_shill_flagged
+
+            author_shill_flagged = _author_shill_flagged(post)
             routed_comments = _route_comments_by_product(
                 post.comments, [name for name, _ in valid_items]
             )
         else:
+            author_shill_flagged = None
             routed_comments = [post.comments for _ in valid_items]
         for (name, price), comments in zip(valid_items, routed_comments):
             new_post = Post(
@@ -837,7 +846,11 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
                 is_reply=post.is_reply,
                 push_count=post.push_count,
                 comments=comments,
-                raw=post.raw,
+                raw=(
+                    {**post.raw, _AUTHOR_SHILL_FLAG_KEY: author_shill_flagged}
+                    if author_shill_flagged is not None
+                    else post.raw
+                ),
                 sibling_products=tuple(other for other, _ in valid_items if other != name),
                 source_product_name=post.source_product_name or post.product_name,
             )
