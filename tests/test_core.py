@@ -551,6 +551,57 @@ class ScoringTest(unittest.TestCase):
             comment_fingerprint_v2(post, routed[1][0]),
         )
 
+    def test_cross_store_same_name_splits_keep_unique_ids_and_route_by_brand(self) -> None:
+        # A comparison can review the same product name at two stores. Those are
+        # distinct public products: collapsing both under the post's inferred brand
+        # creates duplicate generated IDs and makes every routing signature empty,
+        # silently removing the evidence behind the published scores.
+        post = Post(
+            id="cross-store-lemon-tart",
+            brand="全家",
+            title="[商品] 711 與全家法式檸檬塔比較",
+            product_name="711法式檸檬塔49元、全家法式檸檬塔42元",
+            comments=[
+                Comment("推", "seven-fan", "711的塔皮比較酥"),
+                Comment("推", "family-fan", "全家的檸檬味比較明顯"),
+            ],
+        )
+
+        with patch(
+            "cvs_radar.scoring.identity._cached_product_name_labels",
+            return_value={},
+        ):
+            processed = preprocess_posts([post])
+
+        self.assertEqual(
+            [(item.brand, item.product_name, item.price) for item in processed],
+            [("7-11", "法式檸檬塔", "49"), ("全家", "法式檸檬塔", "42")],
+        )
+        self.assertEqual(len({item.id for item in processed}), len(processed))
+        self.assertEqual(
+            [[comment.user for comment in item.comments] for item in processed],
+            [["seven-fan"], ["family-fan"]],
+        )
+
+    def test_exact_split_identity_is_deduplicated_before_scoring(self) -> None:
+        # One source row must never become two copies of the same public product;
+        # that inflates nPosts even when the generated ID collision is otherwise hidden.
+        post = Post(
+            id="duplicate-extraction",
+            brand="7-11",
+            product_name="711草莓大福49元、711草莓大福49元",
+        )
+        with patch(
+            "cvs_radar.scoring.identity._cached_product_name_labels",
+            return_value={},
+        ):
+            processed = preprocess_posts([post])
+
+        self.assertEqual(
+            [(item.brand, item.product_name) for item in processed],
+            [("7-11", "草莓大福")],
+        )
+
     def test_shared_comment_never_takes_a_text_keyed_score(self) -> None:
         # Legacy text labels and reviewed corrections are keyed on the comment
         # alone. Letting either answer for a comment that evaluates two products
