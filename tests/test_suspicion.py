@@ -5,7 +5,7 @@ from statistics import mean
 import unittest
 from unittest.mock import patch
 
-from cvs_radar.models import Comment, Post
+from cvs_radar.models import Comment, CommentOpinion, Post
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.preference import _burst_ratio, _template_like_ratio, build_profiles
 from cvs_radar.reporting import render_suspicion_detail
@@ -22,6 +22,40 @@ from cvs_radar.scoring import (
 
 
 class SuspicionSignalTest(unittest.TestCase):
+    def test_published_score_credibility_is_invariant_to_preprocessed_post_order(self) -> None:
+        # Routed copies are one source comment and therefore one account action.
+        # Its profile signal is the mean of the product-specific sentiments; which
+        # product row happens to come first must never change published scores.
+        shared = "左邊不好吃，右邊還可以"
+        shared_url = "https://example.test/shared-comparison"
+        left = Post(id="shared-left", url=shared_url, brand="全家", product_name="左邊")
+        right = Post(id="shared-right", url=shared_url, brand="全家", product_name="右邊")
+        left.comments = [Comment("推", "order-test-user", shared, attributed_product="左邊")]
+        right.comments = [Comment("推", "order-test-user", shared, attributed_product="右邊")]
+        posts = [left, right]
+        opinions = {
+            ("shared-left", 0): CommentOpinion(True, -1.0),
+            ("shared-right", 0): CommentOpinion(True, 0.2),
+        }
+        for index in range(4):
+            post = Post(id=f"ordinary-{index}", brand="全家", product_name=f"一般{index}")
+            post.comments = [Comment("推", "order-test-user", f"不同內容{index}")]
+            posts.append(post)
+            opinions[(post.id, 0)] = CommentOpinion(True, 1.0)
+
+        forward = build_profiles(posts, opinions)
+        reversed_order = build_profiles(list(reversed(posts)), opinions)
+
+        self.assertEqual(
+            {user: profile.credibility for user, profile in forward.items()},
+            {user: profile.credibility for user, profile in reversed_order.items()},
+        )
+        self.assertEqual(forward["order-test-user"].total_comments, 5)
+        self.assertAlmostEqual(
+            forward["order-test-user"].brand_stats["全家"].avg_sentiment,
+            0.72,
+        )
+
     def test_burst_ratio_detects_same_brand_window(self) -> None:
         start = datetime(2026, 6, 1, 10, 0)
         timestamps = [start + timedelta(minutes=20 * index) for index in range(5)]
