@@ -139,6 +139,8 @@ dry run that commits only in the worktree.
 - **Last success:** the cron wrapper writes `LAST_SUCCESS_FILE`
   (default `~/.claude/logs/cvs-rebackfill.last-success`); the wrapper also runs
   the freshness check after every successful run.
+  It checks `$WT/web/public/data.json`, the copy this run just built and pushed,
+  not the checkout's own `web/public/data.json`, which only changes on a pull.
 - **Existing local alerts** (WSL cron, outside the repo): `cvs-ci-healthcheck.py`
   and `cvs-rebackfill-healthcheck.py` post to Discord on prolonged failure.
 

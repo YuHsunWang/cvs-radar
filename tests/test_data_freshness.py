@@ -8,10 +8,17 @@ silently treated as fresh.
 from __future__ import annotations
 
 import json
+import os
+import shutil
+import subprocess
+import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from scripts.check_data_freshness import DEFAULT_MAX_AGE_DAYS, data_age_days, main
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _iso(days_ago: float) -> str:
@@ -65,6 +72,51 @@ class FreshnessCliTest(unittest.TestCase):
 
     def test_missing_file_is_unknown(self) -> None:
         self.assertEqual(main(["--data", "/nonexistent/data.json"]), 2)
+
+
+class CronFreshnessGateTest(unittest.TestCase):
+    """The cron wrapper must judge the data the run just built in the worktree
+    ($WT), not the checkout's own web/public/data.json. That copy only moves when
+    someone pulls, so reading it failed healthy runs once it aged past the SLO and
+    would pass a dead pipeline whenever someone had pulled recently."""
+
+    def _run_wrapper(self, checkout_age_days: float, worktree_age_days: float) -> tuple[int, bool]:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            repo, wt = base / "repo", base / "wt"
+            ops = repo / "scripts" / "ops"
+            ops.mkdir(parents=True)
+            shutil.copy(ROOT / "scripts" / "ops" / "rebackfill-cron.sh", ops)
+            shutil.copy(ROOT / "scripts" / "check_data_freshness.py", repo / "scripts")
+            (ops / "rebackfill.sh").write_text("exit 0\n", encoding="utf-8")  # pipeline succeeded
+            for where, age in ((repo, checkout_age_days), (wt, worktree_age_days)):
+                data = where / "web" / "public" / "data.json"
+                data.parent.mkdir(parents=True)
+                data.write_text(json.dumps({"generatedAt": _iso(age), "products": []}), encoding="utf-8")
+            last_success = base / "last-success"
+            env = {
+                **os.environ,
+                "CVS_CRON_PATH": os.environ.get("PATH", ""),
+                "WT": str(wt),
+                "LAST_SUCCESS_FILE": str(last_success),
+                "PUSH": "0",
+                "CVS_FRESHNESS_WEBHOOK": "",
+            }
+            env.pop("CVS_DATA_STALE_DAYS", None)
+            proc = subprocess.run(
+                ["bash", str(ops / "rebackfill-cron.sh")], env=env, capture_output=True, text=True, timeout=60
+            )
+            return proc.returncode, last_success.exists()
+
+    def test_fresh_run_passes_even_if_checkout_copy_is_stale(self) -> None:
+        rc, marked = self._run_wrapper(checkout_age_days=DEFAULT_MAX_AGE_DAYS + 5, worktree_age_days=0.1)
+        self.assertEqual(rc, 0)
+        self.assertTrue(marked)
+
+    def test_stale_run_fails_even_if_checkout_copy_is_fresh(self) -> None:
+        rc, marked = self._run_wrapper(checkout_age_days=0.1, worktree_age_days=DEFAULT_MAX_AGE_DAYS + 5)
+        self.assertEqual(rc, 1)
+        self.assertFalse(marked)
 
 
 if __name__ == "__main__":
