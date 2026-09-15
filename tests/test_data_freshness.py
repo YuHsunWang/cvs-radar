@@ -74,30 +74,59 @@ class FreshnessCliTest(unittest.TestCase):
         self.assertEqual(main(["--data", "/nonexistent/data.json"]), 2)
 
 
-class CronFreshnessGateTest(unittest.TestCase):
-    """The cron wrapper must judge the data the run just built in the worktree
-    ($WT), not the checkout's own web/public/data.json. That copy only moves when
-    someone pulls, so reading it failed healthy runs once it aged past the SLO and
-    would pass a dead pipeline whenever someone had pulled recently."""
+# Keep the user's global/system git config (signing, hooks, url rewrites) out of
+# the throwaway repos these tests build.
+_HERMETIC_GIT = {"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"}
 
-    def _run_wrapper(self, checkout_age_days: float, worktree_age_days: float) -> tuple[int, bool]:
+
+def _git(cwd: Path, *args: str) -> None:
+    subprocess.run(
+        ["git", "-c", "user.name=test", "-c", "user.email=test@example.com", *args],
+        cwd=cwd, check=True, capture_output=True, env={**os.environ, **_HERMETIC_GIT},
+    )
+
+
+def _write_data(root: Path, age_days: float) -> None:
+    data = root / "web" / "public" / "data.json"
+    data.parent.mkdir(parents=True, exist_ok=True)
+    data.write_text(json.dumps({"generatedAt": _iso(age_days), "products": []}), encoding="utf-8")
+
+
+class CronFreshnessGateTest(unittest.TestCase):
+    """The cron wrapper must judge the data.json on origin, which is what the site
+    is built from, not either local copy. The checkout's copy only moves when
+    someone pulls. The worktree's copy is rebuilt by every run that reaches the
+    check, so it is always fresh, including on a run whose push was rejected."""
+
+    def _run_wrapper(
+        self, *, published_age_days: float | None, local_age_days: float, checkout_age_days: float
+    ) -> tuple[int, bool]:
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
-            repo, wt = base / "repo", base / "wt"
+            repo, wt, origin = base / "repo", base / "wt", base / "origin.git"
             ops = repo / "scripts" / "ops"
             ops.mkdir(parents=True)
             shutil.copy(ROOT / "scripts" / "ops" / "rebackfill-cron.sh", ops)
             shutil.copy(ROOT / "scripts" / "check_data_freshness.py", repo / "scripts")
             (ops / "rebackfill.sh").write_text("exit 0\n", encoding="utf-8")  # pipeline succeeded
-            for where, age in ((repo, checkout_age_days), (wt, worktree_age_days)):
-                data = where / "web" / "public" / "data.json"
-                data.parent.mkdir(parents=True)
-                data.write_text(json.dumps({"generatedAt": _iso(age), "products": []}), encoding="utf-8")
+            _write_data(repo, checkout_age_days)
+            wt.mkdir()
+            _git(wt, "init", "-q", "-b", "main")
+            if published_age_days is not None:  # None: no origin to read from
+                _git(base, "init", "-q", "--bare", "-b", "main", str(origin))
+                _write_data(wt, published_age_days)
+                _git(wt, "add", "web/public/data.json")
+                _git(wt, "commit", "-q", "-m", "published snapshot")
+                _git(wt, "remote", "add", "origin", str(origin))
+                _git(wt, "push", "-q", "origin", "main")
+            _write_data(wt, local_age_days)  # this run's own build, never pushed
             last_success = base / "last-success"
             env = {
                 **os.environ,
+                **_HERMETIC_GIT,
                 "CVS_CRON_PATH": os.environ.get("PATH", ""),
                 "WT": str(wt),
+                "BRANCH": "main",
                 "LAST_SUCCESS_FILE": str(last_success),
                 "PUSH": "0",
                 "CVS_FRESHNESS_WEBHOOK": "",
@@ -108,14 +137,26 @@ class CronFreshnessGateTest(unittest.TestCase):
             )
             return proc.returncode, last_success.exists()
 
-    def test_fresh_run_passes_even_if_checkout_copy_is_stale(self) -> None:
-        rc, marked = self._run_wrapper(checkout_age_days=DEFAULT_MAX_AGE_DAYS + 5, worktree_age_days=0.1)
+    def test_run_whose_push_never_landed_fails(self) -> None:
+        # Both local copies are minutes old; origin still has the old snapshot.
+        rc, marked = self._run_wrapper(
+            published_age_days=DEFAULT_MAX_AGE_DAYS + 5, local_age_days=0.1, checkout_age_days=0.1
+        )
+        self.assertEqual(rc, 1)
+        self.assertFalse(marked)
+
+    def test_fresh_published_data_passes_even_if_local_copies_are_stale(self) -> None:
+        rc, marked = self._run_wrapper(
+            published_age_days=0.1,
+            local_age_days=DEFAULT_MAX_AGE_DAYS + 5,
+            checkout_age_days=DEFAULT_MAX_AGE_DAYS + 5,
+        )
         self.assertEqual(rc, 0)
         self.assertTrue(marked)
 
-    def test_stale_run_fails_even_if_checkout_copy_is_fresh(self) -> None:
-        rc, marked = self._run_wrapper(checkout_age_days=0.1, worktree_age_days=DEFAULT_MAX_AGE_DAYS + 5)
-        self.assertEqual(rc, 1)
+    def test_unreadable_origin_is_unknown_not_success(self) -> None:
+        rc, marked = self._run_wrapper(published_age_days=None, local_age_days=0.1, checkout_age_days=0.1)
+        self.assertEqual(rc, 2)
         self.assertFalse(marked)
 
 

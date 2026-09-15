@@ -7,7 +7,9 @@ from types import SimpleNamespace
 
 import web.build_data as build_data
 from web.build_data import (
+    ALLOW_PRODUCT_DROP_ENV,
     apply_product_override,
+    assert_no_product_collapse,
     assert_unique_product_ids,
     calibrate_recommendation_score,
     calibrate_recommendation_scores,
@@ -86,11 +88,58 @@ def test_stale_source_snapshot_prints_build_warning(
     source.write_text(json.dumps({"generated_at": "2026-07-01 12:00:00"}), encoding="utf-8")
     site_built_at = datetime(2026, 7, 23, 4, 0, tzinfo=timezone.utc)
 
-    resolve_data_timestamps(source, site_built_at)
+    resolve_data_timestamps(source, site_built_at, now=site_built_at)
 
     warning = capsys.readouterr().out
     assert "WARNING: source data is stale" in warning
     assert "threshold: 14 days" in warning
+
+
+def test_stale_warning_ignores_the_carried_over_site_build_time(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # siteBuiltAt is carried over from the committed artifact, so it can be older than
+    # the data itself (live since 2026-08-25). Old data must still warn.
+    source = tmp_path / "results.json"
+    source.write_text(json.dumps({"generated_at": "2026-08-01 12:00:00"}), encoding="utf-8")
+
+    resolve_data_timestamps(
+        source,
+        site_built_at=datetime(2026, 7, 1, tzinfo=timezone.utc),
+        now=datetime(2026, 9, 1, tzinfo=timezone.utc),
+    )
+
+    assert "WARNING: source data is stale" in capsys.readouterr().out
+
+
+def test_product_count_gate_passes_daily_drift_and_stops_a_collapse(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv(ALLOW_PRODUCT_DROP_ENV, raising=False)
+    assert_no_product_collapse(2356, 2347)  # 2026-09-09, the largest real daily dip
+    assert_no_product_collapse(None, 0)  # first build: nothing to compare against
+    with pytest.raises(ValueError, match="refusing to publish"):
+        assert_no_product_collapse(2342, 812)  # 2026-08-26, which shipped
+    monkeypatch.setenv(ALLOW_PRODUCT_DROP_ENV, "1")
+    assert_no_product_collapse(2342, 812)  # an intended cut can still go out
+
+
+def test_collapsed_rebuild_leaves_the_published_snapshot_untouched(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "results.json"
+    output = tmp_path / "data.json"
+    source.write_text(json.dumps({"generated_at": "2026-09-15 08:30:00"}), encoding="utf-8")
+    published = {"generatedAt": "2026-09-14T08:30:00+08:00", "siteBuiltAt": "2026-08-25T00:00:00+00:00",
+                 "products": [{"id": f"p{i}"} for i in range(10)]}
+    output.write_text(json.dumps(published), encoding="utf-8")
+    monkeypatch.setattr(build_data, "ROOT", tmp_path)
+    monkeypatch.setattr(build_data, "load_results", lambda _source: ([], []))
+    monkeypatch.setattr(build_data, "load_product_overrides", lambda: {})
+    monkeypatch.delenv(ALLOW_PRODUCT_DROP_ENV, raising=False)
+
+    with pytest.raises(ValueError, match="from 10 to 0"):
+        build_data.main(source=source, output=output)
+
+    assert json.loads(output.read_text(encoding="utf-8")) == published
 
 
 def test_recommendation_score_calibration_is_monotonic_and_reaches_nineties() -> None:

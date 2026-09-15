@@ -136,6 +136,7 @@
   letter-spacing: 0.02em;
 }
 .sl-ab-sep { opacity: 0.5; }
+.sl-ab-stale { color: var(--sl-mid); font-weight: 700; }
 
 /* ---- controls ---- */
 .sl-controls { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
