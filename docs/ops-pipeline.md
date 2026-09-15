@@ -112,7 +112,8 @@ the same comments differently, which silently splits the cache into two conventi
 
 `REPO` `BRANCH` `WT` `STORE_SEED` `PAGES` `REFRESH_DAYS` `CHUNK` `CONC`
 `DO_COMMIT` `PUSH` `RUNNER` (rebackfill.sh); `CVS_CRON_PATH` `LAST_SUCCESS_FILE`
-`CVS_DATA_STALE_DAYS` `CVS_FRESHNESS_WEBHOOK` (cron wrapper / freshness check).
+`CVS_DATA_STALE_DAYS` `CVS_FRESHNESS_WEBHOOK` (cron wrapper / freshness check);
+`CVS_ALLOW_PRODUCT_DROP` (`web/build_data.py`, see below).
 Defaults target the author's WSL setup; override them on any other host.
 
 ## Scheduling
@@ -139,8 +140,19 @@ dry run that commits only in the worktree.
 - **Last success:** the cron wrapper writes `LAST_SUCCESS_FILE`
   (default `~/.claude/logs/cvs-rebackfill.last-success`); the wrapper also runs
   the freshness check after every successful run.
-  It checks `$WT/web/public/data.json`, the copy this run just built and pushed,
-  not the checkout's own `web/public/data.json`, which only changes on a pull.
+  It fetches and checks the `web/public/data.json` on `origin/$BRANCH`, which is
+  what the site is built from. Neither local copy can stand in for it: the
+  checkout's only changes on a pull, and `$WT`'s is rebuilt by every run, so it
+  looks fresh even when the push never landed.
+- **A rejected push fails the run.** `rebackfill.sh` exits non-zero, so no
+  last-success marker is written. The next run parks the unpushed commit on a
+  `rebackfill-unpushed-*` branch before its `reset --hard`, so the labels it paid
+  for can be recovered.
+- **Volume gate:** `web/build_data.py` refuses to publish a snapshot with more than
+  20% fewer products than the one it replaces (2026-08-26 shipped 2,342 → 812).
+  For an intended cut, set `CVS_ALLOW_PRODUCT_DROP=1`. The manual `refresh-data.yml`
+  fallback hits this gate when its seed is missing, instead of publishing a
+  few-hundred-product site.
 - **Existing local alerts** (WSL cron, outside the repo): `cvs-ci-healthcheck.py`
   and `cvs-rebackfill-healthcheck.py` post to Discord on prolonged failure.
 

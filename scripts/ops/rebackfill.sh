@@ -54,6 +54,13 @@ if git worktree list --porcelain | grep -q "worktree $WT"; then
   on_branch="$(git -C "$WT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
   [ "$on_branch" = "$BRANCH" ] || die \
     "worktree $WT is on '$on_branch', not '$BRANCH' (another worktree probably holds that branch)"
+  # A run whose push was rejected leaves its commit here, and the reset below would
+  # destroy it together with every label that run paid for. Park it on a branch first
+  # so the labels can still be recovered by hand.
+  if ! git -C "$WT" merge-base --is-ancestor HEAD "origin/$BRANCH" 2>/dev/null; then
+    keep="rebackfill-unpushed-$(date -u +%Y%m%dT%H%M%SZ)"
+    git -C "$WT" branch "$keep" HEAD && log "kept an unpushed commit as branch $keep"
+  fi
   git -C "$WT" reset -q --hard "origin/$BRANCH"
 else
   rm -rf "$WT"
@@ -346,8 +353,15 @@ if [ "$DO_COMMIT" = "1" ]; then
   else
     git commit -q -m "chore: refresh live data + LLM labels (sentiment cache ${before}→${after})
 
-Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
-    [ "$PUSH" = "1" ] && { git push -q origin "$BRANCH" && log "pushed to origin/$BRANCH"; }
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>" || die "git commit"
+    # This script runs without `set -e`, so a rejected push (main moved while the run
+    # was labelling) used to fall through to DONE, exit 0, and let the cron mark the
+    # day a success while the site stayed stale. It has to fail the run.
+    if [ "$PUSH" = "1" ]; then
+      git push -q origin "$BRANCH" \
+        || die "git push to origin/$BRANCH (the commit stays in $WT; the next run parks it on a branch)"
+      log "pushed to origin/$BRANCH"
+    fi
   fi
 fi
 

@@ -13,6 +13,7 @@ import {
 import {
   AdvancedFilters,
   CategoryKey,
+  DATA_STALE_DAYS,
   DataPayload,
   Product,
   SortKey,
@@ -25,6 +26,7 @@ import {
   filterHasScore,
   filterBySearch,
   formatDisplayDate,
+  isDataStale,
   sortProducts,
 } from '@/lib/data'
 
@@ -99,6 +101,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const draggingRef = useRef(false)
   // Client-only store clock (24h konbini). Starts blank so SSR/CSR markup matches.
   const [clock, setClock] = useState<{ time: string; day: string }>({ time: '--:--:--', day: '' })
+  // Client-only as well. The page is a static export rebuilt right after each data
+  // refresh, so at build time the data is always fresh; only the visitor's clock can
+  // tell that refreshes have stopped.
+  const [dataStale, setDataStale] = useState(false)
 
   function openSheet(section = 'category') {
     setSheetSection(section)
@@ -170,6 +176,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     const id = window.setInterval(tick, 1000)
     return () => window.clearInterval(id)
   }, [])
+
+  useEffect(() => {
+    setDataStale(isDataStale(initialPayload.generatedAt))
+  }, [initialPayload.generatedAt])
 
   // Lock body scroll and wire Escape-to-close while the filter sheet is open.
   useEffect(() => {
@@ -414,6 +424,11 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <span className="sl-ab-slot">本區 {products.length} 品</span>
         <span className="sl-ab-sep">·</span>
         <span>資料更新 {formatDisplayDate(initialPayload.generatedAt)}</span>
+        {dataStale ? (
+          <span className="sl-ab-stale" role="status">
+            已超過 {DATA_STALE_DAYS} 天未更新
+          </span>
+        ) : null}
         <span className="sl-ab-sep">·</span>
         <span>分數＝綜合評分／滿分 100</span>
       </div>

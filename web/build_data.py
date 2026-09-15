@@ -30,11 +30,16 @@ PRODUCT_OVERRIDES_PATH = ROOT / "data" / "labels" / "product_overrides.csv"
 CLEAR_VALUE = "__CLEAR__"
 REPRESENTATIVE_LIMIT = 3
 DATA_STALE_DAYS = 14
+# Largest share of products one rebuild may lose before publishing is refused.
+MAX_PRODUCT_DROP = 0.2
+ALLOW_PRODUCT_DROP_ENV = "CVS_ALLOW_PRODUCT_DROP"
 TAIPEI_TIMEZONE = ZoneInfo("Asia/Taipei")
 URL_PATTERN = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
 
 
-def resolve_data_timestamps(source: Path, site_built_at: datetime) -> tuple[str, str]:
+def resolve_data_timestamps(
+    source: Path, site_built_at: datetime, now: datetime | None = None
+) -> tuple[str, str]:
     source_payload = json.loads(source.read_text(encoding="utf-8"))
     source_generated_at = source_payload.get("generated_at")
     if not source_generated_at:
@@ -44,7 +49,10 @@ def resolve_data_timestamps(source: Path, site_built_at: datetime) -> tuple[str,
     data_generated_at = datetime.strptime(
         source_generated_at, "%Y-%m-%d %H:%M:%S"
     ).replace(tzinfo=TAIPEI_TIMEZONE)
-    data_age = site_built_at - data_generated_at.astimezone(timezone.utc)
+    # Measure against the clock, not site_built_at: that value is carried over from
+    # the committed artifact so rebuilds stay reproducible, and once it is older than
+    # the data (it froze on 2026-08-25) the age came out negative and never warned.
+    data_age = (now or datetime.now(timezone.utc)) - data_generated_at.astimezone(timezone.utc)
     if data_age > timedelta(days=DATA_STALE_DAYS):
         print(
             "WARNING: source data is stale: "
@@ -66,6 +74,31 @@ def existing_site_built_at(output: Path) -> datetime | None:
     except (OSError, TypeError, ValueError, json.JSONDecodeError):
         return None
     return timestamp if timestamp.tzinfo is not None else None
+
+
+def existing_product_count(output: Path) -> int | None:
+    """Product count of the snapshot about to be replaced, or None if there is none."""
+    try:
+        products = json.loads(output.read_text(encoding="utf-8")).get("products")
+    except (OSError, ValueError, AttributeError):
+        return None
+    return len(products) if isinstance(products, list) else None
+
+
+def assert_no_product_collapse(previous: int | None, current: int) -> None:
+    """Refuse to replace a snapshot with one that lost a large share of its products.
+
+    Day to day the count moves by a handful. On 2026-08-26 it went 2,342 -> 812 and
+    shipped, because nothing on the publish path looked at volume. A drop that size
+    means a truncated store or a broken parser, not a change on PTT.
+    """
+    if not previous or os.environ.get(ALLOW_PRODUCT_DROP_ENV) == "1":
+        return
+    if current < previous * (1 - MAX_PRODUCT_DROP):
+        raise ValueError(
+            f"refusing to publish: product count fell from {previous} to {current} "
+            f"(more than {MAX_PRODUCT_DROP:.0%}); set {ALLOW_PRODUCT_DROP_ENV}=1 if intended"
+        )
 
 
 def load_product_overrides(path: Path = PRODUCT_OVERRIDES_PATH) -> dict[str, dict[str, Any]]:
@@ -484,6 +517,7 @@ def main(
             products.append(corrected)
     products = merge_products(products)
     assert_unique_product_ids(products)
+    assert_no_product_collapse(existing_product_count(output), len(products))
     generated_at, site_built_at_iso = resolve_data_timestamps(source, site_built_at)
     payload = {
         "generatedAt": generated_at,
