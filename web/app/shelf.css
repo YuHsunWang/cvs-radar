@@ -316,7 +316,6 @@
 }
 .sl-review-date { margin: 6px 0 0; font-size: 11px; color: var(--sl-soft); }
 .sl-mobile-na { display: none; }
-.sl-detail-name { margin: 0 0 8px; font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
 .sl-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
 .sl-tag {
   font-family: var(--sl-mono);
@@ -634,74 +633,120 @@
   .sl-sheet { animation: none; transition: none; }
 }
 
-/* ---- compact detail: same docket, boxes removed --------------------------
-   The content is tiny — evidence items are at most 19 characters and the median
-   summary is 17 — so the height was going into containers, not text. Each item
-   drops its own border and padding and is carried by a coloured polarity glyph
-   instead, which also lets the two polarities share one heading. */
+/* ---- expanded panel: three blocks, each carrying its own count -----------
+   The panel answers three questions in the order a shopper asks them — what did
+   people say, what is good, what goes wrong — so each one gets its own block and
+   its own count instead of one merged list the reader has to tally by icon.
+   Content is tiny (evidence items are at most 19 characters, the median summary
+   17), so blocks stay thin: a hairline, a polarity rail and 8px of air. The two
+   polarity blocks sit side by side from 560px and stack below that, which is
+   what keeps this expander from pushing the next product off a 360×800 screen.
+   Colour is never the only carrier — every block keeps its icon and heading. */
 
 /* A perforation, not a cut: the boundary still reads, but as a tear line on
    one ticket rather than the edge of a second object. */
 .sl-k {
   border-top: 1px dashed var(--sl-hair);
   background: #fbfaf6;
-  padding: 9px 12px 11px;
+  padding: 10px 12px 12px;
+  display: grid;
+  gap: 8px;
 }
 
-.sl-k-head {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-family: var(--sl-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--sl-soft);
+.sl-kb {
+  border: 1px solid var(--sl-hair);
+  border-left: 3px solid var(--sl-hair);
+  border-radius: 4px;
+  background: var(--sl-tag);
+  padding: 7px 10px 9px;
+  min-width: 0;
 }
-.sl-k-head::after { content: ""; flex: 1; border-top: 1px dashed var(--sl-hair); }
-.sl-k-head b {
+.sl-kb-say { border-left-color: var(--sl-ink); }
+.sl-kb-up { border-left-color: var(--sl-good); background: #f4f9f5; }
+.sl-kb-dn { border-left-color: var(--sl-hot); background: #fdf5f3; }
+
+.sl-kb-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+.sl-kb-head b {
   font-family: var(--sl-cjk);
   font-size: 12.5px;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: var(--sl-ink);
 }
-.sl-k-head i {
+/* the glyph rides with the colour, so the polarity survives greyscale */
+.sl-kb-head .sl-kb-icon { display: inline-flex; align-items: center; }
+.sl-kb-up .sl-kb-icon { color: var(--sl-good); }
+.sl-kb-dn .sl-kb-icon { color: var(--sl-hot); }
+.sl-kb-head i {
   font-style: normal;
   font-family: var(--sl-mono);
   font-size: 10.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--sl-soft);
+  border: 1px solid var(--sl-hair);
+  border-radius: 2px;
+  padding: 0 4px;
+  background: rgba(255, 255, 255, 0.7);
 }
 
-.sl-k-list { display: grid; gap: 1px; margin: 5px 0 0; padding: 0; list-style: none; }
-.sl-k-row {
-  display: grid;
-  grid-template-columns: 13px minmax(0, 1fr);
-  gap: 7px;
-  align-items: baseline;
+/* Reviewer rewrites: numbered only when there are several people to tell apart. */
+.sl-say-list { display: grid; gap: 3px; margin: 5px 0 0; padding: 0; list-style: none; }
+.sl-say-row { display: flex; gap: 6px; align-items: baseline; }
+.sl-say-row > span {
+  flex: none;
+  font-family: var(--sl-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--sl-soft);
+  font-variant-numeric: tabular-nums;
+}
+.sl-say-row p {
+  margin: 0;
   font-size: 13px;
   font-weight: 600;
-  line-height: 1.54;
+  line-height: 1.6;
   color: var(--sl-ink);
-  padding: 2px 0;
   overflow-wrap: anywhere;
 }
-/* the glyph is the only thing carrying polarity, so it must not be decorative */
-.sl-k-row b {
-  font-family: var(--sl-mono);
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.3;
-  text-align: center;
-}
-.sl-k-up b { color: var(--sl-good); }
-.sl-k-dn b { color: var(--sl-hot); }
-/* a hairline only where the polarity actually turns over */
-.sl-k-dn:first-of-type { margin-top: 4px; padding-top: 5px; border-top: 1px dotted var(--sl-hair); }
 
+.sl-k-split { display: grid; grid-template-columns: 1fr; gap: 8px; }
+@media (min-width: 560px) {
+  .sl-k-split { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+
+.sl-kb-list { display: grid; gap: 2px; margin: 5px 0 0; padding: 0; list-style: none; }
+.sl-kb-list li {
+  position: relative;
+  padding-left: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--sl-ink);
+  overflow-wrap: anywhere;
+}
+.sl-kb-list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.66em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--sl-hair);
+}
+.sl-kb-up .sl-kb-list li::before { background: var(--sl-good); }
+.sl-kb-dn .sl-kb-list li::before { background: var(--sl-hot); }
+
+/* An empty polarity keeps its block: "nobody complained" and "we found three
+   complaints" are different facts, and a missing block reads as the first. */
+.sl-kb-none,
 .sl-k-none {
   margin: 4px 0 0;
   font-family: var(--sl-mono);
@@ -709,10 +754,14 @@
   font-weight: 600;
   color: var(--sl-na);
 }
+.sl-k-none-wide {
+  margin: 0;
+  border: 1px dashed var(--sl-hair);
+  border-radius: 4px;
+  padding: 8px 10px;
+  background: var(--sl-tag);
+}
 
-.sl-k-sec { margin-top: 9px; }
-.sl-k-sum { margin: 4px 0 0; font-size: 13px; font-weight: 600; line-height: 1.6; color: var(--sl-ink); overflow-wrap: anywhere; }
-.sl-k-sum span { color: var(--sl-soft); font-family: var(--sl-mono); font-size: 10.5px; font-weight: 700; margin-right: 4px; }
 .sl-k-prov {
   font-family: var(--sl-mono);
   font-size: 9.5px;
@@ -722,11 +771,13 @@
   border: 1px dashed currentColor;
   border-radius: 2px;
   padding: 0 4px;
-  margin-left: 5px;
 }
 
-.sl-k-src { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 9px; }
+.sl-k-src { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .sl-k-src > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--sl-mono);
   font-size: 10px;
   font-weight: 700;
@@ -734,31 +785,51 @@
   text-transform: uppercase;
   color: var(--sl-soft);
 }
+.sl-k-src > span i {
+  font-style: normal;
+  letter-spacing: 0;
+  color: var(--sl-ink);
+  border: 1px solid var(--sl-hair);
+  border-radius: 2px;
+  padding: 0 4px;
+  background: var(--sl-tag);
+}
+.sl-k-srclist { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Checking a source is a one-handed action on a phone, so the chip is a real
+   target rather than 11px of text with 2px of padding around it. */
 .sl-k-src a {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  justify-content: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 10px;
   font-family: var(--sl-mono);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--sl-ink);
   border: 1.5px solid var(--sl-ink);
   border-radius: 3px;
-  padding: 2px 7px;
   background: var(--sl-tag);
   text-decoration: none;
   font-variant-numeric: tabular-nums;
 }
+/* Shelf-label barcode, carried over from the Direction 02 pass (PR #23). Purely
+   decorative: it marks the chip as a scannable source. Screen readers get the
+   link's aria-label instead, so nothing is lost by hiding it from them. */
+.sl-k-barcode {
+  width: 16px;
+  height: 10px;
+  background: repeating-linear-gradient(
+    90deg,
+    currentColor 0 1px, transparent 1px 3px,
+    currentColor 3px 5px, transparent 5px 7px
+  );
+  opacity: 0.75;
+}
 .sl-k-src a:hover { background: var(--sl-pop); }
 .sl-k-src a:focus-visible { outline: 3px solid #35e0a1; outline-offset: 2px; }
 
-/* ---- polarity treatment ------------------------------------------------
-   Colour never carries the meaning alone — the icon rides with it, so the
-   like/caution split survives greyscale and colour-blind vision. */
-
-.sl-t3 { grid-template-columns: 16px minmax(0, 1fr); align-items: start; }
-.sl-t3 b { display: inline-flex; padding-top: 2px; }
-.sl-t3.sl-k-up b { color: var(--sl-good); }
-.sl-t3.sl-k-dn b { color: var(--sl-hot); }
-.sl-t3.sl-k-dn span { font-weight: 700; }
-.sl-t3.sl-k-dn:first-of-type { border-top: 1px solid var(--sl-hair); }
+@media (max-width: 640px) {
+  .sl-k-src a { min-height: 44px; min-width: 72px; }
+}

@@ -94,13 +94,19 @@ describe('truthful shelf results', () => {
     expect(missing).not.toContain('$0')
   })
 
-  it('recovers the full product identity in expanded detail and names missing identity honestly', () => {
+  it('names the product exactly once and names missing identity honestly', () => {
+    // The expanded panel used to repeat the name so a clamped one stayed
+    // readable. It no longer does, so the heading on the collapsed card is the
+    // only place identity lives — and it must carry the full name, not a
+    // truncated copy, or expanding would lose information.
     const name = '非常長的商品名稱'.repeat(12)
-    expect(card(product({ productName: name }), 1, true))
-      .toContain(`<h3 class="sl-detail-name">${name}</h3>`)
+    const expanded = card(product({ productName: name }), 1, true)
+    expect(expanded).toContain(`<h2 class="sl-pname">${name}</h2>`)
+    expect(expanded.split(name).length - 1).toBe(1)
+
     const missing = card(product({ productName: '  ', category: '' }), 1, true)
     expect(missing).toContain('<h2 class="sl-pname">商品名稱待確認</h2>')
-    expect(missing).toContain('<h3 class="sl-detail-name">商品名稱待確認</h3>')
+    expect(missing.split('商品名稱待確認').length - 1).toBe(1)
     expect(missing).toContain('<span class="sl-tag">其他</span>')
   })
 
