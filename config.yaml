@@ -100,15 +100,32 @@ BRAND_COMPARISON:
     - "贏"
     - "屌打"
 
+# Reweighted 2026-09-18. The old weights put 95% of the penalty on one_sided
+# (0.35) and single_brand (0.20), neither of which is evidence of astroturfing:
+# single_brand measures shopping at one chain — the normal case — and has a
+# structural floor at small n (5 comments across 4 brands cannot score below
+# 0.40), while one_sided measures liking things. Between them they docked every
+# account with >=5 comments: 1301 of 1301 fell below 1.0, median credibility
+# 0.779, and an account's 5th comment cost it 24% of its weight. Nothing was
+# ever caught — the 0.1 floor was never reached and the minimum observed was
+# 0.456. So the mechanism found no shills and taxed activity instead.
+# The three features that do describe astroturfing — repeated text, 24h bursts,
+# extreme-only scoring — carried 5% of the weight and now carry all of it. That
+# leaves credibility sparse and targeted: 79 of 6984 accounts fall below 0.9.
 SUSPICION:
   min_activity: 5
   weight_floor: 0.1
   feature_weights:
-    one_sided: 0.35
-    single_brand: 0.20
-    extreme: 0.20
-    template_like: 0.10
-    burst: 0.15
+    # Deliberately zero rather than deleted: the features are still computed and
+    # stored on the profile, so their distributions stay observable if this needs
+    # revisiting. Re-enabling one is a config edit, not a code change.
+    one_sided: 0.00
+    single_brand: 0.00
+    # Having strong opinions is not the same as faking them, so extreme stays a
+    # minor corroborating signal rather than a third of the score.
+    extreme: 0.15
+    template_like: 0.40
+    burst: 0.45
   burst_window_hours: 24
   burst_min_count: 3
 
