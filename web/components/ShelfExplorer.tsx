@@ -14,6 +14,7 @@ import {
 import {
   AdvancedFilters,
   CategoryKey,
+  DATA_STALE_DAYS,
   DataPayload,
   Product,
   SortKey,
@@ -26,6 +27,7 @@ import {
   filterHasScore,
   filterBySearch,
   formatDisplayDate,
+  isDataStale,
   sortProducts,
 } from '@/lib/data'
 
@@ -87,6 +89,9 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [datePreset, setDatePreset] = useState<string>('all')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [sheetSection, setSheetSection] = useState('category')
+  const sheetBody = useRef<HTMLDivElement>(null)
+  const inlineControls = useRef<HTMLDivElement>(null)
   // Drag-to-dismiss: track finger offset while dragging the sheet's grab handle.
   const [dragY, setDragY] = useState(0)
   const [dragging, setDragging] = useState(false)
@@ -97,12 +102,30 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const draggingRef = useRef(false)
   // Client-only store clock (24h konbini). Starts blank so SSR/CSR markup matches.
   const [clock, setClock] = useState<{ time: string; day: string }>({ time: '--:--:--', day: '' })
+  // Client-only as well. The page is a static export rebuilt right after each data
+  // refresh, so at build time the data is always fresh; only the visitor's clock can
+  // tell that refreshes have stopped.
+  const [dataStale, setDataStale] = useState(false)
 
-  function openSheet() {
+  function openSheet(section = 'category') {
+    setSheetSection(section)
     dragYRef.current = 0
     setDragY(0)
     setSheetOpen(true)
   }
+  // Phones reach the filters through the sheet; wider screens already show the
+  // inline bar, so send them there rather than open a surface CSS keeps hidden.
+  function revealSection(section = 'category') {
+    const bar = inlineControls.current
+    if (bar && getComputedStyle(bar).display !== 'none') {
+      const group = bar.querySelector<HTMLElement>(`[data-section="${section}"]`)
+      group?.scrollIntoView({ block: 'nearest' })
+      group?.querySelector<HTMLElement>('button, input')?.focus()
+      return
+    }
+    openSheet(section)
+  }
+
   function closeSheet() {
     setSheetOpen(false)
     dragYRef.current = 0
@@ -155,6 +178,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     return () => window.clearInterval(id)
   }, [])
 
+  useEffect(() => {
+    setDataStale(isDataStale(initialPayload.generatedAt))
+  }, [initialPayload.generatedAt])
+
   // Lock body scroll and wire Escape-to-close while the filter sheet is open.
   useEffect(() => {
     if (!sheetOpen) return
@@ -169,6 +196,12 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       document.removeEventListener('keydown', onKeyDown)
     }
   }, [sheetOpen])
+
+  useEffect(() => {
+    if (!sheetOpen) return
+    sheetBody.current?.querySelector(`[data-section="${sheetSection}"]`)
+      ?.scrollIntoView({ block: 'nearest' })
+  }, [sheetOpen, sheetSection])
 
   const visibleProducts = useMemo(() => {
     return sortProducts(
@@ -238,7 +271,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   // Filter groups defined once, then placed both in the desktop bar and the
   // mobile sheet (same element rendered in two parents = two live instances).
   const categoryGroup = (
-    <div className="sl-filterrow">
+    <div className="sl-filterrow" data-section="category">
       <span className="sl-eyebrow">分類</span>
       <nav className="sl-chips" aria-label="分類">
         <button
@@ -275,7 +308,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   )
 
   const brandGroup = (
-    <div className="sl-filterrow">
+    <div className="sl-filterrow" data-section="brand">
       <span className="sl-eyebrow">品牌</span>
       <nav className="sl-chips" aria-label="品牌">
         <button
@@ -315,7 +348,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   )
 
   const dateGroup = (
-    <div className="sl-filterrow">
+    <div className="sl-filterrow" data-section="date">
       <span className="sl-eyebrow">日期</span>
       <nav className="sl-chips" aria-label="最新發文日期">
         {DATE_PRESETS.map((preset) => (
@@ -333,7 +366,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   )
 
   const sortGroup = (
-    <div className="sl-filterrow">
+    <div className="sl-filterrow" data-section="sort">
       <span className="sl-eyebrow">排序</span>
       <nav className="sl-chips" aria-label="排序方式">
         {SORT_OPTIONS.map((option) => (
@@ -356,7 +389,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   )
 
   const hideToggle = (
-    <label className="sl-check">
+    <label className="sl-check" data-section="score">
       <input
         type="checkbox"
         checked={hideNoScore}
@@ -395,7 +428,12 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       <div className="sl-aislebar">
         <span className="sl-ab-slot">本區 {products.length} 品</span>
         <span className="sl-ab-sep">·</span>
-        <span>上架更新 {formatDisplayDate(initialPayload.generatedAt)}</span>
+        <span>資料更新 {formatDisplayDate(initialPayload.generatedAt)}</span>
+        {dataStale ? (
+          <span className="sl-ab-stale" role="status">
+            已超過 {DATA_STALE_DAYS} 天未更新
+          </span>
+        ) : null}
         <span className="sl-ab-sep">·</span>
         <span>分數＝綜合評分／滿分 100</span>
       </div>
@@ -411,7 +449,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </div>
 
       {/* Desktop / wide screens: filters inline. Hidden on mobile (sheet used). */}
-      <div className="sl-controls">
+      <div className="sl-controls" ref={inlineControls}>
         {categoryGroup}
         {brandGroup}
         {dateGroup}
@@ -419,9 +457,29 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <div className="sl-toolbar-row">{hideToggle}</div>
       </div>
 
-      <p className="sl-count" aria-live="polite">
-        找到 <b>{visibleProducts.length}</b> 項商品
-      </p>
+      <div className="sl-count">
+        <p aria-live="polite">找到 <b>{visibleProducts.length}</b> 項商品</p>
+        <button
+          type="button"
+          className="sl-context-button"
+          title={sortKey === 'recentRecommendationDesc' ? '綜合評分結合心得新近程度與討論量' : undefined}
+          onClick={() => revealSection('sort')}
+        >
+          排序：{SORT_OPTIONS.find((option) => option.key === sortKey)?.label}
+        </button>
+        <div className="sl-filter-context">
+          <span className="sl-active-context">
+            {activeFilterCount === 0 ? '全部商品' : null}
+            {brand ? <button type="button" className="sl-context-button" onClick={() => revealSection('brand')}>品牌：{brand}</button> : null}
+            {category ? <button type="button" className="sl-context-button" onClick={() => revealSection('category')}>分類：{category}</button> : null}
+            {datePreset !== 'all' ? <button type="button" className="sl-context-button" onClick={() => revealSection('date')}>最新心得：{DATE_PRESETS.find((preset) => preset.key === datePreset)?.label}</button> : null}
+            {hideNoScore ? <button type="button" className="sl-context-button" onClick={() => revealSection('score')}>隱藏暫無綜合評分</button> : null}
+          </span>
+          <button type="button" className="sl-context-button" onClick={() => revealSection()}>
+            篩選 {activeFilterCount}
+          </button>
+        </div>
+      </div>
 
       <main className="sl-shelf">
         {visibleProducts.length === 0 ? (
@@ -469,7 +527,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         className="sl-fab"
         aria-label={`篩選${activeFilterCount ? `（已套用 ${activeFilterCount} 項）` : ''}`}
         aria-expanded={sheetOpen}
-        onClick={openSheet}
+        onClick={() => openSheet()}
       >
         <SlidersHorizontal size={22} aria-hidden="true" />
         {activeFilterCount > 0 ? <span className="sl-fab-badge">{activeFilterCount}</span> : null}
@@ -506,7 +564,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
                 </button>
               </div>
             </div>
-            <div className="sl-sheet-body">
+            <div className="sl-sheet-body" ref={sheetBody}>
               {categoryGroup}
               {brandGroup}
               {dateGroup}

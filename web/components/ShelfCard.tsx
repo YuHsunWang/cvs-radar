@@ -1,6 +1,5 @@
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useId, type CSSProperties } from 'react'
-import CountUp from '@/components/CountUp'
 import ProductDetail from '@/components/ProductDetail'
 import {
   Product,
@@ -10,7 +9,7 @@ import {
   displayCategory,
 } from '@/lib/data'
 
-// Shelf-edge label palette: brand-colour rails + gold/silver/bronze rank medals.
+// Shelf-edge label palette: brand-colour rails.
 const RAIL: Record<string, string> = {
   '7-11': '#F26522',
   全家: '#009B4C',
@@ -19,7 +18,6 @@ const RAIL: Record<string, string> = {
   美聯社: '#6C3DBF',
   其他: '#6B7280',
 }
-const MEDAL: Record<number, string> = { 1: 'sl-gold', 2: 'sl-silver', 3: 'sl-bronze' }
 
 function scoreTone(score: number | null): string {
   if (score === null) return 'sl-na'
@@ -46,11 +44,11 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
   const score = comprehensiveScore(product)
   const volume = product.nPosts + product.nComments
   const pop = (product.likes[0] ?? '').replace(/\s+/g, ' ').trim().slice(0, 16)
-  const date = product.latestDate ? product.latestDate.replaceAll('-', '/') : '—'
+  const date = product.latestDate ? `最新心得 ${product.latestDate.replaceAll('-', '/')}` : '心得日期不明'
   const detailId = useId()
 
   return (
-    <article className={`sl-label${rank === 1 ? ' sl-top' : ''}`}>
+    <article className="sl-label">
       <button
         type="button"
         aria-expanded={isExpanded}
@@ -65,21 +63,15 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
 
           <div className="sl-body">
             <div className="sl-slotline">
-              {rank in MEDAL ? (
-                <span className={`sl-medal ${MEDAL[rank]}`} title={`第 ${rank} 名`}>
-                  <b>{rank}</b>
-                </span>
-              ) : (
-                <span className="sl-slot">架位 {String(rank).padStart(2, '0')}</span>
-              )}
-              <span>上架 {date}</span>
+              <span className="sl-slot">{String(rank).padStart(2, '0')}</span>
             </div>
 
-            <h2 className="sl-pname">{product.productName}</h2>
+            <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
+            <p className="sl-review-date">{date}</p>
 
             <div className="sl-tags">
               <span className="sl-tag">{displayCategory(product.category)}</span>
-              {product.price != null ? <span className="sl-tag sl-price">${product.price}</span> : null}
+              {product.price != null ? <span className="sl-tag sl-price">價格 ${product.price}</span> : null}
               <span className="sl-tag sl-ghost">聲量 {volume}</span>
             </div>
 
@@ -96,17 +88,15 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
               <span className="sl-pb-label">綜合評分</span>
               <div className={`sl-score ${scoreTone(score)}`}>
                 {score === null ? (
-                  <span className="sl-s-na">暫無</span>
+                  <span className="sl-s-na">暫無<span className="sl-mobile-na">評分・樣本少</span></span>
                 ) : (
                   <>
-                    <span className="sl-s-num">
-                      <CountUp end={score} />
-                    </span>
+                    <span className="sl-s-num">{score}</span>
                     <span className="sl-s-unit">分</span>
                   </>
                 )}
               </div>
-              {product.confidence === '低' ? <span className="sl-chip-warn">樣本少</span> : null}
+              {product.confidence === '低' ? <span className={`sl-chip-warn${score === null ? ' sl-null-warn' : ''}`}>樣本少</span> : null}
             </div>
             <span className="sl-chevron" aria-hidden="true">
               {isExpanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}

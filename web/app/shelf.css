@@ -136,6 +136,7 @@
   letter-spacing: 0.02em;
 }
 .sl-ab-sep { opacity: 0.5; }
+.sl-ab-stale { color: var(--sl-mid); font-weight: 700; }
 /* Sits in the category chip row but navigates instead of filtering, so it
    keeps the chip's shape and takes a solid outline to read as its own thing. */
 .sl-zonelink {
@@ -228,6 +229,7 @@
 
 .sl-count {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin-top: 4px;
@@ -239,6 +241,27 @@
   color: var(--sl-soft);
 }
 .sl-count b { color: var(--sl-ink); font-family: var(--sl-mono); }
+.sl-count p { margin: 0; }
+.sl-context-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--sl-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.sl-filter-context { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.sl-filter-context > button { flex: none; }
+.sl-active-context {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sl-active-context button { margin-right: 8px; }
 
 /* ---- shelf ---- */
 .sl-shelf { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
@@ -254,7 +277,6 @@
   overflow: hidden;
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
-.sl-label.sl-top { border-color: var(--sl-ink); }
 .sl-rowbtn {
   display: block;
   width: 100%;
@@ -298,23 +320,6 @@
   letter-spacing: 0.06em;
 }
 .sl-slot { font-weight: 700; color: var(--sl-ink); }
-.sl-medal {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  font-family: var(--sl-mono);
-  font-weight: 800;
-  font-size: 15px;
-  line-height: 1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.55), inset 0 -2px 3px rgba(0, 0, 0, 0.18);
-}
-.sl-medal b { transform: translateY(0.5px); }
-.sl-medal.sl-gold { background: radial-gradient(circle at 34% 28%, #fff3b0, #ffd23f 46%, #e3a100); border: 1.5px solid #bc8600; color: #4a3600; }
-.sl-medal.sl-silver { background: radial-gradient(circle at 34% 28%, #fcfdff, #d3d8df 46%, #a6adb6); border: 1.5px solid #8a929c; color: #2b3138; }
-.sl-medal.sl-bronze { background: radial-gradient(circle at 34% 28%, #f7cda0, #db8c4c 46%, #b0602a); border: 1.5px solid #96501f; color: #3a2410; }
 .sl-pname {
   margin: 6px 0 0;
   font-size: 18px;
@@ -325,7 +330,11 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
+.sl-review-date { margin: 6px 0 0; font-size: 11px; color: var(--sl-soft); }
+.sl-mobile-na { display: none; }
+.sl-detail-name { margin: 0 0 8px; font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
 .sl-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
 .sl-tag {
   font-family: var(--sl-mono);
@@ -407,7 +416,9 @@
 }
 .sl-chevron { margin-top: 8px; color: var(--sl-soft); }
 
-.sl-detail { padding: 0 12px 12px; }
+/* Full bleed: the open panel is the lower half of the label, not a card
+   floated inside one. */
+.sl-detail { padding: 0; }
 
 .sl-loadmore {
   grid-column: 1 / -1;
@@ -478,6 +489,26 @@
 .sl-sheet-backdrop { display: none; }
 
 @media (max-width: 640px) {
+  .sl-filter-context { flex-basis: 100%; justify-content: space-between; }
+  .sl-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 12px; }
+  .sl-body, .sl-stampline { display: contents; }
+  .sl-rail { grid-row: 1; grid-column: 1 / -1; justify-self: start; padding: 3px 8px; border-radius: 3px; }
+  .sl-rail span { writing-mode: horizontal-tb; letter-spacing: 0.04em; }
+  .sl-slotline { grid-row: 1; grid-column: 1 / -1; justify-self: end; min-height: 0; }
+  .sl-pname { grid-row: 2; grid-column: 1 / -1; margin: 0; font-size: 18px; -webkit-line-clamp: 3; }
+  .sl-review-date { grid-row: 3; grid-column: 1 / -1; margin: 0; }
+  .sl-tags { grid-row: 4; grid-column: 1 / -1; margin: 0; }
+  .sl-stamp { grid-row: 5; grid-column: 1; justify-self: start; align-self: center; }
+  .sl-pop { grid-row: 6; grid-column: 1 / -1; }
+  .sl-pricebox { grid-row: 5; grid-column: 2; flex-direction: row; align-items: center; gap: 6px; border: 0; padding: 0; background: none; }
+  .sl-pb-top { flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: flex-end; gap: 4px; }
+  .sl-pb-label { display: none; }
+  .sl-score, .sl-chip-warn, .sl-chevron { margin-top: 0; }
+  .sl-s-num { font-size: 24px; }
+  .sl-s-na { font-size: 12px; }
+  .sl-mobile-na { display: inline; }
+  .sl-null-warn { display: none; }
+
   /* Inline filter bar is replaced by the sheet on phones. */
   .sl-controls { display: none; }
 
@@ -620,3 +651,132 @@
   .sl-sheet-backdrop,
   .sl-sheet { animation: none; transition: none; }
 }
+
+/* ---- compact detail: same docket, boxes removed --------------------------
+   The content is tiny — evidence items are at most 19 characters and the median
+   summary is 17 — so the height was going into containers, not text. Each item
+   drops its own border and padding and is carried by a coloured polarity glyph
+   instead, which also lets the two polarities share one heading. */
+
+/* A perforation, not a cut: the boundary still reads, but as a tear line on
+   one ticket rather than the edge of a second object. */
+.sl-k {
+  border-top: 1px dashed var(--sl-hair);
+  background: #fbfaf6;
+  padding: 9px 12px 11px;
+}
+
+.sl-k-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--sl-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--sl-soft);
+}
+.sl-k-head::after { content: ""; flex: 1; border-top: 1px dashed var(--sl-hair); }
+.sl-k-head b {
+  font-family: var(--sl-cjk);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--sl-ink);
+}
+.sl-k-head i {
+  font-style: normal;
+  font-family: var(--sl-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--sl-soft);
+}
+
+.sl-k-list { display: grid; gap: 1px; margin: 5px 0 0; padding: 0; list-style: none; }
+.sl-k-row {
+  display: grid;
+  grid-template-columns: 13px minmax(0, 1fr);
+  gap: 7px;
+  align-items: baseline;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.54;
+  color: var(--sl-ink);
+  padding: 2px 0;
+  overflow-wrap: anywhere;
+}
+/* the glyph is the only thing carrying polarity, so it must not be decorative */
+.sl-k-row b {
+  font-family: var(--sl-mono);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+}
+.sl-k-up b { color: var(--sl-good); }
+.sl-k-dn b { color: var(--sl-hot); }
+/* a hairline only where the polarity actually turns over */
+.sl-k-dn:first-of-type { margin-top: 4px; padding-top: 5px; border-top: 1px dotted var(--sl-hair); }
+
+.sl-k-none {
+  margin: 4px 0 0;
+  font-family: var(--sl-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sl-na);
+}
+
+.sl-k-sec { margin-top: 9px; }
+.sl-k-sum { margin: 4px 0 0; font-size: 13px; font-weight: 600; line-height: 1.6; color: var(--sl-ink); overflow-wrap: anywhere; }
+.sl-k-sum span { color: var(--sl-soft); font-family: var(--sl-mono); font-size: 10.5px; font-weight: 700; margin-right: 4px; }
+.sl-k-prov {
+  font-family: var(--sl-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--sl-mid);
+  border: 1px dashed currentColor;
+  border-radius: 2px;
+  padding: 0 4px;
+  margin-left: 5px;
+}
+
+.sl-k-src { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 9px; }
+.sl-k-src > span {
+  font-family: var(--sl-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sl-soft);
+}
+.sl-k-src a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--sl-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--sl-ink);
+  border: 1.5px solid var(--sl-ink);
+  border-radius: 3px;
+  padding: 2px 7px;
+  background: var(--sl-tag);
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.sl-k-src a:hover { background: var(--sl-pop); }
+.sl-k-src a:focus-visible { outline: 3px solid #35e0a1; outline-offset: 2px; }
+
+/* ---- polarity treatment ------------------------------------------------
+   Colour never carries the meaning alone — the icon rides with it, so the
+   like/caution split survives greyscale and colour-blind vision. */
+
+.sl-t3 { grid-template-columns: 16px minmax(0, 1fr); align-items: start; }
+.sl-t3 b { display: inline-flex; padding-top: 2px; }
+.sl-t3.sl-k-up b { color: var(--sl-good); }
+.sl-t3.sl-k-dn b { color: var(--sl-hot); }
+.sl-t3.sl-k-dn span { font-weight: 700; }
+.sl-t3.sl-k-dn:first-of-type { border-top: 1px solid var(--sl-hair); }

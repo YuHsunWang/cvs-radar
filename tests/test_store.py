@@ -227,11 +227,13 @@ class StoreTest(unittest.TestCase):
         )
         old_schema.pop("shill_flag", None)
         old_schema.pop("shill_ratio", None)
+        old_schema.pop("review_provisional", None)
 
         restored = store_dict_to_report(old_schema)
 
         self.assertFalse(restored.shill_flag)
         self.assertEqual(restored.shill_ratio, 0.0)
+        self.assertTrue(restored.review_provisional)
 
     def test_profile_roundtrip(self) -> None:
         """AccountProfile -> dict -> AccountProfile preserves all fields."""

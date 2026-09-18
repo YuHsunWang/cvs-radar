@@ -41,6 +41,14 @@ def build_profiles(
     """從貼文留言建立帳號輪廓。"""
     rows: dict[str, list[tuple[str, float, str]]] = defaultdict(list)
     timestamps: dict[str, dict[str, list[datetime]]] = defaultdict(lambda: defaultdict(list))
+    # A comment that evaluates several products of one article is routed to each of
+    # them, but it is still one act by one account. Reduce its product-specific
+    # sentiments to one mean profile signal; retaining whichever copy happened to
+    # occur first made credibility (and therefore published scores) row-order dependent.
+    routed_copies: dict[
+        tuple[str, str, str, str],
+        list[tuple[str, float, str, datetime | None]],
+    ] = defaultdict(list)
     for post in posts:
         for index, comment in enumerate(post.comments):
             opinion = opinions[(post.id, index)]
@@ -50,14 +58,43 @@ def build_profiles(
                 or not comment.user
             ):
                 continue
+            if comment.attributed_product:
+                source = (post.url or post.id, comment.user, comment.tag, comment.text)
+                routed_copies[source].append(
+                    (
+                        post.brand,
+                        opinion.effective_sentiment,
+                        comment.text.strip(),
+                        comment.posted_at,
+                    )
+                )
+                continue
             rows[comment.user].append(
                 (post.brand, opinion.effective_sentiment, comment.text.strip())
             )
             if comment.posted_at is not None:
                 timestamps[comment.user][post.brand].append(comment.posted_at)
 
+    for source in sorted(routed_copies):
+        copies = routed_copies[source]
+        representative = min(
+            copies,
+            key=lambda item: (
+                item[0],
+                item[2],
+                item[3].isoformat() if item[3] is not None else "",
+            ),
+        )
+        brand, _, text, _ = representative
+        sentiment = mean(item[1] for item in copies)
+        rows[source[1]].append((brand, sentiment, text))
+        posted_times = [item[3] for item in copies if item[3] is not None]
+        if posted_times:
+            timestamps[source[1]][brand].append(min(posted_times))
+
     profiles: dict[str, AccountProfile] = {}
     for user, values in rows.items():
+        values.sort(key=lambda item: (item[0], item[2], item[1]))
         by_brand: dict[str, list[float]] = defaultdict(list)
         texts: list[str] = []
         for brand, sentiment, text in values:

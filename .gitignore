@@ -8,5 +8,21 @@ __pycache__/
 
 # Raw crawl output & local caches (never commit real PTT data)
 data/posts.jsonl
+# Any JSONL under data/ is a copy of the raw store with real accounts in it:
+# posts.jsonl.tmp / .reconcile left behind by an interrupted rewrite, or a copy
+# parked in data/raw/. An exact filename is not enough.
+data/**/*.jsonl*
+data/raw/
+data/family_food/
 .cvs_radar_seen.json
 data/labels/*draft*.csv
+# Labelling working output: exports, quarantined rows and adjudication queues all
+# carry raw comment/review text, same reason as posts.jsonl above.
+artifacts/
+excerpt_work/
+comment_pick_work/
+product_name_work/
+product_category_work/
+grounding_work/
+.vercel
+.env*

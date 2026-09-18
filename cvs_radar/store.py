@@ -245,6 +245,7 @@ def report_to_store_dict(report: ProductReport) -> dict:
         "shill_flag": report.shill_flag,
         "latest_post_date": report.latest_post_date.isoformat() if report.latest_post_date else None,
         "review_excerpt": report.review_excerpt,
+        "review_provisional": report.review_provisional,
         "post_urls": report.post_urls,
     }
 
@@ -293,6 +294,10 @@ def store_dict_to_report(data: dict) -> ProductReport:
         shill_flag=data.get("shill_flag", False),
         latest_post_date=_stored_datetime(data["latest_post_date"]) if data.get("latest_post_date") else None,
         review_excerpt=data.get("review_excerpt", ""),
+        # Results written before provenance existed must be treated as provisional;
+        # otherwise the UI would present an old rule-selected excerpt as a model
+        # judgement. New reports always carry the explicit boolean.
+        review_provisional=data.get("review_provisional", True),
         post_urls=data.get("post_urls", []),
     )
 

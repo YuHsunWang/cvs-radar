@@ -9,10 +9,12 @@
 # Like the other labelling steps this needs a local Codex CLI and is NOT reproducible
 # in CI — which is exactly why the answers are cached in a committed CSV.
 #
-# Env overrides: REPO CHUNK CONC MODEL RUNNER DELTA
+# Env overrides: REPO POSTS LABELS CHUNK CONC MODEL RUNNER DELTA EFFORT
 set -uo pipefail
 
 REPO="${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+POSTS="${POSTS:-$REPO/data/posts.jsonl}"
+LABELS="${LABELS:-$REPO/data/labels/comment_picks.csv}"
 CHUNK="${CHUNK:-50}"
 CONC="${CONC:-5}"
 MODEL="${MODEL:-gpt-5.6-luna}"
@@ -32,7 +34,7 @@ trap 'rm -rf "$WORK"' EXIT
 DELTA="${DELTA:-$WORK/delta.csv}"
 
 # --- 1. export the still-unlabelled products ---
-python3 scripts/export_comment_picks.py --out "$DELTA" 2>&1 | tail -1 || die "export"
+python3 scripts/export_comment_picks.py --posts "$POSTS" --labels "$LABELS" --out "$DELTA" 2>&1 | tail -1 || die "export"
 N="$(python3 -c "import csv,sys;csv.field_size_limit(10**7);print(sum(1 for _ in csv.DictReader(open('$DELTA',encoding='utf-8-sig'))))")"
 [ "$N" -eq 0 ] && { log "nothing new to label — done."; exit 0; }
 log "delta: $N product(s)"
@@ -69,11 +71,14 @@ log "labeling $(ls comment_pick_work/chunks/chunk_*.csv | wc -l) chunk(s), concu
 : > "$WORK/manifest.tsv"
 run_one(){
   local nn="$1"
+  local effort_args=()
+  [ -z "${EFFORT:-}" ] || effort_args=(--effort "$EFFORT")
   node "$RUNNER" "$WORK/prompts/prompt_${nn}.md" --cwd "$REPO" --model "$MODEL" \
+       "${effort_args[@]}" \
        --timeout 2400000 --inactivity-timeout 600000 > "$WORK/chunk_${nn}.log" 2>&1
   printf '%s\t%s\n' "$nn" "$?" >> "$WORK/manifest.tsv"
 }
-export -f run_one; export RUNNER WORK REPO MODEL
+export -f run_one; export RUNNER WORK REPO MODEL EFFORT="${EFFORT:-}"
 ls comment_pick_work/chunks/chunk_*.csv | sed -E 's/.*chunk_([0-9]+)\.csv/\1/' \
   | xargs -P"$CONC" -I{} bash -c 'run_one "$@"' _ {}
 bad="$(awk -F'\t' '$2!=0' "$WORK/manifest.tsv" | wc -l)"
@@ -111,7 +116,7 @@ for src in sorted(glob.glob(f"{source_dir}/chunk_*.csv")):
         source = original.get(row["fingerprint"])
         if source is None:
             continue
-        for column in ("other_products", "positive_candidates", "negative_candidates", "body_candidates"):
+        for column in ("fingerprint", "brand", "product_name", "other_products", "comments", "body_candidates", "prompt_version"):
             if row.get(column, "") != source.get(column, ""):
                 errors.append(f"{name} r{i}: {column} was modified")
     combined.extend(rows)
@@ -126,6 +131,6 @@ print(f"verified {len(combined)} labeled rows -> {out}")
 PY
 
 # --- 6. import into the committed cache ---
-python3 scripts/import_comment_picks.py "$WORK/all_labeled.csv" --model-tag "$MODEL" 2>&1 | tail -1 || die "import"
+python3 scripts/import_comment_picks.py "$WORK/all_labeled.csv" --source "$DELTA" --labels "$LABELS" --model-tag "$MODEL" 2>&1 | tail -1 || die "import"
 rm -rf comment_pick_work
 log "DONE. delta labeled=$N"

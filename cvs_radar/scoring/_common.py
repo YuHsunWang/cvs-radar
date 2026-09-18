@@ -255,6 +255,11 @@ _PRODUCT_REVIEW_START_RE = re.compile(r"^\s*[：:]?\s*[【\[]?\s*心得\s*[】\]
 
 _PRICE_TOKEN_RE = re.compile(r"(?<!\d)(\d{1,3})(?!\d)\s*(?:元|台幣)?")
 
+# 集點活動寫的是「集幾章／幾點」，那個數字不是價格——「集20章免費換」的 20 是章數，
+# 商品其實沒有標價（DEV: 嚕嚕米夥伴3入組咖啡磚被讀成 20 元）。金額只會寫成裸數字或
+# 「N元」，不會寫成「N章」，所以緊跟在數字後的這些量詞就足以否決該 token。
+_STAMP_COUNT_UNIT_RE = re.compile(r"\s*(?:章|點|枚|印花)")
+
 _PRICE_CONTEXT_RE = re.compile(
     r"^\s*(?:價格|售價|價錢|原價|特價|目前|活動價|NT\$?|\$|\d+\s*(?:ML|毫升|G|公克|克))",
     re.IGNORECASE,
@@ -295,6 +300,15 @@ _SYNONYM_MAP = {
     "吐司": "土司",
     "哈蜜瓜": "哈密瓜",
     "贅澤": "贅沢",
+    # Same word, different character. Commenters routinely write these forms
+    # while the product name uses the other, and the routing match is exact on
+    # characters, so an unfolded variant reads as a different word entirely.
+    # Only same-word pairs belong here: a general one-character fuzzy match is
+    # not viable, because 綜合/組合, 起司/起來 and 可可/可以 are one character
+    # apart too and mean nothing alike.
+    "板條": "粄條",
+    "東波": "東坡",
+    "蕃茄": "番茄",
 }
 
 _DISTINCTIVE_TERMS = {
@@ -525,4 +539,4 @@ _EXCERPT_ASPECT_TERMS: dict[str, tuple[str, ...]] = {
 DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH = "data/labels/review_excerpt_batch_scored.csv"
 
 
-__all__ = ['AccountProfile', 'BRANDS', 'BRAND_COMPARISON', 'CONFIDENCE_BANDS', 'CONSENSUS', 'Comment', 'Contributor', 'Counter', 'DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH', 'NEGATIVE_WORDS', 'POSITIVE_WORDS', 'PRODUCT_ALIASES', 'PRODUCT_CATEGORIES', 'PRODUCT_NORMALIZATION', 'Path', 'Post', 'ProductReport', 'SCORING', 'SHILL_DETECTION', 'SequenceMatcher', '_AUTHORITATIVE_BACKENDS', '_BRACKET_RE', '_BUNDLE_PRICE_RE', '_BUNDLE_PRICE_SUFFIX_RE', '_CATEGORY_STRONG_KEYWORDS', '_COMMENT_NOISE_RE', '_DISTINCTIVE_TERMS', '_EXCERPT_ASPECT_TERMS', '_EXCERPT_DECISION_TERMS', '_EXCERPT_DROP_RE', '_EXCERPT_FIRST_HAND_RE', '_EXCERPT_INTRO_RE', '_EXCERPT_LABEL_RE', '_EXCERPT_SENTENCE_RE', '_EXCERPT_SENTENCE_START_RE', '_EXCERPT_SIGNATURE_RE', '_FIRST_HAND_COMMENT_RE', '_FRAGMENT_PRODUCT_NAMES', '_GARBAGE_NAME_RE', '_GENERIC_CATEGORY_KEYWORDS', '_MAX_PRICE', '_MIN_PRICE', '_MULTI_PRODUCT_RE', '_NOISE_RE', '_OFF_TOPIC_COMMENT_RE', '_OPTIONAL_RE', '_PARALLEL_PRODUCT_SUFFIXES', '_PAYMENT_ASIDE_PATTERN', '_PRICE_BEFORE_PROMO_RE', '_PRICE_CONTEXT_RE', '_PRICE_TOKEN_RE', '_PRODUCT_FORM_TERMS', '_PRODUCT_REVIEW_START_RE', '_PROMO_RE', '_PROMO_SUFFIX_RE', '_PROMO_TAIL_RE', '_PTT_PRODUCT_TEMPLATE', '_QUANTITY_SUFFIX_RE', '_REACTION_ECHO_RE', '_SHARED_FLAVOR_RE', '_SHARED_SAME_PRICE_RE', '_SYNONYM_MAP', '_TITLE_PREFIX_RE', '_TRAILING_FILLER_RE', '_TRAILING_NOISE_CLEAN_RE', '_TRAILING_PRICE_CLEAN_RE', '_TRAILING_PRICE_RE', '_URL_RE', '_title_product_name', 'annotations', 'brand_alias_positions', 'csv', 'dataclass', 'datetime', 'defaultdict', 'lru_cache', 'math', 'mean', 'normalize_datetime', 're', 'timezone', 'unicodedata']
+__all__ = ['AccountProfile', 'BRANDS', 'BRAND_COMPARISON', 'CONFIDENCE_BANDS', 'CONSENSUS', 'Comment', 'Contributor', 'Counter', 'DEFAULT_REVIEW_EXCERPT_OVERRIDES_PATH', 'NEGATIVE_WORDS', 'POSITIVE_WORDS', 'PRODUCT_ALIASES', 'PRODUCT_CATEGORIES', 'PRODUCT_NORMALIZATION', 'Path', 'Post', 'ProductReport', 'SCORING', 'SHILL_DETECTION', 'SequenceMatcher', '_AUTHORITATIVE_BACKENDS', '_BRACKET_RE', '_BUNDLE_PRICE_RE', '_BUNDLE_PRICE_SUFFIX_RE', '_CATEGORY_STRONG_KEYWORDS', '_COMMENT_NOISE_RE', '_DISTINCTIVE_TERMS', '_EXCERPT_ASPECT_TERMS', '_EXCERPT_DECISION_TERMS', '_EXCERPT_DROP_RE', '_EXCERPT_FIRST_HAND_RE', '_EXCERPT_INTRO_RE', '_EXCERPT_LABEL_RE', '_EXCERPT_SENTENCE_RE', '_EXCERPT_SENTENCE_START_RE', '_EXCERPT_SIGNATURE_RE', '_FIRST_HAND_COMMENT_RE', '_FRAGMENT_PRODUCT_NAMES', '_GARBAGE_NAME_RE', '_GENERIC_CATEGORY_KEYWORDS', '_MAX_PRICE', '_MIN_PRICE', '_MULTI_PRODUCT_RE', '_NOISE_RE', '_OFF_TOPIC_COMMENT_RE', '_OPTIONAL_RE', '_PARALLEL_PRODUCT_SUFFIXES', '_PAYMENT_ASIDE_PATTERN', '_PRICE_BEFORE_PROMO_RE', '_PRICE_CONTEXT_RE', '_PRICE_TOKEN_RE', '_PRODUCT_FORM_TERMS', '_PRODUCT_REVIEW_START_RE', '_PROMO_RE', '_PROMO_SUFFIX_RE', '_PROMO_TAIL_RE', '_PTT_PRODUCT_TEMPLATE', '_QUANTITY_SUFFIX_RE', '_REACTION_ECHO_RE', '_SHARED_FLAVOR_RE', '_SHARED_SAME_PRICE_RE', '_STAMP_COUNT_UNIT_RE', '_SYNONYM_MAP', '_TITLE_PREFIX_RE', '_TRAILING_FILLER_RE', '_TRAILING_NOISE_CLEAN_RE', '_TRAILING_PRICE_CLEAN_RE', '_TRAILING_PRICE_RE', '_URL_RE', '_title_product_name', 'annotations', 'brand_alias_positions', 'csv', 'dataclass', 'datetime', 'defaultdict', 'lru_cache', 'math', 'mean', 'normalize_datetime', 're', 'timezone', 'unicodedata']

@@ -39,7 +39,12 @@ jobs:
         working-directory: web
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
-          NEXT_PUBLIC_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          # Deliberately the Vercel domain, not this mirror's own github.io URL.
+          # Only Vercel can read NEXT_PUBLIC_GA_ID, so analytics only exists
+          # there; pointing the mirror's canonical, og:url and sitemap reference
+          # at Vercel keeps organic search from landing on the unmeasured copy.
+          # Internal links still use NEXT_PUBLIC_BASE_PATH above.
+          NEXT_PUBLIC_SITE_URL: https://cvs-radar.vercel.app
         run: npm run build
       - name: Configure Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5

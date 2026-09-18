@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from collections import defaultdict
+from dataclasses import replace
 from difflib import SequenceMatcher
 from functools import lru_cache
 from ..config import (
@@ -20,7 +21,10 @@ from ..product_labels import (
     product_name_fingerprint_v2,
 )
 
-from ._common import (unwrap_name_brackets, _NAME_SEPARATOR_RE, _PURCHASE_CONDITION_RE, _GIVEAWAY_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
+from ._common import (unwrap_name_brackets, _NAME_SEPARATOR_RE, _PURCHASE_CONDITION_RE, _GIVEAWAY_RE, _DECIMAL_PRICE_RE, _DISCOUNT_MULTIPLIER_RE, _GIFT_TAIL_RE, _PRICE_NOTE_ASIDE_RE, _TRAILING_QUALIFIER_RE, _BUNDLE_PRICE_RE, _BUNDLE_PRICE_SUFFIX_RE, _CATEGORY_STRONG_KEYWORDS, _DISTINCTIVE_TERMS, _FRAGMENT_PRODUCT_NAMES, _FRIENDLY_TIME_MARK_RE, _FRIENDLY_TIME_TAIL_RE, _GARBAGE_NAME_RE, _GENERIC_CATEGORY_KEYWORDS, _MAX_PRICE, _MIN_PRICE, _MULTI_PRODUCT_RE, _NOISE_RE, _OPTIONAL_RE, _PARALLEL_PRODUCT_SUFFIXES, _PAYMENT_ASIDE_PATTERN, _PRICE_BEFORE_PROMO_RE, _PRICE_CONTEXT_RE, _PRICE_TOKEN_RE, _PRODUCT_FORM_TERMS, _PRODUCT_REVIEW_START_RE, _PROMO_RE, _PROMO_SUFFIX_RE, _PROMO_TAIL_RE, _PTT_PRODUCT_TEMPLATE, _QUANTITY_SUFFIX_RE, _SHARED_FLAVOR_RE, _SHARED_SAME_PRICE_RE, _STAMP_COUNT_UNIT_RE, _SYNONYM_MAP, _TITLE_PREFIX_RE, _TRAILING_FILLER_RE, _TRAILING_NOISE_CLEAN_RE, _TRAILING_PRICE_CLEAN_RE, _TRAILING_PRICE_RE, _URL_RE)
+
+
+_AUTHOR_SHILL_FLAG_KEY = "_author_shill_flagged"
 
 
 def _extract_space_separated_parallel_products(
@@ -83,6 +87,58 @@ def extract_products_and_prices(
         return _fill_missing_price_from_rules(list(labelled), rule_items)
 
     return rule_items
+
+
+def _brand_mentions(text: str) -> list[str]:
+    """Return canonical store names in the order their aliases occur."""
+    matches: list[tuple[int, int, str]] = []
+    normalized = unicodedata.normalize("NFKC", text or "")
+    for canonical, aliases in BRANDS.items():
+        if canonical == "其他":
+            continue
+        for alias in sorted(set([canonical, *aliases]), key=len, reverse=True):
+            # Bare "OK" is ordinary review language (「還算 OK」), not reliable
+            # evidence that an item belongs to OK Mart.
+            if not alias or alias.casefold() == "ok":
+                continue
+            if re.search(r"[A-Za-z0-9]", alias):
+                pattern = rf"(?<![A-Za-z0-9]){re.escape(alias)}(?![A-Za-z0-9])"
+            else:
+                pattern = re.escape(alias)
+            for match in re.finditer(pattern, normalized, flags=re.IGNORECASE):
+                matches.append((match.start(), match.end(), canonical))
+
+    ordered: list[tuple[int, int, str]] = []
+    for start, end, canonical in sorted(matches, key=lambda item: (item[0], -(item[1] - item[0]))):
+        if ordered and start < ordered[-1][1]:
+            continue
+        ordered.append((start, end, canonical))
+    return [canonical for _, _, canonical in ordered]
+
+
+def _extract_products_with_brands(
+    raw_name: str, brand: str = "", title: str = ""
+) -> list[tuple[str, str, int | None]]:
+    """Extract one canonical store together with each product name and price."""
+    items = extract_products_and_prices(raw_name, brand, title)
+    if len(items) < 2:
+        return [(brand, name, price) for name, price in items]
+    mentions = _brand_mentions(raw_name)
+    if len(mentions) != len(items) or len(set(mentions)) < 2:
+        title_mentions = _brand_mentions(title)
+        mentions = (
+            title_mentions
+            if len(title_mentions) == len(items) and len(set(title_mentions)) >= 2
+            else [brand] * len(items)
+        )
+    return [
+        (
+            item_brand,
+            _clean_extracted_product_name(name, item_brand) if item_brand != brand else name,
+            price,
+        )
+        for item_brand, (name, price) in zip(mentions, items)
+    ]
 
 
 def extract_products_and_prices_by_rules(
@@ -553,6 +609,8 @@ def _price_from_text(text: str, *, prefer_first: bool, max_price: int) -> int | 
         span = match.span(1)
         if any(start <= span[0] and span[1] <= end for start, end in bundle_spans):
             continue
+        if _STAMP_COUNT_UNIT_RE.match(text, span[1]):
+            continue
         price = int(match.group(1))
         if _MIN_PRICE <= price <= max_price:
             prices.append(price)
@@ -651,7 +709,13 @@ def _strip_brand_keywords(text: str, brand: str) -> str:
 
 
 def categorize_product(name: str) -> str:
-    """Assign a category to a product name based on keyword matching."""
+    """Assign a category to a product name based on keyword matching.
+
+    The fallback, not the answer: `cvs_radar.product_categories.resolve_category`
+    calls this only for a product with no label. The keyword list is frozen — see
+    config.yaml — because a whitelist cannot cover the long tail, which is what
+    put 125 products in 其他 (docs/DECISIONS.md, 2026-08-18).
+    """
     text = unicodedata.normalize("NFKC", name or "").lower()
     matches: list[tuple[tuple[int, int, int, int], str]] = []
     for index, (category, keywords) in enumerate(PRODUCT_CATEGORIES.items()):
@@ -677,22 +741,45 @@ def categorize_product(name: str) -> str:
 
 def _name_bigrams(text: str) -> set[str]:
     chars = re.sub(r"[^\w\u4e00-\u9fff]", "", text)
+    # Fold alternative writings of the same term before slicing, on product names
+    # and comment text alike, so the two sides meet on one spelling: a commenter
+    # who types \u677f\u689d still matches a product named \u7c84\u689d.
+    for old, new in _SYNONYM_MAP.items():
+        if old in chars:
+            chars = chars.replace(old, new)
     if len(chars) < 2:
         return {chars} if chars else set()
     return {chars[i : i + 2] for i in range(len(chars) - 1)}
 
 
-def _route_comments_by_product(comments: list[Comment], names: list[str]) -> list[list[Comment]]:
-    """Route each comment to the split product whose name it distinctly matches.
+def _route_comments_by_product(
+    comments: list[Comment], names: list[str], brands: list[str] | None = None
+) -> list[list[Comment]]:
+    """Route each comment to the split product(s) whose name fragments it matches.
 
-    Only comments that distinctly single out exactly one split product's name
-    fragments are attributed. Ambiguous comments — those matching none or more
-    than one product's distinctive fragments — are dropped rather than shared
-    across every split product, so a comment about one item no longer pollutes
-    the fair score, consensus and excerpt of the other products in the same
-    multi-product post (review #21).
+    A comment that singles out exactly one split product is attributed to it.
+    A comment that names several — "糰子不好吃 蕨餅還可以" — holds a separate
+    verdict for each one, so it goes to every product it names, as a copy tagged
+    with that product in ``attributed_product``. The tag moves the sentiment key
+    to (comment, product), so each copy is labelled against the item it is about
+    instead of one scalar standing for opposite opinions (see
+    :func:`cvs_radar.sentiment.comment_fingerprint_v2`).
+
+    Comments that name none of them are still dropped rather than shared across
+    every split product, which polluted the others' fair score, consensus and
+    excerpt (review #21).
     """
-    bigrams = [_name_bigrams(name) for name in names]
+    brands = brands or [""] * len(names)
+    bigrams = [
+        _name_bigrams(name).union(
+            *(
+                _name_bigrams(alias)
+                for alias in [brand, *BRANDS.get(brand, [])]
+                if alias and alias.casefold() != "ok"
+            )
+        )
+        for brand, name in zip(brands, names)
+    ]
     distinctive: list[set[str]] = []
     for i, grams in enumerate(bigrams):
         others: set[str] = set()
@@ -707,7 +794,10 @@ def _route_comments_by_product(comments: list[Comment], names: list[str]) -> lis
         hits = [i for i, dset in enumerate(distinctive) if dset and (comment_grams & dset)]
         if len(hits) == 1:
             routed[hits[0]].append(comment)
-        # else: ambiguous (no distinct match, or matches several) -> drop it.
+        elif hits:
+            for index in hits:
+                routed[index].append(replace(comment, attributed_product=names[index]))
+        # else: names none of them -> drop it.
     return routed
 
 
@@ -725,9 +815,12 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             if post.is_reply
             else post.product_name
         )
-        items = extract_products_and_prices(extraction_name, post.brand, post.title)
-        cleaned_items = [_strip_product_item_promo_suffix(name, price) for name, price in items]
-        if len(items) == 1 and items[0][0] == extraction_name and items[0][1] is None:
+        items = _extract_products_with_brands(extraction_name, post.brand, post.title)
+        cleaned_items = [
+            (item_brand, *_strip_product_item_promo_suffix(name, price))
+            for item_brand, name, price in items
+        ]
+        if len(items) == 1 and items[0][1] == extraction_name and items[0][2] is None:
             cleaned_name = _strip_product_name_promo_suffix(extraction_name)
             if len(cleaned_name) >= 2 and not _is_junk_extracted_product_name(cleaned_name):
                 if cleaned_name == post.product_name:
@@ -743,27 +836,27 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
             result.append(post)
             continue
         valid_items = [
-            (name, price) for name, price in cleaned_items
+            (item_brand, name, price) for item_brand, name, price in cleaned_items
             if not _GARBAGE_NAME_RE.match(name)
             and not _is_junk_extracted_product_name(name)
             and len(name) >= 2
         ]
         junk_items = [
-            (name, price) for name, price in cleaned_items
+            (item_brand, name, price) for item_brand, name, price in cleaned_items
             if len(name) >= 2 and _is_junk_extracted_product_name(name)
         ]
         if not valid_items and junk_items:
             fallback_name = _title_fallback_product_name(post)
             fallback_price = _fallback_price_from_text(extraction_name)
             if fallback_name and len(fallback_name) >= 2:
-                valid_items = [(fallback_name, fallback_price)]
+                valid_items = [(post.brand, fallback_name, fallback_price)]
         # Drop items that still canonicalize to "unknown" (promo/fragment tokens such
         # as 加價購169元 / 嚐鮮價 that slip past junk detection); if that empties the
         # list, fall back to the post title so unrelated posts don't merge under "unknown".
         resolved_items = [
-            (name, price)
-            for name, price in valid_items
-            if canonical_product_name(post.brand, name) != "unknown"
+            (item_brand, name, price)
+            for item_brand, name, price in valid_items
+            if canonical_product_name(item_brand, name) != "unknown"
         ]
         if not resolved_items:
             fallback_name = _title_fallback_product_name(post)
@@ -772,7 +865,9 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
                 and len(fallback_name) >= 2
                 and canonical_product_name(post.brand, fallback_name) != "unknown"
             ):
-                resolved_items = [(fallback_name, _fallback_price_from_text(extraction_name))]
+                resolved_items = [
+                    (post.brand, fallback_name, _fallback_price_from_text(extraction_name))
+                ]
         valid_items = resolved_items
         # Expand a bare product-form name (e.g. "霜淇淋" from a shorthand price line) to
         # the title's more specific flavored name when the title ends with that form word
@@ -780,31 +875,54 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
         title_specific = _title_fallback_product_name(post)
         if title_specific and not _is_junk_extracted_product_name(title_specific):
             expanded_items = []
-            for name, price in valid_items:
+            for item_brand, name, price in valid_items:
                 if (
                     _is_bare_form_name(name)
                     and len(title_specific) > len(name)
                     and title_specific != name
                     and any(title_specific.endswith(form) for form in _matched_product_forms(name))
                 ):
-                    expanded_items.append((title_specific, price))
+                    expanded_items.append((item_brand, title_specific, price))
                 else:
-                    expanded_items.append((name, price))
+                    expanded_items.append((item_brand, name, price))
             valid_items = expanded_items
+        deduplicated_items: list[tuple[str, str, int | None]] = []
+        seen_identities: set[tuple[str, str]] = set()
+        for item_brand, name, price in valid_items:
+            identity = (item_brand, _compact_key(name))
+            if identity in seen_identities:
+                continue
+            seen_identities.add(identity)
+            deduplicated_items.append((item_brand, name, price))
+        valid_items = deduplicated_items
         if len(valid_items) > 1:
+            # Shill accusations target the post's author, not one routed product.
+            # Preserve that thread-level verdict before hit-0 comments are dropped.
+            from .compute import _author_shill_flagged
+
+            author_shill_flagged = _author_shill_flagged(post)
             routed_comments = _route_comments_by_product(
-                post.comments, [name for name, _ in valid_items]
+                post.comments,
+                [name for _, name, _ in valid_items],
+                [item_brand for item_brand, _, _ in valid_items],
             )
         else:
+            author_shill_flagged = None
             routed_comments = [post.comments for _ in valid_items]
-        for (name, price), comments in zip(valid_items, routed_comments):
+        name_counts = defaultdict(int)
+        for _, name, _ in valid_items:
+            name_counts[_compact_key(name)] += 1
+        for (item_brand, name, price), comments in zip(valid_items, routed_comments):
+            suffix = _compact_key(name)
+            if name_counts[suffix] > 1:
+                suffix = f"{_compact_key(item_brand)}_{suffix}"
             new_post = Post(
-                id=f"{post.id}_{_compact_key(name)}" if len(items) > 1 else post.id,
+                id=f"{post.id}_{suffix}" if len(items) > 1 else post.id,
                 source=post.source,
                 board=post.board,
                 url=post.url,
                 title=post.title,
-                brand=post.brand,
+                brand=item_brand,
                 product_name=name,
                 price=str(price) if price is not None else post.price,
                 author=post.author,
@@ -814,11 +932,20 @@ def preprocess_posts(posts: list[Post]) -> list[Post]:
                 is_reply=post.is_reply,
                 push_count=post.push_count,
                 comments=comments,
-                raw=post.raw,
-                sibling_products=tuple(other for other, _ in valid_items if other != name),
+                raw=(
+                    {**post.raw, _AUTHOR_SHILL_FLAG_KEY: author_shill_flagged}
+                    if author_shill_flagged is not None
+                    else post.raw
+                ),
+                sibling_products=tuple(
+                    other_name for _, other_name, _ in valid_items if other_name != name
+                ),
                 source_product_name=post.source_product_name or post.product_name,
             )
             result.append(new_post)
+    generated_ids = [post.id for post in result]
+    if len(generated_ids) != len(set(generated_ids)):
+        raise ValueError("preprocess_posts generated duplicate post IDs")
     return result
 
 

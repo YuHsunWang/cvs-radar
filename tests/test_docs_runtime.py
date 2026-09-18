@@ -40,8 +40,14 @@ def test_operational_docs_match_active_entry_points() -> None:
         "product-name labeling",
         "excerpt labeling",
         "representative-comment labeling",
+        "category labeling",
     ):
         assert layer in normalized_ops
-    assert "runs none of these four labelers" in normalized_ops
+    assert "runs none of these five labelers" in normalized_ops
+    # The sentiment prompt is an inline heredoc in rebackfill.sh, not a file in
+    # scripts/prompts/. Assert the doc keeps saying so: people have looked only
+    # in scripts/prompts/, concluded it was lost, and rewritten it from scratch.
+    assert not (ROOT / "scripts/prompts/sentiment-labeling.md").exists()
+    assert "inline heredoc in" in normalized_ops
     assert "flush/fsync 成功後" in crawl
     assert "直接串接成單一 Comment" in crawl

@@ -65,6 +65,12 @@ Three of those are gates people forget:
 - **`data/posts.jsonl` never enters the repo.** It holds real PTT accounts and
   is gitignored. The repo's history was rewritten once to purge identity data;
   don't undo that.
+- **Category comes from the label cache, not from `config.yaml`.**
+  `data/labels/product_category_labels.csv` decides; the `PRODUCT_CATEGORIES`
+  keywords are a frozen fallback for unlabelled products only. Adding a keyword
+  to fix a miscategorised product does nothing — every published product already
+  has a label, and the label wins. Fix it with a label (or, for a one-off,
+  `product_overrides.csv`, which outranks both).
 - **Low-sample products don't show a recommendation score** or a percentage
   distribution. The gating is deliberate, not a rendering bug.
 
@@ -98,13 +104,21 @@ comment to this one. The working fix is to export an `other_products` column so
 the LLM can exclude them — both the excerpt and comment-pick layers depend on it.
 
 **4. The label CSVs don't share an encoding.** There is no `.gitattributes`, so
-whatever you write is what lands. As of 2026-08-03, all five label caches are
-**CRLF**; `product_overrides.csv` has **no BOM** while `comment_picks.csv`,
-`excerpt_labels.csv`, `product_name_labels.csv` and
-`sentiment_fingerprint_labels.csv` are **BOM-prefixed**. Check the file you're
-about to touch and write it back the same way — rewriting a whole CSV with
-different settings produces a diff where every line changed and hides the one
-line you meant to change. For small fixes, edit rows in place.
+whatever you write is what lands. As of 2026-08-25:
+
+| Encoding | Files |
+|---|---|
+| **BOM + CRLF** | `sentiment_fingerprint_labels.csv`, `product_name_labels.csv`, `excerpt_labels.csv`, `comment_picks.csv`, `product_category_labels.csv`, `grounding_verdicts.csv`, `sentiment_overrides.csv` |
+| CRLF, no BOM | `product_overrides.csv`, `gold_v1.csv`, `to_label_v1.csv` |
+| LF, no BOM | `gold_smoke.csv`, `sentiment_corrections.csv` |
+
+Check the file you're about to touch and write it back the same way — rewriting a
+whole CSV with different settings produces a diff where every line changed and
+hides the one line you meant to change. For small fixes, edit rows in place.
+Verify by raw bytes (`raw[:3] == b'\xef\xbb\xbf'`, `b'\r\n' in raw[:8000]`), not by
+eye. Also note `wc -l` **overcounts** these files: `raw_name` and the pick columns
+contain embedded newlines inside quoted fields, so `product_name_labels.csv` reads
+as ~9,300 lines for ~3,100 records. Count with `csv.reader`, never with `wc`.
 
 **5. The cron worktree resets hard to `origin/main` on every run.** Step 0 of
 `scripts/ops/rebackfill.sh` runs `git reset --hard`, so any uncommitted label
@@ -120,7 +134,77 @@ applied. Comparing the two produces a flood of fake differences. Compare
 **7. Ordering matters in the label pipeline.** Excerpt and comment-pick
 fingerprints both contain the product name, so names must be settled before
 those layers export their deltas. `scripts/ops/run_required_label_layers.sh`
-encodes the order; don't reorder it casually.
+encodes the order; don't reorder it casually. The category layer is the one
+exception and deliberately sits *outside* that script, after the recompute in
+`rebackfill.sh`: it keys on the final product name, which only exists once
+`results.json` is written. `build_data.py` resolves categories through the cache
+at publish time, so a label imported there lands without a second recompute.
+
+**8. Importer tests must never use the importers' default output paths.**
+`import_excerpts`/`import_picks` write quarantine and adjudication queues under
+`artifacts/` by default. A test that calls them without overriding
+`rejects_path`/`pending_path` drops fixture rows into the real `artifacts/`, and
+the next `verify_grounding.sh` run picks those up and adjudicates them as if they
+were real products — a fabricated verdict then lands in the committed cache. This
+has happened. `tests/test_label_importers.py` has an autouse fixture that
+redirects the module-level defaults into `tmp_path`; keep it, and note those
+defaults are resolved *inside* the functions rather than as default arguments
+precisely so the fixture can reach them.
+
+**9. A character-overlap check cannot judge a Chinese paraphrase.** 「太貴了」→
+「價格偏高」 is faithful and shares zero characters. If you find yourself tuning
+`MIN_MEANINGFUL_OVERLAP` to fix false positives or false negatives, you are only
+trading one for the other — the distinction is semantic and a character statistic
+cannot see it. That threshold is a *screen* that routes uncertain rewrites to
+model adjudication; it is not the verdict. `docs/DECISIONS.md` (2026-08-13) has
+the measured false-positive rate.
+
+**10. Test a labelling-prompt change on a small batch before the corpus, and
+count the items.** Prompt rules are global: one aimed at a single product changes
+every product. Twice now a rule written to fix one商品 measurably damaged others —
+the second attempt cut item counts across an 8-product batch by 20% while still
+not fixing its target. Build a chunk of the products where the behaviour is
+visible, run it, and diff the picks against the live cache *before* spending an
+hour of `EFFORT=max` on 826 rows. Watch total item count, not just the case you
+were aiming at. Imperative phrasing (`drop the item`, `this rule outranks…`) is
+what turns a judgement rule into a blunt one; prefer describing what good output
+looks like. `docs/DECISIONS.md` (2026-08-14) has both failed attempts.
+
+**11. The sentiment prompt is not in `scripts/prompts/`.** The other four layers
+have prompt files there; sentiment's canonical prompt is an inline heredoc in
+`scripts/ops/rebackfill.sh` (~line 126). Searching `scripts/prompts/`, finding
+nothing, and concluding it was never versioned leads to reconstructing it — and a
+reconstruction scores the same comments differently, which splits the cache into
+two disagreeing conventions that no test catches. This has happened; it was caught
+only because a cron commit had labelled 13 of the same comments and 10 disagreed.
+**If two label rows for the same kind of input disagree in style, go find the
+cron's prompt before writing your own.** Grep the `scripts/ops/*.sh` heredocs.
+
+**12. A long-lived branch will conflict with the daily cron on all seven data
+files, and six of them must not be hand-merged.** The cron commits to `main`
+nightly, so any branch open for more than a day comes back to conflicts in the
+five label CSVs plus `data/results.json` and `web/public/data.json`. They split
+into two kinds, and the fix differs:
+
+- **The five label CSVs are append-only caches keyed by fingerprint** → resolve by
+  **union**, not by picking a side. Neither side is "the" version; both are
+  partial.
+- **`results.json` and `data.json` are derived artifacts** → **never merge them at
+  all.** Take either side to clear the conflict, then regenerate from
+  `data/posts.jsonl` (`run_pipeline` → `save_results` → `web/build_data.py`). A
+  textually merged JSON can be internally inconsistent in ways that still parse.
+
+The trap inside the trap: the same fingerprint can carry **different values** on
+the two sides, because the fingerprint keys the model's *input* and the model is
+non-deterministic. A blind row-union then produces a result worse than either
+branch. Seen 2026-08-25: `main` had `紫桑果粒紅茶/青茶` as one product with a real
+excerpt, the branch had it split into two blank-shell products; unioning the rows
+yielded the merged name *plus* one of the splits — a duplicate that existed on
+neither side. **Diff the colliding rows and judge them on content**, and for
+`product_name_labels.csv` replace the whole item-set for a fingerprint rather than
+merging row by row, since one fingerprint maps to N products and N differs between
+sides. Rebase is worse than merge here: every data commit touches `results.json`,
+so a rebase re-fights the same conflict once per commit.
 
 **8. The soft-serve zone reads flavour count out of the product name.** There is
 no flavour field anywhere in the pipeline, so `web/lib/soft-serve.ts` decides

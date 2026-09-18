@@ -43,7 +43,24 @@ cd "$REPO" || die "no repo at $REPO"
 git fetch -q origin "$BRANCH" || die "git fetch $BRANCH"
 if git worktree list --porcelain | grep -q "worktree $WT"; then
   git -C "$WT" fetch -q origin "$BRANCH"
-  git -C "$WT" checkout -q "$BRANCH" 2>/dev/null || git -C "$WT" checkout -q -B "$BRANCH" "origin/$BRANCH"
+  git -C "$WT" checkout -q "$BRANCH" 2>/dev/null \
+    || git -C "$WT" checkout -q -B "$BRANCH" "origin/$BRANCH" 2>/dev/null
+  # git refuses to check out a branch another worktree already holds, and both
+  # attempts above then fail quietly. The reset below would still succeed — it
+  # would move whichever branch this worktree is on to BRANCH's commit — and the
+  # run would crawl, label, recompute and commit onto that branch without a word.
+  # A 2026-08-27 run put its data commit on the main clone's feature branch that
+  # way. Confirm the checkout took before anything writes.
+  on_branch="$(git -C "$WT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
+  [ "$on_branch" = "$BRANCH" ] || die \
+    "worktree $WT is on '$on_branch', not '$BRANCH' (another worktree probably holds that branch)"
+  # A run whose push was rejected leaves its commit here, and the reset below would
+  # destroy it together with every label that run paid for. Park it on a branch first
+  # so the labels can still be recovered by hand.
+  if ! git -C "$WT" merge-base --is-ancestor HEAD "origin/$BRANCH" 2>/dev/null; then
+    keep="rebackfill-unpushed-$(date -u +%Y%m%dT%H%M%SZ)"
+    git -C "$WT" branch "$keep" HEAD && log "kept an unpushed commit as branch $keep"
+  fi
   git -C "$WT" reset -q --hard "origin/$BRANCH"
 else
   rm -rf "$WT"
@@ -56,10 +73,53 @@ _excl="$(git rev-parse --git-path info/exclude 2>/dev/null)"
 [ -n "$_excl" ] && { grep -qxF 'rebackfill_work/' "$_excl" 2>/dev/null || echo 'rebackfill_work/' >> "$_excl"; }
 
 # --- persistent posts.jsonl so we only ever crawl the delta ---
+# The worktree store is the working copy; the seed is its mirror, refreshed from
+# it at the end of every successful run. Reconcile BOTH ways before crawling.
+# Seeding only when the worktree store was missing meant a seed replaced out of
+# band -- a corpus backfill published straight into $REPO/data -- sat unused
+# while the run recomputed and published from the older worktree copy, dropping
+# every post the backfill had added (2026-08-26: 2,342 products -> 812) and then
+# mirroring the smaller store back over the seed at the end. The reconcile is
+# append-only on post id, so the worktree's fresher comment snapshots always win
+# and neither side can lose posts.
 mkdir -p data
 if [ ! -s data/posts.jsonl ] && [ -s "$STORE_SEED" ]; then
   cp "$STORE_SEED" data/posts.jsonl
   log "seeded posts.jsonl from $STORE_SEED ($(wc -l < data/posts.jsonl) posts)"
+elif [ -s "$STORE_SEED" ]; then
+  python3 - "$STORE_SEED" data/posts.jsonl <<'PY' || die "seed reconcile"
+import json, os, sys
+
+seed, store = sys.argv[1], sys.argv[2]
+
+
+def rows(path):
+    with open(path, encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if line:
+                yield json.loads(line)
+
+
+have = {row["id"] for row in rows(store)}
+missing = [row for row in rows(seed) if row["id"] not in have]
+if not missing:
+    print("seed reconcile: store already covers the seed")
+else:
+    with open(store, encoding="utf-8") as handle:
+        body = handle.read()
+    if body and not body.endswith("\n"):
+        body += "\n"
+    tmp = store + ".reconcile"
+    with open(tmp, "w", encoding="utf-8") as handle:
+        handle.write(body)
+        for row in missing:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(tmp, store)
+    print(f"seed reconcile: appended {len(missing)} post(s) from {seed}")
+PY
 fi
 [ -s data/posts.jsonl ] || die "no posts.jsonl seed available (set STORE_SEED)"
 
@@ -263,6 +323,15 @@ reports, profiles = run_pipeline(posts)
 save_results(reports, profiles, "data/results.json")
 print(f"[recompute] {len(reports)} reports")
 PY
+# --- 7c. categories: label the products the recompute just settled on ---
+# This layer is not in run_required_label_layers.sh because it cannot run there:
+# its fingerprint is keyed to the final product name, which only exists once the
+# recompute above has written results.json. build_data resolves each category
+# through the cache, so labels imported here reach the snapshot without a second
+# recompute. Like the layers above it, a failure stops the run rather than
+# shipping a snapshot whose categories quietly fell back to the keyword rule.
+bash scripts/label_product_categories.sh || die "category labeling"
+
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
 # --- 8. commit (+push): labels + recomputed, de-identified public data ---
@@ -270,18 +339,29 @@ if [ "$DO_COMMIT" = "1" ]; then
   # Every label cache this run may have written has to be committed. Step 0 resets the
   # worktree to origin, so an uncommitted label file is silently destroyed before the
   # next run — and the layer would be paid for and re-labelled every single day.
+  # grounding_verdicts.csv was missing from this list until 2026-08-27 and was being
+  # re-adjudicated daily for exactly that reason.
   git add data/labels/sentiment_fingerprint_labels.csv \
           data/labels/product_name_labels.csv \
           data/labels/excerpt_labels.csv \
           data/labels/comment_picks.csv \
+          data/labels/product_category_labels.csv \
+          data/labels/grounding_verdicts.csv \
           data/results.json web/public/data.json
   if git diff --cached --quiet; then
     log "no data change to commit"
   else
     git commit -q -m "chore: refresh live data + LLM labels (sentiment cache ${before}→${after})
 
-Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
-    [ "$PUSH" = "1" ] && { git push -q origin "$BRANCH" && log "pushed to origin/$BRANCH"; }
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>" || die "git commit"
+    # This script runs without `set -e`, so a rejected push (main moved while the run
+    # was labelling) used to fall through to DONE, exit 0, and let the cron mark the
+    # day a success while the site stayed stale. It has to fail the run.
+    if [ "$PUSH" = "1" ]; then
+      git push -q origin "$BRANCH" \
+        || die "git push to origin/$BRANCH (the commit stays in $WT; the next run parks it on a branch)"
+      log "pushed to origin/$BRANCH"
+    fi
   fi
 fi
 

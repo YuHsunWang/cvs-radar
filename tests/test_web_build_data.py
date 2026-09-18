@@ -7,7 +7,9 @@ from types import SimpleNamespace
 
 import web.build_data as build_data
 from web.build_data import (
+    ALLOW_PRODUCT_DROP_ENV,
     apply_product_override,
+    assert_no_product_collapse,
     assert_unique_product_ids,
     calibrate_recommendation_score,
     calibrate_recommendation_scores,
@@ -86,11 +88,58 @@ def test_stale_source_snapshot_prints_build_warning(
     source.write_text(json.dumps({"generated_at": "2026-07-01 12:00:00"}), encoding="utf-8")
     site_built_at = datetime(2026, 7, 23, 4, 0, tzinfo=timezone.utc)
 
-    resolve_data_timestamps(source, site_built_at)
+    resolve_data_timestamps(source, site_built_at, now=site_built_at)
 
     warning = capsys.readouterr().out
     assert "WARNING: source data is stale" in warning
     assert "threshold: 14 days" in warning
+
+
+def test_stale_warning_ignores_the_carried_over_site_build_time(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # siteBuiltAt is carried over from the committed artifact, so it can be older than
+    # the data itself (live since 2026-08-25). Old data must still warn.
+    source = tmp_path / "results.json"
+    source.write_text(json.dumps({"generated_at": "2026-08-01 12:00:00"}), encoding="utf-8")
+
+    resolve_data_timestamps(
+        source,
+        site_built_at=datetime(2026, 7, 1, tzinfo=timezone.utc),
+        now=datetime(2026, 9, 1, tzinfo=timezone.utc),
+    )
+
+    assert "WARNING: source data is stale" in capsys.readouterr().out
+
+
+def test_product_count_gate_passes_daily_drift_and_stops_a_collapse(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv(ALLOW_PRODUCT_DROP_ENV, raising=False)
+    assert_no_product_collapse(2356, 2347)  # 2026-09-09, the largest real daily dip
+    assert_no_product_collapse(None, 0)  # first build: nothing to compare against
+    with pytest.raises(ValueError, match="refusing to publish"):
+        assert_no_product_collapse(2342, 812)  # 2026-08-26, which shipped
+    monkeypatch.setenv(ALLOW_PRODUCT_DROP_ENV, "1")
+    assert_no_product_collapse(2342, 812)  # an intended cut can still go out
+
+
+def test_collapsed_rebuild_leaves_the_published_snapshot_untouched(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "results.json"
+    output = tmp_path / "data.json"
+    source.write_text(json.dumps({"generated_at": "2026-09-15 08:30:00"}), encoding="utf-8")
+    published = {"generatedAt": "2026-09-14T08:30:00+08:00", "siteBuiltAt": "2026-08-25T00:00:00+00:00",
+                 "products": [{"id": f"p{i}"} for i in range(10)]}
+    output.write_text(json.dumps(published), encoding="utf-8")
+    monkeypatch.setattr(build_data, "ROOT", tmp_path)
+    monkeypatch.setattr(build_data, "load_results", lambda _source: ([], []))
+    monkeypatch.setattr(build_data, "load_product_overrides", lambda: {})
+    monkeypatch.delenv(ALLOW_PRODUCT_DROP_ENV, raising=False)
+
+    with pytest.raises(ValueError, match="from 10 to 0"):
+        build_data.main(source=source, output=output)
+
+    assert json.loads(output.read_text(encoding="utf-8")) == published
 
 
 def test_recommendation_score_calibration_is_monotonic_and_reaches_nineties() -> None:
@@ -212,6 +261,34 @@ def test_load_and_apply_product_overrides(tmp_path: Path) -> None:
         "excerpt": "",
     }
     assert product["productName"] == "錯誤名稱"
+
+
+def test_merge_keeps_a_category_override_that_the_keyword_rule_would_undo() -> None:
+    """A 分類 fix must survive merging.
+
+    The two rows below carry the same public id, so they merge — and 促銷組合 hits
+    no category keyword, so anything that re-derives the category on merge answers
+    其他 and throws the override away.
+    """
+    overridden = {
+        "id": "7-11::促銷組合",
+        "brand": "7-11",
+        "productName": "促銷組合",
+        "category": "鹹食",
+        "nPosts": 1,
+        "nComments": 4,
+        "_nEff": 4,
+        "likes": [],
+        "cautions": [],
+        "postUrls": [],
+        "latestDate": "2026-06-01",
+    }
+    weaker = dict(overridden, nComments=1, _nEff=1, latestDate="2026-05-01")
+
+    merged = merge_products([overridden, weaker])
+
+    assert len(merged) == 1
+    assert merged[0]["category"] == "鹹食"
 
 
 def test_blank_override_fields_preserve_generated_values(tmp_path: Path) -> None:
@@ -391,7 +468,11 @@ def test_override_collision_merges_into_one_public_product() -> None:
     assert merged[0]["firstDate"] == "2026-05-01"
     assert merged[0]["likes"] == ["甲", "共同", "乙"]
     assert merged[0]["cautions"] == ["太甜", "偏貴", "份量少"]
-    assert merged[0]["category"] == "其他"
+    # The merge keeps the dominant member's category rather than re-deriving one
+    # from the renamed product. Re-deriving it meant a keyword guess overwrote
+    # both the LLM label and any 分類 fix in product_overrides.csv, silently, on
+    # every product that happened to merge.
+    assert merged[0]["category"] == "甜點"
     assert merged[0]["price"] == 60
     assert merged[0]["excerpt"] == "新貼文負評"
     assert merged[0]["postUrls"] == [
@@ -450,6 +531,7 @@ def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
         rep_positive=["茶香明顯 https://example.com/photo.jpg"],
         rep_negative=["包裝有刮痕 www.example.com/photo.jpg"],
         review_excerpt="",
+        review_provisional=True,
         post_urls=[],
         latest_post_date=None,
     )
@@ -466,3 +548,4 @@ def test_public_score_fixture_keeps_fair_and_recommendation_scores_distinct(
     assert product["independentThreads"] == 2
     assert product["likes"] == ["茶香明顯"]
     assert product["cautions"] == ["包裝有刮痕"]
+    assert product["reviewProvisional"] is True

@@ -5,20 +5,57 @@ from statistics import mean
 import unittest
 from unittest.mock import patch
 
-from cvs_radar.models import Comment, Post
+from cvs_radar.models import Comment, CommentOpinion, Post
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.preference import _burst_ratio, _template_like_ratio, build_profiles
 from cvs_radar.reporting import render_suspicion_detail
+from cvs_radar.config import SHILL_DETECTION
 from cvs_radar.scoring import (
+    _author_shill_flagged,
     _decay,
     _is_shill_comment,
     _shill_stats,
     build_comment_opinions,
+    preprocess_posts,
     score_product,
 )
 
 
 class SuspicionSignalTest(unittest.TestCase):
+    def test_published_score_credibility_is_invariant_to_preprocessed_post_order(self) -> None:
+        # Routed copies are one source comment and therefore one account action.
+        # Its profile signal is the mean of the product-specific sentiments; which
+        # product row happens to come first must never change published scores.
+        shared = "左邊不好吃，右邊還可以"
+        shared_url = "https://example.test/shared-comparison"
+        left = Post(id="shared-left", url=shared_url, brand="全家", product_name="左邊")
+        right = Post(id="shared-right", url=shared_url, brand="全家", product_name="右邊")
+        left.comments = [Comment("推", "order-test-user", shared, attributed_product="左邊")]
+        right.comments = [Comment("推", "order-test-user", shared, attributed_product="右邊")]
+        posts = [left, right]
+        opinions = {
+            ("shared-left", 0): CommentOpinion(True, -1.0),
+            ("shared-right", 0): CommentOpinion(True, 0.2),
+        }
+        for index in range(4):
+            post = Post(id=f"ordinary-{index}", brand="全家", product_name=f"一般{index}")
+            post.comments = [Comment("推", "order-test-user", f"不同內容{index}")]
+            posts.append(post)
+            opinions[(post.id, 0)] = CommentOpinion(True, 1.0)
+
+        forward = build_profiles(posts, opinions)
+        reversed_order = build_profiles(list(reversed(posts)), opinions)
+
+        self.assertEqual(
+            {user: profile.credibility for user, profile in forward.items()},
+            {user: profile.credibility for user, profile in reversed_order.items()},
+        )
+        self.assertEqual(forward["order-test-user"].total_comments, 5)
+        self.assertAlmostEqual(
+            forward["order-test-user"].brand_stats["全家"].avg_sentiment,
+            0.72,
+        )
+
     def test_burst_ratio_detects_same_brand_window(self) -> None:
         start = datetime(2026, 6, 1, 10, 0)
         timestamps = [start + timedelta(minutes=20 * index) for index in range(5)]
@@ -235,7 +272,15 @@ class ShillDetectionTest(unittest.TestCase):
         self.assertFalse(flag)
         self.assertEqual(ratio, 0.0)
 
-    def test_shill_flag_reduces_score_via_pipeline(self) -> None:
+    def test_shill_accusation_discounts_the_author_and_nobody_else(self) -> None:
+        """The accusation is aimed at whoever wrote the review, so only that vote moves.
+
+        Scaling every opinion instead punishes the accusers along with the accused,
+        and because mu/sigma/n_eff all divide by the total weight, a uniform scale
+        only pulls fair01 toward the prior — which raises the score of a product
+        people are calling a paid promo. Asserting the commenters keep their exact
+        weights is what makes this test fail if the penalty ever goes group-wide.
+        """
         start = datetime(2026, 6, 10, 14, 0)
         shill_posts = [
             Post(
@@ -254,13 +299,87 @@ class ShillDetectionTest(unittest.TestCase):
         ]
         reports, _ = run_pipeline(shill_posts)
         with patch(
-            "cvs_radar.scoring.compute._shill_stats", return_value=(0.0, False)
+            "cvs_radar.scoring.compute._author_shill_flagged", return_value=False
         ):
             control_reports, _ = run_pipeline(shill_posts)
 
         self.assertTrue(reports[0].shill_flag)
         self.assertGreater(reports[0].shill_ratio, 0.0)
-        self.assertLess(reports[0].fair_score, control_reports[0].fair_score)
+
+        weights = {c.user: c.weight for c in reports[0].contributors}
+        control = {c.user: c.weight for c in control_reports[0].contributors}
+        penalty = float(SHILL_DETECTION["post_weight_penalty"])
+        self.assertAlmostEqual(weights["promo"], control["promo"] * penalty, places=4)
+        for commenter in ("a", "b", "c", "d"):
+            self.assertAlmostEqual(weights[commenter], control[commenter], places=4)
+
+    def test_multi_product_shill_accusation_discounts_author_on_every_split(self) -> None:
+        """Post-level accusations must survive product-specific comment routing."""
+        start = datetime(2026, 6, 10, 14, 0)
+
+        def split_posts(accusation: str) -> list[Post]:
+            return preprocess_posts([
+                Post(
+                    id="multi-product-shill",
+                    brand="全家",
+                    product_name="草莓大福/巧克力泡芙 各49元",
+                    author="promo",
+                    author_score=80,
+                    posted_at=start,
+                    comments=[
+                        Comment("推", "fan-a", "草莓大福很好吃", start),
+                        Comment("推", "fan-b", "巧克力泡芙很好吃", start),
+                        Comment("噓", "accuser-a", accusation, start),
+                        Comment("噓", "accuser-b", accusation, start),
+                        Comment("噓", "accuser-c", accusation, start),
+                    ],
+                )
+            ])
+
+        accused = split_posts("業配文吧")
+        control = split_posts("先觀望")
+        self.assertEqual(len(accused), 2)
+        self.assertEqual([len(post.comments) for post in accused], [1, 1])
+
+        accused_reports, _ = run_pipeline(accused, now=start)
+        control_reports, _ = run_pipeline(control, now=start)
+        penalty = float(SHILL_DETECTION["post_weight_penalty"])
+        for report in accused_reports:
+            matching_control = next(
+                item for item in control_reports
+                if item.product_name == report.product_name
+            )
+            author_weight = next(
+                item.weight for item in report.contributors if item.user == "promo"
+            )
+            control_weight = next(
+                item.weight for item in matching_control.contributors
+                if item.user == "promo"
+            )
+            self.assertTrue(report.shill_flag)
+            self.assertAlmostEqual(author_weight, control_weight * penalty, places=4)
+
+    def test_one_accuser_does_not_discount_the_author(self) -> None:
+        """業配 is cheap to shout, so a lone accusation is not a verdict.
+
+        12 of the 16 accused posts in the corpus carry exactly one accusation; if a
+        single account could halve a reviewer's vote, the cheapest way to sink a
+        review would be to shout at it once.
+        """
+        start = datetime(2026, 6, 10, 14, 0)
+        post = Post(
+            id="one-accuser",
+            brand="全家",
+            product_name="單人指控",
+            author="reviewer",
+            author_score=95,
+            comments=[
+                Comment("推", "a", "好吃", start),
+                Comment("推", "b", "不錯吃", start + timedelta(minutes=1)),
+                Comment("噓", "c", "業配", start + timedelta(minutes=2)),
+            ],
+        )
+        self.assertFalse(_author_shill_flagged(post))
 
     def test_shill_stats_ignores_too_few_comments(self) -> None:
         posts = [

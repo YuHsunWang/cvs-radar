@@ -21,7 +21,7 @@ if str(ROOT) not in sys.path:
 from cvs_radar.app_helpers import consensus_distribution, volume_label  # noqa: E402
 from cvs_radar.config import SCORING  # noqa: E402
 from cvs_radar.scoring.compute import _classify, _confidence  # noqa: E402
-from cvs_radar.scoring.identity import categorize_product  # noqa: E402
+from cvs_radar.product_categories import resolve_category  # noqa: E402
 from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
 from cvs_radar.store import load_results  # noqa: E402
 
@@ -30,11 +30,16 @@ PRODUCT_OVERRIDES_PATH = ROOT / "data" / "labels" / "product_overrides.csv"
 CLEAR_VALUE = "__CLEAR__"
 REPRESENTATIVE_LIMIT = 3
 DATA_STALE_DAYS = 14
+# Largest share of products one rebuild may lose before publishing is refused.
+MAX_PRODUCT_DROP = 0.2
+ALLOW_PRODUCT_DROP_ENV = "CVS_ALLOW_PRODUCT_DROP"
 TAIPEI_TIMEZONE = ZoneInfo("Asia/Taipei")
 URL_PATTERN = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
 
 
-def resolve_data_timestamps(source: Path, site_built_at: datetime) -> tuple[str, str]:
+def resolve_data_timestamps(
+    source: Path, site_built_at: datetime, now: datetime | None = None
+) -> tuple[str, str]:
     source_payload = json.loads(source.read_text(encoding="utf-8"))
     source_generated_at = source_payload.get("generated_at")
     if not source_generated_at:
@@ -44,7 +49,10 @@ def resolve_data_timestamps(source: Path, site_built_at: datetime) -> tuple[str,
     data_generated_at = datetime.strptime(
         source_generated_at, "%Y-%m-%d %H:%M:%S"
     ).replace(tzinfo=TAIPEI_TIMEZONE)
-    data_age = site_built_at - data_generated_at.astimezone(timezone.utc)
+    # Measure against the clock, not site_built_at: that value is carried over from
+    # the committed artifact so rebuilds stay reproducible, and once it is older than
+    # the data (it froze on 2026-08-25) the age came out negative and never warned.
+    data_age = (now or datetime.now(timezone.utc)) - data_generated_at.astimezone(timezone.utc)
     if data_age > timedelta(days=DATA_STALE_DAYS):
         print(
             "WARNING: source data is stale: "
@@ -66,6 +74,31 @@ def existing_site_built_at(output: Path) -> datetime | None:
     except (OSError, TypeError, ValueError, json.JSONDecodeError):
         return None
     return timestamp if timestamp.tzinfo is not None else None
+
+
+def existing_product_count(output: Path) -> int | None:
+    """Product count of the snapshot about to be replaced, or None if there is none."""
+    try:
+        products = json.loads(output.read_text(encoding="utf-8")).get("products")
+    except (OSError, ValueError, AttributeError):
+        return None
+    return len(products) if isinstance(products, list) else None
+
+
+def assert_no_product_collapse(previous: int | None, current: int) -> None:
+    """Refuse to replace a snapshot with one that lost a large share of its products.
+
+    Day to day the count moves by a handful. On 2026-08-26 it went 2,342 -> 812 and
+    shipped, because nothing on the publish path looked at volume. A drop that size
+    means a truncated store or a broken parser, not a change on PTT.
+    """
+    if not previous or os.environ.get(ALLOW_PRODUCT_DROP_ENV) == "1":
+        return
+    if current < previous * (1 - MAX_PRODUCT_DROP):
+        raise ValueError(
+            f"refusing to publish: product count fell from {previous} to {current} "
+            f"(more than {MAX_PRODUCT_DROP:.0%}); set {ALLOW_PRODUCT_DROP_ENV}=1 if intended"
+        )
 
 
 def load_product_overrides(path: Path = PRODUCT_OVERRIDES_PATH) -> dict[str, dict[str, Any]]:
@@ -107,6 +140,8 @@ def apply_product_override(
     for field in ("brand", "productName", "category", "excerpt"):
         if field in override:
             corrected[field] = "" if override[field] == CLEAR_VALUE else override[field]
+            if field == "excerpt" and "reviewProvisional" in corrected:
+                corrected["reviewProvisional"] = False
     if "price" in override:
         corrected["price"] = None if override["price"] == CLEAR_VALUE else int(override["price"])
     corrected["id"] = f"{corrected['brand']}::{corrected['productName']}"
@@ -247,7 +282,6 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
             merged["postUrls"] = sorted(
                 {url for item in members for url in item.get("postUrls", [])}
             )
-            merged["category"] = categorize_product(merged["productName"])
             newest = sorted(
                 members,
                 key=lambda item: (item.get("latestDate") or "", item.get("id") or ""),
@@ -260,6 +294,9 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
             merged["excerpt"] = next(
                 (item.get("excerpt", "") for item in newest if item.get("excerpt")),
                 "",
+            )
+            merged["reviewProvisional"] = any(
+                bool(item.get("reviewProvisional", False)) for item in members
             )
             merged["volumeLevel"] = clean_volume_label(
                 volume_label(
@@ -356,7 +393,12 @@ def to_product(report: Any, recommendation_score: int | None = None) -> dict[str
         "brand": report.brand,
         "productName": report.product_name,
         "price": report.price,
-        "category": report.category or "",
+        # Resolved here, not just taken from the report: results.json may predate
+        # the category label cache, and a manual override in product_overrides.csv
+        # is applied after this and still wins.
+        "category": resolve_category(
+            report.brand, report.product_name, fallback=report.category or ""
+        ),
         "fairScore": round(fair_score) if fair_score is not None else None,
         "recommendationScore": recommendation_score,
         "consensus": report.consensus,
@@ -376,6 +418,7 @@ def to_product(report: Any, recommendation_score: int | None = None) -> dict[str
         "likes": clean_representatives(list(report.rep_positive or [])),
         "cautions": clean_representatives(list(report.rep_negative or [])),
         "excerpt": report.review_excerpt or "",
+        "reviewProvisional": bool(getattr(report, "review_provisional", False)),
         "postUrls": list(report.post_urls or []),
         "latestDate": latest_date,
         "_scoreWeight": getattr(report, "score_weight_sum", 0.0),
@@ -403,13 +446,15 @@ def validate_payload(payload: dict[str, Any]) -> None:
         "consensus", "confidence", "nPosts", "nComments", "rawComments",
         "eligibleComments", "uniqueEligibleCommenters", "independentThreads",
         "volumeLevel", "positivePct",
-        "neutralPct", "negativePct", "likes", "cautions", "excerpt", "postUrls", "latestDate",
+        "neutralPct", "negativePct", "likes", "cautions", "excerpt", "reviewProvisional", "postUrls", "latestDate",
     }
     for index, product in enumerate(payload["products"]):
         if not isinstance(product, dict) or set(product) != required_fields:
             raise ValueError(f"public payload product {index} has an invalid shape")
         if not all(isinstance(product[key], str) for key in ("id", "brand", "productName", "category", "consensus", "confidence", "volumeLevel", "excerpt")):
             raise ValueError(f"public payload product {index} has invalid text fields")
+        if not isinstance(product["reviewProvisional"], bool):
+            raise ValueError(f"public payload product {index} has invalid excerpt provenance")
         count_fields = (
             "nPosts",
             "nComments",
@@ -472,6 +517,7 @@ def main(
             products.append(corrected)
     products = merge_products(products)
     assert_unique_product_ids(products)
+    assert_no_product_collapse(existing_product_count(output), len(products))
     generated_at, site_built_at_iso = resolve_data_timestamps(source, site_built_at)
     payload = {
         "generatedAt": generated_at,

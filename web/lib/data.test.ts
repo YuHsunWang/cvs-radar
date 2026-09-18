@@ -43,6 +43,7 @@ function product(overrides: Partial<Product>): Product {
     likes: [],
     cautions: [],
     excerpt: '',
+    reviewProvisional: false,
     postUrls: [],
     latestDate: '2026-06-15',
     ...overrides,
@@ -68,6 +69,10 @@ describe('applyAdvanced', () => {
 })
 
 describe('filterByCategory', () => {
+  it('keeps products identifiable as other when category data is absent', () => {
+    expect(displayCategory(null)).toBe('其他')
+    expect(displayCategory(undefined)).toBe('其他')
+  })
   const products = [
     product({ id: 'meal', category: '便當' }),
     product({ id: 'savory', category: '鹹食' }),
@@ -158,6 +163,11 @@ describe('consensusTone', () => {
 })
 
 describe('formatDisplayDate', () => {
+  it('admits an unknown snapshot timestamp instead of promising a pending update', () => {
+    for (const value of ['', 'invalid', null, undefined]) {
+      expect(formatDisplayDate(value)).toBe('更新時間不明')
+    }
+  })
   it('converts UTC timestamps to the Taiwan calendar date', () => {
     expect(formatDisplayDate('2026-07-10T23:55:11+00:00')).toBe('2026/07/11')
   })

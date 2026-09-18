@@ -8,10 +8,12 @@
 # Like the other labelling steps this needs a local Codex CLI and is NOT reproducible
 # in CI — which is exactly why the answers are cached in a committed CSV.
 #
-# Env overrides: REPO CHUNK CONC MODEL RUNNER DELTA
+# Env overrides: REPO POSTS LABELS CHUNK CONC MODEL RUNNER DELTA EFFORT
 set -uo pipefail
 
 REPO="${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+POSTS="${POSTS:-$REPO/data/posts.jsonl}"
+LABELS="${LABELS:-$REPO/data/labels/excerpt_labels.csv}"
 CHUNK="${CHUNK:-100}"
 CONC="${CONC:-5}"
 MODEL="${MODEL:-gpt-5.6-luna}"
@@ -31,7 +33,7 @@ trap 'rm -rf "$WORK"' EXIT
 DELTA="${DELTA:-$WORK/delta.csv}"
 
 # --- 1. export the still-unlabelled products ---
-python3 scripts/export_excerpts.py --out "$DELTA" 2>&1 | tail -1 || die "export"
+python3 scripts/export_excerpts.py --posts "$POSTS" --labels "$LABELS" --out "$DELTA" 2>&1 | tail -1 || die "export"
 N="$(python3 -c "import csv,sys;csv.field_size_limit(10**7);print(sum(1 for _ in csv.DictReader(open('$DELTA',encoding='utf-8-sig'))))")"
 [ "$N" -eq 0 ] && { log "nothing new to label — done."; exit 0; }
 log "delta: $N pair(s)"
@@ -68,11 +70,14 @@ log "labeling $(ls excerpt_work/chunks/chunk_*.csv | wc -l) chunk(s), concurrenc
 : > "$WORK/manifest.tsv"
 run_one(){
   local nn="$1"
+  local effort_args=()
+  [ -z "${EFFORT:-}" ] || effort_args=(--effort "$EFFORT")
   node "$RUNNER" "$WORK/prompts/prompt_${nn}.md" --cwd "$REPO" --model "$MODEL" \
+       "${effort_args[@]}" \
        --timeout 2400000 --inactivity-timeout 600000 > "$WORK/chunk_${nn}.log" 2>&1
   printf '%s\t%s\n' "$nn" "$?" >> "$WORK/manifest.tsv"
 }
-export -f run_one; export RUNNER WORK REPO MODEL
+export -f run_one; export RUNNER WORK REPO MODEL EFFORT="${EFFORT:-}"
 ls excerpt_work/chunks/chunk_*.csv | sed -E 's/.*chunk_([0-9]+)\.csv/\1/' \
   | xargs -P"$CONC" -I{} bash -c 'run_one "$@"' _ {}
 bad="$(awk -F'\t' '$2!=0' "$WORK/manifest.tsv" | wc -l)"
@@ -103,14 +108,14 @@ for src in sorted(glob.glob(f"{source_dir}/chunk_*.csv")):
         errors.append(f"{name}: {len(want - got)} fingerprint(s) dropped")
     if got - want:
         errors.append(f"{name}: unknown fingerprint(s) added")
-    # review_text is the ground truth an excerpt must be quoted from, so a chunk
-    # that rewrote it would let an unverifiable excerpt through.
+    # Context and candidate pools are immutable: changing them would silently
+    # re-aim the source indices.
     original = {r["fingerprint"]: r for r in source_rows}
     for i, row in enumerate(rows, 1):
         source = original.get(row["fingerprint"])
         if source is None:
             continue
-        for column in ("post_id", "product_name", "review_text"):
+        for column in ("fingerprint", "post_id", "brand", "product_name", "other_products", "review_text", "body_candidates", "prompt_version"):
             if row.get(column, "") != source.get(column, ""):
                 errors.append(f"{name} r{i}: {column} was modified")
     combined.extend(rows)
@@ -125,7 +130,7 @@ print(f"verified {len(combined)} labeled rows -> {out}")
 PY
 
 # --- 6. import into the committed cache ---
-python3 scripts/import_excerpts.py "$WORK/all_labeled.csv" --source "$DELTA" \
+python3 scripts/import_excerpts.py "$WORK/all_labeled.csv" --source "$DELTA" --labels "$LABELS" \
         --model-tag "$MODEL" 2>&1 | tail -1 || die "import"
 rm -rf excerpt_work
 log "DONE. delta labeled=$N"

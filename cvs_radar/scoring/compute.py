@@ -16,8 +16,14 @@ from ..preference import AccountProfile
 
 from ._common import (_OFF_TOPIC_COMMENT_RE)
 from .attribution import (_comment_attribution, _competitor_stats, _is_reaction_echo_comment)
-from .excerpt import (_load_review_excerpt_overrides, _rep_comments, _review_excerpt, representative_product_name)
-from .identity import (categorize_product, group_products, normalize_product)
+from .excerpt import (
+    _load_review_excerpt_overrides,
+    _rep_comments_with_provenance,
+    _review_excerpt_with_provenance,
+    representative_product_name,
+)
+from ..product_categories import resolve_category
+from .identity import (_AUTHOR_SHILL_FLAG_KEY, group_products, normalize_product)
 
 
 def _weighted_mean(pairs: list[tuple[float, float]]) -> float:
@@ -129,6 +135,7 @@ def _author_contributions(
 ) -> list[tuple[str, str, float, float]]:
     """One (user, role, score01, weight) row per scored post."""
     role_weight = float(SCORING["role_weight"]["author"])
+    penalty = float(SHILL_DETECTION["post_weight_penalty"])
     rows: list[tuple[str, str, float, float]] = []
     for post in posts:
         if post.author_score is None:
@@ -138,6 +145,14 @@ def _author_contributions(
         # the same per-user cap apply. Leaving authors uncapped let one account post
         # ten reviews of one product and carry ten full votes.
         weight = max(0.0, _credibility(profiles, post.author) * role_weight * _decay(post.posted_at, now))
+        # A shill accusation is aimed at whoever wrote the review, so it discounts
+        # that one vote. Scaling every opinion on the product instead — what this
+        # did until 2026-08-21 — punished the accusers alongside the accused, and
+        # since mu, sigma and n_eff all divide by the total weight, a uniform
+        # scale left them untouched and only pulled fair01 toward the 0.5 prior:
+        # a badly reviewed product scored *higher* for being called a paid promo.
+        if _author_shill_flagged(post):
+            weight *= penalty
         rows.append((post.author, "author", score01, weight))
     return rows
 
@@ -200,8 +215,33 @@ def _is_shill_comment(text: str) -> bool:
     return False
 
 
+def _author_shill_flagged(post: Post) -> bool:
+    """Whether this post's own thread accuses its author of writing a paid promo.
+
+    Two distinct accounts are required because 業配 costs nothing to shout on PTT:
+    12 of the 16 accused posts in the corpus carry exactly one accusation, and one
+    person's suspicion should not discount someone's review. The ratio floor keeps
+    a couple of shouts inside a very long thread from reading as a verdict.
+    """
+    preserved = post.raw.get(_AUTHOR_SHILL_FLAG_KEY)
+    if post.sibling_products and isinstance(preserved, bool):
+        return preserved
+    comments = [comment for comment in post.comments if comment.text.strip()]
+    if len(comments) < int(SHILL_DETECTION["min_comments"]):
+        return False
+    accusations = [comment for comment in comments if _is_shill_comment(comment.text)]
+    accusers = {comment.user for comment in accusations if comment.user}
+    if len(accusers) < int(SHILL_DETECTION["author_min_accusers"]):
+        return False
+    return len(accusations) / len(comments) >= float(SHILL_DETECTION["author_ratio_threshold"])
+
+
 def _shill_stats(posts: list[Post]) -> tuple[float, bool]:
-    """計算貼文群組的業配喊聲比例與是否標記。"""
+    """業配喊聲比例（群組層）與是否有作者被指控。
+
+    Reported for observability only — the score effect lives in
+    ``_author_contributions``, on the accused author's own vote.
+    """
     total = 0
     shill_count = 0
     for post in posts:
@@ -211,11 +251,10 @@ def _shill_stats(posts: list[Post]) -> tuple[float, bool]:
             total += 1
             if _is_shill_comment(comment.text):
                 shill_count += 1
+    flag = any(_author_shill_flagged(post) for post in posts)
     if total < int(SHILL_DETECTION["min_comments"]):
-        return 0.0, False
-    ratio = shill_count / total
-    flag = ratio >= float(SHILL_DETECTION["ratio_threshold"])
-    return round(ratio, 4), flag
+        return 0.0, flag
+    return round(shill_count / total, 4), flag
 
 
 def score_product(
@@ -236,7 +275,6 @@ def score_product(
     mu0 = float(SCORING["prior_mean"])
     prior_strength = float(SCORING["prior_strength"])
     shill_ratio, shill_flag = _shill_stats(posts)
-    shill_penalty = float(SHILL_DETECTION["post_weight_penalty"]) if shill_flag else 1.0
 
     opinions = opinions or build_comment_opinions(posts)
     opinion_pairs, opinion_contributors = _opinion_pairs(posts, profiles, now, opinions)
@@ -246,9 +284,6 @@ def score_product(
         for index, comment in enumerate(post.comments)
         if opinions[(post.id, index)].include_score
     ]
-
-    if shill_flag and opinion_pairs:
-        opinion_pairs = [(score, weight * shill_penalty) for score, weight in opinion_pairs]
 
     if opinion_pairs:
         weighted_sum = sum(score * weight for score, weight in opinion_pairs)
@@ -270,8 +305,15 @@ def score_product(
     contributors = sorted(opinion_contributors, key=lambda c: -c.weight)
     product_name = representative_product_name(posts)
     product_key = f"{posts[0].brand}:{normalize_product(posts[0].brand, product_name)}"
-    review_excerpt = _load_review_excerpt_overrides().get(product_key) or _review_excerpt(posts)
-    rep_pos, rep_neg = _rep_comments(posts, excerpt=review_excerpt)
+    override = _load_review_excerpt_overrides().get(product_key)
+    if override:
+        review_excerpt = override
+        review_excerpt_provisional = False
+    else:
+        review_excerpt, review_excerpt_provisional = _review_excerpt_with_provenance(posts)
+    rep_pos, rep_neg, rep_provisional = _rep_comments_with_provenance(
+        posts, excerpt=review_excerpt
+    )
     (
         competitor_mention_count,
         competitor_preference_count,
@@ -313,7 +355,7 @@ def score_product(
         product_key=product_key,
         score_mean=round(mean01, 4),
         price=price,
-        category=categorize_product(product_name),
+        category=resolve_category(posts[0].brand, product_name),
         competitor_mention_count=competitor_mention_count,
         competitor_preference_count=competitor_preference_count,
         competitor_own_preference_count=competitor_own_preference_count,
@@ -322,6 +364,7 @@ def score_product(
         shill_flag=shill_flag,
         latest_post_date=latest_post_date,
         review_excerpt=review_excerpt,
+        review_provisional=review_excerpt_provisional or rep_provisional,
         post_urls=post_urls,
     )
 

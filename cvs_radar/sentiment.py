@@ -338,13 +338,22 @@ def comment_fingerprint_v2(post: Post, comment: Comment) -> str:
     product_name for all but a handful of items, so hashing the rewritten value here
     would miss every label the exporter wrote. Keeping the raw field also stops a
     product-name relabel from invalidating unrelated sentiment answers.
+
+    The exception is a comment routing attributed to one of several products it
+    names in the same post: the raw field is the whole post's, identical for each
+    of them, so hashing it would give "糰子不好吃 蕨餅還可以" one key and one
+    verdict to stand for two opposite ones. Those copies hash the product they
+    were attributed to, which is also the name the exporter shows the labeller,
+    so each is judged against the item it is about.
     """
     return sentiment_fingerprint_v2(
         post.url or post.id,
         comment.tag,
         comment.text,
         brand=post.brand,
-        product_name=post.source_product_name or post.product_name,
+        product_name=(
+            comment.attributed_product or post.source_product_name or post.product_name
+        ),
         post_title=post.title,
     )
 
@@ -442,20 +451,33 @@ def apply_sentiment_overrides(
     for post in posts:
         for comment in post.comments:
             key = _normalize_override_text(comment.text)
-            labelled = next(
-                (fp for fp in comment_fingerprints(post, comment) if fp in fingerprint_labels),
-                None,
+            # A comment attributed to one of several products it names needs the
+            # verdict decided against THAT product. The legacy fingerprint and both
+            # text-keyed maps below are keyed on the comment alone, so they would
+            # copy a single scalar onto every product the comment names — the very
+            # pollution routing exists to prevent. Only the contextual key counts.
+            shared = bool(comment.attributed_product)
+            candidates = (
+                (comment_fingerprint_v2(post, comment),)
+                if shared
+                else comment_fingerprints(post, comment)
             )
+            labelled = next((fp for fp in candidates if fp in fingerprint_labels), None)
             if labelled is not None:
                 score, is_relevant = fingerprint_labels[labelled]
                 comment.sentiment = round(score, 4) if is_relevant and score is not None else None
                 comment.backend = "llm-backfill"
+            elif shared:
+                # Not labelled per product yet: stay out of the score rather than
+                # let the rule backend's text-only guess speak for both products.
+                comment.sentiment = None
+                comment.backend = "unattributed"
             elif key in overrides:
                 comment.sentiment = round(overrides[key], 4)
                 comment.backend = "codex-legacy"
 
             # Reviewed corrections remain the final authority for edge cases.
-            if key in corrections:
+            if key in corrections and not shared:
                 comment.sentiment = round(corrections[key], 4)
                 comment.backend = "codex"
     return posts

@@ -6,7 +6,7 @@
 # published data against the freshness SLO so a prolonged failure/absence is
 # caught instead of silently going stale. See docs/ops-pipeline.md.
 #
-# Env overrides: CVS_CRON_PATH PUSH DO_COMMIT LAST_SUCCESS_FILE
+# Env overrides: CVS_CRON_PATH PUSH DO_COMMIT LAST_SUCCESS_FILE WT BRANCH
 #                CVS_DATA_STALE_DAYS CVS_FRESHNESS_WEBHOOK
 set -uo pipefail
 
@@ -18,6 +18,10 @@ export PATH="${CVS_CRON_PATH:-/home/user/.local/bin:/home/user/.hermes/node/bin:
 export PUSH="${PUSH:-1}"        # go live by default; override PUSH=0 to dry-run
 export DO_COMMIT="${DO_COMMIT:-1}"
 LAST_SUCCESS_FILE="${LAST_SUCCESS_FILE:-$HOME/.claude/logs/cvs-rebackfill.last-success}"
+# Same defaults as rebackfill.sh; exported so both scripts agree on one worktree
+# and one branch.
+export WT="${WT:-$HOME/.cache/cvs-rebackfill-wt}"
+export BRANCH="${BRANCH:-main}"
 
 echo "========== $(date -u +%FT%TZ) cvs-rebackfill cron start (PUSH=$PUSH) =========="
 bash "$HERE/rebackfill.sh"
@@ -28,8 +32,19 @@ if [ "$rc" -eq 0 ]; then
   # while the published data is stale is precisely the failure an exit-status monitor
   # exists to catch, so the check runs before the marker is written and its exit code
   # is kept instead of being downgraded to a warning.
-  python3 "$REPO/scripts/check_data_freshness.py"
-  fresh_rc=$?
+  # Judge the data.json that origin actually holds. Neither local copy can answer
+  # that: $REPO's only moves when someone pulls, and $WT's is rebuilt by every run
+  # that gets this far, so it is always minutes old even when the push never landed.
+  published="$(mktemp)"
+  if git -C "$WT" fetch -q origin "$BRANCH" \
+     && git -C "$WT" show "origin/$BRANCH:web/public/data.json" > "$published"; then
+    python3 "$REPO/scripts/check_data_freshness.py" --data "$published"
+    fresh_rc=$?
+  else
+    echo "[cron] cannot read web/public/data.json from origin/$BRANCH" >&2
+    fresh_rc=2
+  fi
+  rm -f "$published"
   if [ "$fresh_rc" -eq 0 ]; then
     mkdir -p "$(dirname "$LAST_SUCCESS_FILE")"
     date -u +%FT%TZ > "$LAST_SUCCESS_FILE"

@@ -29,16 +29,20 @@ from cvs_radar.parser import (
 from cvs_radar.pipeline import run_pipeline
 from cvs_radar.reporting import hash_user, render_json, render_suspicion, render_text, report_to_dict
 from cvs_radar.excerpt_labels import (
+    ExcerptLabel,
+    PROMPT_VERSION as CURRENT_EXCERPT_PROMPT_VERSION,
     excerpt_fingerprint,
     excerpt_fingerprint_v2,
     load_excerpt_labels,
 )
 from cvs_radar.comment_labels import (
+    PROMPT_VERSION as COMMENT_PICKS_PROMPT_VERSION,
     CommentPicks,
     comment_picks_fingerprint,
     comment_picks_fingerprint_v2,
     load_comment_picks,
 )
+from cvs_radar.label_validation import Rewrite
 from cvs_radar.product_labels import (
     load_product_name_labels,
     product_name_fingerprint,
@@ -68,9 +72,11 @@ from cvs_radar.scoring import (
 )
 from cvs_radar.sentiment import (
     LlmBackend,
+    _normalize_override_text,
     annotate_posts,
     apply_sentiment_overrides,
     clamp,
+    comment_fingerprint_v2,
     llm_has_key,
     resolve_backend,
     score_comment,
@@ -501,24 +507,179 @@ class ScoringTest(unittest.TestCase):
         )
 
     def test_ambiguous_comment_not_shared_across_split_products(self) -> None:
-        # review #21: in a multi-product post, a comment that does not distinctly
-        # single out exactly one split product must be dropped, not copied into
-        # every product's bucket (which polluted the others' fair score /
-        # consensus / excerpt). Comments that DO distinctly match are still
-        # attributed to that one product.
+        # review #21: in a multi-product post, a comment that names none of the
+        # split products must be dropped, not copied into every product's bucket
+        # (which polluted the others' fair score / consensus / excerpt). Comments
+        # that DO distinctly match are still attributed to that one product.
         from cvs_radar.scoring import _route_comments_by_product
 
         names = ["草莓大福", "巧克力泡芙"]
         comments = [
             Comment("推", "a", "草莓大福好好吃"),
             Comment("推", "b", "巧克力泡芙超讚"),
-            Comment("推", "c", "好吃推薦"),  # ambiguous -> must be dropped
+            Comment("推", "c", "好吃推薦"),  # names neither -> must be dropped
         ]
         routed = _route_comments_by_product(comments, names)
         self.assertEqual([c.text for c in routed[0]], ["草莓大福好好吃"])
         self.assertEqual([c.text for c in routed[1]], ["巧克力泡芙超讚"])
-        # the ambiguous comment must land in NEITHER bucket
+        # the unattributable comment must land in NEITHER bucket
         self.assertNotIn("好吃推薦", [c.text for bucket in routed for c in bucket])
+        # a comment about exactly one product carries no attribution tag, so its
+        # existing sentiment label keeps answering to the same key
+        self.assertEqual([c.attributed_product for c in routed[0]], [""])
+
+    def test_comment_naming_both_products_goes_to_each_with_its_own_key(self) -> None:
+        # "糰子不好吃 蕨餅還可以" holds an opposite verdict for each product, so
+        # dropping it lost both, and one shared scalar could only ever be right
+        # about one. Route it to each product tagged with that product, which is
+        # what moves the sentiment key from (comment, post) to (comment, product).
+        from cvs_radar.scoring import _route_comments_by_product
+
+        names = ["抹茶紅豆串糰子", "和風蕨餅小盛"]
+        comment = Comment("推", "a", "糰子不好吃 蕨餅還可以")
+        routed = _route_comments_by_product([comment], names)
+
+        self.assertEqual([c.text for c in routed[0]], ["糰子不好吃 蕨餅還可以"])
+        self.assertEqual([c.text for c in routed[1]], ["糰子不好吃 蕨餅還可以"])
+        self.assertEqual(routed[0][0].attributed_product, "抹茶紅豆串糰子")
+        self.assertEqual(routed[1][0].attributed_product, "和風蕨餅小盛")
+
+        post = Post(id="p1", brand="全家", product_name="抹茶紅豆串糰子", author="a1")
+        post.source_product_name = "抹茶紅豆串糰子/和風蕨餅小盛"
+        self.assertNotEqual(
+            comment_fingerprint_v2(post, routed[0][0]),
+            comment_fingerprint_v2(post, routed[1][0]),
+        )
+
+    def test_cross_store_same_name_splits_keep_unique_ids_and_route_by_brand(self) -> None:
+        # A comparison can review the same product name at two stores. Those are
+        # distinct public products: collapsing both under the post's inferred brand
+        # creates duplicate generated IDs and makes every routing signature empty,
+        # silently removing the evidence behind the published scores.
+        post = Post(
+            id="cross-store-lemon-tart",
+            brand="全家",
+            title="[商品] 711 與全家法式檸檬塔比較",
+            product_name="711法式檸檬塔49元、全家法式檸檬塔42元",
+            comments=[
+                Comment("推", "seven-fan", "711的塔皮比較酥"),
+                Comment("推", "family-fan", "全家的檸檬味比較明顯"),
+            ],
+        )
+
+        with patch(
+            "cvs_radar.scoring.identity._cached_product_name_labels",
+            return_value={},
+        ):
+            processed = preprocess_posts([post])
+
+        self.assertEqual(
+            [(item.brand, item.product_name, item.price) for item in processed],
+            [("7-11", "法式檸檬塔", "49"), ("全家", "法式檸檬塔", "42")],
+        )
+        self.assertEqual(len({item.id for item in processed}), len(processed))
+        self.assertEqual(
+            [[comment.user for comment in item.comments] for item in processed],
+            [["seven-fan"], ["family-fan"]],
+        )
+
+    def test_exact_split_identity_is_deduplicated_before_scoring(self) -> None:
+        # One source row must never become two copies of the same public product;
+        # that inflates nPosts even when the generated ID collision is otherwise hidden.
+        post = Post(
+            id="duplicate-extraction",
+            brand="7-11",
+            product_name="711草莓大福49元、711草莓大福49元",
+        )
+        with patch(
+            "cvs_radar.scoring.identity._cached_product_name_labels",
+            return_value={},
+        ):
+            processed = preprocess_posts([post])
+
+        self.assertEqual(
+            [(item.brand, item.product_name) for item in processed],
+            [("7-11", "草莓大福")],
+        )
+
+    def test_shared_comment_never_takes_a_text_keyed_score(self) -> None:
+        # Legacy text labels and reviewed corrections are keyed on the comment
+        # alone. Letting either answer for a comment that evaluates two products
+        # would put one scalar on both — the pollution routing exists to prevent.
+        # Without a per-product label the copy stays out of the score entirely.
+        post = Post(id="p1", brand="全家", product_name="抹茶紅豆串糰子", author="a1")
+        post.source_product_name = "抹茶紅豆串糰子/和風蕨餅小盛"
+        post.comments = [
+            Comment("推", "a", "糰子不好吃 蕨餅還可以", attributed_product="抹茶紅豆串糰子")
+        ]
+        post.comments[0].sentiment = 0.8  # whatever the rule backend guessed
+
+        text_key = _normalize_override_text("糰子不好吃 蕨餅還可以")
+        apply_sentiment_overrides(
+            [post],
+            overrides={text_key: 0.9},
+            fingerprint_labels={},
+            corrections={text_key: 0.9},
+        )
+        self.assertIsNone(post.comments[0].sentiment)
+        self.assertEqual(post.comments[0].backend, "unattributed")
+
+        # the per-product label, and only that, decides it
+        apply_sentiment_overrides(
+            [post],
+            overrides={text_key: 0.9},
+            fingerprint_labels={comment_fingerprint_v2(post, post.comments[0]): (-0.7, True)},
+            corrections={text_key: 0.9},
+        )
+        self.assertEqual(post.comments[0].sentiment, -0.7)
+
+    def test_shared_comment_counts_once_towards_its_author(self) -> None:
+        # The copies routing makes are one act by one account. Counting each would
+        # show the account posting identical text at the same minute, which is what
+        # the template_like and burst suspicion features exist to punish — so the
+        # author of a single multi-product comment would lose credibility for it.
+        from cvs_radar.models import CommentOpinion
+        from cvs_radar.preference import build_profiles
+
+        text = "糰子不好吃 蕨餅還可以"
+        posted = datetime(2026, 8, 24, 11, 6, tzinfo=timezone.utc)
+        url = "https://example.test/M.shared"
+        left = Post(id="p1_a", url=url, brand="全家", product_name="抹茶紅豆串糰子", author="x")
+        right = Post(id="p1_b", url=url, brand="全家", product_name="和風蕨餅小盛", author="x")
+        left.comments = [Comment("推", "u1", text, posted, attributed_product="抹茶紅豆串糰子")]
+        right.comments = [Comment("推", "u1", text, posted, attributed_product="和風蕨餅小盛")]
+
+        profiles = build_profiles(
+            [left, right],
+            {
+                ("p1_a", 0): CommentOpinion(True, -0.6),
+                ("p1_b", 0): CommentOpinion(True, 0.3),
+            },
+        )
+        self.assertEqual(profiles["u1"].total_comments, 1)
+
+    def test_variant_spelling_routes_to_the_product_it_names(self) -> None:
+        # Half the commenters on 慢燉滷肉油蔥粄條 write 板條. The routing match is
+        # exact on characters, so the variant matched nothing and every one of
+        # those comments — most of them the "太油" complaints — was dropped, while
+        # a comparison like 喜歡板條勝過意麵 matched only 意麵 and was counted as
+        # praise for the product it ranks second.
+        from cvs_radar.scoring import _route_comments_by_product
+
+        names = ["慢燉滷肉油蔥粄條", "府城鹽水意麵"]
+        comments = [
+            Comment("推", "a", "板條好吃，但超油"),
+            Comment("推", "b", "喜歡板條勝過意麵 肉燥味很香"),
+        ]
+        routed = _route_comments_by_product(comments, names)
+
+        self.assertEqual([c.text for c in routed[0]], ["板條好吃，但超油", "喜歡板條勝過意麵 肉燥味很香"])
+        self.assertEqual([c.text for c in routed[1]], ["喜歡板條勝過意麵 肉燥味很香"])
+        # the plain 板條 comment is now this product's alone, no attribution tag
+        self.assertEqual(routed[0][0].attributed_product, "")
+        # the comparison names both, so each side gets its own labelled copy
+        self.assertEqual(routed[0][1].attributed_product, "慢燉滷肉油蔥粄條")
+        self.assertEqual(routed[1][0].attributed_product, "府城鹽水意麵")
 
     def test_product_synonym_normalization(self) -> None:
         self.assertEqual(
@@ -763,6 +924,32 @@ class ScoringTest(unittest.TestCase):
         self.assertEqual(reports[0].rep_positive, ["超好吃"])
         self.assertEqual(reports[0].rep_negative, ["很難吃"])
 
+    def test_non_food_comment_without_lexicon_sentiment_reaches_model_pool(self) -> None:
+        # 「可愛」 is a meaningful merchandise attribute, but it is absent from the
+        # food sentiment lexicon. Candidate construction must not make that model
+        # judgement in advance.
+        post = Post(
+            id="cute-merch",
+            brand="7-11",
+            product_name="飲料小夥伴吊飾",
+            comments=[Comment("→", "u1", "可愛", sentiment=0.0)],
+        )
+
+        self.assertEqual(_rep_candidates([post]), ["可愛"])
+
+    def test_model_pool_keeps_contentful_neutral_and_availability_comments(self) -> None:
+        post = Post(
+            id="mechanical-comment-pool",
+            brand="全家",
+            product_name="測試生活用品",
+            comments=[
+                Comment("→", "u1", "找不到", sentiment=None),
+                Comment("→", "u2", "質感好", sentiment=0.0),
+            ],
+        )
+
+        self.assertEqual(_rep_candidates([post]), ["找不到", "質感好"])
+
     def test_representative_comment_preserves_brand_inside_sentence(self) -> None:
         from cvs_radar.scoring import _clean_representative_comment
 
@@ -776,7 +963,7 @@ class ScoringTest(unittest.TestCase):
         )
         self.assertEqual(
             _clean_representative_comment("7-11", "7-11 這款超好吃推薦"),
-            "超好吃",
+            "這款超好吃推薦",
         )
 
     def test_public_reports_hide_internal_fields_unless_internal_mode(self) -> None:
@@ -1070,7 +1257,8 @@ class ReviewExcerptTest(unittest.TestCase):
         self.assertNotIn("(。", excerpt)
 
     def test_uses_wrapped_product_description_not_product_name_or_promo(self) -> None:
-        # 「軟」在「軟歐」裡只是品名的一部分；真正的口感描述在下一段，且被硬換行拆開。
+        # Candidate export is intentionally broad; the provisional selector still
+        # suppresses the promotion line before a model label exists.
         post = Post(
             id="fruit-bread",
             product_name="滿滿果乾切片軟歐",
@@ -1087,8 +1275,7 @@ class ReviewExcerptTest(unittest.TestCase):
         candidates = _review_candidates([post])
         excerpt = _review_excerpt([post])
 
-        # 「軟歐」的「軟」不再把促銷句升格為有 aspect 的候選句。
-        self.assertFalse(any("優惠券" in candidate.text for candidate in candidates))
+        self.assertTrue(any("優惠券" in candidate.text for candidate in candidates))
         self.assertIn("果乾", excerpt)
         self.assertRegex(excerpt, r"軟|彈牙")
         self.assertIn("軟帶點彈牙", excerpt)
@@ -1237,6 +1424,24 @@ class ExtractionRegressionTest(unittest.TestCase):
         for raw_name, brand, expected in safe:
             with self.subTest(raw_name=raw_name):
                 self.assertEqual(extract_products_and_prices_by_rules(raw_name, brand), [expected])
+
+    def test_stamp_count_is_not_a_price(self) -> None:
+        # 集點活動的「集20章免費換」寫的是章數，不是價格；商品本身沒有標價，
+        # price 必須留空而不是 20。金額仍要照抽。
+        self.assertEqual(
+            extract_products_and_prices_by_rules(
+                "：嚕嚕米夥伴3入組咖啡磚\n集20章免費換", "全家"
+            ),
+            [("嚕嚕米夥伴3入組咖啡磚", None)],
+        )
+        # 但真正的金額還是要抽得到：同一欄位裡的「原價$99」不能被集點守則波及
+        # （這一列後半的「贈20點」另有既有的拆項行為，這裡只鎖第一項）。
+        self.assertEqual(
+            extract_products_and_prices_by_rules(
+                "：GODIVA醇濃熱巧克力 原價$99 指定期間再贈20點OPNEPOINT點數", "7-11"
+            )[0],
+            ("GODIVA醇濃熱巧克力", 99),
+        )
 
     def test_combo_bundle_keeps_only_first_product(self) -> None:
         # "A3入+B3入/75元" 是併購組合，第二項是比較對象；報告只以第一個商品為
@@ -2434,7 +2639,8 @@ class ExcerptLabelCacheTest(unittest.TestCase):
         path = os.path.join(tempfile.mkdtemp(), "excerpt_labels.csv")
         with open(path, "w", encoding="utf-8", newline="") as handle:
             handle.write(
-                "fingerprint,post_id,brand,product_name,excerpt,model,prompt_version\n" + rows
+                "fingerprint,post_id,brand,product_name,source_indices,rewrite,model,prompt_version\n"
+                + rows
             )
         return path
 
@@ -2455,13 +2661,41 @@ class ExcerptLabelCacheTest(unittest.TestCase):
         )
 
     def test_blank_excerpt_is_stored_as_a_verdict(self) -> None:
-        digest = excerpt_fingerprint("M.3", "福袋", "只是買來抽獎")
-        path = self._write(f"{digest},M.3,全家,福袋,,codex,excerpt-v1\n")
+        candidates = ["只是買來抽獎"]
+        digest = excerpt_fingerprint_v2(
+            "M.3", "福袋", "只是買來抽獎", brand="全家", candidate_sentences=candidates
+        )
+        path = self._write(
+            f"{digest},M.3,全家,福袋,,,codex,{CURRENT_EXCERPT_PROMPT_VERSION}\n"
+        )
 
         labels = load_excerpt_labels(path)
 
         self.assertIn(digest, labels)
-        self.assertEqual(labels[digest], "")
+        self.assertEqual(labels[digest], ExcerptLabel((), ""))
+
+    def test_partial_excerpt_cache_stays_provisional_until_all_posts_are_labelled(self) -> None:
+        from cvs_radar.scoring import excerpt as excerpt_module
+
+        first = Post(id="M.1", product_name="草莓蛋糕", review_text="奶油很輕盈。")
+        second = Post(id="M.2", product_name="草莓蛋糕", review_text="蛋糕偏甜。")
+        first_candidates = _body_candidates([first])
+        first_key = excerpt_fingerprint_v2(
+            first.id,
+            first.product_name,
+            first.review_text,
+            candidate_sentences=first_candidates,
+        )
+        with patch.object(
+            excerpt_module,
+            "load_excerpt_labels",
+            return_value={first_key: ExcerptLabel((0,), "奶油輕盈")},
+        ):
+            excerpt_module._cached_excerpt_labels.cache_clear()
+            self.assertTrue(
+                excerpt_module._review_excerpt_with_provenance([first, second])[1]
+            )
+        excerpt_module._cached_excerpt_labels.cache_clear()
 
     def test_sibling_products_are_part_of_the_current_key(self) -> None:
         # Every split item keeps the whole review_text, so the sibling list is the
@@ -2477,6 +2711,16 @@ class ExcerptLabelCacheTest(unittest.TestCase):
                 "M.2", "白醋涼麵", review, brand="全家", other_products="鹹雪糕 | 芋泥球"
             ),
             digest,
+        )
+        self.assertNotEqual(
+            excerpt_fingerprint_v2(
+                "M.2", "白醋涼麵", review, brand="全家", other_products="鹹雪糕",
+                candidate_sentences=("涼麵吃起來很清爽。",),
+            ),
+            excerpt_fingerprint_v2(
+                "M.2", "白醋涼麵", review, brand="全家", other_products="鹹雪糕",
+                candidate_sentences=("雪糕則是單純的鹹。",),
+            ),
         )
         self.assertNotEqual(
             excerpt_fingerprint_v2(
@@ -2552,15 +2796,24 @@ class CommentPickCacheTest(unittest.TestCase):
 
     def test_labelled_product_uses_picked_indices_in_given_order(self) -> None:
         post = self._post()
-        positive, negative = _rep_candidates([post])
+        comments = _rep_candidates([post])
         body = _body_candidates([post])
-        digest = comment_picks_fingerprint(post.brand, post.product_name, positive, negative, body)
+        digest = comment_picks_fingerprint_v2(post.brand, post.product_name, comments, body)
 
-        with self._with_picks({digest: CommentPicks((2, 0), (0,), (), ())}):
+        with self._with_picks(
+            {
+                digest: CommentPicks(
+                    (Rewrite(2, "第三則巧克力內餡好評"), Rewrite(0, "第一則草莓奶油好評")),
+                    (Rewrite(3, "第一則奶油太膩負評"),),
+                    (),
+                    (),
+                )
+            }
+        ):
             rep_positive, rep_negative = _rep_comments([post])
 
-        self.assertEqual(rep_positive, ["第三則具體好評", "第一則具體好評"])
-        self.assertEqual(rep_negative, ["第一則具體負評"])
+        self.assertEqual(rep_positive, ["第三則巧克力內餡好評", "第一則草莓奶油好評"])
+        self.assertEqual(rep_negative, ["第一則奶油太膩負評"])
 
     def test_out_of_range_pick_is_rejected_by_the_cache_importer(self) -> None:
         from scripts.import_comment_picks import import_picks
@@ -2570,41 +2823,45 @@ class CommentPickCacheTest(unittest.TestCase):
             "brand",
             "product_name",
             "other_products",
-            "positive_candidates",
-            "negative_candidates",
+            "comments",
             "body_candidates",
-            "positive_picks",
-            "negative_picks",
-            "positive_body_picks",
-            "negative_body_picks",
+            "positive_rewrites",
+            "negative_rewrites",
+            "positive_body_rewrites",
+            "negative_body_rewrites",
             "model",
             "prompt_version",
         )
+        comments = ["第一則", "第二則"]
+        body: list[str] = []
         row = {
-            "fingerprint": "a" * 64,
+            "fingerprint": comment_picks_fingerprint_v2(
+                "7-11", "草莓蛋糕", comments, body
+            ),
             "brand": "7-11",
             "product_name": "草莓蛋糕",
             "other_products": "",
-            "positive_candidates": "0. 第一則\n1. 第二則",
-            "negative_candidates": "",
+            "comments": "0. 第一則\n1. 第二則",
             "body_candidates": "",
-            "positive_picks": "99|1",
-            "negative_picks": "",
-            "positive_body_picks": "",
-            "negative_body_picks": "",
+            "positive_rewrites": '[{"source_index":99,"text":"第一則"}]',
+            "negative_rewrites": "",
+            "positive_body_rewrites": "",
+            "negative_body_rewrites": "",
             "model": "codex",
-            "prompt_version": "comment-picks-v1",
+            "prompt_version": COMMENT_PICKS_PROMPT_VERSION,
         }
         with TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.csv"
             labeled = Path(tmp) / "labeled.csv"
             cache = Path(tmp) / "cache.csv"
-            with labeled.open("w", encoding="utf-8-sig", newline="") as handle:
-                writer = csv.DictWriter(handle, fieldnames=fields)
-                writer.writeheader()
-                writer.writerow(row)
+            for path in (source, labeled):
+                with path.open("w", encoding="utf-8-sig", newline="") as handle:
+                    writer = csv.DictWriter(handle, fieldnames=fields)
+                    writer.writeheader()
+                    writer.writerow(dict(row, positive_rewrites="") if path == source else row)
 
-            with self.assertRaisesRegex(ValueError, "outside candidate range"):
-                import_picks(labeled, cache)
+            with self.assertRaisesRegex(ValueError, "outside candidate pool"):
+                import_picks(labeled, source, cache)
             self.assertFalse(cache.exists())
 
     def test_unlabelled_product_falls_back_to_top_ranked_comments(self) -> None:
@@ -2618,9 +2875,9 @@ class CommentPickCacheTest(unittest.TestCase):
 
     def test_labelled_empty_polarity_without_body_pick_does_not_use_rule_fallback(self) -> None:
         post = self._post(review_text="外皮很脆而且好吃。價格太貴而且很難吃。")
-        positive, negative = _rep_candidates([post])
+        comments = _rep_candidates([post])
         body = _body_candidates([post])
-        digest = comment_picks_fingerprint(post.brand, post.product_name, positive, negative, body)
+        digest = comment_picks_fingerprint_v2(post.brand, post.product_name, comments, body)
 
         with self._with_picks({digest: CommentPicks((), (), (), ())}):
             rep_positive, rep_negative = _rep_comments([post])
@@ -2636,17 +2893,26 @@ class CommentPickCacheTest(unittest.TestCase):
                 "價格太貴而且很難吃。"
             )
         )
-        positive, negative = _rep_candidates([post])
+        comments = _rep_candidates([post])
         body = _body_candidates([post])
-        digest = comment_picks_fingerprint(post.brand, post.product_name, positive, negative, body)
+        digest = comment_picks_fingerprint_v2(post.brand, post.product_name, comments, body)
 
-        with self._with_picks({digest: CommentPicks((), (), (1,), (2,))}):
+        with self._with_picks(
+            {
+                digest: CommentPicks(
+                    (),
+                    (),
+                    (Rewrite(1, "外皮偏脆"),),
+                    (Rewrite(2, "價格偏貴且難吃"),),
+                )
+            }
+        ):
             rep_positive, rep_negative = _rep_comments(
                 [post], excerpt="口感滑順又很好吃。"
             )
 
-        self.assertEqual(rep_positive, ["外皮很脆而且好吃。"])
-        self.assertEqual(rep_negative, ["價格太貴而且很難吃。"])
+        self.assertEqual(rep_positive, ["外皮偏脆"])
+        self.assertEqual(rep_negative, ["價格偏貴且難吃"])
         self.assertNotIn("口感滑順又很好吃", " ".join(rep_positive + rep_negative))
 
     def test_unlabelled_product_still_uses_body_highlights_rule_fallback(self) -> None:
@@ -2665,7 +2931,7 @@ class CommentPickCacheTest(unittest.TestCase):
         self.assertEqual(rep_positive, ["外皮很脆而且好吃。"])
         self.assertEqual(rep_negative, ["價格太貴而且很難吃。"])
 
-    def test_body_candidates_order_by_post_and_sentence_not_score(self) -> None:
+    def test_body_candidates_keep_contentless_category_neutral_sentences_for_model(self) -> None:
         from cvs_radar.scoring import excerpt as excerpt_module
 
         first = _ReviewCandidate("第一句口感很好", 1.0, frozenset({"texture"}), 0, 1)
@@ -2676,43 +2942,39 @@ class CommentPickCacheTest(unittest.TestCase):
         with patch.object(excerpt_module, "_review_candidates", return_value=[first, second, earlier, no_aspect]):
             self.assertEqual(
                 _body_candidates([self._post()]),
-                ["更早一句奶味濃。", "第一句口感很好。", "第二句價格太高。"],
+                ["更早一句奶味濃。", "第一句口感很好。", "第二句價格太高。", "不應列入。"],
             )
 
     def test_fingerprint_changes_when_candidate_pool_changes(self) -> None:
         original = comment_picks_fingerprint(
-            "7-11", "草莓蛋糕", ["外皮很脆"], ["價格太貴"], ["奶味濃"]
+            "7-11", "草莓蛋糕", ["外皮很脆"], ["奶味濃"]
         )
         changed = comment_picks_fingerprint(
-            "7-11", "草莓蛋糕", ["外皮很脆"], ["價格太貴"], ["奶味濃", "口感滑順"]
+            "7-11", "草莓蛋糕", ["外皮很脆"], ["奶味濃", "口感滑順"]
         )
 
         self.assertNotEqual(original, changed)
 
     def test_thread_mates_are_part_of_the_current_key(self) -> None:
-        # Picks are stored as candidate numbers, and the thread-mate list is what
-        # tells the labeller which candidates belong to a sibling product. If that
-        # list changes, the stored numbers point at a selection made under different
-        # exclusions.
-        args = ("7-11", "草莓蛋糕", ["外皮很脆"], ["價格太貴"], ["奶味濃"])
+        args = ("7-11", "草莓蛋糕", ["外皮很脆"], ["奶味濃"])
         digest = comment_picks_fingerprint_v2(*args, other_products="巧克力可頌")
         self.assertNotEqual(
             comment_picks_fingerprint_v2(*args, other_products="巧克力可頌 | 芋泥球"), digest
         )
         self.assertNotEqual(
             comment_picks_fingerprint_v2(
-                *args, other_products="巧克力可頌", prompt_version="comment-picks-v2"
+                *args, other_products="巧克力可頌", prompt_version="comment-picks-v3"
             ),
             digest,
         )
 
     def test_blank_cells_are_kept_as_a_verdict(self) -> None:
-        digest = comment_picks_fingerprint("7-11", "草莓蛋糕", ["外皮很脆"], [], [])
+        digest = comment_picks_fingerprint("7-11", "草莓蛋糕", ["外皮很脆"], [])
         path = os.path.join(tempfile.mkdtemp(), "comment_picks.csv")
         with open(path, "w", encoding="utf-8", newline="") as handle:
             handle.write(
-                "fingerprint,brand,product_name,positive_picks,negative_picks,positive_body_picks,negative_body_picks,model,prompt_version\n"
-                f"{digest},7-11,草莓蛋糕,,,,,codex,comment-picks-v1\n"
+                "fingerprint,brand,product_name,positive_rewrites,negative_rewrites,positive_body_rewrites,negative_body_rewrites,model,prompt_version\n"
+                f"{digest},7-11,草莓蛋糕,,,,,codex,{COMMENT_PICKS_PROMPT_VERSION}\n"
             )
 
         self.assertEqual(load_comment_picks(path)[digest], CommentPicks((), (), (), ()))

@@ -1,61 +1,65 @@
 <task>
-Choose the review excerpt shown to shoppers for each (post, product) pair in ONE
-CSV: `excerpt_work/chunks/__CHUNK__.csv` (__N__ data rows). Write your answers to
+Review every (post, product) row in `excerpt_work/chunks/__CHUNK__.csv`
+(__N__ rows). Write the completed answers to
 `excerpt_work/chunks/__CHUNK__.labeled.csv`.
 
-Each row is one product plus the body of the PTT post reviewing it. Pick the
-sentences from `review_text` that would actually help someone decide whether to
-buy `product_name`.
-
-Judge each row YOURSELF by reading it. Do NOT write a keyword-scoring script —
-keyword scoring is exactly what this cache replaces.
+The model decides what counts as a product review. The source pool is supplied
+as numbered, mechanically cleaned author sentences; it is not pre-filtered by
+food keywords or sentiment.
 </task>
 
 <how_to_fill_each_row>
-Keep every column and the same header, rows in the SAME order, and keep
-`fingerprint`, `post_id`, `brand`, `product_name`, `other_products`,
-`review_text` UNCHANGED. Fill in `excerpt`, and set `model` to `codex`.
+Keep the header, every source column, and exact row order. Keep these columns
+byte-for-byte unchanged: `fingerprint`, `post_id`, `brand`, `product_name`,
+`other_products`, `review_text`, `body_candidates`, and `prompt_version`.
 
-`excerpt` rules:
-- Quote one contiguous slice of the author's `review_text` VERBATIM. Do not drop,
-  join, paraphrase, translate, or invent words or punctuation.
-- At most 3 sentences and at most 90 characters total. Shorter is fine.
-- Prefer concrete, checkable description: taste, texture, filling/ingredients,
-  portion, heat/spice level, sweetness, price-worth, how it compares with a
-  similar item, and any caveat worth knowing (熱量高, 份量少, 偏鹹, 要加熱).
-- REJECT contentless praise as the whole excerpt: 「超級好吃」「我很愛」「看起來很好吃」
-  「推推」 say nothing. A verdict IS allowed when it carries a reason or a
-  condition (「喜歡吃辣的這個很推」「有優惠再買」「不會回購」).
-- REJECT scene-setting and logistics: 「今天路過全家」「圖多多版本」「先上圖」, store
-  availability, coupon mechanics, shipping, and anything with a URL.
-- **`other_products` lists the OTHER products reviewed in this same post. Sentences
-  about those belong to them, not here — never let them into this excerpt.** If a
-  sentence compares this product with one of them, keep it only if it tells you
-  something about THIS product.
-- If the post genuinely says nothing usable about this product (it only mentions
-  buying it, or all the description belongs to another product), leave `excerpt`
-  EMPTY. An empty answer is a real verdict and is recorded as such — do not pad.
+Fill `source_indices` with at most 3 cited candidate numbers joined by `|` (for
+example `0|3`) and fill `rewrite` with one concise Traditional-Chinese summary.
+The rewrite is a model-written condensation, not a quote. Set `model` to
+`codex`. If the post has no useful review of this product, leave both
+`source_indices` and `rewrite` empty, but still set `model` to `codex`.
+Before writing the summary, check that each cited index exists in the printed pool
+and that every concrete fact in the summary is supported by one of those cited
+sentences. Never cite a nearby but unrelated index.
 </how_to_fill_each_row>
 
+<rewrite_rules>
+- Traditional Chinese, no more than 30 characters for this item.
+- Drop filler, scene-setting, logistics, quoted headers, and URLs.
+- Keep concrete attributes and any caveat worth knowing.
+- Never add a fact, number, product, comparison, or usage claim not in the
+  cited source.
+- Never merge two different products into one item. Read `other_products` first;
+  the shared post body can contain sentences belonging to those products.
+- Category comes from `product_name` and context. Food may mention taste,
+  texture, portion, spice, price, repurchase, or preparation. For 吊飾、周邊、
+  生活用品、飲料、雜貨, 「可愛」「質感好」「做工細」「實用」「CP 值高」
+  are concrete attributes and must not be rejected merely because they are not
+  food descriptors. Reject emptiness relative to the category, not a fixed
+  word list.
+</rewrite_rules>
+
+<example>
+Source: 「這一款,其實蠻好吃的,只是菠蘿皮是軟菠蘿,內餡的奶酥,很好吃我一星期會買一次來吃」
+Rewrite: 「菠蘿皮偏軟，內餡奶酥好吃」
+
+Source: 「飲料小夥伴超萌逗趣的模樣」 for a 吊飾
+Rewrite: 「造型超萌逗趣」
+</example>
+
 <acceptance_criteria>
-- `excerpt_work/chunks/__CHUNK__.labeled.csv` exists, UTF-8 BOM, same header.
-- Exactly __N__ rows, same order, SAME fingerprints; none dropped or added.
-- Every non-empty `excerpt` is an exact contiguous slice of `review_text`, is <= 90
-  characters, and contains no URL.
-- No excerpt describes a product named in that row's `other_products`.
+- `__CHUNK__.labeled.csv` exists as UTF-8 BOM with exactly __N__ rows.
+- Same header, fingerprints, source columns, and row order as the input.
+- `source_indices` is empty exactly when `rewrite` is empty, otherwise every
+  index exists in that row's `body_candidates` and there are no more than 3.
+- No URL, controls, width-garbage, or rewrite over 30 characters.
 </acceptance_criteria>
 
 <scope_constraints>
-Only create the labeled CSV. Do not modify anything under cvs_radar/, scripts/,
-tests/, data/, web/, or .github/. Do not git add or commit.
+Only create the labeled CSV. Do not modify cvs_radar/, scripts/, tests/, data/,
+web/, or .github/. Do not git add or commit.
 </scope_constraints>
 
 <default_follow_through_policy>
-Label all __N__ rows. Do not sample.
+Label all __N__ rows. Do not sample or leave a row structurally incomplete.
 </default_follow_through_policy>
-
-<compact_output_contract>
-Under 300 words: rows in/out, how many you left empty, how many times you excluded
-a sentence because it belonged to another product, and 3-5 examples where the
-choice was difficult. No CSV dump.
-</compact_output_contract>
