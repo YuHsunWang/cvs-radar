@@ -19,9 +19,10 @@ The pipeline scripts are versioned in this repo:
 | [`scripts/ops/rebackfill-cron.sh`](../scripts/ops/rebackfill-cron.sh) | scheduled wrapper: full PATH, records last-success, runs the freshness check |
 | [`scripts/check_data_freshness.py`](../scripts/check_data_freshness.py) | freshness SLO check on the **published** `web/public/data.json` |
 
-Sentiment labeling calls **TypeSafe Jev** and needs `TYPESAFE_API_KEY` (read from
-`~/.config/typesafe/env` unless already exported). The other **Codex labeling
-steps require a local Codex CLI subscription**. Neither is reproducible in CI. Each layer must export, validate and import successfully;
+Sentiment, category and grounding labeling call **TypeSafe Jev** and need
+`TYPESAFE_API_KEY` (read from `~/.config/typesafe/env` unless already exported).
+Product-name, excerpt and representative-comment labeling write new text, which Jev
+cannot, so those **Codex labeling steps require a local Codex CLI subscription**. Neither is reproducible in CI. Each layer must export, validate and import successfully;
 any failure exits before recompute, commit or push, leaving the raw store for retry.
 Every other step is standard Python + git.
 
@@ -99,11 +100,12 @@ publisher and must not be treated as a semantically complete refresh.
 
 ### Where the prompts live
 
-Four of the five prompts are files under `scripts/prompts/`
-(`product-name-labeling.md`, `excerpt-labeling.md`, `comment-picks-labeling.md`,
-`product-category-labeling.md`, plus `grounding-verification.md`). **The sentiment
-rubric is not one of them** — since 2026-09-19 it is the Jev questions in
-[`scripts/label_sentiment_jev.py`](../scripts/label_sentiment_jev.py). Rows it
+The three Codex layers keep their prompts under `scripts/prompts/`
+(`product-name-labeling.md`, `excerpt-labeling.md`, `comment-picks-labeling.md`).
+The Jev layers' rubrics are Python: category and grounding are the questions in
+[`scripts/jev_labelers.py`](../scripts/jev_labelers.py) (their old Codex prompts are
+in git history), and **the sentiment rubric** — since 2026-09-19 — is the Jev
+questions in [`scripts/label_sentiment_jev.py`](../scripts/label_sentiment_jev.py). Rows it
 writes carry `model=jev`; older rows (`model=codex`) came from an inline heredoc in
 `scripts/ops/rebackfill.sh` that git history still has. Looking only in
 `scripts/prompts/` and concluding the sentiment rubric was never versioned is a

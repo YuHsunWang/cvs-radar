@@ -36,7 +36,8 @@ die(){ echo "[rebackfill] FAILED: $*" >&2; exit 1; }
 
 command -v node >/dev/null || die "node not found"
 [ -f "$RUNNER" ] || die "run-codex.mjs not found at $RUNNER"
-# Sentiment is labelled by TypeSafe Jev; its key lives outside the repo.
+# Sentiment, category and grounding are labelled by TypeSafe Jev; its key lives
+# outside the repo.
 TYPESAFE_ENV="${TYPESAFE_ENV:-$HOME/.config/typesafe/env}"
 # shellcheck source=/dev/null
 [ -n "${TYPESAFE_API_KEY:-}" ] || { [ -f "$TYPESAFE_ENV" ] && . "$TYPESAFE_ENV"; }

@@ -97,8 +97,9 @@ were aiming at. Imperative phrasing (`drop the item`, `this rule outranks…`) i
 what turns a judgement rule into a blunt one; prefer describing what good output
 looks like. `docs/DECISIONS.md` (2026-08-14) has both failed attempts.
 
-**11. The sentiment prompt is not in `scripts/prompts/`.** The other four layers
-have prompt files there; sentiment's canonical rubric is the Jev questions in
+**11. The sentiment prompt is not in `scripts/prompts/`.** Only the three Codex
+layers have prompt files there (category and grounding are Jev questions in
+`scripts/jev_labelers.py`); sentiment's canonical rubric is the Jev questions in
 `scripts/label_sentiment_jev.py` (since 2026-09-19; before that, `model=codex`
 rows came from an inline heredoc in `scripts/ops/rebackfill.sh`). Searching `scripts/prompts/`, finding
 nothing, and concluding it was never versioned leads to reconstructing it — and a
