@@ -19,14 +19,15 @@ The pipeline scripts are versioned in this repo:
 | [`scripts/ops/rebackfill-cron.sh`](../scripts/ops/rebackfill-cron.sh) | scheduled wrapper: full PATH, records last-success, runs the freshness check |
 | [`scripts/check_data_freshness.py`](../scripts/check_data_freshness.py) | freshness SLO check on the **published** `web/public/data.json` |
 
-The **Codex labeling steps require a local Codex CLI subscription** and are
-not reproducible in CI. Each layer must export, validate and import successfully;
+Sentiment labeling calls **TypeSafe Jev** and needs `TYPESAFE_API_KEY` (read from
+`~/.config/typesafe/env` unless already exported). The other **Codex labeling
+steps require a local Codex CLI subscription**. Neither is reproducible in CI. Each layer must export, validate and import successfully;
 any failure exits before recompute, commit or push, leaving the raw store for retry.
 Every other step is standard Python + git.
 
 ### Category labeling runs after the recompute (since 2026-08-18)
 
-`scripts/label_product_categories.sh` is the fifth Codex-labelled layer
+`scripts/label_product_categories.sh` is the fifth labelled layer
 (`data/labels/product_category_labels.csv`). It is **not** part of
 `run_required_label_layers.sh`, because its fingerprint is keyed to the product
 name the pipeline settled on — that name only exists once the recompute has
@@ -101,17 +102,18 @@ publisher and must not be treated as a semantically complete refresh.
 Four of the five prompts are files under `scripts/prompts/`
 (`product-name-labeling.md`, `excerpt-labeling.md`, `comment-picks-labeling.md`,
 `product-category-labeling.md`, plus `grounding-verification.md`). **The sentiment
-prompt is not one of them** — it is an inline heredoc in
-[`scripts/ops/rebackfill.sh`](../scripts/ops/rebackfill.sh) (`prompt_template.md`,
-around line 126). Looking only in `scripts/prompts/` and concluding the sentiment
-prompt was never versioned is a mistake that has been made; grep the `scripts/ops/*.sh`
-heredocs too before reconstructing one from scratch. A reconstructed prompt scores
-the same comments differently, which silently splits the cache into two conventions.
+rubric is not one of them** — since 2026-09-19 it is the Jev questions in
+[`scripts/label_sentiment_jev.py`](../scripts/label_sentiment_jev.py). Rows it
+writes carry `model=jev`; older rows (`model=codex`) came from an inline heredoc in
+`scripts/ops/rebackfill.sh` that git history still has. Looking only in
+`scripts/prompts/` and concluding the sentiment rubric was never versioned is a
+mistake that has been made. A reconstructed rubric scores the same comments
+differently, which silently splits the cache into two conventions.
 
 ### Key environment overrides
 
-`REPO` `BRANCH` `WT` `STORE_SEED` `PAGES` `REFRESH_DAYS` `CHUNK` `CONC`
-`DO_COMMIT` `PUSH` `RUNNER` (rebackfill.sh); `CVS_CRON_PATH` `LAST_SUCCESS_FILE`
+`REPO` `BRANCH` `WT` `STORE_SEED` `PAGES` `REFRESH_DAYS` `CONC`
+`DO_COMMIT` `PUSH` `RUNNER` `TYPESAFE_ENV` (rebackfill.sh); `CVS_CRON_PATH` `LAST_SUCCESS_FILE`
 `CVS_DATA_STALE_DAYS` `CVS_FRESHNESS_WEBHOOK` (cron wrapper / freshness check);
 `CVS_ALLOW_PRODUCT_DROP` (`web/build_data.py`, see below).
 Defaults target the author's WSL setup; override them on any other host.

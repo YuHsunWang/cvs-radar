@@ -91,7 +91,7 @@ Each entry is a failure that has actually happened. Full write-ups in
 | 8 | importer tests | override `rejects_path`/`pending_path` or fixtures pollute real `artifacts/` |
 | 9 | `MIN_MEANINGFUL_OVERLAP` | character overlap cannot judge a Chinese paraphrase; it is a screen, not a verdict |
 | 10 | a labelling prompt | rules are global; small batch first, watch total item count |
-| 11 | the sentiment prompt | it is a heredoc in `scripts/ops/rebackfill.sh`, not in `scripts/prompts/` |
+| 11 | the sentiment prompt | it is the Jev questions in `scripts/label_sentiment_jev.py`, not in `scripts/prompts/` |
 | 12 | merging a branch older than a day | union the 5 label CSVs, regenerate the 2 JSONs, never hand-merge |
 | 13 | `web/lib/soft-serve.ts` | flavour count is parsed out of the product name; trap 1 feeds it |
 
