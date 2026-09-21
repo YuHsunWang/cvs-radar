@@ -1117,11 +1117,28 @@ class ScoringTest(unittest.TestCase):
                 self.assertTrue(attribution.include_score)
                 self.assertEqual(attribution.competitor_brands, ())
 
-        for text in ("OK", "OKmart", "OK超商", "OK便利商店"):
+        for text in ("OKmart", "OK超商", "OK便利商店", "去OK超商買的"):
             with self.subTest(text=text):
                 attribution = _comment_attribution("全家", Comment("推", "u1", text, sentiment=0.8))
                 self.assertFalse(attribution.include_score)
                 self.assertEqual(attribution.competitor_brands, ("OK",))
+
+    def test_bare_ok_reads_as_the_adjective_not_the_chain(self) -> None:
+        """A comment saying the product is fine must keep its vote.
+
+        "OK" is both a chain and the commonest way on this board to say "fine".
+        Reading the adjective as a rival chain silently deleted the comment from
+        the product's score — 193 of them across the store, every single OK hit
+        under another chain's post.
+        """
+        from cvs_radar.scoring import _comment_attribution
+
+        for text in ("熱量不高當早餐很OK欸", "麵條口感其實OK", "還ok啦", "OK"):
+            with self.subTest(text=text):
+                attribution = _comment_attribution("全家", Comment("推", "u1", text, sentiment=0.45))
+                self.assertTrue(attribution.include_score)
+                self.assertEqual(attribution.competitor_brands, ())
+                self.assertEqual(attribution.effective_sentiment, 0.45)
 
     def test_reaction_echo_comments_do_not_count_as_independent_complaints(self) -> None:
         post = Post(
