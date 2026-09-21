@@ -213,10 +213,41 @@ def _all_brand_spans(text: str, brands: tuple[str, ...]) -> list[tuple[str, int,
     return spans
 
 
+# A bare ASCII "OK" inside a Chinese sentence is the English adjective far more
+# often than it is the OK Mart chain. Sweeping the whole comment store on
+# 2026-09-21 found 193 comments under other chains' posts matching this alias,
+# and not one of them carried a store word next to it — every hit was 還OK /
+# 味道ok / 很不OK, and every one was dropped from its product's score as if it
+# had discussed a rival. Requiring the store word costs the rare bare-alias
+# mention ("全家/萊/OK也同樣比照檢視"), which merely leaves a comment in the
+# score it was already about.
+#
+# This guard is deliberately local to comment attribution. `parser.infer_brand`
+# reads titles and the 便利商店 field, where the bare alias IS the chain: 8 of
+# the 15 OK posts in the store are titled "[商品] OK <product>" with nothing else
+# to go on.
+_AMBIGUOUS_ASCII_ALIASES = frozenset({"ok"})
+_STORE_CONTEXT_WORDS = ("超商", "超市", "便利商店", "便利店", "門市", "mart")
+
+
+def _has_store_context(token: str, span: tuple[int, int]) -> bool:
+    """Whether a chain-store word sits immediately beside this alias match."""
+    start, end = span
+    return token[end:].startswith(_STORE_CONTEXT_WORDS) or token[:start].endswith(
+        _STORE_CONTEXT_WORDS
+    )
+
+
 def _brand_positions(text: str, brand: str) -> list[tuple[int, int]]:
     positions: list[tuple[int, int]] = []
+    # `brand_alias_positions` reports spans over the NFKC-casefolded text, so the
+    # context check has to read the same string, not the raw one.
+    token = _text_token(text)
     for alias in _brand_aliases(brand):
-        positions.extend(brand_alias_positions(text, alias))
+        spans = brand_alias_positions(text, alias)
+        if _text_token(alias) in _AMBIGUOUS_ASCII_ALIASES:
+            spans = [span for span in spans if _has_store_context(token, span)]
+        positions.extend(spans)
     return sorted(set(positions))
 
 
