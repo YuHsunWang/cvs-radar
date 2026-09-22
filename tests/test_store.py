@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import unittest
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from zoneinfo import ZoneInfo
@@ -14,12 +14,30 @@ from cvs_radar.store import (
     dict_to_post,
     load_posts,
     post_to_dict,
+    save_results,
     save_posts,
     store_stats,
 )
 
 
 class StoreTest(unittest.TestCase):
+    def test_results_snapshot_timestamp_is_timezone_aware(self) -> None:
+        with TemporaryDirectory() as tmp:
+            output = Path(tmp) / "results.json"
+            before = datetime.now(timezone.utc)
+
+            save_results([], {}, output)
+
+            generated_at = datetime.fromisoformat(
+                json.loads(output.read_text(encoding="utf-8"))["generated_at"]
+            )
+            after = datetime.now(timezone.utc)
+            self.assertIsNotNone(generated_at.tzinfo)
+            self.assertLessEqual(
+                before.replace(microsecond=0), generated_at.astimezone(timezone.utc)
+            )
+            self.assertLessEqual(generated_at.astimezone(timezone.utc), after)
+
     def test_roundtrip_post_with_comments(self) -> None:
         """Post -> dict -> Post preserves all fields."""
         original = Post(

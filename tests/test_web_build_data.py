@@ -52,6 +52,22 @@ def test_source_snapshot_time_is_distinct_from_site_build_time(
     assert payload["generatedAt"] != payload["siteBuiltAt"]
 
 
+def test_source_snapshot_preserves_an_explicit_timezone(tmp_path: Path) -> None:
+    source = tmp_path / "results.json"
+    source.write_text(
+        json.dumps({"generated_at": "2026-07-22T00:34:28+00:00"}),
+        encoding="utf-8",
+    )
+
+    generated_at, _ = resolve_data_timestamps(
+        source,
+        site_built_at=datetime(2026, 7, 23, 4, 0, tzinfo=timezone.utc),
+        now=datetime(2026, 7, 22, 1, 0, tzinfo=timezone.utc),
+    )
+
+    assert generated_at == "2026-07-22T00:34:28+00:00"
+
+
 def test_missing_source_snapshot_time_falls_back_to_site_build_time(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -449,11 +465,14 @@ def test_override_collision_merges_into_one_public_product() -> None:
     assert len(merged) == 1
     assert merged[0]["id"] == "7-11::促銷商品"
     assert merged[0]["nPosts"] == 4
-    assert merged[0]["nComments"] == 8
+    # Identity data has already been stripped at this boundary, so overlap
+    # cannot be unioned exactly. Keep the conservative lower bound rather than
+    # claiming the member counts represent eight distinct people/threads.
+    assert merged[0]["nComments"] == 6
     assert merged[0]["rawComments"] == 11
     assert merged[0]["eligibleComments"] == 8
-    assert merged[0]["uniqueEligibleCommenters"] == 8
-    assert merged[0]["independentThreads"] == 4
+    assert merged[0]["uniqueEligibleCommenters"] == 6
+    assert merged[0]["independentThreads"] == 3
     assert merged[0]["fairScore"] == 28
     assert merged[0]["recommendationScore"] == 13
     assert merged[0]["consensus"] == "評價兩極"
@@ -481,6 +500,37 @@ def test_override_collision_merges_into_one_public_product() -> None:
     ]
     assert "_nEff" not in merged[0]
     assert "_fairScoreRaw" not in merged[0]
+
+
+def test_merged_low_evidence_product_shows_no_recommendation_score() -> None:
+    member = {
+        "id": "7-11::低樣本商品",
+        "brand": "7-11",
+        "productName": "低樣本商品",
+        "category": "其他",
+        "nPosts": 1,
+        "nComments": 1,
+        "_nEff": 1,
+        "_scoreWeight": 0.5,
+        "_scoreWeightedSum": 0.35,
+        "_scoreWeightSquareSum": 0.25,
+        "_scoreMean": 0.7,
+        "_scoreStd": 0.0,
+        "_positiveWeight": 0.5,
+        "_neutralWeight": 0.0,
+        "_negativeWeight": 0.0,
+        "likes": [],
+        "cautions": [],
+        "postUrls": [],
+        "latestDate": "2026-09-01",
+    }
+
+    merged = merge_products([dict(member), dict(member)])[0]
+
+    assert merged["confidence"] == "低"
+    assert merged["consensus"] == "資料不足"
+    assert merged["recommendationScore"] is None
+    assert merged["positivePct"] is None
 
 
 def test_duplicate_public_product_ids_fail_fast() -> None:
