@@ -69,6 +69,15 @@ LEGACY_SEPARATOR_RESTORATIONS = {
     ),
 }
 
+# This source contains two separate products.  The separator belongs to the
+# second item, so the first item must deliberately remain a single flavour.
+DELIBERATE_SEPARATOR_SKIPS = {
+    "海鹽檸檬霜淇淋": (
+        "海鹽檸檬霜淇淋、海鹽檸檬x草莓優格霜淇淋",
+        "海鹽檸檬x草莓優格霜淇淋",
+    ),
+}
+
 
 def read_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
     with path.open(encoding="utf-8-sig", newline="") as handle:
@@ -126,6 +135,34 @@ def restore_legacy_separator_values(rows: list[dict[str, str]]) -> int:
         row["product_name"] = corrected
         updated += 1
     return updated
+
+
+def validate_deliberate_separator_skips(rows: list[dict[str, str]]) -> list[str]:
+    validated = []
+    for product_name, (source_fragment, sibling_name) in DELIBERATE_SEPARATOR_SKIPS.items():
+        matching_rows = [row for row in rows if row.get("product_name") == product_name]
+        source_row = next(
+            (
+                row
+                for row in matching_rows
+                if unicodedata.normalize("NFKC", source_fragment).casefold()
+                in unicodedata.normalize(
+                    "NFKC", f"{row.get('title', '')}\n{row.get('raw_name', '')}"
+                ).casefold()
+            ),
+            None,
+        )
+        if source_row is None or not any(
+            row.get("fingerprint") == source_row.get("fingerprint")
+            and row.get("product_name") == sibling_name
+            for row in rows
+        ):
+            raise RuntimeError(
+                f"separate-product evidence disappeared for {product_name}: "
+                f"{source_fragment!r}, sibling={sibling_name!r}"
+            )
+        validated.append(product_name)
+    return validated
 
 
 def migrate_product_names(raw_posts, rows: list[dict[str, str]]):
@@ -325,6 +362,7 @@ def main() -> None:
     product_rekeyed, judgement_updates, legacy_updates, candidate_fingerprints = migrate_product_names(
         raw_posts, product_rows
     )
+    deliberate_skips = validate_deliberate_separator_skips(product_rows)
     # The legacy extractor is the before-state only while v2 fingerprints still
     # need migration.  On a later value-only run it would resurrect the already
     # retired behaviour and can change the split-item count.
@@ -365,6 +403,7 @@ def main() -> None:
         "candidate_fingerprints": candidate_fingerprints,
         "product_name_judgements_separator_only_updated": judgement_updates,
         "legacy_product_name_values_updated": legacy_updates,
+        "deliberately_skipped_product_names": deliberate_skips,
         "rekeyed_rows": rekeyed,
         "deduplicated_identical_rows": deduplicated,
         "override_rows": override_count,
