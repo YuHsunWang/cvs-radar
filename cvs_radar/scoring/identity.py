@@ -25,6 +25,8 @@ from ._common import (unwrap_name_brackets, _NAME_SEPARATOR_RE, _PURCHASE_CONDIT
 
 
 _AUTHOR_SHILL_FLAG_KEY = "_author_shill_flagged"
+_HAN_X_HAN_RE = re.compile(r"(?<=[\u4e00-\u9fff])\s*[xX×]\s*(?=[\u4e00-\u9fff])")
+_SWIRL_PRODUCT_RE = re.compile(r"(?:霜淇淋|冰淇淋)")
 
 
 def _extract_space_separated_parallel_products(
@@ -370,7 +372,7 @@ def _extract_products_and_prices_from_text(raw_name: str, brand: str = "") -> li
     if shared_flavors:
         return shared_flavors
 
-    s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
+    s = _normalize_han_x_separator(s)
     s = _NAME_SEPARATOR_RE.sub(" ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
@@ -569,7 +571,7 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
     s = _normalize_marketing_text(s)
     s = unwrap_name_brackets(s)
     s = _strip_brand_keywords(s, brand)
-    s = re.sub(r"(?<=[\u4e00-\u9fff])[xX×](?=[\u4e00-\u9fff])", " ", s)
+    s = _normalize_han_x_separator(s)
     s = _NAME_SEPARATOR_RE.sub(" ", s)
     s = _TITLE_PREFIX_RE.sub(" ", s)
     s = _NOISE_RE.sub(" ", s)
@@ -583,6 +585,26 @@ def _clean_extracted_product_name(raw_name: str, brand: str) -> str:
     # of the name rather than a separator or a discount.
     s = re.sub(r"[^\w.%\u4e00-\u9fff]+", "", s)
     return s
+
+
+def _normalize_han_x_separator(text: str) -> str:
+    """Keep a flavour-swirl separator, but drop a collaboration separator.
+
+    A Han-x-Han sequence is meaningful in a soft-serve/ice-cream name.  Elsewhere
+    it is the marketing shorthand used by names such as ``聯名x品牌`` and keeps
+    the historical noise-removal behaviour.  ``聯名`` beside the separator is an
+    explicit collaboration marker even if the promoted product is ice cream.
+    """
+    is_swirl = bool(_SWIRL_PRODUCT_RE.search(text))
+
+    def replace(match: re.Match[str]) -> str:
+        left = text[: match.start()].rstrip()
+        right = text[match.end() :].lstrip()
+        if is_swirl and not left.endswith("聯名") and not right.startswith("聯名"):
+            return "x"
+        return " "
+
+    return _HAN_X_HAN_RE.sub(replace, text)
 
 
 def _best_price_from_text(text: str) -> int | None:

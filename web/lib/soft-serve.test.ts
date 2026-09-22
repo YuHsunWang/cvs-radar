@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Product } from './data'
+import publicData from '../public/data.json'
 import {
   buildFlavorGroups,
   comparableFlavors,
@@ -45,6 +46,14 @@ function softServe(name: string, score: number | null, latestDate = '2026-06-15'
 }
 
 describe('splitFlavors', () => {
+  it('splits a migrated swirl name from the published payload', () => {
+    const migratedName = '泰式奶茶x起司蛋糕霜淇淋'
+    const published = publicData.products.find((item) => item.productName === migratedName)
+
+    expect(published).toBeDefined()
+    expect(splitFlavors(published!.productName)).toEqual(['泰式奶茶', '起司蛋糕'])
+  })
+
   it('keeps a single-flavour name as one flavour once the 霜淇淋 suffix is dropped', () => {
     expect(splitFlavors('梨山水蜜桃霜淇淋')).toEqual(['梨山水蜜桃'])
   })

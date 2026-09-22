@@ -1354,6 +1354,25 @@ class ReviewExcerptTest(unittest.TestCase):
 
 
 class ExtractionRegressionTest(unittest.TestCase):
+    def test_pipeline_preserves_soft_serve_flavour_separator(self) -> None:
+        post = Post(
+            id="swirl",
+            brand="全家",
+            title="[商品] 全家 抹茶x牛奶霜淇淋",
+            product_name="抹茶x牛奶霜淇淋/49元",
+            author_score=80,
+        )
+
+        reports, _ = run_pipeline([post])
+
+        self.assertEqual([report.product_name for report in reports], ["抹茶x牛奶霜淇淋"])
+
+    def test_collaboration_x_remains_marketing_noise(self) -> None:
+        self.assertEqual(
+            extract_products_and_prices_by_rules("聯名x品牌抹茶蛋糕/59元", "全家"),
+            [("品牌抹茶蛋糕", 59)],
+        )
+
     def test_extract_products_and_prices_cases(self) -> None:
         cases = [
             ("BF薄荷岩鹽檸檬糖35", [("BF薄荷岩鹽檸檬糖", 35)]),
