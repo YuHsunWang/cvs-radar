@@ -47,11 +47,11 @@ function softServe(name: string, score: number | null, latestDate = '2026-06-15'
 
 describe('splitFlavors', () => {
   it('splits a migrated swirl name from the published payload', () => {
-    const migratedName = '哈尼午茉綠x香芋牛奶霜淇淋'
+    const migratedName = '泰式奶茶x起司蛋糕霜淇淋'
     const published = publicData.products.find((item) => item.productName === migratedName)
 
     expect(published).toBeDefined()
-    expect(splitFlavors(published!.productName)).toEqual(['哈尼午茉綠', '香芋牛奶'])
+    expect(splitFlavors(published!.productName)).toEqual(['泰式奶茶', '起司蛋糕'])
   })
 
   it('keeps a single-flavour name as one flavour once the 霜淇淋 suffix is dropped', () => {
