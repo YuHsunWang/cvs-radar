@@ -7,6 +7,7 @@ import {
   consensusTone,
   dataAgeDays,
   dateToOffset,
+  displayBrand,
   displayCategory,
   filterByCategory,
   filterHasScore,
@@ -49,6 +50,12 @@ function product(overrides: Partial<Product>): Product {
     ...overrides,
   }
 }
+
+describe('displayBrand', () => {
+  it('keeps the canonical 美廉社 convenience-store brand', () => {
+    expect(displayBrand('美廉社')).toBe('美廉社')
+  })
+})
 
 describe('applyAdvanced', () => {
   it('treats both date boundaries as inclusive and drops undated products', () => {

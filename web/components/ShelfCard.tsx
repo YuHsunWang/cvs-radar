@@ -15,7 +15,7 @@ const RAIL: Record<string, string> = {
   全家: '#00A651',
   萊爾富: '#E60012',
   OK: '#F5A623',
-  美聯社: '#6C3DBF',
+  美廉社: '#6C3DBF',
   其他: '#6B7280',
 }
 

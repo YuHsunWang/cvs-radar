@@ -15,7 +15,7 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         "全家": ["全家", "FamilyMart", "family mart", "Fami!ce", "fami"],
         "萊爾富": ["萊爾富", "Hi-Life", "hilife"],
         "OK": ["OK超商", "OKmart", "OK"],
-        "美聯社": ["美聯社"],
+        "美廉社": ["美廉社", "美聯社"],
         "其他": [],
     },
     "CRAWL": {

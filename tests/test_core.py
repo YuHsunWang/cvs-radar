@@ -104,6 +104,7 @@ class ParserTest(unittest.TestCase):
         self.assertTrue(is_product_title("［商品］全家 測試甜點"))
         self.assertFalse(is_product_title("[閒聊] 測試"))
         self.assertEqual(infer_brand("family mart 測試"), "全家")
+        self.assertEqual(infer_brand("", "[商品] 美廉社 測試商品"), "美廉社")
         self.assertEqual(parse_push_count("爆"), 100)
         self.assertEqual(parse_push_count("X2"), -2)
         self.assertEqual(rows, [
