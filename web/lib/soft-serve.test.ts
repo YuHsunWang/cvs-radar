@@ -33,6 +33,7 @@ function product(overrides: Partial<Product>): Product {
     likes: [],
     cautions: [],
     excerpt: '',
+    reviewProvisional: false,
     postUrls: [],
     latestDate: '2026-06-15',
     ...overrides,
@@ -208,4 +209,3 @@ describe('flavorVerdict', () => {
     ).toBeNull()
   })
 })
-

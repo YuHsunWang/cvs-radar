@@ -32,6 +32,7 @@ python -m pytest -q            # from the repo root
 ruff check .
 cd web && npm run build:data   # then: git diff --exit-code -- web/public/data.json
 cd web && npm test
+cd web && npx tsc --noEmit
 cd web && npm run build
 ```
 

@@ -17,15 +17,15 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
 
       - name: Restore private crawl history
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: data/posts.jsonl
           key: cvs-posts-${{ github.run_id }}
@@ -35,13 +35,13 @@ jobs:
       - name: Require crawl history from cache
         run: |
           # posts.jsonl is gitignored and tracked in no branch, so there is no
-          # seed fallback: the only source is the cvs-posts-* Actions cache that
-          # refresh-data.yml refreshes on every daily run on main. A miss here
-          # means that cache has expired or never ran — fail loudly with the fix.
+          # seed fallback: the only source is the cvs-posts-* Actions cache. A
+          # miss means that cache has expired or was never seeded — fail loudly
+          # with the documented recovery path.
           if [ ! -s data/posts.jsonl ]; then
             echo "::error::No crawl history restored from the cvs-posts-* Actions cache." >&2
-            echo "Run refresh-data.yml on main first (or wait for its daily run) to" >&2
-            echo "repopulate the cache, then re-run this workflow." >&2
+            echo "Run seed-cache.yml using docs/runbook-data-recovery.md," >&2
+            echo "then re-run this workflow." >&2
             exit 1
           fi
           echo "Restored $(wc -l < data/posts.jsonl) posts from cache"
@@ -56,7 +56,7 @@ jobs:
             --out artifacts/unlabeled-comments.csv
 
       - name: Upload private labeling artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: llm-history-backfill-${{ github.run_id }}
           path: artifacts/unlabeled-comments.csv

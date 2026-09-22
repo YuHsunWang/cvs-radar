@@ -48,22 +48,17 @@ jobs:
           restore-keys: |
             cvs-posts-
 
-      # First run has no cache: seed the accumulated history once from the
-      # ui/mobile-redesign branch (where posts.jsonl is tracked) so the live
-      # dataset keeps its existing ~772 products instead of collapsing to a
-      # single 10-page window. Non-fatal if the seed is unavailable.
-      - name: Seed crawl history on cache miss
+      # The private crawl history is tracked in no branch. Publishing from an
+      # empty cache would collapse the dataset to one crawl window, so fail
+      # loudly and direct the operator to the recovery workflow.
+      - name: Require crawl history from cache
         run: |
-          if [ ! -f data/posts.jsonl ]; then
-            echo "No cached posts.jsonl — seeding from ui/mobile-redesign"
-            if git fetch --depth=1 origin ui/mobile-redesign; then
-              git show FETCH_HEAD:data/posts.jsonl > data/posts.jsonl \
-                && echo "Seeded $(wc -l < data/posts.jsonl) posts" \
-                || echo "Seed path missing; starting fresh"
-            else
-              echo "Seed branch unavailable; starting fresh"
-            fi
+          if [ ! -s data/posts.jsonl ]; then
+            echo "::error::No crawl history restored from the cvs-posts-* Actions cache." >&2
+            echo "Run seed-cache.yml using docs/runbook-data-recovery.md, then re-run this workflow." >&2
+            exit 1
           fi
+          echo "Restored $(wc -l < data/posts.jsonl) posts from cache"
 
       - name: Install dependencies
         run: |
