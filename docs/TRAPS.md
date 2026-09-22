@@ -1,6 +1,6 @@
 # Traps
 
-Failure modes that have actually bitten this repo. `CLAUDE.md` carries the
+Failure modes that have actually bitten this repo. `AGENTS.md` carries the
 one-line index; read the entry here before touching the area it names.
 
 **1. Changing product-name extraction silently breaks four other things.**
