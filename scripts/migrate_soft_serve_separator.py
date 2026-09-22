@@ -13,6 +13,7 @@ import copy
 import csv
 import json
 import sys
+import unicodedata
 from collections import defaultdict
 from contextlib import contextmanager
 from pathlib import Path
@@ -55,6 +56,19 @@ CACHE_PATHS = {
 }
 OVERRIDES_PATH = ROOT / "data/labels/product_overrides.csv"
 
+# These v1 rows predate rule_guess and therefore cannot be reached by the v2
+# re-keying pass below.  Each replacement is accepted only while its own source
+# still contains the recorded separator-bearing fragment.
+LEGACY_SEPARATOR_RESTORATIONS = {
+    "青森蘋果藍莓霜淇淋": ("青森蘋果x藍莓霜淇淋", ("青森蘋果x藍莓霜淇淋",)),
+    "泰式奶茶起司蛋糕霜淇淋": ("泰式奶茶x起司蛋糕霜淇淋", ("泰式奶茶x起司蛋糕霜淇淋",)),
+    "芭樂芋頭牛奶霜淇淋": ("芭樂x芋頭牛奶霜淇淋", ("芭樂x芋頭牛奶",)),
+    "伊藤園抹茶咖啡綜合霜淇淋": (
+        "伊藤園抹茶x咖啡綜合霜淇淋",
+        ("伊藤園抹茶x咖啡綜合霜淇淋", "伊藤園抹茶+咖啡"),
+    ),
+}
+
 
 def read_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
     with path.open(encoding="utf-8-sig", newline="") as handle:
@@ -89,6 +103,29 @@ def raw_rule_items(post, *, legacy: bool):
 
 def compact_without_x(value: str) -> str:
     return "".join(value.split()).replace("x", "").replace("X", "").replace("×", "")
+
+
+def restore_legacy_separator_values(rows: list[dict[str, str]]) -> int:
+    updated = 0
+    for row in rows:
+        restoration = LEGACY_SEPARATOR_RESTORATIONS.get(row.get("product_name", ""))
+        if restoration is None:
+            continue
+        corrected, evidence_options = restoration
+        source = unicodedata.normalize(
+            "NFKC", f"{row.get('title', '')}\n{row.get('raw_name', '')}"
+        ).casefold()
+        if not any(
+            unicodedata.normalize("NFKC", evidence).casefold() in source
+            for evidence in evidence_options
+        ):
+            raise RuntimeError(
+                f"separator evidence disappeared for {row['product_name']}: "
+                f"{evidence_options}"
+            )
+        row["product_name"] = corrected
+        updated += 1
+    return updated
 
 
 def migrate_product_names(raw_posts, rows: list[dict[str, str]]):
@@ -133,7 +170,8 @@ def migrate_product_names(raw_posts, rows: list[dict[str, str]]):
         if replacement:
             row["fingerprint"] = replacement
             rekeyed += 1
-    return rekeyed, judgement_updates, len(changed_inputs)
+    legacy_updates = restore_legacy_separator_values(rows)
+    return rekeyed, judgement_updates, legacy_updates, len(changed_inputs)
 
 
 def build_state(raw_posts, *, legacy: bool):
@@ -240,6 +278,17 @@ JUDGEMENT_FIELDS = {
 def rekey_rows(layer, rows, fp_map, name_map):
     count = 0
     for row in rows:
+        if layer == "category":
+            replacement_name = name_map.get(row["product_name"])
+            if replacement_name and replacement_name != row["product_name"]:
+                row["product_name"] = replacement_name
+                row["fingerprint"] = product_category_fingerprint(
+                    row["brand"],
+                    replacement_name,
+                    prompt_version=row["prompt_version"],
+                )
+                count += 1
+            continue
         replacement = fp_map.get(row["fingerprint"])
         if replacement and replacement != row["fingerprint"]:
             row["fingerprint"] = replacement
@@ -272,11 +321,18 @@ def main() -> None:
     args = parser.parse_args()
     raw_posts = load_posts(ROOT / "data/posts.jsonl")
     all_rows = {name: read_rows(path) for name, path in CACHE_PATHS.items()}
-    old_posts, old_groups, old_active = build_state(raw_posts, legacy=True)
+    product_rows = all_rows["product_name"][1]
+    product_rekeyed, judgement_updates, legacy_updates, candidate_fingerprints = migrate_product_names(
+        raw_posts, product_rows
+    )
+    # The legacy extractor is the before-state only while v2 fingerprints still
+    # need migration.  On a later value-only run it would resurrect the already
+    # retired behaviour and can change the split-item count.
+    old_posts, old_groups, old_active = build_state(
+        raw_posts, legacy=product_rekeyed > 0
+    )
     before_orphans = orphan_counts(all_rows, old_active)
 
-    product_rows = all_rows["product_name"][1]
-    product_rekeyed, judgement_updates, candidate_fingerprints = migrate_product_names(raw_posts, product_rows)
     if args.apply:
         write_rows(CACHE_PATHS["product_name"], all_rows["product_name"][0], product_rows)
     identity._cached_product_name_labels.cache_clear()
@@ -308,6 +364,7 @@ def main() -> None:
         "applied": args.apply,
         "candidate_fingerprints": candidate_fingerprints,
         "product_name_judgements_separator_only_updated": judgement_updates,
+        "legacy_product_name_values_updated": legacy_updates,
         "rekeyed_rows": rekeyed,
         "deduplicated_identical_rows": deduplicated,
         "override_rows": override_count,
