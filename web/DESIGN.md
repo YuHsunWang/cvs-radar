@@ -79,7 +79,7 @@ Follows `../docs/redesign/app_mockup_mobile_v3.png`: a single mobile column with
 - a header with product count and data-update notice,
 - an always-visible latest-review-date range slider plus a hide-unscored toggle and sort menu,
 - intent category chips (正餐 / 甜點 / 冰品 / 飲料 / 麵包 / 零食 / 其他),
-- brand chips (7-11 / 全家 / 萊爾富 / OK / 美聯社 / 其他, each in its brand colour),
+- brand chips (7-11 / 全家 / 萊爾富 / OK / 美廉社 / 其他, each in its brand colour),
 - a result count and section title, and
 - ranked product cards.
 

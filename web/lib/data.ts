@@ -46,7 +46,7 @@ export type SortKey =
 export const DATA_STALE_DAYS = 14
 const millisecondsPerDay = 24 * 60 * 60 * 1000
 
-export const brands = ['7-11', '全家', '萊爾富', 'OK', '美聯社', '其他'] as const
+export const brands = ['7-11', '全家', '萊爾富', 'OK', '美廉社', '其他'] as const
 export const categoryGroups = {
   正餐: ['便當', '鹹食', '泡麵'],
   甜點: ['甜點'],

@@ -26,6 +26,12 @@ jobs:
         run: python scripts/backfill_reviews.py --help
       - name: Run Ruff
         run: ruff check .
+      - name: Smoke-test standalone script entry points
+        run: |
+          python -m pip uninstall -y cvs-radar
+          for script in scripts/*.py; do
+            python "$script" --help > /dev/null
+          done
 
   web:
     runs-on: ubuntu-latest
@@ -52,6 +58,9 @@ jobs:
       - name: Run web tests
         working-directory: web
         run: npm test
+      - name: Type-check web sources and tests
+        working-directory: web
+        run: npx tsc --noEmit
       - name: Build static site
         working-directory: web
         run: npm run build

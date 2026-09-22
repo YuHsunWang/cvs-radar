@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from cvs_radar.config import CONFIDENCE_BANDS, CONSENSUS, SCORING
@@ -35,6 +36,10 @@ def test_operational_docs_match_active_entry_points() -> None:
 
     assert "公開快照每日自動更新" not in readme
     assert "repository 本身不包含或證明該主機的 crontab" in normalized_readme
+    assert (
+        "`n_eff < 3` 就判為「資料不足」，前端不顯示綜合評分也不顯示正／中／負百分比"
+        "——約四分之一的商品因此留白。"
+    ) in normalized_readme
     for layer in (
         "sentiment labeling",
         "product-name labeling",
@@ -52,3 +57,25 @@ def test_operational_docs_match_active_entry_points() -> None:
     assert "scripts/label_sentiment_jev.py" in normalized_ops
     assert "flush/fsync 成功後" in crawl
     assert "直接串接成單一 Comment" in crawl
+
+
+def test_manual_refresh_never_seeds_private_posts_from_a_git_branch() -> None:
+    workflow = (ROOT / ".github/workflows/refresh-data.yml").read_text(encoding="utf-8")
+    export_workflow = (ROOT / ".github/workflows/export-llm-backfill.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "ui/mobile-redesign" not in workflow
+    assert "seed-cache.yml" in workflow
+    assert "docs/runbook-data-recovery.md" in workflow
+    assert "Run refresh-data.yml on main first" not in export_workflow
+    assert "seed-cache.yml" in export_workflow
+    assert "docs/runbook-data-recovery.md" in export_workflow
+
+
+def test_github_actions_are_pinned_to_commit_shas() -> None:
+    uses_line = re.compile(r"^\s*-?\s*uses:\s*actions/[^@]+@(?P<ref>\S+)", re.MULTILINE)
+
+    for workflow in (ROOT / ".github/workflows").glob("*.yml"):
+        for match in uses_line.finditer(workflow.read_text(encoding="utf-8")):
+            assert re.fullmatch(r"[0-9a-f]{40}", match.group("ref")), workflow

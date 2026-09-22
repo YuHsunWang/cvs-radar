@@ -42,8 +42,6 @@ const BRAND_RAIL: Record<string, string> = {
   美廉社: '#6C3DBF',
   其他: '#6B7280',
 }
-// 美聯社 in lib/data is a typo for 美廉社 and has no products — hide it for now.
-const HIDDEN_BRANDS = new Set(['美聯社'])
 
 function isoDaysAgo(days: number): string {
   const d = new Date()
@@ -321,9 +319,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         >
           全部
         </button>
-        {brands
-          .filter((name) => !HIDDEN_BRANDS.has(name))
-          .map((name) => (
+        {brands.map((name) => (
             <button
               key={name}
               type="button"
@@ -342,7 +338,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             >
               {name}
             </button>
-          ))}
+        ))}
       </nav>
     </div>
   )

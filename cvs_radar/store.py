@@ -9,7 +9,7 @@ from datetime import datetime
 from fcntl import LOCK_EX, LOCK_SH, flock
 from pathlib import Path
 
-from .filters import normalize_datetime, parse_datetime
+from .filters import TAIPEI_TZ, normalize_datetime, parse_datetime
 from .models import Comment, Contributor, Post, ProductReport
 from .parser import infer_brand
 from .preference import AccountProfile, BrandStat
@@ -348,7 +348,7 @@ def save_results(
     for report in public_reports:
         report["contributors"] = []
     payload = {
-        "generated_at": datetime.now().isoformat(sep=" ", timespec="seconds"),
+        "generated_at": datetime.now(TAIPEI_TZ).isoformat(timespec="seconds"),
         "reports": public_reports,
         "profiles": [],
     }

@@ -46,9 +46,9 @@ def resolve_data_timestamps(
         print("WARNING: source data has no generated_at; using site build time for generatedAt")
         return site_built_at.isoformat(), site_built_at.isoformat()
 
-    data_generated_at = datetime.strptime(
-        source_generated_at, "%Y-%m-%d %H:%M:%S"
-    ).replace(tzinfo=TAIPEI_TIMEZONE)
+    data_generated_at = datetime.fromisoformat(str(source_generated_at))
+    if data_generated_at.tzinfo is None:
+        data_generated_at = data_generated_at.replace(tzinfo=TAIPEI_TIMEZONE)
     # Measure against the clock, not site_built_at: that value is carried over from
     # the committed artifact so rebuilds stay reproducible, and once it is older than
     # the data (it froze on 2026-08-25) the age came out negative and never warned.
@@ -201,14 +201,21 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if len(members) > 1:
             for field in (
                 "nPosts",
-                "nComments",
                 "rawComments",
                 "eligibleComments",
+            ):
+                if any(field in item for item in members):
+                    merged[field] = sum(item.get(field, 0) for item in members)
+            # Account identities are stripped before this projection, so exact
+            # set unions are unavailable. max() is a conservative lower bound;
+            # summing falsely claims overlapping people/threads are distinct.
+            for field in (
+                "nComments",
                 "uniqueEligibleCommenters",
                 "independentThreads",
             ):
                 if any(field in item for item in members):
-                    merged[field] = sum(item.get(field, 0) for item in members)
+                    merged[field] = max(item.get(field, 0) for item in members)
 
             weight_sum = sum(float(item.get("_scoreWeight") or 0) for item in members)
             weighted_sum = sum(
@@ -239,12 +246,17 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     else 0.0
                 )
                 merged["fairScore"] = round(merged_fair_score)
-                merged["recommendationScore"] = calibrate_recommendation_score(
-                    merged_fair_score
-                )
                 merged["consensus"] = _classify(mean01, std, n_eff)
                 merged["confidence"] = _confidence(n_eff)
-                if merged["confidence"] == "低" or merged["consensus"] == "資料不足":
+                publishable_score = _has_publishable_score(
+                    merged["confidence"], merged["consensus"]
+                )
+                merged["recommendationScore"] = (
+                    calibrate_recommendation_score(merged_fair_score)
+                    if publishable_score
+                    else None
+                )
+                if not publishable_score:
                     distribution = None
                 else:
                     distribution = _percentages(
@@ -350,13 +362,16 @@ def calibrate_recommendation_score(fair_score: float) -> int:
     return round((score - _SCORE_FLOOR) * 100 / span)
 
 
+def _has_publishable_score(confidence: str, consensus: str) -> bool:
+    return confidence != "低" and consensus != "資料不足"
+
+
 def calibrate_recommendation_scores(reports: list[Any]) -> dict[str, int]:
     return {
         report.product_key: calibrate_recommendation_score(report.fair_score)
         for report in reports
         if report.fair_score is not None
-        and report.confidence != "低"
-        and report.consensus != "資料不足"
+        and _has_publishable_score(report.confidence, report.consensus)
     }
 
 
@@ -370,7 +385,7 @@ def display_confidence(report: Any) -> str:
 
 def to_product(report: Any, recommendation_score: int | None = None) -> dict[str, Any]:
     distribution = None
-    if report.confidence != "低" and report.consensus != "資料不足":
+    if _has_publishable_score(report.confidence, report.consensus):
         aggregate_weights = (
             getattr(report, "positive_weight", 0.0),
             getattr(report, "neutral_weight", 0.0),

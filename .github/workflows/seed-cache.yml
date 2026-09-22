@@ -57,7 +57,7 @@ jobs:
       # A fresh unique key makes the post-job step save this file; refresh-data
       # restores it via the cvs-posts- restore-keys prefix (most recent wins).
       - name: Save as crawl-history cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: data/posts.jsonl
           key: cvs-posts-seed-${{ github.run_id }}
