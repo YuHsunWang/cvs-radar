@@ -5,5 +5,5 @@ export const dynamic = 'force-static'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl = getSiteUrl()
-  return [{ url: siteUrl.href }, { url: new URL('soft-serve/', siteUrl).href }]
+  return [{ url: siteUrl.href }]
 }
