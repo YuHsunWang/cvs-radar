@@ -45,6 +45,29 @@ keyword result, which is what makes a CI rebuild deterministic; a manual
 `category` in `data/labels/product_overrides.csv` is applied afterwards and
 still outranks both.
 
+### Official calories are fetched before `build_data` (since 2026-09-26)
+
+`scripts/fetch_official_kcal.py` refreshes `data/labels/official_kcal.csv` from
+the 7-11 fresh-food catalogue and FamilyMart's food-safety catalogue, then
+`build_data` attaches a `kcal` (whole package) to each product whose name
+matches exactly, or that has a reviewed `same` verdict in
+`data/labels/kcal_matches.csv`. Everything else stays `null`.
+
+- **Optional step.** A failed fetch logs a WARN and the run publishes with the
+  committed cache. Rows are never dropped, so delisted products keep their value.
+- **FamilyMart needs a real browser.** Its API returns 403 to scripts and to
+  headless Chrome, so the fetch opens a normal Chrome window through WSLg
+  (Playwright, `DISPLAY=:0`) for a few seconds. This was the repo owner's call
+  on 2026-09-26 and it is in tension with the README's rule against bypassing
+  access controls for the FamilyMart crawler — reconcile one or the other.
+- **7-11** is plain HTTP: 30 requests, one second apart. Its `robots.txt`
+  disallows `*.xml*`; `read_food_xml.aspx` does not match that pattern.
+- **Near-miss names are never auto-matched.** `python3 scripts/fetch_official_kcal.py
+  --candidates /tmp/c.csv` lists unreviewed near misses; fill in `verdict`
+  (`same`/`different`) and append the rows to `kcal_matches.csv` by hand.
+- 萊爾富's site refuses scripts (403) and has no calorie source; photo reading
+  was sampled and parked in Linear DEV-228.
+
 ### Labeling runs in two passes (since 2026-08-13)
 
 `run_required_label_layers.sh` runs all three layers, then — if anything was held

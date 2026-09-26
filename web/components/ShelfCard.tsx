@@ -72,6 +72,7 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
             <div className="sl-tags">
               <span className="sl-tag">{displayCategory(product.category)}</span>
               {product.price != null ? <span className="sl-tag sl-price">價格 ${product.price}</span> : null}
+              {product.kcal != null ? <span className="sl-tag">{product.kcal} 大卡</span> : null}
               <span className="sl-tag sl-ghost">聲量 {volume}</span>
             </div>
 

@@ -20,6 +20,7 @@ if str(ROOT) not in sys.path:
 
 from cvs_radar.app_helpers import consensus_distribution, volume_label  # noqa: E402
 from cvs_radar.config import SCORING  # noqa: E402
+from cvs_radar.official_kcal import load_lookup as load_kcal_lookup  # noqa: E402
 from cvs_radar.scoring.compute import _classify, _confidence  # noqa: E402
 from cvs_radar.product_categories import resolve_category  # noqa: E402
 from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
@@ -462,12 +463,16 @@ def validate_payload(payload: dict[str, Any]) -> None:
         "eligibleComments", "uniqueEligibleCommenters", "independentThreads",
         "volumeLevel", "positivePct",
         "neutralPct", "negativePct", "likes", "cautions", "excerpt", "reviewProvisional", "postUrls", "latestDate",
+        "kcal",
     }
     for index, product in enumerate(payload["products"]):
         if not isinstance(product, dict) or set(product) != required_fields:
             raise ValueError(f"public payload product {index} has an invalid shape")
         if not all(isinstance(product[key], str) for key in ("id", "brand", "productName", "category", "consensus", "confidence", "volumeLevel", "excerpt")):
             raise ValueError(f"public payload product {index} has invalid text fields")
+        kcal = product["kcal"]
+        if kcal is not None and (not isinstance(kcal, int) or isinstance(kcal, bool) or kcal <= 0):
+            raise ValueError(f"public payload product {index} has invalid kcal")
         if not isinstance(product["reviewProvisional"], bool):
             raise ValueError(f"public payload product {index} has invalid excerpt provenance")
         count_fields = (
@@ -532,6 +537,10 @@ def main(
             products.append(corrected)
     products = merge_products(products)
     assert_unique_product_ids(products)
+    # After merge and overrides, so the match is on the name the site shows.
+    kcal_lookup = load_kcal_lookup()
+    for product in products:
+        product["kcal"] = kcal_lookup.kcal_for(product["brand"], product["productName"])
     assert_no_product_collapse(existing_product_count(output), len(products))
     generated_at, site_built_at_iso = resolve_data_timestamps(source, site_built_at)
     payload = {
