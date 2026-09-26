@@ -23,8 +23,9 @@ SEVEN_XML = """<?xml version="1.0" encoding="utf-8"?><BD>
 </BD>"""
 
 
-def family(*rows, code="00"):
-    return {"RESULT_CODE": code, "LIST": [{"ITEM": [{"PRODNAME": n, "NOTE": note} for n, note in rows]}]}
+def family(*rows, code="00", category="5"):
+    items = [{"PRODNAME": n, "NOTE": note} for n, note in rows]
+    return {"RESULT_CODE": code, "LIST": [{"CATEGORY_ID": category, "ITEM": items}]}
 
 
 def official_row(brand, name, kcal):
@@ -44,6 +45,17 @@ def test_family_calories_are_per_package_not_per_serving():
     # The site states 106 kcal per serving and 3 servings; a shopper eats the box.
     items = parse_family_list(family(("招牌高麗菜鍋貼", "熱量106大卡，本包裝含3份")))
     assert items == [OfficialItem("全家", "招牌高麗菜鍋貼", 318, 3)]
+
+
+def test_family_counter_items_are_one_serving_not_the_bulk_bag():
+    # A 葡式千層蛋塔 is sold as one tart; x6 would publish 1,498 kcal for it.
+    items = parse_family_list(family(("葡式千層蛋塔", "熱量249.7大卡，本包裝含6份"), category="11"))
+    assert [i.kcal for i in items] == [250]
+
+
+def test_family_egg_packs_with_several_servings_get_no_value():
+    assert parse_family_list(family(("伊勢幸福鮮蛋10入", "熱量77.2大卡，本包裝含10份"), category="13")) == []
+    assert [i.kcal for i in parse_family_list(family(("茶葉蛋", "熱量75大卡，本包裝含1份"), category="13"))] == [75]
 
 
 def test_family_skips_rows_without_a_calorie_statement():

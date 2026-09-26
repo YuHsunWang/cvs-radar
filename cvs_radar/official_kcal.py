@@ -20,7 +20,8 @@ A product gets calories only on an exact normalised-name match or a reviewed
 
 FamilyMart states calories per serving plus the servings per package; this
 module stores the per-package total, because the question a shopper asks is
-"how much is this one item", not "how much is a third of it".
+"how much is this one item", not "how much is a third of it". Counter items
+sold one at a time are the exception — see FAMILY_SOLD_LOOSE.
 """
 
 from __future__ import annotations
@@ -54,6 +55,13 @@ FAMILY_PAGE = "https://foodsafety.family.com.tw/Web_FFD_2022/"
 FAMILY_URL = FAMILY_PAGE + "ws/QueryFsProductListByFilter"
 USER_AGENT = "CVS-Radar/1.0 (+https://cvs-radar.vercel.app; once-daily calorie lookup)"
 
+# FamilyMart's "servings per package" describes the bulk bag a store receives
+# for counter items sold one at a time: a 葡式千層蛋塔 is "249.7 kcal, 6 servings"
+# but is sold as one tart. For those categories one serving is the unit sold.
+FAMILY_SOLD_LOOSE = {"11", "12"}  # 燒烤食品, 現煮鍋物
+# 蛋品 mixes loose tea eggs with boxed packs (鮮蛋10入); the name cannot tell
+# which a review meant, so multi-serving rows there get no value.
+FAMILY_AMBIGUOUS_UNIT = {"13"}
 _FAMILY_NOTE = re.compile(r"熱量\s*(\d+(?:\.\d+)?)\s*大卡.*?本包裝含\s*(\d+(?:\.\d+)?)\s*份")
 _SEVEN_KCAL = re.compile(r"^\s*(\d+(?:\.\d+)?)")
 _BRACKETED = re.compile(r"（[^）]*）|\([^)]*\)")
@@ -92,6 +100,7 @@ def parse_family_list(payload: dict) -> list[OfficialItem]:
         raise ValueError(f"FamilyMart API error: {payload.get('RESULT_DESC')!r}")
     items = []
     for category in payload.get("LIST") or []:
+        category_id = str(category.get("CATEGORY_ID") or "")
         for row in category.get("ITEM") or []:
             name = (row.get("PRODNAME") or "").strip()
             match = _FAMILY_NOTE.search(row.get("NOTE") or "")
@@ -99,6 +108,10 @@ def parse_family_list(payload: dict) -> list[OfficialItem]:
                 continue
             per_serving, servings = float(match.group(1)), float(match.group(2))
             if servings <= 0 or servings != int(servings):
+                continue
+            if category_id in FAMILY_SOLD_LOOSE:
+                servings = 1.0
+            elif category_id in FAMILY_AMBIGUOUS_UNIT and servings > 1:
                 continue
             kcal = round(per_serving * servings)
             if kcal > 0:
