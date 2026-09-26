@@ -82,6 +82,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         <p className="sl-k-none sl-k-none-wide">留言沒有集中的優缺點</p>
       )}
 
+      {product.kcal != null ? (
+        <p className="sl-k-none sl-k-none-wide">熱量 {product.kcal} 大卡，取自官網標示的整份數值</p>
+      ) : null}
+
       {product.postUrls.length > 0 ? (
         <div className="sl-k-src">
           <span>

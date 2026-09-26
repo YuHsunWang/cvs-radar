@@ -24,6 +24,8 @@ export type Product = {
   reviewProvisional: boolean
   postUrls: string[]
   latestDate: string | null
+  // Whole-package calories from the chain's own catalogue; null when unmatched.
+  kcal: number | null
 }
 
 export type DataPayload = {

@@ -224,6 +224,13 @@ PY
 # shipping a snapshot whose categories quietly fell back to the keyword rule.
 bash scripts/label_product_categories.sh || die "category labeling"
 
+# --- 7d. official calories (7-11 + FamilyMart catalogues) ---
+# Optional by design: a catalogue outage must not cost the day's publish. On
+# failure the committed official_kcal.csv is left as it was and build_data uses it.
+# FamilyMart opens a real Chrome window through WSLg (its API refuses scripts).
+python3 scripts/fetch_official_kcal.py 2>&1 | tail -2 \
+  || log "WARN: official calorie refresh failed; publishing with the cached values"
+
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
 # --- 8. commit (+push): labels + recomputed, de-identified public data ---
@@ -239,6 +246,7 @@ if [ "$DO_COMMIT" = "1" ]; then
           data/labels/comment_picks.csv \
           data/labels/product_category_labels.csv \
           data/labels/grounding_verdicts.csv \
+          data/labels/official_kcal.csv \
           data/results.json web/public/data.json
   if git diff --cached --quiet; then
     log "no data change to commit"

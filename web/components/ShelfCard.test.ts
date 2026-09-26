@@ -41,7 +41,7 @@ function product(overrides: Partial<Product> = {}): Product {
     rawComments: 2, eligibleComments: 2, uniqueEligibleCommenters: 2,
     independentThreads: 1, volumeLevel: '中等', positivePct: 60,
     neutralPct: 20, negativePct: 20, likes: [], cautions: [], excerpt: '',
-    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15',
+    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null,
     ...overrides,
   }
 }
@@ -92,6 +92,15 @@ describe('truthful shelf results', () => {
     expect(missing).toContain('心得日期不明')
     expect(missing).not.toContain('價格')
     expect(missing).not.toContain('$0')
+  })
+
+  it('shows official calories only when a catalogue value exists', () => {
+    // An unmatched product must show nothing: a placeholder like 0 大卡 would
+    // read as a real (and very wrong) figure.
+    expect(card(product({ kcal: 318 }))).toContain('318 大卡')
+    expect(card(product({ kcal: 318 }), 1, true)).toContain('取自官網標示的整份數值')
+    const missing = card(product({ kcal: null }), 1, true)
+    expect(missing).not.toContain('大卡')
   })
 
   it('names the product exactly once and names missing identity honestly', () => {
