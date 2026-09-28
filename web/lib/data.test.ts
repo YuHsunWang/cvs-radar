@@ -104,8 +104,11 @@ describe('filterByCategory', () => {
     expect(filterByCategory([product({ id: 'new', category: '新品類' })], '其他').map(({ id }) => id)).toEqual(['new'])
   })
 
-  it('returns every product when no category is selected', () => {
-    expect(filterByCategory(products, null)).toEqual(products)
+  it('leaves merchandise out of the unfiltered list but keeps everything else', () => {
+    // A charm scoring 97 must not sit above food in 「全部」; it is still under 其他.
+    expect(filterByCategory(products, null).map(({ id }) => id)).toEqual(
+      ['meal', 'savory', 'noodles', 'dessert', 'milk', 'unknown'],
+    )
   })
 })
 
