@@ -82,9 +82,28 @@ describe('truthful shelf results', () => {
     expect(html).toContain('<span class="sl-score sl-na">—</span>')
     expect(html).not.toContain('>70<')
     const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
-    for (const [tone, color] of [['good', '#176b3a'], ['mid', '#8a6100'], ['low', '#a52a20'], ['na', '#8a847a']]) {
-      expect(css).toContain(`.sl-score.sl-${tone} { color: ${color}; }`)
+    for (const [tone, background, color] of [
+      ['good', '#e2f2e7', '#176b3a'],
+      ['mid', '#fbefd6', '#7a5500'],
+      ['low', '#fbe3df', '#a52a20'],
+      ['na', '#eeedea', '#6e685e'],
+    ]) {
+      expect(css).toContain(`.sl-score.sl-${tone} { background: ${background}; color: ${color}; }`)
     }
+  })
+
+  it('places each channel colour only on its dot, including the unknown fallback', () => {
+    const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
+    for (const [brand, color] of [
+      ['7-11', '#f26522'], ['全家', '#00a651'], ['萊爾富', '#1f4fa8'],
+      ['OK', '#f5a623'], ['美廉社', '#6c3dbf'],
+    ]) {
+      expect(card(product({ brand }))).toContain(`<span class="sl-channel-dot" data-brand="${brand}" aria-hidden="true"></span>${brand}`)
+      expect(css).toContain(`.sl-channel-dot[data-brand="${brand}"] { background: ${color}; }`)
+    }
+    expect(card(product({ brand: '不明通路' }))).toContain('<span class="sl-channel-dot" data-brand="其他" aria-hidden="true"></span>其他')
+    expect(css).toContain('border-radius: 50%; background: #9ca3af;')
+    expect(css).not.toContain('--sl-brand')
   })
 
   it('keeps price in the quiet meta line and post dates in expanded detail', () => {
@@ -128,7 +147,7 @@ describe('truthful shelf results', () => {
   it('reserves the card face for channel, name, meta and score while keeping context in detail', () => {
     const item = product({ consensus: '褒貶不一', likes: ['香氣足'], cautions: ['偏甜'], kcal: 318 })
     const collapsed = card(item)
-    expect(collapsed).toContain('<span class="sl-channel">全家</span>')
+    expect(collapsed).toContain('<span class="sl-channel"><span class="sl-channel-dot" data-brand="全家" aria-hidden="true"></span>全家</span>')
     expect(collapsed).not.toMatch(/sl-rail|聲量|褒貶不一|香氣足|318 大卡|分類：/)
     const expanded = card(item, true)
     expect(expanded).toContain('分類：飲料')

@@ -19,6 +19,7 @@ type ShelfCardProps = {
 export default function ShelfCard({ product, rank, isExpanded, onToggle }: ShelfCardProps) {
   const score = comprehensiveScore(product)
   const detailId = useId()
+  const channel = displayBrand(product.brand)
 
   return (
     <article className="sl-label">
@@ -30,12 +31,14 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
         className="sl-rowbtn"
       >
         <div className="sl-row">
-          <span className="sl-channel">{displayBrand(product.brand)}</span>
           <div className="sl-card-main">
+            <div className="sl-card-top">
+              <span className="sl-channel"><span className="sl-channel-dot" data-brand={channel} aria-hidden="true" />{channel}</span>
+              <span className="sl-meta">
+                {product.price != null ? `$${product.price} · ` : ''}{product.nPosts} 篇心得
+              </span>
+            </div>
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
-            <span className="sl-meta">
-              {product.price != null ? `$${product.price} · ` : ''}{product.nPosts} 篇心得
-            </span>
           </div>
           <span className={`sl-score ${scoreTone(score)}`}>{score === null ? '—' : score}</span>
         </div>

@@ -97,7 +97,8 @@
   vertical-align: 2px;
 }
 /* The main list follows the approved compact header; the soft-serve header keeps its own layout. */
-.sl-page:not(.ss-page) { background: #f4f2ec; }
+.sl-page:not(.ss-page) { background: #f6f7f9; }
+body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
 .sl-page:not(.ss-page) .sl-sign {
   display: flex;
   align-items: center;
@@ -106,19 +107,19 @@
   margin: 0 auto;
   padding: 0 0 20px;
   border-radius: 0;
-  background: transparent;
-  color: #17130e;
+  background: #ffffff;
+  color: #111827;
   box-shadow: none;
 }
-.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: 0.02em; }
-.sl-update-date { flex: 1; color: #5c574e; font-size: 13px; }
+.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: 0.02em; color: #111827; }
+.sl-update-date { flex: 1; color: #6b7280; font-size: 13px; }
 .sl-searchwrap { width: 320px; }
 .sl-searchwrap label > svg { display: none; }
 .sl-page .sl-searchwrap input[type="search"] {
   height: 44px;
   padding: 0 14px;
-  border: 1px solid #c9c3b5;
-  border-radius: 10px;
+  border: 1px solid #e2ddd2;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 400;
   box-shadow: none;
@@ -208,7 +209,6 @@
 }
 .sl-chip-btn.sl-on { background: var(--sl-ink); color: #f6f3ea; border-color: var(--sl-ink); }
 .sl-chip-btn.sl-on::before { border-color: var(--sl-pop); background: var(--sl-pop); }
-.sl-chip-btn.sl-brand.sl-on { background: var(--sl-brand, var(--sl-ink)); border-color: var(--sl-brand, var(--sl-ink)); }
 
 .sl-datebtn {
   font-family: var(--sl-cjk);
@@ -271,19 +271,27 @@
   overflow: hidden;
 }
 .sl-active-context button { margin-right: 8px; }
+.sl-page:not(.ss-page) .sl-active-context {
+  width: fit-content;
+  max-width: 100%;
+  border-bottom: 3px solid #ff6b35;
+  padding-bottom: 4px;
+}
 
 /* ---- product list ---- */
 .sl-shelf {
   display: flex;
   flex-direction: column;
+  gap: 10px;
   max-width: 960px;
   margin: 14px auto 0;
-  background: #fff;
+}
+.sl-label {
   border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.08);
   overflow: hidden;
 }
-.sl-label { border-bottom: 1px solid #eeeae0; }
-.sl-label:last-of-type { border-bottom: 0; }
 .sl-rowbtn {
   display: block;
   width: 100%;
@@ -294,47 +302,63 @@
   color: inherit;
   cursor: pointer;
 }
-.sl-rowbtn:focus-visible { outline: 3px solid #176b3a; outline-offset: -3px; }
+.sl-rowbtn:focus-visible { outline: 3px solid #111827; outline-offset: -3px; }
 .sl-row {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr) 120px;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  column-gap: 20px;
-  padding: 16px 28px;
+  gap: 12px;
+  padding: 14px 14px 14px 16px;
 }
 .sl-channel {
-  justify-self: start;
-  border: 1px solid #6b665d;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  border-radius: 6px;
   padding: 2px 8px;
-  color: #17130e;
-  font-size: 14px;
+  background: #f1f2f4;
+  color: #111827;
+  font-size: 12px;
   font-weight: 700;
-  line-height: 20px;
+  line-height: 18px;
   white-space: nowrap;
 }
-.sl-card-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sl-channel-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: #9ca3af; }
+.sl-channel-dot[data-brand="7-11"] { background: #f26522; }
+.sl-channel-dot[data-brand="全家"] { background: #00a651; }
+.sl-channel-dot[data-brand="萊爾富"] { background: #1f4fa8; }
+.sl-channel-dot[data-brand="OK"] { background: #f5a623; }
+.sl-channel-dot[data-brand="美廉社"] { background: #6c3dbf; }
+.sl-card-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sl-card-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .sl-pname {
   margin: 0;
   color: #17130e;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
-.sl-meta { color: #5c574e; font-size: 13px; }
+.sl-meta { color: #6e685e; font-size: 12px; white-space: nowrap; }
 .sl-score {
   justify-self: end;
-  color: #8a847a;
-  font-size: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 72px;
+  height: 56px;
+  border-radius: 12px;
+  font-size: 30px;
   font-weight: 900;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-.sl-score.sl-good { color: #176b3a; }
-.sl-score.sl-mid { color: #8a6100; }
-.sl-score.sl-low { color: #a52a20; }
-.sl-score.sl-na { color: #8a847a; }
+.sl-score.sl-good { background: #e2f2e7; color: #176b3a; }
+.sl-score.sl-mid { background: #fbefd6; color: #7a5500; }
+.sl-score.sl-low { background: #fbe3df; color: #a52a20; }
+.sl-score.sl-na { background: #eeedea; color: #6e685e; }
 .sl-detail { padding: 0; }
 
 .sl-loadmore {
@@ -410,10 +434,9 @@
     flex-wrap: wrap;
     gap: 12px;
     margin: 0 -16px;
-    padding: 20px 16px 12px;
-    border-bottom: 1px solid #ddd8cc;
+    padding: 20px 16px 16px;
   }
-  .sl-page:not(.ss-page) .sl-sign-title { font-size: 20px; }
+  .sl-page:not(.ss-page) .sl-sign-title { font-size: 22px; }
   .sl-update-date { flex: 1; text-align: right; font-size: 12px; }
   .sl-searchwrap { order: 2; width: 100%; }
   .sl-mobile-sort {
@@ -432,14 +455,8 @@
     cursor: pointer;
   }
   .sl-count > .sl-context-button { display: none; }
-  .sl-shelf { gap: 10px; margin-top: 12px; background: transparent; border-radius: 0; overflow: visible; }
-  .sl-label { border: 0; border-radius: 12px; background: #fff; box-shadow: 0 1px 0 #e4dfd3; overflow: hidden; }
-  .sl-row { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 14px 16px; }
-  .sl-channel { grid-column: 1; grid-row: 1; font-size: 13px; padding: 1px 7px; }
-  .sl-card-main { display: contents; }
-  .sl-meta { grid-column: 2; grid-row: 1; justify-self: end; font-size: 12px; white-space: nowrap; }
-  .sl-pname { grid-column: 1; grid-row: 2; font-size: 19px; }
-  .sl-score { grid-column: 2; grid-row: 2; min-width: 56px; text-align: right; font-size: 32px; }
+  .sl-shelf { margin-top: 12px; }
+  .sl-score { width: 60px; height: 52px; font-size: 26px; }
   .sl-filter-context { flex-basis: 100%; }
   .sl-filter-context > button { display: none; }
   .sl-count { justify-content: space-between; }
@@ -462,7 +479,7 @@
     padding: 0 22px;
     border: none;
     border-radius: 28px;
-    background: var(--sl-ink);
+    background: #111827;
     color: #fff;
     box-shadow: 0 6px 18px rgba(23, 19, 14, 0.28);
     font: inherit;

@@ -20,7 +20,6 @@ import {
   applyAdvanced,
   brands,
   categoryKeys,
-  displayBrand,
   filterByBrand,
   filterByCategory,
   filterHasScore,
@@ -31,16 +30,6 @@ import {
 } from '@/lib/data'
 
 const PAGE_SIZE = 30
-
-// Rail colours mirror ShelfCard so an active brand chip wears its shelf colour.
-const BRAND_RAIL: Record<string, string> = {
-  '7-11': '#F26522',
-  全家: '#00A651',
-  萊爾富: '#E60012',
-  OK: '#F5A623',
-  美廉社: '#6C3DBF',
-  其他: '#6B7280',
-}
 
 function isoDaysAgo(days: number): string {
   const d = new Date()
@@ -298,12 +287,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             <button
               key={name}
               type="button"
-              className={`sl-chip-btn sl-brand${brand === name ? ' sl-on' : ''}`}
-              style={
-                brand === name
-                  ? ({ '--sl-brand': BRAND_RAIL[displayBrand(name)] } as CSSProperties)
-                  : undefined
-              }
+              className={`sl-chip-btn${brand === name ? ' sl-on' : ''}`}
               onClick={() => {
                 const next = brand === name ? null : name
                 setBrand(next)
