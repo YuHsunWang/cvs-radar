@@ -97,8 +97,6 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   // Ref mirrors `dragging` so move/end read it synchronously (state closure is
   // stale for the first pointermove fired before React re-renders).
   const draggingRef = useRef(false)
-  // Client-only store clock (24h konbini). Starts blank so SSR/CSR markup matches.
-  const [clock, setClock] = useState<{ time: string; day: string }>({ time: '--:--:--', day: '' })
   // Client-only as well. The page is a static export rebuilt right after each data
   // refresh, so at build time the data is always fresh; only the visitor's clock can
   // tell that refreshes have stopped.
@@ -156,24 +154,6 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     }
     dragYRef.current = 0
   }
-
-  useEffect(() => {
-    const tick = () => {
-      const timeFmt = new Intl.DateTimeFormat('zh-TW', {
-        timeZone: 'Asia/Taipei',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-      })
-      const dayFmt = new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', weekday: 'short' })
-      const now = new Date()
-      setClock({ time: timeFmt.format(now), day: dayFmt.format(now) })
-    }
-    tick()
-    const id = window.setInterval(tick, 1000)
-    return () => window.clearInterval(id)
-  }, [])
 
   useEffect(() => {
     setDataStale(isDataStale(initialPayload.generatedAt))
@@ -398,28 +378,29 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     <div className="sl-page">
       <header className="sl-sign">
         <div className="sl-sign-main">
-          <div className="sl-sign-mark" aria-hidden="true">
-            <span className="sl-sweep" />
-          </div>
-          <div>
-            <p className="sl-sign-kicker">便利商店・新品貨架</p>
-            <h1 className="sl-sign-title">
-              貨架雷達 <span>CVS&nbsp;RADAR</span>
-            </h1>
-          </div>
+          <h1 className="sl-sign-title">超商雷達</h1>
         </div>
-        <div className="sl-sign-stamp">
-          <span className="sl-clock-time" aria-label={`目前時間 ${clock.time}`}>
-            {clock.time}
-          </span>
-          <span className="sl-st-line">24H 營業中{clock.day ? ` · ${clock.day}` : ''}</span>
+        <span className="sl-update-date">{initialPayload.generatedAt ? `${formatDisplayDate(initialPayload.generatedAt)} 更新` : '更新時間不明'}</span>
+        <div className="sl-searchwrap">
+          <SearchBar
+            value={query}
+            onChange={(value) => {
+              setQuery(value)
+              resetPage()
+            }}
+          />
         </div>
+        <button
+          type="button"
+          className="sl-mobile-sort"
+          onClick={() => revealSection('sort')}
+        >
+          {SORT_OPTIONS.find((option) => option.key === sortKey)?.label} ▾
+        </button>
       </header>
 
       <div className="sl-aislebar">
         <span className="sl-ab-slot">本區 {products.length} 品</span>
-        <span className="sl-ab-sep">·</span>
-        <span>資料更新 {formatDisplayDate(initialPayload.generatedAt)}</span>
         {dataStale ? (
           <span className="sl-ab-stale" role="status">
             已超過 {DATA_STALE_DAYS} 天未更新
@@ -427,16 +408,6 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         ) : null}
         <span className="sl-ab-sep">·</span>
         <span>分數＝綜合評分／滿分 100</span>
-      </div>
-
-      <div className="sl-searchwrap">
-        <SearchBar
-          value={query}
-          onChange={(value) => {
-            setQuery(value)
-            resetPage()
-          }}
-        />
       </div>
 
       {/* Desktop / wide screens: filters inline. Hidden on mobile (sheet used). */}
@@ -506,10 +477,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </main>
 
       <footer className="sl-foot">
-        <p>資料來自公開使用者內容，僅供選購參考；本頁為 CVS Radar 的介面設計試作，非官方評鑑。</p>
-        <p className="sl-foot-mono">
-          SHELF-EDGE LABEL VARIANT · 資料更新 {formatDisplayDate(initialPayload.generatedAt)}
-        </p>
+        <p>資料來自公開使用者內容，僅供選購參考；本頁為超商雷達的介面設計試作，非官方評鑑。</p>
       </footer>
 
       {/* Mobile only: floating filter button + bottom sheet. */}
@@ -521,6 +489,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         onClick={() => openSheet()}
       >
         <SlidersHorizontal size={22} aria-hidden="true" />
+        <span>篩選</span>
         {activeFilterCount > 0 ? <span className="sl-fab-badge">{activeFilterCount}</span> : null}
       </button>
 

@@ -46,9 +46,9 @@ function product(overrides: Partial<Product> = {}): Product {
   }
 }
 
-function card(item: Product, rank = 1, expanded = false) {
+function card(item: Product, expanded = false) {
   return renderToStaticMarkup(
-    React.createElement(ShelfCard, { product: item, rank, isExpanded: expanded, onToggle: () => {} }),
+    React.createElement(ShelfCard, { product: item, rank: 1, isExpanded: expanded, onToggle: () => {} }),
   )
 }
 
@@ -62,44 +62,50 @@ describe('truthful shelf results', () => {
     ], 'comprehensiveAsc')
 
     expect(sorted.map((item) => item.id)).toEqual(['low', 'middle', 'high', 'unknown'])
-    sorted.forEach((item, index) => {
-      const html = card(item, index + 1)
-      expect(html).not.toMatch(/sl-(?:medal|gold|silver|bronze|top)\b/)
-      expect(html).toContain(`<span class="sl-slot">${String(index + 1).padStart(2, '0')}</span>`)
+    sorted.forEach((item) => {
+      const html = card(item)
+      expect(html).not.toMatch(/sl-(?:medal|gold|silver|bronze|top|slot)\b/)
     })
   })
 
   it('shows the calibrated score in static HTML before any scroll observer or effect can run', () => {
     const html = card(product({ fairScore: 20, recommendationScore: 78 }))
-    expect(html).toContain('<span class="sl-s-num">78</span>')
+    expect(html).toContain('<span class="sl-score sl-good">78</span>')
     expect(html).not.toContain('>0<')
   })
 
-  it('withholds numeric scores even when an unpublishable underlying score exists', () => {
+  it('uses the approved 70/50 score bands and a dash when the sample cannot support a score', () => {
+    for (const [score, tone] of [[70, 'good'], [69, 'mid'], [50, 'mid'], [49, 'low']] as const) {
+      expect(card(product({ recommendationScore: score }))).toContain(`<span class="sl-score sl-${tone}">${score}</span>`)
+    }
     const html = card(product({ fairScore: 70, recommendationScore: null, confidence: '低' }))
-    expect(html).toContain('暫無')
-    expect(html).toContain('評分・樣本少')
-    expect(html).not.toContain('class="sl-s-num"')
+    expect(html).toContain('<span class="sl-score sl-na">—</span>')
     expect(html).not.toContain('>70<')
+    const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
+    for (const [tone, color] of [['good', '#176b3a'], ['mid', '#8a6100'], ['low', '#a52a20'], ['na', '#8a847a']]) {
+      expect(css).toContain(`.sl-score.sl-${tone} { color: ${color}; }`)
+    }
   })
 
-  it('identifies post dates and historical prices without implying shelf availability', () => {
+  it('keeps price in the quiet meta line and post dates in expanded detail', () => {
     const html = card(product())
-    expect(html).toContain('最新心得 2026/06/15')
-    expect(html).toContain('價格 $50')
+    expect(html).toContain('$50 · 1 篇心得')
+    expect(html).not.toContain('最新心得 2026/06/15')
+    expect(card(product(), true)).toContain('最新心得 2026/06/15')
     expect(html).not.toContain('上架')
     const missing = card(product({ latestDate: null, price: null }))
-    expect(missing).toContain('心得日期不明')
-    expect(missing).not.toContain('價格')
+    expect(missing).toContain('1 篇心得')
+    expect(missing).not.toContain(' · 1 篇心得')
     expect(missing).not.toContain('$0')
+    expect(card(product({ latestDate: null }), true)).toContain('心得日期不明')
   })
 
   it('shows official calories only when a catalogue value exists', () => {
     // An unmatched product must show nothing: a placeholder like 0 大卡 would
     // read as a real (and very wrong) figure.
-    expect(card(product({ kcal: 318 }))).toContain('318 大卡')
-    expect(card(product({ kcal: 318 }), 1, true)).toContain('取自官網標示的整份數值')
-    const missing = card(product({ kcal: null }), 1, true)
+    expect(card(product({ kcal: 318 }))).not.toContain('318 大卡')
+    expect(card(product({ kcal: 318 }), true)).toContain('取自官網標示的整份數值')
+    const missing = card(product({ kcal: null }), true)
     expect(missing).not.toContain('大卡')
   })
 
@@ -109,14 +115,29 @@ describe('truthful shelf results', () => {
     // only place identity lives — and it must carry the full name, not a
     // truncated copy, or expanding would lose information.
     const name = '非常長的商品名稱'.repeat(12)
-    const expanded = card(product({ productName: name }), 1, true)
+    const expanded = card(product({ productName: name }), true)
     expect(expanded).toContain(`<h2 class="sl-pname">${name}</h2>`)
     expect(expanded.split(name).length - 1).toBe(1)
 
-    const missing = card(product({ productName: '  ', category: '' }), 1, true)
+    const missing = card(product({ productName: '  ', category: '' }), true)
     expect(missing).toContain('<h2 class="sl-pname">商品名稱待確認</h2>')
     expect(missing.split('商品名稱待確認').length - 1).toBe(1)
-    expect(missing).toContain('<span class="sl-tag">其他</span>')
+    expect(missing).toContain('分類：其他')
+  })
+
+  it('reserves the card face for channel, name, meta and score while keeping context in detail', () => {
+    const item = product({ consensus: '褒貶不一', likes: ['香氣足'], cautions: ['偏甜'], kcal: 318 })
+    const collapsed = card(item)
+    expect(collapsed).toContain('<span class="sl-channel">全家</span>')
+    expect(collapsed).not.toMatch(/sl-rail|聲量|褒貶不一|香氣足|318 大卡|分類：/)
+    const expanded = card(item, true)
+    expect(expanded).toContain('分類：飲料')
+    expect(expanded).toContain('共識：褒貶不一')
+    expect(expanded).toContain('目前列表第 1 項')
+    expect(expanded).toContain('討論量：3')
+    expect(expanded).toContain('2 位網友留言')
+    expect(expanded).toContain('香氣足')
+    expect(expanded).toContain('偏甜')
   })
 
   it('keeps sort and filter controls available even when there are no results', () => {
@@ -127,7 +148,7 @@ describe('truthful shelf results', () => {
     expect(html).toContain('全部商品')
     expect(html).toContain('篩選 0')
     expect(html).toContain('沒有符合條件的商品')
-    expect(html).toContain('資料更新 更新時間不明')
+    expect(html).toContain('更新時間不明')
     expect(html).not.toContain('2026/09/08')
     expect(html).not.toContain('上架更新')
   })
