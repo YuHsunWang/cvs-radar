@@ -106,8 +106,6 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
       </header>
 
       <div className="sl-aislebar">
-        <span className="sl-ab-slot">本區 {allItems.length} 品</span>
-        <span className="sl-ab-sep">·</span>
         <span>上架更新 {formatDisplayDate(initialPayload.generatedAt)}</span>
         <span className="sl-ab-sep">·</span>
         <span>分數＝綜合評分／滿分 100</span>

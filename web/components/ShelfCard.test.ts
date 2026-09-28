@@ -32,6 +32,7 @@ function loadSource(filename: string): Record<string, unknown> {
 }
 const ShelfCard = loadSource(resolve(webRoot, 'components/ShelfCard.tsx')).default as typeof import('./ShelfCard').default
 const ShelfExplorer = loadSource(resolve(webRoot, 'components/ShelfExplorer.tsx')).default as typeof import('./ShelfExplorer').default
+const SoftServeZone = loadSource(resolve(webRoot, 'components/SoftServeZone.tsx')).default as typeof import('./SoftServeZone').default
 
 function product(overrides: Partial<Product> = {}): Product {
   return {
@@ -174,5 +175,14 @@ describe('truthful shelf results', () => {
     expect(html).toContain('更新時間不明')
     expect(html).not.toContain('2026/09/08')
     expect(html).not.toContain('上架更新')
+  })
+
+  it('does not show a product count on the soft-serve page either', () => {
+    // Counts were dropped site-wide; the soft-serve aisle bar must not bring one back.
+    const html = renderToStaticMarkup(React.createElement(SoftServeZone, { initialPayload: {
+      products: [product({ productName: '香草霜淇淋', category: '冰品' })], generatedAt: '', siteBuiltAt: '',
+    } }))
+    expect(html).toContain('分數＝綜合評分／滿分 100')
+    expect(html).not.toContain('本區')
   })
 })
