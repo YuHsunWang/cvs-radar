@@ -108,6 +108,9 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
   padding: 0 0 20px;
   border-radius: 0;
   background: #ffffff;
+  /* Paint the white band edge to edge (and up over the page's top padding)
+     without changing layout; border-image outset is ink overflow, not scroll. */
+  border-image: linear-gradient(#ffffff, #ffffff) fill 0 / 0 / 100vmax 100vmax 0;
   color: #111827;
   box-shadow: none;
 }

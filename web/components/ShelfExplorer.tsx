@@ -68,7 +68,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [query, setQuery] = useState('')
   const [brand, setBrand] = useState<string | null>(null)
   const [category, setCategory] = useState<CategoryKey | null>(null)
-  const [sortKey, setSortKey] = useState<SortKey>('recentRecommendationDesc')
+  const [sortKey, setSortKey] = useState<SortKey>('comprehensiveDesc')
   const [hideNoScore, setHideNoScore] = useState(false)
   const [filters, setFilters] = useState<AdvancedFilters>({ fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
@@ -384,13 +384,14 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </header>
 
       <div className="sl-aislebar">
-        <span className="sl-ab-slot">本區 {products.length} 品</span>
         {dataStale ? (
-          <span className="sl-ab-stale" role="status">
-            已超過 {DATA_STALE_DAYS} 天未更新
-          </span>
+          <>
+            <span className="sl-ab-stale" role="status">
+              已超過 {DATA_STALE_DAYS} 天未更新
+            </span>
+            <span className="sl-ab-sep">·</span>
+          </>
         ) : null}
-        <span className="sl-ab-sep">·</span>
         <span>分數＝綜合評分／滿分 100</span>
       </div>
 
@@ -404,7 +405,6 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </div>
 
       <div className="sl-count">
-        <p aria-live="polite">找到 <b>{visibleProducts.length}</b> 項商品</p>
         <button
           type="button"
           className="sl-context-button"

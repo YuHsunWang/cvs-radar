@@ -163,8 +163,12 @@ describe('truthful shelf results', () => {
     const html = renderToStaticMarkup(React.createElement(ShelfExplorer, { initialPayload: {
       products: [], generatedAt: '', siteBuiltAt: '2026-09-08T00:00:00Z',
     } }))
-    expect(html).toContain('排序：近期推薦')
+    // Default sort is score high→low so the list opens on the scan the card is built for.
+    expect(html).toContain('排序：評分高→低')
     expect(html).toContain('全部商品')
+    // Product counts were dropped from the page on purpose; they add nothing to picking a product.
+    expect(html).not.toContain('本區')
+    expect(html).not.toContain('項商品')
     expect(html).toContain('篩選 0')
     expect(html).toContain('沒有符合條件的商品')
     expect(html).toContain('更新時間不明')
