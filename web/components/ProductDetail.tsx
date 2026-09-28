@@ -2,10 +2,11 @@
 
 import { ExternalLink, ThumbsUp, TriangleAlert } from 'lucide-react'
 import { trackOutboundPttClick } from '@/lib/analytics'
-import { Product } from '@/lib/data'
+import { Product, displayCategory } from '@/lib/data'
 
 type ProductDetailProps = {
   product: Product
+  rank: number
 }
 
 /**
@@ -34,7 +35,7 @@ type ProductDetailProps = {
  * screen. Colour never carries polarity alone — each block keeps its icon and a
  * screen-reader label, so the split survives greyscale and colour-blind vision.
  */
-export default function ProductDetail({ product }: ProductDetailProps) {
+export default function ProductDetail({ product, rank }: ProductDetailProps) {
   // One rewrite per reviewing post, joined with 「；」 upstream. Splitting them
   // back out is the honest reading: they are separate people, not one sentence.
   const takes = (product.excerpt || '')
@@ -46,6 +47,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="sl-k">
+      <div className="sl-detail-meta">
+        <span>目前列表第 {rank} 項</span>
+        <span>分類：{displayCategory(product.category)}</span>
+        <span>{product.latestDate ? `最新心得 ${product.latestDate.replaceAll('-', '/')}` : '心得日期不明'}</span>
+        <span>共識：{product.consensus}</span>
+        <span>{product.nPosts} 篇心得 · {product.nComments} 位網友留言</span>
+        <span>討論量：{product.nPosts + product.nComments}</span>
+        {product.confidence === '低' ? <span>樣本少</span> : null}
+      </div>
       {/* Rendered when there is a summary OR the row is provisional: a provisional
           row with no summary still has to admit it is a rule fallback, otherwise
           it is presented as though a model had labelled it. */}
