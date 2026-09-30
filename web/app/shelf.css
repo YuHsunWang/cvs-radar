@@ -60,17 +60,6 @@
   border-radius: 50%;
   background: repeating-radial-gradient(circle at 50% 50%, transparent 0 6px, rgba(246, 243, 234, 0.16) 6px 7px);
 }
-.sl-sweep {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 50%;
-  height: 2px;
-  transform-origin: left center;
-  background: linear-gradient(90deg, #35e0a1, transparent);
-  animation: sl-sweep 3.6s linear infinite;
-}
-@keyframes sl-sweep { to { transform: rotate(360deg); } }
 .sl-sign-kicker {
   margin: 0;
   font-family: var(--sl-mono);
@@ -103,18 +92,28 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
   display: flex;
   align-items: center;
   gap: 16px;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 0 20px;
+  /* Sticky translucent bar, edge to edge: the list scrolls under it and search
+     stays in reach. Negative inline margins escape the centred page column. */
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: -22px calc(50% - 50vw) 0;
+  padding: 16px max(16px, calc(50vw - 480px));
   border-radius: 0;
-  background: #ffffff;
-  /* Paint the white band edge to edge (and up over the page's top padding)
-     without changing layout; border-image outset is ink overflow, not scroll. */
-  border-image: linear-gradient(#ffffff, #ffffff) fill 0 / 0 / 100vmax 100vmax 0;
+  background: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
   color: #111827;
-  box-shadow: none;
+  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.06);
 }
-.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: 0.02em; color: #111827; }
+@media (min-width: 720px) {
+  .sl-page:not(.ss-page) .sl-sign { margin-top: -32px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .sl-page:not(.ss-page) .sl-sign { background: #ffffff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
+.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; color: #111827; }
 .sl-update-date { flex: 1; color: #6b7280; font-size: 13px; }
 .sl-searchwrap { width: 320px; }
 .sl-searchwrap label > svg { display: none; }
@@ -127,7 +126,6 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
   font-weight: 400;
   box-shadow: none;
 }
-.sl-mobile-sort { display: none; }
 
 .sl-aislebar {
   display: flex;
@@ -296,6 +294,9 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
   color: inherit;
   cursor: pointer;
 }
+.sl-label { transition: transform 120ms ease-out, box-shadow 120ms ease-out; }
+/* Feedback on press, not on release. */
+.sl-label:has(.sl-rowbtn:active) { transform: scale(0.98); box-shadow: 0 0 0 rgba(17, 24, 39, 0); }
 .sl-rowbtn:focus-visible { outline: 3px solid #111827; outline-offset: -3px; }
 .sl-row {
   display: grid;
@@ -348,6 +349,7 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
   font-weight: 900;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 .sl-score.sl-good { background: #e2f2e7; color: #176b3a; }
 .sl-score.sl-mid { background: #fbefd6; color: #7a5500; }
@@ -420,6 +422,8 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
 
 /* ---- mobile: floating filter button + bottom sheet ---- */
 .sl-fab { display: none; }
+.sl-fab { transition: transform 100ms ease-out; }
+.sl-fab:active { transform: scale(0.96); }
 .sl-sheet-backdrop { display: none; }
 
 @media (max-width: 640px) {
@@ -428,26 +432,11 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
     flex-wrap: wrap;
     gap: 12px;
     margin: 0 -16px;
-    padding: 20px 16px 16px;
+    padding: 14px 16px 12px;
   }
   .sl-page:not(.ss-page) .sl-sign-title { font-size: 22px; }
   .sl-update-date { flex: 1; text-align: right; font-size: 12px; }
   .sl-searchwrap { order: 2; width: 100%; }
-  .sl-mobile-sort {
-    order: 3;
-    display: block;
-    width: 100%;
-    height: 44px;
-    padding: 0 4px;
-    border: 0;
-    background: transparent;
-    color: #17130e;
-    font: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    text-align: right;
-    cursor: pointer;
-  }
   .sl-count > .sl-context-button { display: none; }
   .sl-shelf { margin-top: 12px; }
   .sl-score { width: 60px; height: 52px; font-size: 26px; }
@@ -521,6 +510,9 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
     transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
   }
   .sl-sheet.sl-dragging { transition: none; animation: none; }
+  /* Leave along the path it entered, starting from wherever it is now. */
+  .sl-sheet.sl-closing { animation: sl-slidedown 0.22s cubic-bezier(0.4, 0, 1, 1) both; }
+  .sl-sheet-backdrop.sl-closing { animation: sl-fadeout 0.22s ease both; }
   .sl-sheet-head {
     padding: 8px 16px 12px;
     border-bottom: 1px solid var(--sl-hair);
@@ -597,9 +589,10 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
 
 @keyframes sl-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sl-slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes sl-slidedown { from { transform: translateY(var(--sl-from, 0px)); } to { transform: translateY(100%); } }
+@keyframes sl-fadeout { from { opacity: 1; } to { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .sl-sweep { animation: none; }
   .sl-sheet-backdrop,
   .sl-sheet { animation: none; transition: none; }
 }

@@ -185,4 +185,13 @@ describe('truthful shelf results', () => {
     expect(html).toContain('分數＝綜合評分／滿分 100')
     expect(html).not.toContain('本區')
   })
+
+  it('puts sort behind the same floating button as filters on phones', () => {
+    // Sort and filter change the same list, so they live together in one sheet.
+    const html = renderToStaticMarkup(React.createElement(ShelfExplorer, { initialPayload: {
+      products: [product()], generatedAt: '', siteBuiltAt: '',
+    } }))
+    expect(html).toContain('排序・篩選')
+    expect(html).not.toContain('sl-mobile-sort')
+  })
 })

@@ -58,6 +58,11 @@ const SORT_OPTIONS: readonly { key: SortKey; label: string }[] = [
 
 // Drag distance (px) past which a downward flick on the sheet handle closes it.
 const SHEET_CLOSE_THRESHOLD = 110
+// A downward flick faster than this (px/ms) closes the sheet even if it moved
+// less than the threshold: judge the gesture by where it is going, not where it stopped.
+const SHEET_FLICK_VELOCITY = 0.5
+// Matches the .sl-sheet transform transition so the sheet leaves the way it came in.
+const SHEET_EXIT_MS = 220
 
 type ShelfExplorerProps = {
   initialPayload: DataPayload
@@ -75,6 +80,8 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [datePreset, setDatePreset] = useState<string>('all')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [sheetClosing, setSheetClosing] = useState(false)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [sheetSection, setSheetSection] = useState('category')
   const sheetBody = useRef<HTMLDivElement>(null)
   const inlineControls = useRef<HTMLDivElement>(null)
@@ -83,6 +90,8 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [dragging, setDragging] = useState(false)
   const dragStartY = useRef(0)
   const dragYRef = useRef(0)
+  // Last two pointer samples, for release velocity.
+  const lastMove = useRef({ y: 0, t: 0, v: 0 })
   // Ref mirrors `dragging` so move/end read it synchronously (state closure is
   // stale for the first pointermove fired before React re-renders).
   const draggingRef = useRef(false)
@@ -91,7 +100,9 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   // tell that refreshes have stopped.
   const [dataStale, setDataStale] = useState(false)
 
-  function openSheet(section = 'category') {
+  function openSheet(section = 'sort') {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    setSheetClosing(false)
     setSheetSection(section)
     dragYRef.current = 0
     setDragY(0)
@@ -110,14 +121,29 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     openSheet(section)
   }
 
-  function closeSheet() {
+  function finishClose() {
+    closeTimer.current = null
     setSheetOpen(false)
+    setSheetClosing(false)
     dragYRef.current = 0
     setDragY(0)
+  }
+  function closeSheet() {
+    if (closeTimer.current) return
+    const reduceMotion = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion) {
+      finishClose()
+      return
+    }
+    // Slide out from wherever the sheet is now (including mid-drag), then unmount.
+    setSheetClosing(true)
+    closeTimer.current = setTimeout(finishClose, SHEET_EXIT_MS)
   }
 
   function onSheetDragStart(event: ReactPointerEvent<HTMLDivElement>) {
     dragStartY.current = event.clientY
+    lastMove.current = { y: event.clientY, t: event.timeStamp, v: 0 }
     draggingRef.current = true
     setDragging(true)
     try {
@@ -129,20 +155,30 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   function onSheetDragMove(event: ReactPointerEvent<HTMLDivElement>) {
     if (!draggingRef.current) return
     const offset = Math.max(0, event.clientY - dragStartY.current)
+    const dt = event.timeStamp - lastMove.current.t
+    if (dt > 0) {
+      lastMove.current = { y: event.clientY, t: event.timeStamp, v: (event.clientY - lastMove.current.y) / dt }
+    }
     dragYRef.current = offset
     setDragY(offset)
   }
-  function onSheetDragEnd() {
+  function onSheetDragEnd(event: ReactPointerEvent<HTMLDivElement>) {
     if (!draggingRef.current) return
     draggingRef.current = false
     setDragging(false)
-    if (dragYRef.current > SHEET_CLOSE_THRESHOLD) {
+    // A finger that paused before lifting has no momentum left.
+    const flicked = event.timeStamp - lastMove.current.t < 100 && lastMove.current.v > SHEET_FLICK_VELOCITY
+    if (dragYRef.current > SHEET_CLOSE_THRESHOLD || flicked) {
       closeSheet()
     } else {
       setDragY(0)
     }
     dragYRef.current = 0
   }
+
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }, [])
 
   useEffect(() => {
     setDataStale(isDataStale(initialPayload.generatedAt))
@@ -374,13 +410,6 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             }}
           />
         </div>
-        <button
-          type="button"
-          className="sl-mobile-sort"
-          onClick={() => revealSection('sort')}
-        >
-          {SORT_OPTIONS.find((option) => option.key === sortKey)?.label} ▾
-        </button>
       </header>
 
       <div className="sl-aislebar">
@@ -468,24 +497,28 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       <button
         type="button"
         className="sl-fab"
-        aria-label={`篩選${activeFilterCount ? `（已套用 ${activeFilterCount} 項）` : ''}`}
+        aria-label={`排序與篩選${activeFilterCount ? `（已套用 ${activeFilterCount} 項）` : ''}`}
         aria-expanded={sheetOpen}
         onClick={() => openSheet()}
       >
         <SlidersHorizontal size={22} aria-hidden="true" />
-        <span>篩選</span>
+        <span>排序・篩選</span>
         {activeFilterCount > 0 ? <span className="sl-fab-badge">{activeFilterCount}</span> : null}
       </button>
 
       {sheetOpen ? (
-        <div className="sl-sheet-backdrop" onClick={closeSheet}>
+        <div className={`sl-sheet-backdrop${sheetClosing ? ' sl-closing' : ''}`} onClick={closeSheet}>
           <div
-            className={`sl-sheet${dragging ? ' sl-dragging' : ''}`}
+            className={`sl-sheet${dragging ? ' sl-dragging' : ''}${sheetClosing ? ' sl-closing' : ''}`}
             role="dialog"
             aria-modal="true"
-            aria-label="篩選"
+            aria-label="排序與篩選"
             onClick={(event) => event.stopPropagation()}
-            style={dragY ? ({ transform: `translateY(${dragY}px)` } as CSSProperties) : undefined}
+            style={
+              sheetClosing
+                ? ({ '--sl-from': `${dragY}px` } as CSSProperties)
+                : dragY ? ({ transform: `translateY(${dragY}px)` } as CSSProperties) : undefined
+            }
           >
             {/* Grab handle — drag it down past the threshold to dismiss. */}
             <div
@@ -497,11 +530,11 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             >
               <span className="sl-grabber" aria-hidden="true" />
               <div className="sl-sheet-headrow">
-                <span className="sl-sheet-title">篩選</span>
+                <span className="sl-sheet-title">排序與篩選</span>
                 <button
                   type="button"
                   className="sl-sheet-x"
-                  aria-label="關閉篩選"
+                  aria-label="關閉排序與篩選"
                   onClick={closeSheet}
                 >
                   <X size={20} aria-hidden="true" />
@@ -509,10 +542,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
               </div>
             </div>
             <div className="sl-sheet-body" ref={sheetBody}>
+              {sortGroup}
               {categoryGroup}
               {brandGroup}
               {dateGroup}
-              {sortGroup}
               {hideToggle}
             </div>
             <div className="sl-sheet-foot">
