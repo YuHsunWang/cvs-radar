@@ -100,27 +100,27 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
   margin: -22px calc(50% - 50vw) 0;
   padding: 16px max(16px, calc(50vw - 480px));
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(55, 48, 163, 0.92);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
-  color: #111827;
-  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.06);
+  color: #ffffff;
+  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.12);
 }
 @media (min-width: 720px) {
   .sl-page:not(.ss-page) .sl-sign { margin-top: -32px; }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .sl-page:not(.ss-page) .sl-sign { background: #ffffff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .sl-page:not(.ss-page) .sl-sign { background: #3730a3; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
-.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; color: #111827; }
-.sl-update-date { flex: 1; color: #6b7280; font-size: 13px; }
+.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; color: #ffffff; }
+.sl-update-date { flex: 1; color: #c7d2fe; font-size: 13px; }
 .sl-searchwrap { width: 320px; }
 .sl-searchwrap label > svg { display: none; }
 .sl-page .sl-searchwrap input[type="search"] {
   height: 44px;
   padding: 0 14px;
-  border: 1px solid #e2ddd2;
+  border: 0;
   border-radius: 12px;
   font-size: 16px;
   font-weight: 400;
@@ -300,11 +300,28 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-rowbtn:focus-visible { outline: 3px solid #111827; outline-offset: -3px; }
 .sl-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 14px 14px 14px 16px;
+  padding: 12px 14px;
 }
+/* Category tile: tint + icon per group. Hues avoid the score block's green/amber/red. */
+.sl-cat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #f1f2f4;
+  color: #4b5563;
+}
+.sl-cat[data-cat="正餐"] { background: #fdebdd; color: #b4531a; }
+.sl-cat[data-cat="甜點"] { background: #fce7f3; color: #be185d; }
+.sl-cat[data-cat="冰品"] { background: #e0f2fe; color: #0369a1; }
+.sl-cat[data-cat="飲料"] { background: #ede9fe; color: #6d28d9; }
+.sl-cat[data-cat="麵包"] { background: #f5ebdd; color: #8a5a2b; }
+.sl-cat[data-cat="零食"] { background: #e0e7ff; color: #4338ca; }
 .sl-channel {
   display: inline-flex;
   align-items: center;
@@ -351,6 +368,7 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
+.sl-score.sl-great { background: #176b3a; color: #ffffff; }
 .sl-score.sl-good { background: #e2f2e7; color: #176b3a; }
 .sl-score.sl-mid { background: #fbefd6; color: #7a5500; }
 .sl-score.sl-low { background: #fbe3df; color: #a52a20; }
@@ -462,7 +480,7 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
     padding: 0 22px;
     border: none;
     border-radius: 28px;
-    background: #111827;
+    background: #3730a3;
     color: #fff;
     box-shadow: 0 6px 18px rgba(23, 19, 14, 0.28);
     font: inherit;

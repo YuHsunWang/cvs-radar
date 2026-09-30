@@ -75,8 +75,9 @@ describe('truthful shelf results', () => {
     expect(html).not.toContain('>0<')
   })
 
-  it('uses the approved 70/50 score bands and a dash when the sample cannot support a score', () => {
-    for (const [score, tone] of [[70, 'good'], [69, 'mid'], [50, 'mid'], [49, 'low']] as const) {
+  it('uses the approved 85/70/50 score bands and a dash when the sample cannot support a score', () => {
+    // 85+ is solid so the standouts separate from a wall of merely-good scores.
+    for (const [score, tone] of [[85, 'great'], [84, 'good'], [70, 'good'], [69, 'mid'], [50, 'mid'], [49, 'low']] as const) {
       expect(card(product({ recommendationScore: score }))).toContain(`<span class="sl-score sl-${tone}">${score}</span>`)
     }
     const html = card(product({ fairScore: 70, recommendationScore: null, confidence: '低' }))
@@ -84,6 +85,7 @@ describe('truthful shelf results', () => {
     expect(html).not.toContain('>70<')
     const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
     for (const [tone, background, color] of [
+      ['great', '#176b3a', '#ffffff'],
       ['good', '#e2f2e7', '#176b3a'],
       ['mid', '#fbefd6', '#7a5500'],
       ['low', '#fbe3df', '#a52a20'],
@@ -193,5 +195,14 @@ describe('truthful shelf results', () => {
     } }))
     expect(html).toContain('排序・篩選')
     expect(html).not.toContain('sl-mobile-sort')
+  })
+
+  it('gives each card a category tile so neighbouring cards differ', () => {
+    // The tile follows the category group, and unknown categories fall back to 其他.
+    for (const [raw, group] of [['便當', '正餐'], ['乳品', '飲料'], ['冰品', '冰品'], ['新品類', '其他']] as const) {
+      expect(card(product({ category: raw }))).toContain(`<span class="sl-cat" data-cat="${group}" aria-hidden="true"><svg`)
+    }
+    const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
+    expect(css).toContain('.sl-cat[data-cat="冰品"] { background: #e0f2fe; color: #0369a1; }')
   })
 })
