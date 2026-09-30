@@ -373,7 +373,50 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-score.sl-mid { background: #fbefd6; color: #7a5500; }
 .sl-score.sl-low { background: #fbe3df; color: #a52a20; }
 .sl-score.sl-na { background: #eeedea; color: #6e685e; }
-.sl-detail { padding: 0; }
+/* Expand / collapse by animating the grid row from 0fr to 1fr: no height measuring. */
+.sl-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  padding: 0;
+  transition: grid-template-rows 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sl-detail.sl-open { grid-template-rows: 1fr; }
+.sl-detail-inner { min-height: 0; overflow: hidden; }
+
+/* Sort: one pill slides between options. Buttons go transparent so the pill shows through. */
+.sl-chips-sliding { position: relative; }
+.sl-chip-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 3px;
+  background: var(--sl-ink);
+  pointer-events: none;
+}
+.sl-chip-pill.sl-ready {
+  transition:
+    transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 250ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sl-datebtn.sl-on-pill { position: relative; background: transparent; transition: color 250ms cubic-bezier(0.22, 1, 0.36, 1); }
+.sl-datebtn.sl-on-pill.sl-on { background: transparent; }
+
+/* Result count: digits rise in with a slight overshoot and stagger when it changes. */
+.sl-num { display: inline-flex; }
+.sl-num[data-pop] > span {
+  display: inline-block;
+  animation: sl-digit-pop 400ms cubic-bezier(0.34, 1.45, 0.64, 1) both;
+  animation-delay: calc(var(--i) * 40ms);
+}
+@keyframes sl-digit-pop {
+  from { opacity: 0; transform: translateY(40%); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-detail, .sl-chip-pill.sl-ready, .sl-datebtn.sl-on-pill { transition: none; }
+  .sl-num[data-pop] > span { animation: none; }
+}
 
 .sl-loadmore {
   grid-column: 1 / -1;

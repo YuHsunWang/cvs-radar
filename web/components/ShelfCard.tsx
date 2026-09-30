@@ -1,5 +1,5 @@
 import { CakeSlice, Cookie, Croissant, CupSoda, IceCreamCone, Package, Soup, type LucideIcon } from 'lucide-react'
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import ProductDetail from '@/components/ProductDetail'
 import { Product, comprehensiveScore, displayBrand, displayCategory } from '@/lib/data'
 
@@ -32,6 +32,9 @@ type ShelfCardProps = {
 export default function ShelfCard({ product, rank, isExpanded, onToggle }: ShelfCardProps) {
   const score = comprehensiveScore(product)
   const detailId = useId()
+  // Mount the detail on first open and keep it, so closing can animate back to 0.
+  const [mounted, setMounted] = useState(isExpanded)
+  if (isExpanded && !mounted) setMounted(true)
   const channel = displayBrand(product.brand)
   const category = displayCategory(product.category)
   const CategoryIcon = CATEGORY_ICON[category] ?? Package
@@ -61,11 +64,15 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
           <span className={`sl-score ${scoreTone(score)}`}>{score === null ? '—' : score}</span>
         </div>
       </button>
-      {isExpanded ? (
-        <div id={detailId} className="sl-detail">
-          <ProductDetail product={product} rank={rank} />
+      <div
+        id={detailId}
+        className={`sl-detail${isExpanded ? ' sl-open' : ''}`}
+        inert={!isExpanded}
+      >
+        <div className="sl-detail-inner">
+          {mounted ? <ProductDetail product={product} rank={rank} /> : null}
         </div>
-      ) : null}
+      </div>
     </article>
   )
 }

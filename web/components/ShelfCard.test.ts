@@ -205,4 +205,14 @@ describe('truthful shelf results', () => {
     const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
     expect(css).toContain('.sl-cat[data-cat="冰品"] { background: #e0f2fe; color: #0369a1; }')
   })
+
+  it('keeps the detail region in place so opening and closing can animate', () => {
+    // aria-controls must point at a real element, and a closed panel must be unreachable.
+    const closed = card(product())
+    expect(closed).toMatch(/<div id="[^"]+" class="sl-detail" inert="">/)
+    expect(closed).not.toContain('最新心得')
+    const open = card(product(), true)
+    expect(open).toMatch(/<div id="[^"]+" class="sl-detail sl-open">/)
+    expect(open).toContain('最新心得 2026/06/15')
+  })
 })

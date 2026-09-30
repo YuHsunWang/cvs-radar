@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
@@ -63,6 +63,73 @@ const SHEET_CLOSE_THRESHOLD = 110
 const SHEET_FLICK_VELOCITY = 0.5
 // Matches the .sl-sheet transform transition so the sheet leaves the way it came in.
 const SHEET_EXIT_MS = 220
+
+// Sort options with one dark pill that slides to the chosen option, so the
+// change reads as "from here to there" instead of a jump.
+function SortChips({ value, onChange }: { value: SortKey; onChange: (key: SortKey) => void }) {
+  const navRef = useRef<HTMLElement>(null)
+  const [pill, setPill] = useState<{ x: number; y: number; w: number; h: number } | null>(null)
+  const [ready, setReady] = useState(false)
+
+  useLayoutEffect(() => {
+    const nav = navRef.current
+    if (!nav) return
+    const measure = () => {
+      const active = nav.querySelector<HTMLElement>('[aria-pressed="true"]')
+      if (!active || !active.offsetWidth) return
+      setPill({ x: active.offsetLeft, y: active.offsetTop, w: active.offsetWidth, h: active.offsetHeight })
+    }
+    measure()
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
+    observer?.observe(nav)
+    return () => observer?.disconnect()
+  }, [value])
+
+  // Place the pill once without motion; only later changes slide.
+  useEffect(() => {
+    if (pill && !ready) requestAnimationFrame(() => setReady(true))
+  }, [pill, ready])
+
+  return (
+    <nav className="sl-chips sl-chips-sliding" aria-label="排序方式" ref={navRef}>
+      {pill ? (
+        <span
+          className={`sl-chip-pill${ready ? ' sl-ready' : ''}`}
+          aria-hidden="true"
+          style={{ transform: `translate(${pill.x}px, ${pill.y}px)`, width: pill.w, height: pill.h }}
+        />
+      ) : null}
+      {SORT_OPTIONS.map((option) => (
+        <button
+          key={option.key}
+          type="button"
+          className={`sl-datebtn${value === option.key ? ' sl-on' : ''}${pill ? ' sl-on-pill' : ''}`}
+          aria-pressed={value === option.key}
+          onClick={() => onChange(option.key)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </nav>
+  )
+}
+
+// A number that pops its digits in (staggered) whenever it changes after first render.
+function PopNumber({ value }: { value: number }) {
+  const [prev, setPrev] = useState(value)
+  const [tick, setTick] = useState(0)
+  if (value !== prev) {
+    setPrev(value)
+    setTick((t) => t + 1)
+  }
+  return (
+    <span className="sl-num" key={tick} data-pop={tick > 0 ? '' : undefined}>
+      {String(value).split('').map((digit, i) => (
+        <span key={i} style={{ '--i': i } as CSSProperties}>{digit}</span>
+      ))}
+    </span>
+  )
+}
 
 type ShelfExplorerProps = {
   initialPayload: DataPayload
@@ -359,23 +426,14 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const sortGroup = (
     <div className="sl-filterrow" data-section="sort">
       <span className="sl-eyebrow">排序</span>
-      <nav className="sl-chips" aria-label="排序方式">
-        {SORT_OPTIONS.map((option) => (
-          <button
-            key={option.key}
-            type="button"
-            className={`sl-datebtn${sortKey === option.key ? ' sl-on' : ''}`}
-            aria-pressed={sortKey === option.key}
-            onClick={() => {
-              setSortKey(option.key)
-              resetPage()
-              trackSortChange(option.key)
-            }}
-          >
-            {option.label}
-          </button>
-        ))}
-      </nav>
+      <SortChips
+        value={sortKey}
+        onChange={(key) => {
+          setSortKey(key)
+          resetPage()
+          trackSortChange(key)
+        }}
+      />
     </div>
   )
 
@@ -553,7 +611,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
                 清除
               </button>
               <button type="button" className="sl-sheet-apply" onClick={closeSheet}>
-                看 {visibleProducts.length} 項結果
+                看 <PopNumber value={visibleProducts.length} /> 項結果
               </button>
             </div>
           </div>
