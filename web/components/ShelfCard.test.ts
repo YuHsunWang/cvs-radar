@@ -215,4 +215,12 @@ describe('truthful shelf results', () => {
     expect(open).toMatch(/<div id="[^"]+" class="sl-detail sl-open">/)
     expect(open).toContain('最新心得 2026/06/15')
   })
+
+  it('shows the first reviewer takeaway as a one-line summary on the card', () => {
+    // The excerpt joins one rewrite per post with 「；」; the card shows only the first.
+    const html = card(product({ excerpt: '蝦仁彈牙韭菜香；偏鹹' }))
+    expect(html).toContain('<p class="sl-summary">蝦仁彈牙韭菜香</p>')
+    expect(html).not.toContain('<p class="sl-summary">蝦仁彈牙韭菜香；偏鹹</p>')
+    expect(card(product({ excerpt: '' }))).not.toContain('sl-summary')
+  })
 })

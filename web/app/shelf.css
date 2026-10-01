@@ -76,7 +76,8 @@
   line-height: 1;
   font-stretch: condensed;
 }
-.sl-sign-title span {
+/* Soft-serve subtitle only; the main header's logo is a span too. */
+.ss-page .sl-sign-title span {
   font-family: var(--sl-mono);
   font-size: 12px;
   font-weight: 600;
@@ -100,26 +101,50 @@ body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
   margin: -22px calc(50% - 50vw) 0;
   padding: 16px max(16px, calc(50vw - 480px));
   border-radius: 0;
-  background: rgba(55, 48, 163, 0.92);
+  background: rgba(255, 255, 255, 0.88);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
+  color: #312e81;
+  box-shadow: none;
+}
+/* Brand accent: a hairline of indigo fading out to the right, instead of a grey divider. */
+.sl-page:not(.ss-page) .sl-sign::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #4f46e5 0%, rgba(129, 140, 248, 0.6) 45%, rgba(129, 140, 248, 0) 100%);
+  pointer-events: none;
+}
+.sl-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 8px;
+  background: #4f46e5;
   color: #ffffff;
-  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.12);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35);
 }
 @media (min-width: 720px) {
   .sl-page:not(.ss-page) .sl-sign { margin-top: -32px; }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .sl-page:not(.ss-page) .sl-sign { background: #3730a3; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .sl-page:not(.ss-page) .sl-sign { background: #ffffff; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
-.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; color: #ffffff; }
-.sl-update-date { flex: 1; color: #c7d2fe; font-size: 13px; }
+.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; color: #312e81; display: flex; align-items: center; gap: 8px; }
+.sl-update-date { flex: 1; color: #6b7280; font-size: 13px; }
 .sl-searchwrap { width: 320px; }
-.sl-searchwrap label > svg { display: none; }
+.sl-searchwrap label > svg { color: #6b7280; }
 .sl-page .sl-searchwrap input[type="search"] {
   height: 44px;
-  padding: 0 14px;
+  padding: 0 14px 0 42px;
+  background: #f1f2f6;
   border: 0;
   border-radius: 12px;
   font-size: 16px;
@@ -266,8 +291,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-page:not(.ss-page) .sl-active-context {
   width: fit-content;
   max-width: 100%;
-  border-bottom: 3px solid #ff6b35;
-  padding-bottom: 4px;
+  border-bottom: 2px solid #312e81;
+  padding-bottom: 3px;
+  color: #312e81;
 }
 
 /* ---- product list ---- */
@@ -353,6 +379,17 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   overflow-wrap: anywhere;
 }
 .sl-meta { color: #6e685e; font-size: 12px; white-space: nowrap; }
+/* One-line takeaway from reviewers; two lines at most so cards keep a steady rhythm. */
+.sl-summary {
+  margin: 0;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .sl-score {
   justify-self: end;
   display: flex;
@@ -501,6 +538,10 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   .sl-count > .sl-context-button { display: none; }
   .sl-shelf { margin-top: 12px; }
   .sl-score { width: 60px; height: 52px; font-size: 26px; }
+  /* Phones: the summary line already tells cards apart, and the tile's width
+     would wrap it. Category stays reachable through the filter sheet. */
+  .sl-cat { display: none; }
+  .sl-row { grid-template-columns: minmax(0, 1fr) auto; }
   .sl-filter-context { flex-basis: 100%; }
   .sl-filter-context > button { display: none; }
   .sl-count { justify-content: space-between; }
@@ -523,7 +564,7 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
     padding: 0 22px;
     border: none;
     border-radius: 28px;
-    background: #3730a3;
+    background: #312e81;
     color: #fff;
     box-shadow: 0 6px 18px rgba(23, 19, 14, 0.28);
     font: inherit;

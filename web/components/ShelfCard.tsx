@@ -38,6 +38,8 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
   const channel = displayBrand(product.brand)
   const category = displayCategory(product.category)
   const CategoryIcon = CATEGORY_ICON[category] ?? Package
+  // The excerpt joins one rewrite per post with 「；」; the card shows the first one.
+  const summary = (product.excerpt || '').split('；')[0].trim()
 
   return (
     <article className="sl-label">
@@ -60,6 +62,7 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
               </span>
             </div>
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
+            {summary ? <p className="sl-summary">{summary}</p> : null}
           </div>
           <span className={`sl-score ${scoreTone(score)}`}>{score === null ? '—' : score}</span>
         </div>

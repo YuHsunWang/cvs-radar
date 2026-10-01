@@ -456,7 +456,16 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     <div className="sl-page">
       <header className="sl-sign">
         <div className="sl-sign-main">
-          <h1 className="sl-sign-title">超商雷達</h1>
+          <h1 className="sl-sign-title">
+            <span className="sl-logo" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M12 12l6-6" />
+                <path d="M20 12a8 8 0 1 1-8-8" />
+                <path d="M16 12a4 4 0 1 1-4-4" />
+              </svg>
+            </span>
+            超商雷達
+          </h1>
         </div>
         <span className="sl-update-date">{initialPayload.generatedAt ? `${formatDisplayDate(initialPayload.generatedAt)} 更新` : '更新時間不明'}</span>
         <div className="sl-searchwrap">
@@ -479,7 +488,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             <span className="sl-ab-sep">·</span>
           </>
         ) : null}
-        <span>分數＝綜合評分／滿分 100</span>
+        <span>分數滿分 100</span>
       </div>
 
       {/* Desktop / wide screens: filters inline. Hidden on mobile (sheet used). */}
