@@ -1,9 +1,22 @@
-import { useId } from 'react'
+import { CakeSlice, Cookie, Croissant, CupSoda, IceCreamCone, Package, Soup, type LucideIcon } from 'lucide-react'
+import { useId, useState } from 'react'
 import ProductDetail from '@/components/ProductDetail'
-import { Product, comprehensiveScore, displayBrand } from '@/lib/data'
+import { Product, comprehensiveScore, displayBrand, displayCategory } from '@/lib/data'
+
+// One icon per category group so neighbouring cards differ at a glance.
+const CATEGORY_ICON: Record<string, LucideIcon> = {
+  正餐: Soup,
+  甜點: CakeSlice,
+  冰品: IceCreamCone,
+  飲料: CupSoda,
+  麵包: Croissant,
+  零食: Cookie,
+  其他: Package,
+}
 
 function scoreTone(score: number | null): string {
   if (score === null) return 'sl-na'
+  if (score >= 85) return 'sl-great'
   if (score >= 70) return 'sl-good'
   if (score >= 50) return 'sl-mid'
   return 'sl-low'
@@ -19,6 +32,14 @@ type ShelfCardProps = {
 export default function ShelfCard({ product, rank, isExpanded, onToggle }: ShelfCardProps) {
   const score = comprehensiveScore(product)
   const detailId = useId()
+  // Mount the detail on first open and keep it, so closing can animate back to 0.
+  const [mounted, setMounted] = useState(isExpanded)
+  if (isExpanded && !mounted) setMounted(true)
+  const channel = displayBrand(product.brand)
+  const category = displayCategory(product.category)
+  const CategoryIcon = CATEGORY_ICON[category] ?? Package
+  // The excerpt joins one rewrite per post with 「；」; the card shows the first one.
+  const summary = (product.excerpt || '').split('；')[0].trim()
 
   return (
     <article className="sl-label">
@@ -30,21 +51,31 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
         className="sl-rowbtn"
       >
         <div className="sl-row">
-          <span className="sl-channel">{displayBrand(product.brand)}</span>
+          <span className="sl-cat" data-cat={category} aria-hidden="true">
+            <CategoryIcon size={24} strokeWidth={1.8} />
+          </span>
           <div className="sl-card-main">
+            <div className="sl-card-top">
+              <span className="sl-channel"><span className="sl-channel-dot" data-brand={channel} aria-hidden="true" />{channel}</span>
+              <span className="sl-meta">
+                {product.price != null ? `$${product.price} · ` : ''}{product.nPosts} 篇心得
+              </span>
+            </div>
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
-            <span className="sl-meta">
-              {product.price != null ? `$${product.price} · ` : ''}{product.nPosts} 篇心得
-            </span>
+            {summary ? <p className="sl-summary">{summary}</p> : null}
           </div>
           <span className={`sl-score ${scoreTone(score)}`}>{score === null ? '—' : score}</span>
         </div>
       </button>
-      {isExpanded ? (
-        <div id={detailId} className="sl-detail">
-          <ProductDetail product={product} rank={rank} />
+      <div
+        id={detailId}
+        className={`sl-detail${isExpanded ? ' sl-open' : ''}`}
+        inert={!isExpanded}
+      >
+        <div className="sl-detail-inner">
+          {mounted ? <ProductDetail product={product} rank={rank} /> : null}
         </div>
-      ) : null}
+      </div>
     </article>
   )
 }

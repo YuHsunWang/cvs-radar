@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
@@ -20,7 +20,6 @@ import {
   applyAdvanced,
   brands,
   categoryKeys,
-  displayBrand,
   filterByBrand,
   filterByCategory,
   filterHasScore,
@@ -31,16 +30,6 @@ import {
 } from '@/lib/data'
 
 const PAGE_SIZE = 30
-
-// Rail colours mirror ShelfCard so an active brand chip wears its shelf colour.
-const BRAND_RAIL: Record<string, string> = {
-  '7-11': '#F26522',
-  全家: '#00A651',
-  萊爾富: '#E60012',
-  OK: '#F5A623',
-  美廉社: '#6C3DBF',
-  其他: '#6B7280',
-}
 
 function isoDaysAgo(days: number): string {
   const d = new Date()
@@ -69,6 +58,78 @@ const SORT_OPTIONS: readonly { key: SortKey; label: string }[] = [
 
 // Drag distance (px) past which a downward flick on the sheet handle closes it.
 const SHEET_CLOSE_THRESHOLD = 110
+// A downward flick faster than this (px/ms) closes the sheet even if it moved
+// less than the threshold: judge the gesture by where it is going, not where it stopped.
+const SHEET_FLICK_VELOCITY = 0.5
+// Matches the .sl-sheet transform transition so the sheet leaves the way it came in.
+const SHEET_EXIT_MS = 220
+
+// Sort options with one dark pill that slides to the chosen option, so the
+// change reads as "from here to there" instead of a jump.
+function SortChips({ value, onChange }: { value: SortKey; onChange: (key: SortKey) => void }) {
+  const navRef = useRef<HTMLElement>(null)
+  const [pill, setPill] = useState<{ x: number; y: number; w: number; h: number } | null>(null)
+  const [ready, setReady] = useState(false)
+
+  useLayoutEffect(() => {
+    const nav = navRef.current
+    if (!nav) return
+    const measure = () => {
+      const active = nav.querySelector<HTMLElement>('[aria-pressed="true"]')
+      if (!active || !active.offsetWidth) return
+      setPill({ x: active.offsetLeft, y: active.offsetTop, w: active.offsetWidth, h: active.offsetHeight })
+    }
+    measure()
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
+    observer?.observe(nav)
+    return () => observer?.disconnect()
+  }, [value])
+
+  // Place the pill once without motion; only later changes slide.
+  useEffect(() => {
+    if (pill && !ready) requestAnimationFrame(() => setReady(true))
+  }, [pill, ready])
+
+  return (
+    <nav className="sl-chips sl-chips-sliding" aria-label="排序方式" ref={navRef}>
+      {pill ? (
+        <span
+          className={`sl-chip-pill${ready ? ' sl-ready' : ''}`}
+          aria-hidden="true"
+          style={{ transform: `translate(${pill.x}px, ${pill.y}px)`, width: pill.w, height: pill.h }}
+        />
+      ) : null}
+      {SORT_OPTIONS.map((option) => (
+        <button
+          key={option.key}
+          type="button"
+          className={`sl-datebtn${value === option.key ? ' sl-on' : ''}${pill ? ' sl-on-pill' : ''}`}
+          aria-pressed={value === option.key}
+          onClick={() => onChange(option.key)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </nav>
+  )
+}
+
+// A number that pops its digits in (staggered) whenever it changes after first render.
+function PopNumber({ value }: { value: number }) {
+  const [prev, setPrev] = useState(value)
+  const [tick, setTick] = useState(0)
+  if (value !== prev) {
+    setPrev(value)
+    setTick((t) => t + 1)
+  }
+  return (
+    <span className="sl-num" key={tick} data-pop={tick > 0 ? '' : undefined}>
+      {String(value).split('').map((digit, i) => (
+        <span key={i} style={{ '--i': i } as CSSProperties}>{digit}</span>
+      ))}
+    </span>
+  )
+}
 
 type ShelfExplorerProps = {
   initialPayload: DataPayload
@@ -79,13 +140,15 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [query, setQuery] = useState('')
   const [brand, setBrand] = useState<string | null>(null)
   const [category, setCategory] = useState<CategoryKey | null>(null)
-  const [sortKey, setSortKey] = useState<SortKey>('recentRecommendationDesc')
+  const [sortKey, setSortKey] = useState<SortKey>('comprehensiveDesc')
   const [hideNoScore, setHideNoScore] = useState(false)
   const [filters, setFilters] = useState<AdvancedFilters>({ fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [datePreset, setDatePreset] = useState<string>('all')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [sheetClosing, setSheetClosing] = useState(false)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [sheetSection, setSheetSection] = useState('category')
   const sheetBody = useRef<HTMLDivElement>(null)
   const inlineControls = useRef<HTMLDivElement>(null)
@@ -94,6 +157,8 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [dragging, setDragging] = useState(false)
   const dragStartY = useRef(0)
   const dragYRef = useRef(0)
+  // Last two pointer samples, for release velocity.
+  const lastMove = useRef({ y: 0, t: 0, v: 0 })
   // Ref mirrors `dragging` so move/end read it synchronously (state closure is
   // stale for the first pointermove fired before React re-renders).
   const draggingRef = useRef(false)
@@ -102,7 +167,9 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   // tell that refreshes have stopped.
   const [dataStale, setDataStale] = useState(false)
 
-  function openSheet(section = 'category') {
+  function openSheet(section = 'sort') {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    setSheetClosing(false)
     setSheetSection(section)
     dragYRef.current = 0
     setDragY(0)
@@ -121,14 +188,29 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     openSheet(section)
   }
 
-  function closeSheet() {
+  function finishClose() {
+    closeTimer.current = null
     setSheetOpen(false)
+    setSheetClosing(false)
     dragYRef.current = 0
     setDragY(0)
+  }
+  function closeSheet() {
+    if (closeTimer.current) return
+    const reduceMotion = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion) {
+      finishClose()
+      return
+    }
+    // Slide out from wherever the sheet is now (including mid-drag), then unmount.
+    setSheetClosing(true)
+    closeTimer.current = setTimeout(finishClose, SHEET_EXIT_MS)
   }
 
   function onSheetDragStart(event: ReactPointerEvent<HTMLDivElement>) {
     dragStartY.current = event.clientY
+    lastMove.current = { y: event.clientY, t: event.timeStamp, v: 0 }
     draggingRef.current = true
     setDragging(true)
     try {
@@ -140,20 +222,30 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   function onSheetDragMove(event: ReactPointerEvent<HTMLDivElement>) {
     if (!draggingRef.current) return
     const offset = Math.max(0, event.clientY - dragStartY.current)
+    const dt = event.timeStamp - lastMove.current.t
+    if (dt > 0) {
+      lastMove.current = { y: event.clientY, t: event.timeStamp, v: (event.clientY - lastMove.current.y) / dt }
+    }
     dragYRef.current = offset
     setDragY(offset)
   }
-  function onSheetDragEnd() {
+  function onSheetDragEnd(event: ReactPointerEvent<HTMLDivElement>) {
     if (!draggingRef.current) return
     draggingRef.current = false
     setDragging(false)
-    if (dragYRef.current > SHEET_CLOSE_THRESHOLD) {
+    // A finger that paused before lifting has no momentum left.
+    const flicked = event.timeStamp - lastMove.current.t < 100 && lastMove.current.v > SHEET_FLICK_VELOCITY
+    if (dragYRef.current > SHEET_CLOSE_THRESHOLD || flicked) {
       closeSheet()
     } else {
       setDragY(0)
     }
     dragYRef.current = 0
   }
+
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }, [])
 
   useEffect(() => {
     setDataStale(isDataStale(initialPayload.generatedAt))
@@ -298,12 +390,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             <button
               key={name}
               type="button"
-              className={`sl-chip-btn sl-brand${brand === name ? ' sl-on' : ''}`}
-              style={
-                brand === name
-                  ? ({ '--sl-brand': BRAND_RAIL[displayBrand(name)] } as CSSProperties)
-                  : undefined
-              }
+              className={`sl-chip-btn${brand === name ? ' sl-on' : ''}`}
               onClick={() => {
                 const next = brand === name ? null : name
                 setBrand(next)
@@ -339,23 +426,14 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const sortGroup = (
     <div className="sl-filterrow" data-section="sort">
       <span className="sl-eyebrow">排序</span>
-      <nav className="sl-chips" aria-label="排序方式">
-        {SORT_OPTIONS.map((option) => (
-          <button
-            key={option.key}
-            type="button"
-            className={`sl-datebtn${sortKey === option.key ? ' sl-on' : ''}`}
-            aria-pressed={sortKey === option.key}
-            onClick={() => {
-              setSortKey(option.key)
-              resetPage()
-              trackSortChange(option.key)
-            }}
-          >
-            {option.label}
-          </button>
-        ))}
-      </nav>
+      <SortChips
+        value={sortKey}
+        onChange={(key) => {
+          setSortKey(key)
+          resetPage()
+          trackSortChange(key)
+        }}
+      />
     </div>
   )
 
@@ -378,7 +456,16 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     <div className="sl-page">
       <header className="sl-sign">
         <div className="sl-sign-main">
-          <h1 className="sl-sign-title">超商雷達</h1>
+          <h1 className="sl-sign-title">
+            <span className="sl-logo" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M12 12l6-6" />
+                <path d="M20 12a8 8 0 1 1-8-8" />
+                <path d="M16 12a4 4 0 1 1-4-4" />
+              </svg>
+            </span>
+            超商雷達
+          </h1>
         </div>
         <span className="sl-update-date">{initialPayload.generatedAt ? `${formatDisplayDate(initialPayload.generatedAt)} 更新` : '更新時間不明'}</span>
         <div className="sl-searchwrap">
@@ -390,24 +477,18 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             }}
           />
         </div>
-        <button
-          type="button"
-          className="sl-mobile-sort"
-          onClick={() => revealSection('sort')}
-        >
-          {SORT_OPTIONS.find((option) => option.key === sortKey)?.label} ▾
-        </button>
       </header>
 
       <div className="sl-aislebar">
-        <span className="sl-ab-slot">本區 {products.length} 品</span>
         {dataStale ? (
-          <span className="sl-ab-stale" role="status">
-            已超過 {DATA_STALE_DAYS} 天未更新
-          </span>
+          <>
+            <span className="sl-ab-stale" role="status">
+              已超過 {DATA_STALE_DAYS} 天未更新
+            </span>
+            <span className="sl-ab-sep">·</span>
+          </>
         ) : null}
-        <span className="sl-ab-sep">·</span>
-        <span>分數＝綜合評分／滿分 100</span>
+        <span>分數滿分 100</span>
       </div>
 
       {/* Desktop / wide screens: filters inline. Hidden on mobile (sheet used). */}
@@ -420,7 +501,6 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </div>
 
       <div className="sl-count">
-        <p aria-live="polite">找到 <b>{visibleProducts.length}</b> 項商品</p>
         <button
           type="button"
           className="sl-context-button"
@@ -484,24 +564,28 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       <button
         type="button"
         className="sl-fab"
-        aria-label={`篩選${activeFilterCount ? `（已套用 ${activeFilterCount} 項）` : ''}`}
+        aria-label={`排序與篩選${activeFilterCount ? `（已套用 ${activeFilterCount} 項）` : ''}`}
         aria-expanded={sheetOpen}
         onClick={() => openSheet()}
       >
         <SlidersHorizontal size={22} aria-hidden="true" />
-        <span>篩選</span>
+        <span>排序・篩選</span>
         {activeFilterCount > 0 ? <span className="sl-fab-badge">{activeFilterCount}</span> : null}
       </button>
 
       {sheetOpen ? (
-        <div className="sl-sheet-backdrop" onClick={closeSheet}>
+        <div className={`sl-sheet-backdrop${sheetClosing ? ' sl-closing' : ''}`} onClick={closeSheet}>
           <div
-            className={`sl-sheet${dragging ? ' sl-dragging' : ''}`}
+            className={`sl-sheet${dragging ? ' sl-dragging' : ''}${sheetClosing ? ' sl-closing' : ''}`}
             role="dialog"
             aria-modal="true"
-            aria-label="篩選"
+            aria-label="排序與篩選"
             onClick={(event) => event.stopPropagation()}
-            style={dragY ? ({ transform: `translateY(${dragY}px)` } as CSSProperties) : undefined}
+            style={
+              sheetClosing
+                ? ({ '--sl-from': `${dragY}px` } as CSSProperties)
+                : dragY ? ({ transform: `translateY(${dragY}px)` } as CSSProperties) : undefined
+            }
           >
             {/* Grab handle — drag it down past the threshold to dismiss. */}
             <div
@@ -513,11 +597,11 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             >
               <span className="sl-grabber" aria-hidden="true" />
               <div className="sl-sheet-headrow">
-                <span className="sl-sheet-title">篩選</span>
+                <span className="sl-sheet-title">排序與篩選</span>
                 <button
                   type="button"
                   className="sl-sheet-x"
-                  aria-label="關閉篩選"
+                  aria-label="關閉排序與篩選"
                   onClick={closeSheet}
                 >
                   <X size={20} aria-hidden="true" />
@@ -525,10 +609,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
               </div>
             </div>
             <div className="sl-sheet-body" ref={sheetBody}>
+              {sortGroup}
               {categoryGroup}
               {brandGroup}
               {dateGroup}
-              {sortGroup}
               {hideToggle}
             </div>
             <div className="sl-sheet-foot">
@@ -536,7 +620,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
                 清除
               </button>
               <button type="button" className="sl-sheet-apply" onClick={closeSheet}>
-                看 {visibleProducts.length} 項結果
+                看 <PopNumber value={visibleProducts.length} /> 項結果
               </button>
             </div>
           </div>

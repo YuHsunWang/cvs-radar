@@ -90,9 +90,7 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
     <div className="sl-page ss-page">
       <header className="sl-sign">
         <div className="sl-sign-main">
-          <div className="sl-sign-mark" aria-hidden="true">
-            <span className="sl-sweep" />
-          </div>
+          <div className="sl-sign-mark" aria-hidden="true" />
           <div>
             <p className="sl-sign-kicker">便利商店・期間限定</p>
             <h1 className="sl-sign-title">
@@ -106,8 +104,6 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
       </header>
 
       <div className="sl-aislebar">
-        <span className="sl-ab-slot">本區 {allItems.length} 品</span>
-        <span className="sl-ab-sep">·</span>
         <span>上架更新 {formatDisplayDate(initialPayload.generatedAt)}</span>
         <span className="sl-ab-sep">·</span>
         <span>分數＝綜合評分／滿分 100</span>

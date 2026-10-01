@@ -101,8 +101,12 @@ export function filterByBrand(products: Product[], brand: string | null): Produc
   return products.filter((product) => displayBrand(product.brand) === brand)
 }
 
+// Merchandise (charms, bags, coasters) is not food. It stays reachable under
+// 其他 but is left out of the unfiltered list, where it would outrank snacks.
+const MERCH_CATEGORY = '周邊'
+
 export function filterByCategory(products: Product[], category: CategoryKey | null): Product[] {
-  if (!category) return products
+  if (!category) return products.filter((product) => product.category !== MERCH_CATEGORY)
   return products.filter((product) => displayCategory(product.category) === category)
 }
 

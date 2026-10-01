@@ -60,17 +60,6 @@
   border-radius: 50%;
   background: repeating-radial-gradient(circle at 50% 50%, transparent 0 6px, rgba(246, 243, 234, 0.16) 6px 7px);
 }
-.sl-sweep {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 50%;
-  height: 2px;
-  transform-origin: left center;
-  background: linear-gradient(90deg, #35e0a1, transparent);
-  animation: sl-sweep 3.6s linear infinite;
-}
-@keyframes sl-sweep { to { transform: rotate(360deg); } }
 .sl-sign-kicker {
   margin: 0;
   font-family: var(--sl-mono);
@@ -87,7 +76,8 @@
   line-height: 1;
   font-stretch: condensed;
 }
-.sl-sign-title span {
+/* Soft-serve subtitle only; the main header's logo is a span too. */
+.ss-page .sl-sign-title span {
   font-family: var(--sl-mono);
   font-size: 12px;
   font-weight: 600;
@@ -97,33 +87,70 @@
   vertical-align: 2px;
 }
 /* The main list follows the approved compact header; the soft-serve header keeps its own layout. */
-.sl-page:not(.ss-page) { background: #f4f2ec; }
+.sl-page:not(.ss-page) { background: #f6f7f9; }
+body:has(.sl-page:not(.ss-page)) { background: #f6f7f9; }
 .sl-page:not(.ss-page) .sl-sign {
   display: flex;
   align-items: center;
   gap: 16px;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 0 20px;
+  /* Sticky translucent bar, edge to edge: the list scrolls under it and search
+     stays in reach. Negative inline margins escape the centred page column. */
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: -22px calc(50% - 50vw) 0;
+  padding: 16px max(16px, calc(50vw - 480px));
   border-radius: 0;
-  background: transparent;
-  color: #17130e;
+  background: rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  color: #312e81;
   box-shadow: none;
 }
-.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: 0.02em; }
-.sl-update-date { flex: 1; color: #5c574e; font-size: 13px; }
+/* Brand accent: a hairline of indigo fading out to the right, instead of a grey divider. */
+.sl-page:not(.ss-page) .sl-sign::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #4f46e5 0%, rgba(129, 140, 248, 0.6) 45%, rgba(129, 140, 248, 0) 100%);
+  pointer-events: none;
+}
+.sl-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35);
+}
+@media (min-width: 720px) {
+  .sl-page:not(.ss-page) .sl-sign { margin-top: -32px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .sl-page:not(.ss-page) .sl-sign { background: #ffffff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
+.sl-page:not(.ss-page) .sl-sign-title { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; color: #312e81; display: flex; align-items: center; gap: 8px; }
+.sl-update-date { flex: 1; color: #6b7280; font-size: 13px; }
 .sl-searchwrap { width: 320px; }
-.sl-searchwrap label > svg { display: none; }
+.sl-searchwrap label > svg { color: #6b7280; }
 .sl-page .sl-searchwrap input[type="search"] {
   height: 44px;
-  padding: 0 14px;
-  border: 1px solid #c9c3b5;
-  border-radius: 10px;
+  padding: 0 14px 0 42px;
+  background: #f1f2f6;
+  border: 0;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 400;
   box-shadow: none;
 }
-.sl-mobile-sort { display: none; }
 
 .sl-aislebar {
   display: flex;
@@ -134,15 +161,6 @@
   font-size: 12px;
   color: var(--sl-soft);
   font-weight: 600;
-}
-.sl-ab-slot {
-  font-family: var(--sl-mono);
-  font-weight: 700;
-  color: var(--sl-ink);
-  background: var(--sl-pop);
-  padding: 2px 7px;
-  border-radius: 2px;
-  letter-spacing: 0.02em;
 }
 .sl-ab-sep { opacity: 0.5; }
 .sl-ab-stale { color: var(--sl-mid); font-weight: 700; }
@@ -208,7 +226,6 @@
 }
 .sl-chip-btn.sl-on { background: var(--sl-ink); color: #f6f3ea; border-color: var(--sl-ink); }
 .sl-chip-btn.sl-on::before { border-color: var(--sl-pop); background: var(--sl-pop); }
-.sl-chip-btn.sl-brand.sl-on { background: var(--sl-brand, var(--sl-ink)); border-color: var(--sl-brand, var(--sl-ink)); }
 
 .sl-datebtn {
   font-family: var(--sl-cjk);
@@ -271,19 +288,28 @@
   overflow: hidden;
 }
 .sl-active-context button { margin-right: 8px; }
+.sl-page:not(.ss-page) .sl-active-context {
+  width: fit-content;
+  max-width: 100%;
+  border-bottom: 2px solid #312e81;
+  padding-bottom: 3px;
+  color: #312e81;
+}
 
 /* ---- product list ---- */
 .sl-shelf {
   display: flex;
   flex-direction: column;
+  gap: 10px;
   max-width: 960px;
   margin: 14px auto 0;
-  background: #fff;
+}
+.sl-label {
   border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.08);
   overflow: hidden;
 }
-.sl-label { border-bottom: 1px solid #eeeae0; }
-.sl-label:last-of-type { border-bottom: 0; }
 .sl-rowbtn {
   display: block;
   width: 100%;
@@ -294,48 +320,140 @@
   color: inherit;
   cursor: pointer;
 }
-.sl-rowbtn:focus-visible { outline: 3px solid #176b3a; outline-offset: -3px; }
+.sl-label { transition: transform 120ms ease-out, box-shadow 120ms ease-out; }
+/* Feedback on press, not on release. */
+.sl-label:has(.sl-rowbtn:active) { transform: scale(0.98); box-shadow: 0 0 0 rgba(17, 24, 39, 0); }
+.sl-rowbtn:focus-visible { outline: 3px solid #111827; outline-offset: -3px; }
 .sl-row {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr) 120px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  column-gap: 20px;
-  padding: 16px 28px;
+  gap: 12px;
+  padding: 12px 14px;
 }
+/* Category tile: tint + icon per group. Hues avoid the score block's green/amber/red. */
+.sl-cat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #f1f2f4;
+  color: #4b5563;
+}
+.sl-cat[data-cat="正餐"] { background: #fdebdd; color: #b4531a; }
+.sl-cat[data-cat="甜點"] { background: #fce7f3; color: #be185d; }
+.sl-cat[data-cat="冰品"] { background: #e0f2fe; color: #0369a1; }
+.sl-cat[data-cat="飲料"] { background: #ede9fe; color: #6d28d9; }
+.sl-cat[data-cat="麵包"] { background: #f5ebdd; color: #8a5a2b; }
+.sl-cat[data-cat="零食"] { background: #e0e7ff; color: #4338ca; }
 .sl-channel {
-  justify-self: start;
-  border: 1px solid #6b665d;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  border-radius: 6px;
   padding: 2px 8px;
-  color: #17130e;
-  font-size: 14px;
+  background: #f1f2f4;
+  color: #111827;
+  font-size: 12px;
   font-weight: 700;
-  line-height: 20px;
+  line-height: 18px;
   white-space: nowrap;
 }
-.sl-card-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sl-channel-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: #9ca3af; }
+.sl-channel-dot[data-brand="7-11"] { background: #f26522; }
+.sl-channel-dot[data-brand="全家"] { background: #00a651; }
+.sl-channel-dot[data-brand="萊爾富"] { background: #1f4fa8; }
+.sl-channel-dot[data-brand="OK"] { background: #f5a623; }
+.sl-channel-dot[data-brand="美廉社"] { background: #6c3dbf; }
+.sl-card-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sl-card-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .sl-pname {
   margin: 0;
   color: #17130e;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
-.sl-meta { color: #5c574e; font-size: 13px; }
+.sl-meta { color: #6e685e; font-size: 12px; white-space: nowrap; }
+/* One-line takeaway from reviewers; two lines at most so cards keep a steady rhythm. */
+.sl-summary {
+  margin: 0;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .sl-score {
   justify-self: end;
-  color: #8a847a;
-  font-size: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 72px;
+  height: 56px;
+  border-radius: 12px;
+  font-size: 30px;
   font-weight: 900;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
-.sl-score.sl-good { color: #176b3a; }
-.sl-score.sl-mid { color: #8a6100; }
-.sl-score.sl-low { color: #a52a20; }
-.sl-score.sl-na { color: #8a847a; }
-.sl-detail { padding: 0; }
+.sl-score.sl-great { background: #176b3a; color: #ffffff; }
+.sl-score.sl-good { background: #e2f2e7; color: #176b3a; }
+.sl-score.sl-mid { background: #fbefd6; color: #7a5500; }
+.sl-score.sl-low { background: #fbe3df; color: #a52a20; }
+.sl-score.sl-na { background: #eeedea; color: #6e685e; }
+/* Expand / collapse by animating the grid row from 0fr to 1fr: no height measuring. */
+.sl-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  padding: 0;
+  transition: grid-template-rows 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sl-detail.sl-open { grid-template-rows: 1fr; }
+.sl-detail-inner { min-height: 0; overflow: hidden; }
+
+/* Sort: one pill slides between options. Buttons go transparent so the pill shows through. */
+.sl-chips-sliding { position: relative; }
+.sl-chip-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 3px;
+  background: var(--sl-ink);
+  pointer-events: none;
+}
+.sl-chip-pill.sl-ready {
+  transition:
+    transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 250ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sl-datebtn.sl-on-pill { position: relative; background: transparent; transition: color 250ms cubic-bezier(0.22, 1, 0.36, 1); }
+.sl-datebtn.sl-on-pill.sl-on { background: transparent; }
+
+/* Result count: digits rise in with a slight overshoot and stagger when it changes. */
+.sl-num { display: inline-flex; }
+.sl-num[data-pop] > span {
+  display: inline-block;
+  animation: sl-digit-pop 400ms cubic-bezier(0.34, 1.45, 0.64, 1) both;
+  animation-delay: calc(var(--i) * 40ms);
+}
+@keyframes sl-digit-pop {
+  from { opacity: 0; transform: translateY(40%); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-detail, .sl-chip-pill.sl-ready, .sl-datebtn.sl-on-pill { transition: none; }
+  .sl-num[data-pop] > span { animation: none; }
+}
 
 .sl-loadmore {
   grid-column: 1 / -1;
@@ -402,6 +520,8 @@
 
 /* ---- mobile: floating filter button + bottom sheet ---- */
 .sl-fab { display: none; }
+.sl-fab { transition: transform 100ms ease-out; }
+.sl-fab:active { transform: scale(0.96); }
 .sl-sheet-backdrop { display: none; }
 
 @media (max-width: 640px) {
@@ -410,36 +530,18 @@
     flex-wrap: wrap;
     gap: 12px;
     margin: 0 -16px;
-    padding: 20px 16px 12px;
-    border-bottom: 1px solid #ddd8cc;
+    padding: 14px 16px 12px;
   }
-  .sl-page:not(.ss-page) .sl-sign-title { font-size: 20px; }
+  .sl-page:not(.ss-page) .sl-sign-title { font-size: 22px; }
   .sl-update-date { flex: 1; text-align: right; font-size: 12px; }
   .sl-searchwrap { order: 2; width: 100%; }
-  .sl-mobile-sort {
-    order: 3;
-    display: block;
-    width: 100%;
-    height: 44px;
-    padding: 0 4px;
-    border: 0;
-    background: transparent;
-    color: #17130e;
-    font: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    text-align: right;
-    cursor: pointer;
-  }
   .sl-count > .sl-context-button { display: none; }
-  .sl-shelf { gap: 10px; margin-top: 12px; background: transparent; border-radius: 0; overflow: visible; }
-  .sl-label { border: 0; border-radius: 12px; background: #fff; box-shadow: 0 1px 0 #e4dfd3; overflow: hidden; }
-  .sl-row { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 14px 16px; }
-  .sl-channel { grid-column: 1; grid-row: 1; font-size: 13px; padding: 1px 7px; }
-  .sl-card-main { display: contents; }
-  .sl-meta { grid-column: 2; grid-row: 1; justify-self: end; font-size: 12px; white-space: nowrap; }
-  .sl-pname { grid-column: 1; grid-row: 2; font-size: 19px; }
-  .sl-score { grid-column: 2; grid-row: 2; min-width: 56px; text-align: right; font-size: 32px; }
+  .sl-shelf { margin-top: 12px; }
+  .sl-score { width: 60px; height: 52px; font-size: 26px; }
+  /* Phones: the summary line already tells cards apart, and the tile's width
+     would wrap it. Category stays reachable through the filter sheet. */
+  .sl-cat { display: none; }
+  .sl-row { grid-template-columns: minmax(0, 1fr) auto; }
   .sl-filter-context { flex-basis: 100%; }
   .sl-filter-context > button { display: none; }
   .sl-count { justify-content: space-between; }
@@ -462,7 +564,7 @@
     padding: 0 22px;
     border: none;
     border-radius: 28px;
-    background: var(--sl-ink);
+    background: #312e81;
     color: #fff;
     box-shadow: 0 6px 18px rgba(23, 19, 14, 0.28);
     font: inherit;
@@ -510,6 +612,9 @@
     transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
   }
   .sl-sheet.sl-dragging { transition: none; animation: none; }
+  /* Leave along the path it entered, starting from wherever it is now. */
+  .sl-sheet.sl-closing { animation: sl-slidedown 0.22s cubic-bezier(0.4, 0, 1, 1) both; }
+  .sl-sheet-backdrop.sl-closing { animation: sl-fadeout 0.22s ease both; }
   .sl-sheet-head {
     padding: 8px 16px 12px;
     border-bottom: 1px solid var(--sl-hair);
@@ -586,9 +691,10 @@
 
 @keyframes sl-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sl-slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes sl-slidedown { from { transform: translateY(var(--sl-from, 0px)); } to { transform: translateY(100%); } }
+@keyframes sl-fadeout { from { opacity: 1; } to { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .sl-sweep { animation: none; }
   .sl-sheet-backdrop,
   .sl-sheet { animation: none; transition: none; }
 }

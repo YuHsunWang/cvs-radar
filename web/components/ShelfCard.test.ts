@@ -32,6 +32,7 @@ function loadSource(filename: string): Record<string, unknown> {
 }
 const ShelfCard = loadSource(resolve(webRoot, 'components/ShelfCard.tsx')).default as typeof import('./ShelfCard').default
 const ShelfExplorer = loadSource(resolve(webRoot, 'components/ShelfExplorer.tsx')).default as typeof import('./ShelfExplorer').default
+const SoftServeZone = loadSource(resolve(webRoot, 'components/SoftServeZone.tsx')).default as typeof import('./SoftServeZone').default
 
 function product(overrides: Partial<Product> = {}): Product {
   return {
@@ -74,17 +75,38 @@ describe('truthful shelf results', () => {
     expect(html).not.toContain('>0<')
   })
 
-  it('uses the approved 70/50 score bands and a dash when the sample cannot support a score', () => {
-    for (const [score, tone] of [[70, 'good'], [69, 'mid'], [50, 'mid'], [49, 'low']] as const) {
+  it('uses the approved 85/70/50 score bands and a dash when the sample cannot support a score', () => {
+    // 85+ is solid so the standouts separate from a wall of merely-good scores.
+    for (const [score, tone] of [[85, 'great'], [84, 'good'], [70, 'good'], [69, 'mid'], [50, 'mid'], [49, 'low']] as const) {
       expect(card(product({ recommendationScore: score }))).toContain(`<span class="sl-score sl-${tone}">${score}</span>`)
     }
     const html = card(product({ fairScore: 70, recommendationScore: null, confidence: '低' }))
     expect(html).toContain('<span class="sl-score sl-na">—</span>')
     expect(html).not.toContain('>70<')
     const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
-    for (const [tone, color] of [['good', '#176b3a'], ['mid', '#8a6100'], ['low', '#a52a20'], ['na', '#8a847a']]) {
-      expect(css).toContain(`.sl-score.sl-${tone} { color: ${color}; }`)
+    for (const [tone, background, color] of [
+      ['great', '#176b3a', '#ffffff'],
+      ['good', '#e2f2e7', '#176b3a'],
+      ['mid', '#fbefd6', '#7a5500'],
+      ['low', '#fbe3df', '#a52a20'],
+      ['na', '#eeedea', '#6e685e'],
+    ]) {
+      expect(css).toContain(`.sl-score.sl-${tone} { background: ${background}; color: ${color}; }`)
     }
+  })
+
+  it('places each channel colour only on its dot, including the unknown fallback', () => {
+    const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
+    for (const [brand, color] of [
+      ['7-11', '#f26522'], ['全家', '#00a651'], ['萊爾富', '#1f4fa8'],
+      ['OK', '#f5a623'], ['美廉社', '#6c3dbf'],
+    ]) {
+      expect(card(product({ brand }))).toContain(`<span class="sl-channel-dot" data-brand="${brand}" aria-hidden="true"></span>${brand}`)
+      expect(css).toContain(`.sl-channel-dot[data-brand="${brand}"] { background: ${color}; }`)
+    }
+    expect(card(product({ brand: '不明通路' }))).toContain('<span class="sl-channel-dot" data-brand="其他" aria-hidden="true"></span>其他')
+    expect(css).toContain('border-radius: 50%; background: #9ca3af;')
+    expect(css).not.toContain('--sl-brand')
   })
 
   it('keeps price in the quiet meta line and post dates in expanded detail', () => {
@@ -128,7 +150,7 @@ describe('truthful shelf results', () => {
   it('reserves the card face for channel, name, meta and score while keeping context in detail', () => {
     const item = product({ consensus: '褒貶不一', likes: ['香氣足'], cautions: ['偏甜'], kcal: 318 })
     const collapsed = card(item)
-    expect(collapsed).toContain('<span class="sl-channel">全家</span>')
+    expect(collapsed).toContain('<span class="sl-channel"><span class="sl-channel-dot" data-brand="全家" aria-hidden="true"></span>全家</span>')
     expect(collapsed).not.toMatch(/sl-rail|聲量|褒貶不一|香氣足|318 大卡|分類：/)
     const expanded = card(item, true)
     expect(expanded).toContain('分類：飲料')
@@ -144,12 +166,61 @@ describe('truthful shelf results', () => {
     const html = renderToStaticMarkup(React.createElement(ShelfExplorer, { initialPayload: {
       products: [], generatedAt: '', siteBuiltAt: '2026-09-08T00:00:00Z',
     } }))
-    expect(html).toContain('排序：近期推薦')
+    // Default sort is score high→low so the list opens on the scan the card is built for.
+    expect(html).toContain('排序：評分高→低')
     expect(html).toContain('全部商品')
+    // Product counts were dropped from the page on purpose; they add nothing to picking a product.
+    expect(html).not.toContain('本區')
+    expect(html).not.toContain('項商品')
     expect(html).toContain('篩選 0')
     expect(html).toContain('沒有符合條件的商品')
     expect(html).toContain('更新時間不明')
     expect(html).not.toContain('2026/09/08')
     expect(html).not.toContain('上架更新')
+  })
+
+  it('does not show a product count on the soft-serve page either', () => {
+    // Counts were dropped site-wide; the soft-serve aisle bar must not bring one back.
+    const html = renderToStaticMarkup(React.createElement(SoftServeZone, { initialPayload: {
+      products: [product({ productName: '香草霜淇淋', category: '冰品' })], generatedAt: '', siteBuiltAt: '',
+    } }))
+    expect(html).toContain('分數＝綜合評分／滿分 100')
+    expect(html).not.toContain('本區')
+  })
+
+  it('puts sort behind the same floating button as filters on phones', () => {
+    // Sort and filter change the same list, so they live together in one sheet.
+    const html = renderToStaticMarkup(React.createElement(ShelfExplorer, { initialPayload: {
+      products: [product()], generatedAt: '', siteBuiltAt: '',
+    } }))
+    expect(html).toContain('排序・篩選')
+    expect(html).not.toContain('sl-mobile-sort')
+  })
+
+  it('gives each card a category tile so neighbouring cards differ', () => {
+    // The tile follows the category group, and unknown categories fall back to 其他.
+    for (const [raw, group] of [['便當', '正餐'], ['乳品', '飲料'], ['冰品', '冰品'], ['新品類', '其他']] as const) {
+      expect(card(product({ category: raw }))).toContain(`<span class="sl-cat" data-cat="${group}" aria-hidden="true"><svg`)
+    }
+    const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
+    expect(css).toContain('.sl-cat[data-cat="冰品"] { background: #e0f2fe; color: #0369a1; }')
+  })
+
+  it('keeps the detail region in place so opening and closing can animate', () => {
+    // aria-controls must point at a real element, and a closed panel must be unreachable.
+    const closed = card(product())
+    expect(closed).toMatch(/<div id="[^"]+" class="sl-detail" inert="">/)
+    expect(closed).not.toContain('最新心得')
+    const open = card(product(), true)
+    expect(open).toMatch(/<div id="[^"]+" class="sl-detail sl-open">/)
+    expect(open).toContain('最新心得 2026/06/15')
+  })
+
+  it('shows the first reviewer takeaway as a one-line summary on the card', () => {
+    // The excerpt joins one rewrite per post with 「；」; the card shows only the first.
+    const html = card(product({ excerpt: '蝦仁彈牙韭菜香；偏鹹' }))
+    expect(html).toContain('<p class="sl-summary">蝦仁彈牙韭菜香</p>')
+    expect(html).not.toContain('<p class="sl-summary">蝦仁彈牙韭菜香；偏鹹</p>')
+    expect(card(product({ excerpt: '' }))).not.toContain('sl-summary')
   })
 })
