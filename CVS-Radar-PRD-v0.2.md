@@ -304,7 +304,7 @@ ProductReport : brand, product_name, fair_score, consensus,
 | `scoring.role_weight.commenter` | 1.0 | 留言者角色權重 |
 | `scoring.prior_mean` (μ0) | 0.5 | 貝氏先驗均值 |
 | `scoring.prior_strength` (C) | 1.0 | 貝氏先驗強度 |
-| `scoring.time_decay_lambda` (λ) | 0.005 | 時間衰減 |
+| `scoring.time_decay_lambda` (λ) | 0.0 | 時間衰減 |
 | `scoring.per_user_cap` | 1 | 每商品每人折票數 |
 | `suspicion.min_activity` | 5 | 評可疑分的最低留言數 |
 | `suspicion.weight_floor` | 0.1 | 信度權重下限 |

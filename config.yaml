@@ -55,9 +55,10 @@ SCORING:
     commenter: 1.0
   prior_mean: 0.5
   prior_strength: 1.0
-  # 0.005 ≈ 139-day half-life: stale discussions drift toward the neutral
-  # prior instead of weighing forever (chosen from the 2026-07-20 λ sweep).
-  time_decay_lambda: 0.005
+  # 0 = no decay. The old 0.005 (139-day half-life) let the prior swamp every
+  # post older than ~1 year: an 81%-positive 2024 product scored 58, the same
+  # as a 50/50 one. Freshness is shown via latestDate, not baked into the score.
+  time_decay_lambda: 0.0
   per_user_cap: true
   exclude_self_push: true
 
