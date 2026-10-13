@@ -771,6 +771,7 @@ class ScoringTest(unittest.TestCase):
         self.assertEqual({c.user for c in commenters}, {"spammer", "critic"})
         self.assertEqual(len(commenters), 2)
 
+    @patch.dict("cvs_radar.scoring.compute.SCORING", {"time_decay_lambda": 0.005})
     def test_capped_user_stance_respects_time_decay(self) -> None:
         # One user pushing 200 days ago and complaining today must not net out to
         # neutral: at lambda=0.005 the old push carries e^-1≈0.368 of the weight, so
@@ -848,6 +849,7 @@ class ScoringTest(unittest.TestCase):
         reports, _ = run_pipeline(posts, now=as_of)
         self.assertEqual([c.user for c in reports[0].contributors], ["fan"])
 
+    @patch.dict("cvs_radar.scoring.compute.SCORING", {"time_decay_lambda": 0.005})
     def test_scores_are_reproducible_from_an_explicit_as_of_time(self) -> None:
         # Reading the wall clock inside the decay means a rebuild of the same stored
         # snapshot drifts as time passes, so a published score cannot be reproduced.
