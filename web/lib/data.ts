@@ -26,6 +26,18 @@ export type Product = {
   latestDate: string | null
   // Whole-package calories from the chain's own catalogue; null when unmatched.
   kcal: number | null
+  // FamilyMart's full packaging label, per serving as printed; null when absent.
+  nutrition: Nutrition | null
+}
+
+export type Nutrition = {
+  // As printed, unit included: "109 公克", "330 毫升".
+  servingSize: string | null
+  // The label's 本包裝含 N 份; can exceed `servings` for items sold one at a time.
+  packageServings: number | null
+  // Selling unit the calorie figure uses; the 每包裝 column multiplies by this.
+  servings: number
+  perServing: Record<'kcal' | 'protein' | 'fat' | 'saturatedFat' | 'transFat' | 'carbohydrate' | 'sugar' | 'sodium', number>
 }
 
 export type DataPayload = {

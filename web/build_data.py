@@ -21,6 +21,7 @@ if str(ROOT) not in sys.path:
 from cvs_radar.app_helpers import consensus_distribution, volume_label  # noqa: E402
 from cvs_radar.config import SCORING  # noqa: E402
 from cvs_radar.official_kcal import load_lookup as load_kcal_lookup  # noqa: E402
+from cvs_radar.official_nutrition import NUTRIENTS, load_nutrition_lookup  # noqa: E402
 from cvs_radar.scoring.compute import _classify, _confidence  # noqa: E402
 from cvs_radar.product_categories import resolve_category  # noqa: E402
 from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
@@ -463,7 +464,7 @@ def validate_payload(payload: dict[str, Any]) -> None:
         "eligibleComments", "uniqueEligibleCommenters", "independentThreads",
         "volumeLevel", "positivePct",
         "neutralPct", "negativePct", "likes", "cautions", "excerpt", "reviewProvisional", "postUrls", "latestDate",
-        "kcal",
+        "kcal", "nutrition",
     }
     for index, product in enumerate(payload["products"]):
         if not isinstance(product, dict) or set(product) != required_fields:
@@ -473,6 +474,8 @@ def validate_payload(payload: dict[str, Any]) -> None:
         kcal = product["kcal"]
         if kcal is not None and (not isinstance(kcal, int) or isinstance(kcal, bool) or kcal <= 0):
             raise ValueError(f"public payload product {index} has invalid kcal")
+        if not valid_nutrition(product["nutrition"]):
+            raise ValueError(f"public payload product {index} has invalid nutrition")
         if not isinstance(product["reviewProvisional"], bool):
             raise ValueError(f"public payload product {index} has invalid excerpt provenance")
         count_fields = (
@@ -489,6 +492,22 @@ def validate_payload(payload: dict[str, Any]) -> None:
             raise ValueError(f"public payload product {index} has invalid list fields")
         if any(URL_PATTERN.search(item) for key in ("likes", "cautions") for item in product[key]):
             raise ValueError(f"public payload product {index} has a URL in a representative comment")
+
+
+def valid_nutrition(nutrition: Any) -> bool:
+    if nutrition is None:
+        return True
+    if not isinstance(nutrition, dict) or set(nutrition) != {"servingSize", "packageServings", "servings", "perServing"}:
+        return False
+    per_serving = nutrition["perServing"]
+    keys = {"kcal", *(key for key, _, _ in NUTRIENTS)}
+    return (
+        isinstance(nutrition["servings"], int) and nutrition["servings"] > 0
+        and (nutrition["servingSize"] is None or isinstance(nutrition["servingSize"], str))
+        and (nutrition["packageServings"] is None or isinstance(nutrition["packageServings"], float))
+        and isinstance(per_serving, dict) and set(per_serving) == keys
+        and all(isinstance(value, float) and value >= 0 for value in per_serving.values())
+    )
 
 
 def write_json_atomic(output: Path, payload: dict[str, Any]) -> None:
@@ -539,8 +558,10 @@ def main(
     assert_unique_product_ids(products)
     # After merge and overrides, so the match is on the name the site shows.
     kcal_lookup = load_kcal_lookup()
+    nutrition_lookup = load_nutrition_lookup(kcal_lookup)
     for product in products:
         product["kcal"] = kcal_lookup.kcal_for(product["brand"], product["productName"])
+        product["nutrition"] = nutrition_lookup.nutrition_for(product["brand"], product["productName"])
     assert_no_product_collapse(existing_product_count(output), len(products))
     generated_at, site_built_at_iso = resolve_data_timestamps(source, site_built_at)
     payload = {

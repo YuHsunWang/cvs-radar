@@ -867,6 +867,8 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-nutri td { padding: 4px 10px; text-align: left; font-weight: 400; }
 .sl-nutri thead th { border-bottom: 1px solid #17130e; text-align: right; }
 .sl-nutri tbody td { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.sl-nutri .sl-nutri-sub { padding-left: 24px; }
+.sl-nutri .sl-nutri-serving { border-bottom: 1px solid #17130e; text-align: left; font-weight: 400; }
 .sl-nutri tfoot td { border-top: 1px solid #17130e; color: #6e685e; font-size: 11px; }
 
 .sl-k-prov {

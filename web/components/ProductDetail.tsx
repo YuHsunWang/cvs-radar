@@ -2,7 +2,7 @@
 
 import { ExternalLink, ThumbsUp, TriangleAlert } from 'lucide-react'
 import { trackOutboundPttClick } from '@/lib/analytics'
-import { Product } from '@/lib/data'
+import { Nutrition, Product } from '@/lib/data'
 
 type ProductDetailProps = {
   product: Product
@@ -89,24 +89,26 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       )}
 
       {product.kcal != null ? (
-        // Styled after the 營養標示 sticker on the package. Only calories are
-        // imported (7-11 publishes nothing else; FamilyMart's other nutrients
-        // are not ingested yet), and an empty 蛋白質 row would read as "zero".
         // Folded by default: most readers came for the reviews, not the numbers.
         <details className="sl-nutri-fold">
           <summary>看營養標示</summary>
-          <table className="sl-nutri">
-            <caption>營養標示</caption>
-            <thead>
-              <tr><th scope="col" /><th scope="col">每包裝</th></tr>
-            </thead>
-            <tbody>
-              <tr><th scope="row">熱量</th><td>{product.kcal} 大卡</td></tr>
-            </tbody>
-            <tfoot>
-              <tr><td colSpan={2}>取自官網標示；其他營養素尚未收錄</td></tr>
-            </tfoot>
-          </table>
+          {product.nutrition ? (
+            <NutritionLabel nutrition={product.nutrition} />
+          ) : (
+            // 7-11 publishes calories only; an empty 蛋白質 row would read as "zero".
+            <table className="sl-nutri">
+              <caption>營養標示</caption>
+              <thead>
+                <tr><th scope="col" /><th scope="col">每包裝</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">熱量</th><td>{product.kcal} 大卡</td></tr>
+              </tbody>
+              <tfoot>
+                <tr><td colSpan={2}>取自官網標示；其他營養素未收錄</td></tr>
+              </tfoot>
+            </table>
+          )}
         </details>
       ) : null}
 
@@ -136,6 +138,56 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         <p className="sl-k-none sl-k-none-wide">原文連結暫缺</p>
       )}
     </div>
+  )
+}
+
+const NUTRITION_ROWS = [
+  ['kcal', '熱量', '大卡', false],
+  ['protein', '蛋白質', '公克', false],
+  ['fat', '脂肪', '公克', false],
+  ['saturatedFat', '飽和脂肪', '公克', true],
+  ['transFat', '反式脂肪', '公克', true],
+  ['carbohydrate', '碳水化合物', '公克', false],
+  ['sugar', '糖', '公克', true],
+  ['sodium', '鈉', '毫克', false],
+] as const
+
+function amount(value: number): string {
+  return String(Math.round(value * 10) / 10)
+}
+
+/** The packaging label, row for row: per serving, plus the package when it holds several. */
+function NutritionLabel({ nutrition }: { nutrition: Nutrition }) {
+  const multi = nutrition.servings > 1
+  return (
+    <table className="sl-nutri">
+      <caption>營養標示</caption>
+      <thead>
+        <tr>
+          <td colSpan={multi ? 3 : 2} className="sl-nutri-serving">
+            {nutrition.servingSize ? <>每一份量 {nutrition.servingSize}<br /></> : null}
+            {nutrition.packageServings != null ? <>本包裝含 {amount(nutrition.packageServings)} 份</> : null}
+          </td>
+        </tr>
+        <tr>
+          <th scope="col" />
+          <th scope="col">每份</th>
+          {multi ? <th scope="col">每包裝</th> : null}
+        </tr>
+      </thead>
+      <tbody>
+        {NUTRITION_ROWS.map(([key, label, unit, indented]) => (
+          <tr key={key}>
+            <th scope="row" className={indented ? 'sl-nutri-sub' : undefined}>{label}</th>
+            <td>{amount(nutrition.perServing[key])} {unit}</td>
+            {multi ? <td>{amount(nutrition.perServing[key] * nutrition.servings)} {unit}</td> : null}
+          </tr>
+        ))}
+      </tbody>
+      <tfoot>
+        <tr><td colSpan={multi ? 3 : 2}>取自全家官網標示</td></tr>
+      </tfoot>
+    </table>
   )
 }
 
