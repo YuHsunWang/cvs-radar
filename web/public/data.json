@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-14T08:40:53+08:00",
+  "generatedAt": "2026-10-15T09:40:25+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -12594,6 +12594,42 @@
       "kcal": null
     },
     {
+      "id": "全家::冰心可可脆絲蛋糕",
+      "brand": "全家",
+      "productName": "冰心可可脆絲蛋糕",
+      "price": 49,
+      "category": "甜點",
+      "fairScore": 67,
+      "recommendationScore": 78,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 5,
+      "rawComments": 8,
+      "eligibleComments": 5,
+      "uniqueEligibleCommenters": 5,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 67,
+      "neutralPct": 0,
+      "negativePct": 33,
+      "likes": [
+        "下層像義美巧克力酥片，口感更紮實",
+        "脆絲沒有油耗味"
+      ],
+      "cautions": [
+        "份量縮小，優惠改為七折",
+        "脆絲曾被誤以為是異物"
+      ],
+      "excerpt": "巧克力醬多，脆粒增添口感，整體不錯",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791240904.A.FA0.html"
+      ],
+      "latestDate": "2026-10-06",
+      "kcal": 319
+    },
+    {
       "id": "全家::義式蔬菜湯",
       "brand": "全家",
       "productName": "義式蔬菜湯",
@@ -19631,42 +19667,6 @@
       ],
       "latestDate": "2026-01-04",
       "kcal": null
-    },
-    {
-      "id": "全家::冰心可可脆絲蛋糕",
-      "brand": "全家",
-      "productName": "冰心可可脆絲蛋糕",
-      "price": 49,
-      "category": "甜點",
-      "fairScore": 63,
-      "recommendationScore": 71,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 4,
-      "rawComments": 7,
-      "eligibleComments": 4,
-      "uniqueEligibleCommenters": 4,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 60,
-      "neutralPct": 0,
-      "negativePct": 40,
-      "likes": [
-        "脆絲像餅乾碎片，吃起來好吃",
-        "下層像巧克力酥片，口感更紮實"
-      ],
-      "cautions": [
-        "份量縮小，優惠變成七折",
-        "脆絲外觀容易被誤認為異物"
-      ],
-      "excerpt": "巧克力醬多，脆粒增添口感，整體不錯",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791240904.A.FA0.html"
-      ],
-      "latestDate": "2026-10-06",
-      "kcal": 319
     },
     {
       "id": "全家::摩登燒",
@@ -28500,41 +28500,6 @@
       "kcal": null
     },
     {
-      "id": "7-11::奶油咖哩雞肉飯",
-      "brand": "7-11",
-      "productName": "奶油咖哩雞肉飯",
-      "price": 89,
-      "category": "便當",
-      "fairScore": 58,
-      "recommendationScore": 64,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 6,
-      "rawComments": 7,
-      "eligibleComments": 6,
-      "uniqueEligibleCommenters": 6,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 57,
-      "neutralPct": 15,
-      "negativePct": 28,
-      "likes": [
-        "咖哩味道濃郁，不錯吃"
-      ],
-      "cautions": [
-        "沒有蔬菜，讓人放棄",
-        "份量偏小，價格較貴"
-      ],
-      "excerpt": "好吃，覺得比佛蒙特好吃",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791209936.A.B2A.html"
-      ],
-      "latestDate": "2026-10-05",
-      "kcal": null
-    },
-    {
       "id": "7-11::德式辣腸貝果披薩",
       "brand": "7-11",
       "productName": "德式辣腸貝果披薩",
@@ -33560,6 +33525,41 @@
         "https://www.ptt.cc/bbs/CVS/M.1748230849.A.A6F.html"
       ],
       "latestDate": "2025-05-26",
+      "kcal": null
+    },
+    {
+      "id": "7-11::奶油咖哩雞肉飯",
+      "brand": "7-11",
+      "productName": "奶油咖哩雞肉飯",
+      "price": 89,
+      "category": "便當",
+      "fairScore": 55,
+      "recommendationScore": 59,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 7,
+      "rawComments": 8,
+      "eligibleComments": 7,
+      "uniqueEligibleCommenters": 7,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 50,
+      "neutralPct": 13,
+      "negativePct": 37,
+      "likes": [
+        "咖哩味道濃郁"
+      ],
+      "cautions": [
+        "沒有蔬菜，常因此放棄",
+        "份量較小，價格也偏高"
+      ],
+      "excerpt": "好吃，覺得比佛蒙特好吃",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791209936.A.B2A.html"
+      ],
+      "latestDate": "2026-10-05",
       "kcal": null
     },
     {
@@ -60559,40 +60559,6 @@
       "kcal": null
     },
     {
-      "id": "7-11::統一布丁焦糖爆走丁丁",
-      "brand": "7-11",
-      "productName": "統一布丁焦糖爆走丁丁",
-      "price": 18,
-      "category": "甜點",
-      "fairScore": 36,
-      "recommendationScore": 26,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 11,
-      "rawComments": 21,
-      "eligibleComments": 11,
-      "uniqueEligibleCommenters": 11,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 25,
-      "neutralPct": 8,
-      "negativePct": 67,
-      "likes": [],
-      "cautions": [
-        "甜度很高",
-        "吃過一次，嘗鮮即可",
-        "只想吃焦糖液，不想吃果凍"
-      ],
-      "excerpt": "口感像果凍，僅適合嘗鮮、不推薦",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791810933.A.23F.html"
-      ],
-      "latestDate": "2026-10-12",
-      "kcal": null
-    },
-    {
       "id": "全家::味全高鈣高蛋白雙效營養牛乳",
       "brand": "全家",
       "productName": "味全高鈣高蛋白雙效營養牛乳",
@@ -60845,40 +60811,6 @@
       ],
       "latestDate": "2025-06-26",
       "kcal": null
-    },
-    {
-      "id": "全家::伯朗藝伎黑咖啡",
-      "brand": "全家",
-      "productName": "伯朗藝伎黑咖啡",
-      "price": 45,
-      "category": "飲料",
-      "fairScore": 35,
-      "recommendationScore": 26,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 3,
-      "rawComments": 11,
-      "eligibleComments": 3,
-      "uniqueEligibleCommenters": 3,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 25,
-      "neutralPct": 0,
-      "negativePct": 75,
-      "likes": [],
-      "cautions": [
-        "風味像桂圓紅棗茶",
-        "藝伎風味喝不出來",
-        "20元也覺得貴"
-      ],
-      "excerpt": "聞起來不像咖啡，桂圓紅棗茶味重",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791781722.A.D6E.html"
-      ],
-      "latestDate": "2026-10-12",
-      "kcal": 11
     },
     {
       "id": "全家::莓果森林奶茶",
@@ -61308,6 +61240,42 @@
         "https://www.ptt.cc/bbs/CVS/M.1780395611.A.A91.html"
       ],
       "latestDate": "2026-06-02",
+      "kcal": null
+    },
+    {
+      "id": "7-11::統一布丁焦糖爆走丁丁",
+      "brand": "7-11",
+      "productName": "統一布丁焦糖爆走丁丁",
+      "price": 18,
+      "category": "甜點",
+      "fairScore": 35,
+      "recommendationScore": 24,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 14,
+      "rawComments": 26,
+      "eligibleComments": 14,
+      "uniqueEligibleCommenters": 14,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 20,
+      "neutralPct": 13,
+      "negativePct": 67,
+      "likes": [
+        "這版熱量比正常布丁低"
+      ],
+      "cautions": [
+        "成分沒黑糖，像糖水加色素",
+        "感覺甜度很高",
+        "吃過一次，較像嘗鮮"
+      ],
+      "excerpt": "口感像果凍，僅適合嘗鮮、不推薦",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791810933.A.23F.html"
+      ],
+      "latestDate": "2026-10-12",
       "kcal": null
     },
     {
@@ -63493,7 +63461,7 @@
       "confidence": "中",
       "nPosts": 1,
       "nComments": 16,
-      "rawComments": 29,
+      "rawComments": 33,
       "eligibleComments": 17,
       "uniqueEligibleCommenters": 16,
       "independentThreads": 1,
@@ -63501,11 +63469,13 @@
       "positivePct": 12,
       "neutralPct": 12,
       "negativePct": 76,
-      "likes": [],
+      "likes": [
+        "有水蜜桃果汁的色澤與香氣"
+      ],
       "cautions": [
-        "酸度尚可但甜度偏高",
-        "喝幾口就喝不下去",
-        "不含果汁"
+        "喝幾口就喝不太下去",
+        "不含果汁",
+        "含糖56克"
       ],
       "excerpt": "有水蜜桃色澤香氣，酸到爆且酸甜失衡",
       "reviewProvisional": false,
@@ -65867,6 +65837,39 @@
       ],
       "latestDate": "2025-12-26",
       "kcal": null
+    },
+    {
+      "id": "全家::伯朗藝伎黑咖啡",
+      "brand": "全家",
+      "productName": "伯朗藝伎黑咖啡",
+      "price": 45,
+      "category": "飲料",
+      "fairScore": 27,
+      "recommendationScore": 11,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 6,
+      "rawComments": 14,
+      "eligibleComments": 6,
+      "uniqueEligibleCommenters": 6,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 14,
+      "neutralPct": 0,
+      "negativePct": 86,
+      "likes": [],
+      "cautions": [
+        "香料味沒調整好",
+        "連20元都覺得貴"
+      ],
+      "excerpt": "聞起來不像咖啡，桂圓紅棗茶味重",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791781722.A.D6E.html"
+      ],
+      "latestDate": "2026-10-12",
+      "kcal": 11
     },
     {
       "id": "全家::金家欸辣炒雞起司拌麵",
