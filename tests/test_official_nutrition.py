@@ -62,6 +62,12 @@ def test_lookup_follows_the_calorie_match_and_its_servings():
     assert lookup.nutrition_for("全家", "不存在") is None
 
 
+def test_label_contradicting_the_catalogue_calories_is_dropped():
+    rows = [official("鮪魚飯糰", 230, 1)]  # page says 193 per serving, 1 serving
+    lookup = NutritionLookup(KcalLookup(rows, {}), rows, [nutrition("鮪魚飯糰")])
+    assert lookup.nutrition_for("全家", "鮪魚飯糰") is None
+
+
 def test_ambiguous_name_gets_no_label():
     # Two catalogue rows normalise to one name: calories already refuse to guess,
     # and the label must not pick one of them either.

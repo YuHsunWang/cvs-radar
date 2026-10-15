@@ -145,6 +145,12 @@ class NutritionLookup:
         if row is None:
             return None
         servings = int(self._servings.get((brand, official_name)) or 1)
+        # The catalogue and the product page disagree now and then (巧克力派司:
+        # 405 vs 371 kcal on 2026-10-15). Showing a label whose 熱量 row
+        # contradicts the calorie figure next to it is worse than no label.
+        package_kcal = self._kcal.kcal_for(brand, product_name) or 0
+        if abs(float(row["kcal"]) * servings - package_kcal) > max(2.0, package_kcal * 0.02):
+            return None
         return {
             "servingGrams": float(row["serving_g"]) if row["serving_g"] else None,
             "servings": servings,
