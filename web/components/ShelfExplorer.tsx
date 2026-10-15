@@ -533,11 +533,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
           </div>
         ) : (
           <>
-            {displayedProducts.map((product, index) => (
+            {displayedProducts.map((product) => (
               <ShelfCard
                 key={product.id}
                 product={product}
-                rank={index + 1}
                 isExpanded={expanded.has(product.id)}
                 onToggle={() => toggleProduct(product)}
               />

@@ -49,7 +49,7 @@ function product(overrides: Partial<Product> = {}): Product {
 
 function card(item: Product, expanded = false) {
   return renderToStaticMarkup(
-    React.createElement(ShelfCard, { product: item, rank: 1, isExpanded: expanded, onToggle: () => {} }),
+    React.createElement(ShelfCard, { product: item, isExpanded: expanded, onToggle: () => {} }),
   )
 }
 
@@ -109,15 +109,15 @@ describe('truthful shelf results', () => {
     expect(css).not.toContain('--sl-brand')
   })
 
-  it('keeps price in the quiet meta line and post dates in expanded detail', () => {
+  it('shows price as its own figure and post dates in expanded detail', () => {
     const html = card(product())
-    expect(html).toContain('$50 · 1 篇心得')
+    expect(html).toContain('<span class="sl-price">$50</span>')
     expect(html).not.toContain('最新心得 2026/06/15')
     expect(card(product(), true)).toContain('最新心得 2026/06/15')
     expect(html).not.toContain('上架')
     const missing = card(product({ latestDate: null, price: null }))
     expect(missing).toContain('1 篇心得')
-    expect(missing).not.toContain(' · 1 篇心得')
+    expect(missing).not.toContain('sl-price')
     expect(missing).not.toContain('$0')
     expect(card(product({ latestDate: null }), true)).toContain('心得日期不明')
   })
@@ -126,7 +126,8 @@ describe('truthful shelf results', () => {
     // An unmatched product must show nothing: a placeholder like 0 大卡 would
     // read as a real (and very wrong) figure.
     expect(card(product({ kcal: 318 }))).not.toContain('318 大卡')
-    expect(card(product({ kcal: 318 }), true)).toContain('取自官網標示的整份數值')
+    expect(card(product({ kcal: 318 }), true)).toContain('<caption>營養標示</caption>')
+    expect(card(product({ kcal: 318 }), true)).toContain('<td>318 大卡</td>')
     const missing = card(product({ kcal: null }), true)
     expect(missing).not.toContain('大卡')
   })
@@ -144,7 +145,6 @@ describe('truthful shelf results', () => {
     const missing = card(product({ productName: '  ', category: '' }), true)
     expect(missing).toContain('<h2 class="sl-pname">商品名稱待確認</h2>')
     expect(missing.split('商品名稱待確認').length - 1).toBe(1)
-    expect(missing).toContain('分類：其他')
   })
 
   it('reserves the card face for channel, name, meta and score while keeping context in detail', () => {
@@ -153,11 +153,9 @@ describe('truthful shelf results', () => {
     expect(collapsed).toContain('<span class="sl-channel"><span class="sl-channel-dot" data-brand="全家" aria-hidden="true"></span>全家</span>')
     expect(collapsed).not.toMatch(/sl-rail|聲量|褒貶不一|香氣足|318 大卡|分類：/)
     const expanded = card(item, true)
-    expect(expanded).toContain('分類：飲料')
+    expect(expanded).not.toMatch(/分類：|目前列表第|位網友留言/)
     expect(expanded).toContain('共識：褒貶不一')
-    expect(expanded).toContain('目前列表第 1 項')
     expect(expanded).toContain('討論量：3')
-    expect(expanded).toContain('2 位網友留言')
     expect(expanded).toContain('香氣足')
     expect(expanded).toContain('偏甜')
   })

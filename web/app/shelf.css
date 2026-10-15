@@ -379,6 +379,7 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   overflow-wrap: anywhere;
 }
 .sl-meta { color: #6e685e; font-size: 12px; white-space: nowrap; }
+.sl-price { color: #17130e; font-size: 14px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
 /* One-line takeaway from reviewers; two lines at most so cards keep a steady rhythm. */
 .sl-summary {
   margin: 0;
@@ -834,6 +835,30 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   padding: 8px 10px;
   background: var(--sl-tag);
 }
+
+/* Mirrors the black-ruled 營養標示 box printed on Taiwanese packaging. */
+.sl-nutri {
+  width: 100%;
+  max-width: 320px;
+  border: 1.5px solid #17130e;
+  border-collapse: collapse;
+  background: #fff;
+  color: #17130e;
+  font-size: 13px;
+}
+.sl-nutri caption {
+  border: 1.5px solid #17130e;
+  border-bottom: 0;
+  padding: 4px 0;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+}
+.sl-nutri th,
+.sl-nutri td { padding: 4px 10px; text-align: left; font-weight: 400; }
+.sl-nutri thead th { border-bottom: 1px solid #17130e; text-align: right; }
+.sl-nutri tbody td { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.sl-nutri tfoot td { border-top: 1px solid #17130e; color: #6e685e; font-size: 11px; }
 
 .sl-k-prov {
   font-family: var(--sl-mono);

@@ -2,11 +2,10 @@
 
 import { ExternalLink, ThumbsUp, TriangleAlert } from 'lucide-react'
 import { trackOutboundPttClick } from '@/lib/analytics'
-import { Product, displayCategory } from '@/lib/data'
+import { Product } from '@/lib/data'
 
 type ProductDetailProps = {
   product: Product
-  rank: number
 }
 
 /**
@@ -35,7 +34,7 @@ type ProductDetailProps = {
  * screen. Colour never carries polarity alone — each block keeps its icon and a
  * screen-reader label, so the split survives greyscale and colour-blind vision.
  */
-export default function ProductDetail({ product, rank }: ProductDetailProps) {
+export default function ProductDetail({ product }: ProductDetailProps) {
   // One rewrite per reviewing post, joined with 「；」 upstream. Splitting them
   // back out is the honest reading: they are separate people, not one sentence.
   const takes = (product.excerpt || '')
@@ -48,11 +47,8 @@ export default function ProductDetail({ product, rank }: ProductDetailProps) {
   return (
     <div className="sl-k">
       <div className="sl-detail-meta">
-        <span>目前列表第 {rank} 項</span>
-        <span>分類：{displayCategory(product.category)}</span>
         <span>{product.latestDate ? `最新心得 ${product.latestDate.replaceAll('-', '/')}` : '心得日期不明'}</span>
         <span>共識：{product.consensus}</span>
-        <span>{product.nPosts} 篇心得 · {product.nComments} 位網友留言</span>
         <span>討論量：{product.nPosts + product.nComments}</span>
         {product.confidence === '低' ? <span>樣本少</span> : null}
       </div>
@@ -93,7 +89,21 @@ export default function ProductDetail({ product, rank }: ProductDetailProps) {
       )}
 
       {product.kcal != null ? (
-        <p className="sl-k-none sl-k-none-wide">熱量 {product.kcal} 大卡，取自官網標示的整份數值</p>
+        // Styled after the 營養標示 sticker on the package. Only calories are
+        // filled: 7-11's catalogue publishes nothing else, and an empty row
+        // for 蛋白質 would read as "zero", so the other nutrients stay off.
+        <table className="sl-nutri">
+          <caption>營養標示</caption>
+          <thead>
+            <tr><th scope="col" /><th scope="col">每包裝</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">熱量</th><td>{product.kcal} 大卡</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td colSpan={2}>取自官網標示；其他營養素官網未提供</td></tr>
+          </tfoot>
+        </table>
       ) : null}
 
       {product.postUrls.length > 0 ? (
