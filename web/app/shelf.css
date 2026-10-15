@@ -836,6 +836,15 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   background: var(--sl-tag);
 }
 
+.sl-nutri-fold summary {
+  cursor: pointer;
+  width: fit-content;
+  color: #5c574e;
+  font-size: 12px;
+  font-weight: 600;
+}
+.sl-nutri-fold[open] summary { margin-bottom: 6px; }
+
 /* Mirrors the black-ruled 營養標示 box printed on Taiwanese packaging. */
 .sl-nutri {
   width: 100%;

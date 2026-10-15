@@ -126,6 +126,7 @@ describe('truthful shelf results', () => {
     // An unmatched product must show nothing: a placeholder like 0 大卡 would
     // read as a real (and very wrong) figure.
     expect(card(product({ kcal: 318 }))).not.toContain('318 大卡')
+    expect(card(product({ kcal: 318 }), true)).toContain('<details class="sl-nutri-fold"><summary>看營養標示</summary>')
     expect(card(product({ kcal: 318 }), true)).toContain('<caption>營養標示</caption>')
     expect(card(product({ kcal: 318 }), true)).toContain('<td>318 大卡</td>')
     const missing = card(product({ kcal: null }), true)
