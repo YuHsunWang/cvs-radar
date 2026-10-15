@@ -88,7 +88,15 @@ def fetch_family_details(
                 try:
                     page.goto(f"{FAMILY_PAGE}product/{cmno}", wait_until="networkidle", timeout=timeout * 1000)
                     page.get_by_text("每份營養素").first.wait_for(timeout=timeout * 1000)
+                    # The page shows only 碳水/蛋白質/脂肪 until 查看全部 is opened.
+                    expand = page.get_by_text("查看全部").first
+                    if expand.is_visible():
+                        expand.click()
+                        page.wait_for_timeout(500)
                     texts[cmno] = page.inner_text("body")
+                    if parse_detail_text(texts[cmno]) is None:
+                        # Hidden rows may still be in the DOM; textContent includes them.
+                        texts[cmno] = page.text_content("body") or ""
                 except Exception as exc:  # one bad page must not lose the rest
                     texts[cmno] = ""
                     print(f"[official-nutrition] {cmno}: {exc.__class__.__name__}")
