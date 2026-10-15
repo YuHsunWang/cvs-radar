@@ -65,6 +65,11 @@ matches exactly, or that has a reviewed `same` verdict in
 - **Near-miss names are never auto-matched.** `python3 scripts/fetch_official_kcal.py
   --candidates /tmp/c.csv` lists unreviewed near misses; fill in `verdict`
   (`same`/`different`) and append the rows to `kcal_matches.csv` by hand.
+- **Full FamilyMart labels** come from `scripts/fetch_official_nutrition.py`
+  right after, into `data/labels/official_nutrition.csv`. It opens product pages
+  only for names not cached yet (or whose CMNO changed), so most days it visits
+  none. It reads the previous run's `data.json`: a new product gets its label a
+  day after its calories. `--refresh` (by hand) revisits every cached row.
 - 萊爾富's site refuses scripts (403) and has no calorie source; photo reading
   was sampled and parked in Linear DEV-228.
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Fill data/labels/official_nutrition.csv from FamilyMart product pages.
 
-Run by hand (opens a visible Chrome window, see cvs_radar/official_nutrition.py).
+Run daily by scripts/ops/rebackfill.sh, or by hand (opens a visible Chrome
+window, see cvs_radar/official_nutrition.py).
 Only products the site actually shows with FamilyMart calories are visited.
 Cached rows are skipped unless the catalogue now gives that name a different
 CMNO (a relaunched product) or --refresh is passed, which revisits everything

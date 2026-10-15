@@ -230,6 +230,13 @@ bash scripts/label_product_categories.sh || die "category labeling"
 # FamilyMart opens a real Chrome window through WSLg (its API refuses scripts).
 python3 scripts/fetch_official_kcal.py 2>&1 | tail -2 \
   || log "WARN: official calorie refresh failed; publishing with the cached values"
+# Full FamilyMart labels for products not cached yet. Reads the previous
+# data.json, so a product new today gets its label on tomorrow's run. Usually
+# visits zero pages; same Chrome window rule as above.
+# ponytail: pages with no full label are retried daily (6 on 2026-10-15, up to
+# a minute each); cache the misses if that list grows.
+python3 scripts/fetch_official_nutrition.py 2>&1 | tail -2 \
+  || log "WARN: official nutrition refresh failed; publishing with the cached labels"
 
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
@@ -247,6 +254,7 @@ if [ "$DO_COMMIT" = "1" ]; then
           data/labels/product_category_labels.csv \
           data/labels/grounding_verdicts.csv \
           data/labels/official_kcal.csv \
+          data/labels/official_nutrition.csv \
           data/results.json web/public/data.json
   if git diff --cached --quiet; then
     log "no data change to commit"
