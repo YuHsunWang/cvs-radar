@@ -24,12 +24,11 @@ function scoreTone(score: number | null): string {
 
 type ShelfCardProps = {
   product: Product
-  rank: number
   isExpanded: boolean
   onToggle: () => void
 }
 
-export default function ShelfCard({ product, rank, isExpanded, onToggle }: ShelfCardProps) {
+export default function ShelfCard({ product, isExpanded, onToggle }: ShelfCardProps) {
   const score = comprehensiveScore(product)
   const detailId = useId()
   // Mount the detail on first open and keep it, so closing can animate back to 0.
@@ -54,12 +53,13 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
           <span className="sl-cat" data-cat={category} aria-hidden="true">
             <CategoryIcon size={24} strokeWidth={1.8} />
           </span>
+          {/* The icon is aria-hidden and the detail no longer prints the category. */}
+          <span className="sr-only">分類：{category}</span>
           <div className="sl-card-main">
             <div className="sl-card-top">
               <span className="sl-channel"><span className="sl-channel-dot" data-brand={channel} aria-hidden="true" />{channel}</span>
-              <span className="sl-meta">
-                {product.price != null ? `$${product.price} · ` : ''}{product.nPosts} 篇心得
-              </span>
+              {product.price != null ? <span className="sl-price">${product.price}</span> : null}
+              <span className="sl-meta">{product.nPosts} 篇心得</span>
             </div>
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
             {summary ? <p className="sl-summary">{summary}</p> : null}
@@ -73,7 +73,7 @@ export default function ShelfCard({ product, rank, isExpanded, onToggle }: Shelf
         inert={!isExpanded}
       >
         <div className="sl-detail-inner">
-          {mounted ? <ProductDetail product={product} rank={rank} /> : null}
+          {mounted ? <ProductDetail product={product} /> : null}
         </div>
       </div>
     </article>

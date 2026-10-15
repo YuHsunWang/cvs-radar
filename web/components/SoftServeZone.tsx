@@ -171,11 +171,10 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
         <p className="ss-sub">只出現過一種吃法,沒有可比較的另一半——共 {leftovers.length} 支。</p>
 
         <main className="sl-shelf">
-          {leftovers.map((product, index) => (
+          {leftovers.map((product) => (
             <ShelfCard
               key={product.id}
               product={product}
-              rank={index + 1}
               isExpanded={expanded.has(product.id)}
               onToggle={() => toggleProduct(product)}
             />
