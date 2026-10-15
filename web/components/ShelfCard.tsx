@@ -53,6 +53,8 @@ export default function ShelfCard({ product, isExpanded, onToggle }: ShelfCardPr
           <span className="sl-cat" data-cat={category} aria-hidden="true">
             <CategoryIcon size={24} strokeWidth={1.8} />
           </span>
+          {/* The icon is aria-hidden and the detail no longer prints the category. */}
+          <span className="sr-only">分類：{category}</span>
           <div className="sl-card-main">
             <div className="sl-card-top">
               <span className="sl-channel"><span className="sl-channel-dot" data-brand={channel} aria-hidden="true" />{channel}</span>

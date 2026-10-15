@@ -90,8 +90,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
       {product.kcal != null ? (
         // Styled after the 營養標示 sticker on the package. Only calories are
-        // filled: 7-11's catalogue publishes nothing else, and an empty row
-        // for 蛋白質 would read as "zero", so the other nutrients stay off.
+        // imported (7-11 publishes nothing else; FamilyMart's other nutrients
+        // are not ingested yet), and an empty 蛋白質 row would read as "zero".
         // Folded by default: most readers came for the reviews, not the numbers.
         <details className="sl-nutri-fold">
           <summary>看營養標示</summary>
@@ -104,7 +104,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               <tr><th scope="row">熱量</th><td>{product.kcal} 大卡</td></tr>
             </tbody>
             <tfoot>
-              <tr><td colSpan={2}>取自官網標示；其他營養素官網未提供</td></tr>
+              <tr><td colSpan={2}>取自官網標示；其他營養素尚未收錄</td></tr>
             </tfoot>
           </table>
         </details>
