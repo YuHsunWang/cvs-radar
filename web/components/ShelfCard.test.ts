@@ -42,7 +42,7 @@ function product(overrides: Partial<Product> = {}): Product {
     rawComments: 2, eligibleComments: 2, uniqueEligibleCommenters: 2,
     independentThreads: 1, volumeLevel: '中等', positivePct: 60,
     neutralPct: 20, negativePct: 20, likes: [], cautions: [], excerpt: '',
-    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null,
+    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null, nutrition: null,
     ...overrides,
   }
 }
@@ -131,6 +131,17 @@ describe('truthful shelf results', () => {
     expect(card(product({ kcal: 318 }), true)).toContain('<td>318 大卡</td>')
     const missing = card(product({ kcal: null }), true)
     expect(missing).not.toContain('大卡')
+  })
+
+  it('shows the full packaging label when the chain publishes one', () => {
+    const perServing = { kcal: 193, protein: 5.1, fat: 4.5, saturatedFat: 0.9, transFat: 0, carbohydrate: 32.9, sugar: 0.9, sodium: 201 }
+    const single = card(product({ kcal: 193, nutrition: { servingGrams: 109, servings: 1, perServing } }), true)
+    expect(single).toContain('每一份量 109 公克')
+    expect(single).toContain('<td>201 毫克</td>')
+    expect(single).not.toContain('每包裝')
+    // Several servings: the package column is the per-serving value multiplied out.
+    const multi = card(product({ kcal: 386, nutrition: { servingGrams: 109, servings: 2, perServing } }), true)
+    expect(multi).toContain('<td>32.9 公克</td><td>65.8 公克</td>')
   })
 
   it('names the product exactly once and names missing identity honestly', () => {

@@ -38,6 +38,7 @@ function product(overrides: Partial<Product>): Product {
     postUrls: [],
     latestDate: '2026-06-15',
     kcal: null,
+    nutrition: null,
     ...overrides,
   }
 }

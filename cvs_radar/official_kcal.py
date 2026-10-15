@@ -232,13 +232,17 @@ class KcalLookup:
     def __init__(self, official: list[dict[str, str]], matches: dict[str, dict[str, str]]) -> None:
         self._by_name: dict[tuple[str, str], int] = {}
         normalized: dict[tuple[str, str], set[int]] = {}
+        names: dict[tuple[str, str], set[str]] = {}
         for row in official:
             kcal = int(row["kcal"])
             self._by_name[(row["brand"], row["official_name"])] = kcal
-            normalized.setdefault((row["brand"], normalize_name(row["official_name"])), set()).add(kcal)
+            key = (row["brand"], normalize_name(row["official_name"]))
+            normalized.setdefault(key, set()).add(kcal)
+            names.setdefault(key, set()).add(row["official_name"])
         # Two catalogue rows that normalise to one name with different calories
         # (two sizes of the same dish) cannot be told apart by name: no answer.
         self._exact = {key: next(iter(values)) for key, values in normalized.items() if len(values) == 1}
+        self._exact_name = {key: next(iter(values)) for key, values in names.items() if len(values) == 1}
         self._matches = matches
 
     def kcal_for(self, brand: str, product_name: str) -> int | None:
@@ -248,6 +252,15 @@ class KcalLookup:
                 return None
             return self._by_name.get((brand, match["official_name"]))
         return self._exact.get((brand, normalize_name(product_name)))
+
+    def official_name_for(self, brand: str, product_name: str) -> str | None:
+        """The catalogue row `kcal_for` would use, when exactly one row qualifies."""
+        if self.kcal_for(brand, product_name) is None:
+            return None
+        match = self._matches.get(f"{brand}::{product_name}")
+        if match is not None:
+            return match["official_name"]
+        return self._exact_name.get((brand, normalize_name(product_name)))
 
 
 def load_lookup() -> KcalLookup:

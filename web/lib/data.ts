@@ -26,6 +26,14 @@ export type Product = {
   latestDate: string | null
   // Whole-package calories from the chain's own catalogue; null when unmatched.
   kcal: number | null
+  // FamilyMart's full packaging label, per serving as printed; null when absent.
+  nutrition: Nutrition | null
+}
+
+export type Nutrition = {
+  servingGrams: number | null
+  servings: number
+  perServing: Record<'kcal' | 'protein' | 'fat' | 'saturatedFat' | 'transFat' | 'carbohydrate' | 'sugar' | 'sodium', number>
 }
 
 export type DataPayload = {
