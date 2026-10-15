@@ -165,8 +165,8 @@ function NutritionLabel({ nutrition }: { nutrition: Nutrition }) {
       <thead>
         <tr>
           <td colSpan={multi ? 3 : 2} className="sl-nutri-serving">
-            {nutrition.servingGrams != null ? <>每一份量 {amount(nutrition.servingGrams)} 公克<br /></> : null}
-            本包裝含 {nutrition.servings} 份
+            {nutrition.servingSize ? <>每一份量 {nutrition.servingSize}<br /></> : null}
+            {nutrition.packageServings != null ? <>本包裝含 {amount(nutrition.packageServings)} 份</> : null}
           </td>
         </tr>
         <tr>

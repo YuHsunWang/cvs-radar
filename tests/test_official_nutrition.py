@@ -30,9 +30,15 @@ PAGE = """鮪魚飯糰
 def test_reads_every_nutrient_and_keeps_fat_apart_from_saturated_fat():
     row = parse_detail_text(PAGE)
     assert row == {
-        "kcal": "193", "serving_g": "109", "carbohydrate": "32.9", "protein": "5.1", "fat": "4.5",
+        "kcal": "193", "serving_size": "109 公克", "package_servings": "1", "carbohydrate": "32.9", "protein": "5.1", "fat": "4.5",
         "saturatedFat": "0.9", "transFat": "0", "sodium": "201", "sugar": "0.9",
     }
+
+
+def test_drink_keeps_millilitres_and_label_keeps_its_own_serving_count():
+    row = parse_detail_text(PAGE.replace("109公克", "330毫升").replace("(本包裝含1份)", "(本包裝含6份)"))
+    assert row["serving_size"] == "330 毫升"
+    assert row["package_servings"] == "6"
 
 
 def test_partial_label_is_dropped_not_shown_with_gaps():

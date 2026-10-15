@@ -135,12 +135,14 @@ describe('truthful shelf results', () => {
 
   it('shows the full packaging label when the chain publishes one', () => {
     const perServing = { kcal: 193, protein: 5.1, fat: 4.5, saturatedFat: 0.9, transFat: 0, carbohydrate: 32.9, sugar: 0.9, sodium: 201 }
-    const single = card(product({ kcal: 193, nutrition: { servingGrams: 109, servings: 1, perServing } }), true)
-    expect(single).toContain('每一份量 109 公克')
+    const single = card(product({ kcal: 193, nutrition: { servingSize: '330 毫升', packageServings: 6, servings: 1, perServing } }), true)
+    expect(single).toContain('每一份量 330 毫升')
+    // Sold one at a time: the label's own count stays, but no package column multiplies it.
+    expect(single).toContain('本包裝含 6 份')
     expect(single).toContain('<td>201 毫克</td>')
     expect(single).not.toContain('每包裝')
     // Several servings: the package column is the per-serving value multiplied out.
-    const multi = card(product({ kcal: 386, nutrition: { servingGrams: 109, servings: 2, perServing } }), true)
+    const multi = card(product({ kcal: 386, nutrition: { servingSize: '109 公克', packageServings: 2, servings: 2, perServing } }), true)
     expect(multi).toContain('<td>32.9 公克</td><td>65.8 公克</td>')
   })
 

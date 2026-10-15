@@ -497,13 +497,14 @@ def validate_payload(payload: dict[str, Any]) -> None:
 def valid_nutrition(nutrition: Any) -> bool:
     if nutrition is None:
         return True
-    if not isinstance(nutrition, dict) or set(nutrition) != {"servingGrams", "servings", "perServing"}:
+    if not isinstance(nutrition, dict) or set(nutrition) != {"servingSize", "packageServings", "servings", "perServing"}:
         return False
     per_serving = nutrition["perServing"]
     keys = {"kcal", *(key for key, _, _ in NUTRIENTS)}
     return (
         isinstance(nutrition["servings"], int) and nutrition["servings"] > 0
-        and (nutrition["servingGrams"] is None or isinstance(nutrition["servingGrams"], float))
+        and (nutrition["servingSize"] is None or isinstance(nutrition["servingSize"], str))
+        and (nutrition["packageServings"] is None or isinstance(nutrition["packageServings"], float))
         and isinstance(per_serving, dict) and set(per_serving) == keys
         and all(isinstance(value, float) and value >= 0 for value in per_serving.values())
     )

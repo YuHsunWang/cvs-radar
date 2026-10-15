@@ -37,11 +37,12 @@ NUTRIENTS = (
     ("sugar", "糖", "公克"),
     ("sodium", "鈉", "毫克"),
 )
-NUTRITION_FIELDS = ("brand", "official_name", "cmno", "serving_g", "kcal", *(key for key, _, _ in NUTRIENTS), "fetched")
+NUTRITION_FIELDS = ("brand", "official_name", "cmno", "serving_size", "package_servings", "kcal", *(key for key, _, _ in NUTRIENTS), "fetched")
 
 _NUMBER = r"\s*(\d+(?:\.\d+)?)\s*"
 _KCAL = re.compile(r"每份熱量" + _NUMBER + "大卡")
-_SERVING_G = re.compile(r"每份規格" + _NUMBER + "(?:公克|毫升)")
+_SERVING = re.compile(r"每份規格" + _NUMBER + "(公克|毫升)")
+_PACKAGE = re.compile(r"本包裝含" + _NUMBER + "份")
 # Lookbehind keeps 脂肪 from matching inside 飽和脂肪/反式脂肪, and 糖 inside 醣.
 _PATTERNS = {
     key: re.compile(r"(?<![飽和反式])" + re.escape(label) + _NUMBER + re.escape(unit))
@@ -61,10 +62,15 @@ def parse_detail_text(text: str) -> dict[str, str] | None:
     values = {key: pattern.search(text) for key, pattern in _PATTERNS.items()}
     if kcal is None or any(match is None for match in values.values()):
         return None
-    serving = _SERVING_G.search(text)
+    serving = _SERVING.search(text)
+    package = _PACKAGE.search(text)
     row = {key: match.group(1) for key, match in values.items()}
     row["kcal"] = kcal.group(1)
-    row["serving_g"] = serving.group(1) if serving else ""
+    # Unit kept as printed: drinks are labelled in 毫升, not 公克.
+    row["serving_size"] = f"{serving.group(1)} {serving.group(2)}" if serving else ""
+    # The label's own count, which can differ from the selling unit used for
+    # calories (FAMILY_SOLD_LOOSE: a 6-serving tray of tarts sold one at a time).
+    row["package_servings"] = package.group(1) if package else ""
     return row
 
 
@@ -142,7 +148,8 @@ class NutritionLookup:
     def nutrition_for(self, brand: str, product_name: str) -> dict | None:
         official_name = self._kcal.official_name_for(brand, product_name)
         row = self._rows.get((brand, official_name)) if official_name else None
-        if row is None:
+        # Rows from before serving units were recorded cannot say 公克 or 毫升.
+        if row is None or "serving_size" not in row:
             return None
         servings = int(self._servings.get((brand, official_name)) or 1)
         # The catalogue and the product page disagree now and then (巧克力派司:
@@ -152,7 +159,8 @@ class NutritionLookup:
         if abs(float(row["kcal"]) * servings - package_kcal) > max(2.0, package_kcal * 0.02):
             return None
         return {
-            "servingGrams": float(row["serving_g"]) if row["serving_g"] else None,
+            "servingSize": row["serving_size"] or None,
+            "packageServings": float(row["package_servings"]) if row["package_servings"] else None,
             "servings": servings,
             "perServing": {"kcal": float(row["kcal"]), **{key: float(row[key]) for key, _, _ in NUTRIENTS}},
         }

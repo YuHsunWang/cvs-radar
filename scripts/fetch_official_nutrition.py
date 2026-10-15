@@ -2,8 +2,10 @@
 """Fill data/labels/official_nutrition.csv from FamilyMart product pages.
 
 Run by hand (opens a visible Chrome window, see cvs_radar/official_nutrition.py).
-Only products the site actually shows with FamilyMart calories are visited, and
-rows already in the CSV are skipped, so a rerun only picks up new products.
+Only products the site actually shows with FamilyMart calories are visited.
+Cached rows are skipped unless the catalogue now gives that name a different
+CMNO (a relaunched product) or --refresh is passed, which revisits everything
+to pick up reformulations the page changed in place.
 The CSV is saved after every page, so an interrupted run keeps its progress.
 """
 
@@ -36,6 +38,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--delay", type=float, default=1.0, help="seconds between product pages")
     parser.add_argument("--limit", type=int, help="visit at most this many pages (for a trial run)")
+    parser.add_argument("--refresh", action="store_true", help="revisit cached products too")
     args = parser.parse_args()
 
     lookup = load_lookup()
@@ -46,7 +49,8 @@ def main() -> int:
         if product["brand"] == "全家"
         and (name := lookup.official_name_for(product["brand"], product["productName"]))
     }
-    rows = {row["official_name"]: row for row in load_nutrition() if row["brand"] == "全家"}
+    # Rows written before serving units were recorded are refetched, not kept.
+    rows = {row["official_name"]: row for row in load_nutrition() if row["brand"] == "全家" and "serving_size" in row}
     others = [row for row in load_nutrition() if row["brand"] != "全家"]
 
     catalogue = fetch_family_payload()
@@ -56,7 +60,12 @@ def main() -> int:
         for item in category.get("ITEM") or []
         if item.get("CMNO")
     }
-    todo = {cmno_by_name[name]: name for name in sorted(wanted - set(rows)) if name in cmno_by_name}
+    todo = {
+        cmno_by_name[name]: name
+        for name in sorted(wanted)
+        if name in cmno_by_name
+        and (args.refresh or name not in rows or rows[name]["cmno"] != cmno_by_name[name])
+    }
     if args.limit:
         todo = dict(list(todo.items())[: args.limit])
     print(f"[official-nutrition] {len(wanted)} products shown; {len(rows)} cached; visiting {len(todo)}")
