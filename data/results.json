@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T12:04:40+08:00",
+  "generated_at": "2026-10-16T13:33:25+08:00",
   "reports": [
     {
       "brand": "全家",
@@ -21032,18 +21032,18 @@
       "negative_weight": 2.0,
       "contributors": [],
       "rep_positive": [
-        "蘿蔔糕加熱後好像就是這顏色今天吃還不錯",
-        "好像沒吃過三杯調味的蘿蔔糕 感覺可以試試看",
-        "試過蘿蔔糕 超涮嘴  很適合當宵夜配酒xD但同意原Po說的 醬一定要沾均勻才好吃"
+        "超涮嘴，適合宵夜配酒",
+        "氣炸後外皮更酥脆",
+        "有油蔥、口感不粉，打折再回購"
       ],
       "rep_negative": [
-        "友善買了蘿蔔糕  醬很鹹 囧",
-        "塔香太突出...不會回購"
+        "醬料偏鹹",
+        "塔香太突出，不會回購"
       ],
       "product_key": "全家:塔香三杯蘿蔔糕",
       "score_mean": 0.6643,
       "price": 59,
-      "category": "甜點",
+      "category": "鹹食",
       "competitor_mention_count": 0,
       "competitor_preference_count": 0,
       "competitor_own_preference_count": 0,
@@ -21052,7 +21052,7 @@
       "shill_flag": false,
       "latest_post_date": "2024-09-13T14:45:53+08:00",
       "review_excerpt": "三杯香不過鹹，蘿蔔糕厚但沾醬多會苦；蘿蔔糕有臘肉蝦米香，九層塔醬香足但不特別好吃",
-      "review_provisional": true,
+      "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1726017106.A.E07.html",
         "https://www.ptt.cc/bbs/CVS/M.1726209955.A.ADC.html"
@@ -23888,7 +23888,7 @@
       "shill_ratio": 0.0,
       "shill_flag": false,
       "latest_post_date": "2025-03-27T19:33:02+08:00",
-      "review_excerpt": "9元霜淇淋還不給他吃滿滿。 本來想說木瓜牛奶跟芭樂口味會不會不太搭，但吃起來其實沒有很衝突，芭樂口味滿清爽的，木瓜牛奶就是中規中矩，但整體搭配起來我覺得是好吃的。 但比起霜淇淋本體，每次剛推出就像要先吃的最大原因其實是愛心造型餅皮，比Fami霜淇淋原味餅皮好吃太多了。",
+      "review_excerpt": "木瓜牛奶微甜不膩，芭樂味較淡；芭樂像芭樂汁，木瓜牛奶不甜，餅杯硬脆；芭樂清爽不甜，木瓜味濃會蓋過芭樂；芭樂清爽像芭樂汁不甜，與濃郁木瓜牛奶搭配剛好；芭樂味蓋過木瓜牛奶，最後只滴到一滴；味道清爽甜度低，口感滑順綿密；芭樂清爽，木瓜牛奶中規中矩，搭配不衝突",
       "review_provisional": true,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1722827620.A.93F.html",
@@ -30919,6 +30919,58 @@
     },
     {
       "brand": "全家",
+      "product_name": "贅沢巧克力霜淇淋",
+      "fair_score": 60.4,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 61.86,
+      "score_std": 0.258,
+      "n_posts": 5,
+      "n_comments": 114,
+      "n_eligible_comments": 73,
+      "n_unique_commenters": 58,
+      "score_weight_sum": 60.2915,
+      "score_weighted_sum": 36.52575625,
+      "score_weight_square_sum": 58.76272875,
+      "positive_weight": 34.6088,
+      "neutral_weight": 10.7986,
+      "negative_weight": 14.8841,
+      "contributors": [],
+      "rep_positive": [
+        "比比利時巧克力甜嗎?久違的有巧克力+牛奶  月初可以回來吃全家了近幾個月都是吃隔壁家的",
+        "綜合不錯 牛奶偏甜 巧克力微苦",
+        "剛吃 還不錯 有點苦味 加購的金鏟子很可愛"
+      ],
+      "rep_negative": [
+        "這顏色好淡 感覺還是買整桶來挖比較過癮",
+        "吃了個寂寞..QAQ 好淡,不知道是不是我這家的關係",
+        "比較喜歡濃的巧克力,感謝滅火"
+      ],
+      "product_key": "全家:贅沢巧克力霜淇淋",
+      "score_mean": 0.6058,
+      "price": 25,
+      "category": "冰品",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "其他"
+      ],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-03-15T02:08:14+08:00",
+      "review_excerpt": "巧克力味微苦；滑順濃郁、甜度適中不膩，整體無可挑剔；巧克力味濃厚帶苦，甜而不膩；巧克力味保守，份量小，餅乾杯有缺角；巧克力味較比利時淡，但整體好吃",
+      "review_provisional": true,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1770175271.A.571.html",
+        "https://www.ptt.cc/bbs/CVS/M.1770259783.A.4B0.html",
+        "https://www.ptt.cc/bbs/CVS/M.1770801857.A.973.html",
+        "https://www.ptt.cc/bbs/CVS/M.1770896914.A.33C.html",
+        "https://www.ptt.cc/bbs/CVS/M.1773511696.A.C70.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "鼎泰豐紅燒番茄豬肉湯麵",
       "fair_score": 60.4,
       "consensus": "褒貶不一",
@@ -33086,58 +33138,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1750823741.A.4E1.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "贅沢巧克力霜淇淋",
-      "fair_score": 59.4,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 59.86,
-      "score_std": 0.256,
-      "n_posts": 5,
-      "n_comments": 114,
-      "n_eligible_comments": 70,
-      "n_unique_commenters": 56,
-      "score_weight_sum": 58.4184,
-      "score_weighted_sum": 34.79934125,
-      "score_weight_square_sum": 57.00713014,
-      "positive_weight": 32.7357,
-      "neutral_weight": 10.7986,
-      "negative_weight": 14.8841,
-      "contributors": [],
-      "rep_positive": [
-        "比比利時巧克力甜嗎?久違的有巧克力+牛奶  月初可以回來吃全家了近幾個月都是吃隔壁家的",
-        "綜合不錯 牛奶偏甜 巧克力微苦",
-        "剛吃 還不錯 有點苦味 加購的金鏟子很可愛"
-      ],
-      "rep_negative": [
-        "這顏色好淡 感覺還是買整桶來挖比較過癮",
-        "吃了個寂寞..QAQ 好淡,不知道是不是我這家的關係",
-        "比較喜歡濃的巧克力,感謝滅火"
-      ],
-      "product_key": "全家:贅沢巧克力霜淇淋",
-      "score_mean": 0.5957,
-      "price": 25,
-      "category": "冰品",
-      "competitor_mention_count": 1,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "其他"
-      ],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-03-15T02:08:14+08:00",
-      "review_excerpt": "滑順濃郁 非常巧克力 甜度適中不會膩。 口感、味道、顏色各方面都無可挑剔。 建議可以放常溫一下再吃，內餡會比較有炸出來的口感。",
-      "review_provisional": true,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1770175271.A.571.html",
-        "https://www.ptt.cc/bbs/CVS/M.1770259783.A.4B0.html",
-        "https://www.ptt.cc/bbs/CVS/M.1770801857.A.973.html",
-        "https://www.ptt.cc/bbs/CVS/M.1770896914.A.33C.html",
-        "https://www.ptt.cc/bbs/CVS/M.1773511696.A.C70.html"
       ]
     },
     {
@@ -44555,13 +44555,12 @@
       "negative_weight": 1.9324,
       "contributors": [],
       "rep_positive": [
-        "好吃但肉沒幾塊",
-        "還不錯吃 但吃完很空虛"
+        "麻油薑香濃，整體美味下飯"
       ],
       "rep_negative": [
-        "肉、配菜確實只有一點點",
-        "鈉好恐怖XDD",
-        "料太少都在靠醬的味道撐 相對於價格很不划算"
+        "肉和配菜都很少",
+        "鈉很恐怖",
+        "料少、靠醬汁撐，價格不划算"
       ],
       "product_key": "7-11:美福米其林1星米香餐廳三杯雞燴飯",
       "score_mean": 0.5518,
@@ -44575,7 +44574,7 @@
       "shill_flag": false,
       "latest_post_date": "2026-05-24T13:35:21+08:00",
       "review_excerpt": "麻油薑香濃，米飯粒粒分明但少九層塔",
-      "review_provisional": true,
+      "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1779600923.A.991.html"
       ]
@@ -51696,14 +51695,14 @@
       "negative_weight": 33.3903,
       "contributors": [],
       "rep_positive": [
-        "不苦不甜小朋友也能接受",
-        "有微微奶味 茶味算蠻清爽的",
-        "昨天有吃還不錯 我吃配煎茶綜合的"
+        "茶味清爽，帶微微奶味",
+        "不太甜也不苦",
+        "49元購入CP值OK"
       ],
       "rep_negative": [
-        "感謝踩雷,直接pass",
-        "我這邊沒抹茶...是木瓜+芭樂",
-        "就是日式抹茶味 但太甜了"
+        "茶味濃但甜度太高",
+        "抹茶味淡又偏甜",
+        "口感偏油，抹茶味少"
       ],
       "product_key": "全家:伊藤園抹茶霜淇淋",
       "score_mean": 0.5086,
@@ -51718,8 +51717,8 @@
       "shill_ratio": 0.0,
       "shill_flag": false,
       "latest_post_date": "2026-03-15T02:08:14+08:00",
-      "review_excerpt": "三、伊藤園抹茶口味霜淇淋 49元。 也許我們的感想都一樣吧，我比較喜歡微苦、多一點抹茶味道。 買一送一是值得跟朋友家人分享吃吃看，之後會不會回購，我就要考慮一下了。",
-      "review_provisional": true,
+      "review_excerpt": "抹茶霜淇淋略甜；比去年更濃，尾韻微苦且甜度低；抹茶有茶香奶味，尾韻微苦；茶味不突出、稍甜，整體可接受；抹味不多，帶茶香、甜度半糖；抹茶清爽帶奶味，整體好吃；茶香夠有奶味，好吃但少驚喜；抹茶味偏淡略甜，但CP值高",
+      "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1743656257.A.1A9.html",
         "https://www.ptt.cc/bbs/CVS/M.1744027901.A.C82.html",
@@ -51751,14 +51750,11 @@
       "negative_weight": 3.9485,
       "contributors": [],
       "rep_positive": [
-        "很香 滿好吃的",
-        "感謝提醒,一直想嘗試但忘了,先買起來等有空去換來吃",
-        "原來不辣?馬上去囤"
+        "香氣足，吃起來好吃",
+        "20元價格很划算"
       ],
       "rep_negative": [
-        "我上次買超辣傻眼,他上面都沒標辣欸",
-        "味道偏淡 重口味的會小失望",
-        "原本想買,但我都是在外面用餐的人,沒有付碗不知道怎麼倒湯,希望廠商可以付碗"
+        "味道偏淡"
       ],
       "product_key": "全家:味丹味味a炒泡麵爆香三杯風味",
       "score_mean": 0.5087,
@@ -57409,14 +57405,13 @@
       "negative_weight": 10.3721,
       "contributors": [],
       "rep_positive": [
-        "有點想吃",
-        "我給98分,超級好吃,每次要買都被搶購一空",
-        "超好吃"
+        "調味下飯，會越吃越香",
+        "雞肉和薑片給得算多"
       ],
       "rep_negative": [
-        "不要配飯味道不錯,搭了飯變成食之無味,有點可惜",
-        "醬好少",
-        "這有點太鹹了"
+        "醬汁太少",
+        "味道偏鹹",
+        "沒有九層塔味道"
       ],
       "product_key": "7-11:三杯雞燴飯",
       "score_mean": 0.4789,
@@ -57430,7 +57425,7 @@
       "shill_flag": false,
       "latest_post_date": "2026-01-15T03:30:17+08:00",
       "review_excerpt": "調味下飯，雞肉薑片多，但缺九層塔；雞肉搭杏鮑菇蒜頭好吃，但缺少九層塔香",
-      "review_provisional": true,
+      "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1762490491.A.83E.html",
         "https://www.ptt.cc/bbs/CVS/M.1768419019.A.8CF.html"
@@ -73633,7 +73628,7 @@
       "shill_ratio": 0.0,
       "shill_flag": false,
       "latest_post_date": "2025-04-30T09:08:32+08:00",
-      "review_excerpt": "用10塊錢對比，大概要15個10元才能鋪滿。 內餡也超爆餡，我必須分同事一半。 原則上是不太會踩雷的口味。",
+      "review_excerpt": "飯糰吃很飽，兩個一起吃很讚；兩粒飯糰含培根蛋沙拉與鮪魚，吃完很飽",
       "review_provisional": true,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1745902679.A.79A.html",
