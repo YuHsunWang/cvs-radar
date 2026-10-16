@@ -81,8 +81,9 @@ _NOISE_RE = re.compile(
     # the alternation matched inside real names (蜂蜜雷夢軟歐 -> 蜂蜜夢軟歐). DEV-110.
 )
 
+# 三杯 followed by a food word is the dish (三杯雞燴飯), not "three cups".
 _OPTIONAL_RE = re.compile(
-    r"((?:\d+(?:\.\d+)?|[一二三四五六七八九十]+)\s*(入|包|個|顆|片|枚|杯|瓶|罐|盒|組|ml|毫升|g|公克|克|支)|"
+    r"((?!三杯[一-鿿])(?:\d+(?:\.\d+)?|[一二三四五六七八九十]+)\s*(入|包|個|顆|片|枚|杯|瓶|罐|盒|組|ml|毫升|g|公克|克|支)|"
     r"(特大杯|大杯|中杯|小杯|口味|數量|容量|規格|加量|限定|新品|新上市))"
 )
 
