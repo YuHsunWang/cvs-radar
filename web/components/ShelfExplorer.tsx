@@ -556,7 +556,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </main>
 
       <footer className="sl-foot">
-        <p>評分只根據 PTT CVS 板的心得文與留言計算，沒有人工加減分；僅供選購參考。</p>
+        <p>評分只根據 PTT CVS 板的心得文與留言計算，不針對個別商品調分；僅供選購參考。</p>
       </footer>
 
       {/* Mobile only: floating filter button + bottom sheet. */}
