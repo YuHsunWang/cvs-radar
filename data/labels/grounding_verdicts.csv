@@ -20,6 +20,7 @@
 1bcb12794a6cdcd08ce631c42140ddf2a3f7735935262428a2c7b806e3f8ec15,價格偏高,有夠貴,grounded,gpt-5.6-luna,grounding-v1
 1d79b0461f9790fc3e64560afe85655a0b4753fb1eaa3f3e02da0549783c06e5,起司塊口感酥脆,脆的,grounded,gpt-5.6-luna,grounding-v1
 1f6a587c6e2283a8e6374b83626fa735a71b39b3c69264906045e071f2b368af,荔枝香氣明顯,很香。,grounded,gpt-5.6-luna,grounding-v1
+235f72462b657e3476ff196c7dfce1c884d25786dff525499faf0874f8f464ed,海苔一樣脆,卵黃牛挽肉飯糰。,ungrounded,jev,grounding-v1
 24206da653c2b755dec584da6603afb6869004462ae5fe743615d6e81857f306,泡芙太小了,超小顆 有夠慘,grounded,jev,grounding-v1
 24a30774a7f463f9cf98f0beef569bb13a9dcf952c3caba709a9a6bd8fc88e7d,乳酪餡帶淡花香，麵包有些鹹味,"可頌外型看起來胖胖的有點可愛。
 吃的時候一直在想鹽可頌的”鹽” 在哪。",ungrounded,gpt-5.6-luna,grounding-v1
@@ -170,6 +171,7 @@ f0e4cb81bcb179705fe73c57cacd7010f0f7c644cac6325a6672db422031cff0,酒感不明顯
 f3e8eb868420f6806079b86ff6f34d739866d268a0719e323a8cd81296d9c819,價格偏高,但就是有一點太貴了 所以有扣分。,grounded,gpt-5.6-luna,grounding-v1
 f4e50b835fbd71de37e93ab574b7962a6614d36241f09a6ea2c73067e730cb1b,標示7%卻喝不出酒感,說有7趴倒是沒感覺。,grounded,gpt-5.6-luna,grounding-v1
 f50b86efd1ba07f91de9b5d5362ff2c99c9da914688cf73f6e7b6d9774a83186,每層都有奶油,吃起來不會膩。,ungrounded,gpt-5.6-luna,grounding-v1
+f8156d96131498bd4cfc8844f476f70dc806c39149c7374a35d7cc6496936e29,內包蛋黃醬,米飯也好吃。,ungrounded,jev,grounding-v1
 f8be6f1aaa16e20894cffbde1e00fca88176958f2aa28abb5cd610daad2775cc,份量小且價格高,超小超貴,grounded,gpt-5.6-luna,grounding-v1
 f9c2f3974c21d11563fd2cc06dfd573c018f1aac26886fac9becfab87718c3a5,梅子蕃茄果昔值得試試,果昔可以喝喝看 確實挺不錯的,grounded,gpt-5.6-luna,grounding-v1
 fa9232cce727d253dfcbad2962cbbd445e93b1fec0b6fcbdbb922c426320cfb2,吃起來偏甜,"今天終於買到,但覺得好甜,就還可以",grounded,gpt-5.6-luna,grounding-v1
