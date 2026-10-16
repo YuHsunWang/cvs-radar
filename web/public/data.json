@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T08:46:15+08:00",
+  "generatedAt": "2026-10-16T11:38:28+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -11452,7 +11452,7 @@
       "id": "7-11::橘子霜淇淋",
       "brand": "7-11",
       "productName": "橘子霜淇淋",
-      "price": null,
+      "price": 9,
       "category": "冰品",
       "fairScore": 68,
       "recommendationScore": 80,
@@ -51207,61 +51207,6 @@
       "nutrition": null
     },
     {
-      "id": "全家::兩粒飯糰",
-      "brand": "全家",
-      "productName": "兩粒飯糰",
-      "price": 55,
-      "category": "便當",
-      "fairScore": 38,
-      "recommendationScore": 30,
-      "consensus": "一致負評",
-      "confidence": "高",
-      "nPosts": 3,
-      "nComments": 32,
-      "rawComments": 66,
-      "eligibleComments": 38,
-      "uniqueEligibleCommenters": 32,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 13,
-      "neutralPct": 14,
-      "negativePct": 73,
-      "likes": [
-        "兩個一起吃很有飽足感",
-        "兩個一起咬，吃起來很讚",
-        "培根蛋沙拉與鮪魚雙口味"
-      ],
-      "cautions": [
-        "海報上的飯糰內餡很誇張",
-        "單顆更輕，感覺沒有比較划算",
-        "看起來沒料，幾乎都是美乃滋"
-      ],
-      "excerpt": "飯糰吃很飽，兩個一起吃很讚",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1745902679.A.79A.html",
-        "https://www.ptt.cc/bbs/CVS/M.1745915474.A.CD6.html",
-        "https://www.ptt.cc/bbs/CVS/M.1745975314.A.ADF.html"
-      ],
-      "latestDate": "2025-04-30",
-      "kcal": 360,
-      "nutrition": {
-        "servingSize": "200 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 360.0,
-          "protein": 7.2,
-          "fat": 8.2,
-          "saturatedFat": 1.4,
-          "transFat": 0.0,
-          "carbohydrate": 64.6,
-          "sugar": 1.4,
-          "sodium": 662.0
-        }
-      }
-    },
-    {
       "id": "全家::玫梅雙餡餅乾三明治",
       "brand": "全家",
       "productName": "玫梅雙餡餅乾三明治",
@@ -61476,6 +61421,61 @@
       "latestDate": "2025-07-13",
       "kcal": null,
       "nutrition": null
+    },
+    {
+      "id": "全家::兩粒飯糰",
+      "brand": "全家",
+      "productName": "兩粒飯糰",
+      "price": 55,
+      "category": "便當",
+      "fairScore": 38,
+      "recommendationScore": 30,
+      "consensus": "一致負評",
+      "confidence": "高",
+      "nPosts": 3,
+      "nComments": 34,
+      "rawComments": 66,
+      "eligibleComments": 38,
+      "uniqueEligibleCommenters": 34,
+      "independentThreads": 3,
+      "volumeLevel": "充足",
+      "positivePct": 14,
+      "neutralPct": 11,
+      "negativePct": 75,
+      "likes": [
+        "一粒吃不飽的時候,下次試試看XD",
+        "有創意",
+        "飯糰還是最愛素鬆~幾乎都是買這口味"
+      ],
+      "cautions": [
+        "不就兩顆綁一起價格乘以二",
+        "嘖 看起來都沒料。我前兩天吃一顆49元的口味 也都沒料都吃美乃滋",
+        "其實有味道也能吃粗飽 但是全家飯糰的飯不好吃 不會想買...之前吃一見鍾情米沒什麼感覺,但是接著吃普通的忽然就 差好多xD"
+      ],
+      "excerpt": "用10塊錢對比，大概要15個10元才能鋪滿。 內餡也超爆餡，我必須分同事一半。 原則上是不太會踩雷的口味。",
+      "reviewProvisional": true,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1745902679.A.79A.html",
+        "https://www.ptt.cc/bbs/CVS/M.1745915474.A.CD6.html",
+        "https://www.ptt.cc/bbs/CVS/M.1745975314.A.ADF.html"
+      ],
+      "latestDate": "2025-04-30",
+      "kcal": 360,
+      "nutrition": {
+        "servingSize": "200 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 360.0,
+          "protein": 7.2,
+          "fat": 8.2,
+          "saturatedFat": 1.4,
+          "transFat": 0.0,
+          "carbohydrate": 64.6,
+          "sugar": 1.4,
+          "sodium": 662.0
+        }
+      }
     },
     {
       "id": "全家::高球國度檸檬風味調酒",
@@ -76651,7 +76651,7 @@
       "id": "7-11::泰式奶茶霜淇淋",
       "brand": "7-11",
       "productName": "泰式奶茶霜淇淋",
-      "price": null,
+      "price": 9,
       "category": "冰品",
       "fairScore": 66,
       "recommendationScore": null,
