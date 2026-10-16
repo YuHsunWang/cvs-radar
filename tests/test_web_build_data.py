@@ -24,12 +24,20 @@ from web.build_data import (
 )
 
 
-def report(key: str, score: float | None, *, confidence: str = "中", consensus: str = "褒貶不一") -> SimpleNamespace:
+def report(
+    key: str,
+    score: float | None,
+    *,
+    confidence: str = "中",
+    consensus: str = "褒貶不一",
+    commenters: int = 10,
+) -> SimpleNamespace:
     return SimpleNamespace(
         product_key=key,
         fair_score=score,
         confidence=confidence,
         consensus=consensus,
+        n_unique_commenters=commenters,
     )
 
 
@@ -218,9 +226,21 @@ def test_recommendation_score_omits_low_confidence_reports() -> None:
     assert calibrate_recommendation_scores(reports) == {"enough": 92}
 
 
+def test_too_few_commenters_get_no_score_even_when_unanimous() -> None:
+    # Three people who all loved it would otherwise publish a 100; the user's
+    # rule is that an extreme score needs enough people, not just agreement.
+    reports = [
+        report("three", 80, commenters=3),
+        report("four", 80, commenters=4),
+    ]
+
+    assert calibrate_recommendation_scores(reports) == {"four": 100}
+    assert display_confidence(SimpleNamespace(confidence="高", n_posts=3, n_unique_commenters=3)) == "低"
+
+
 def test_single_post_high_confidence_is_capped_only_for_public_display() -> None:
-    single_post = SimpleNamespace(confidence="高", n_posts=1)
-    multi_post = SimpleNamespace(confidence="高", n_posts=2)
+    single_post = SimpleNamespace(confidence="高", n_posts=1, n_unique_commenters=10)
+    multi_post = SimpleNamespace(confidence="高", n_posts=2, n_unique_commenters=10)
 
     assert display_confidence(single_post) == "中"
     assert display_confidence(multi_post) == "高"
