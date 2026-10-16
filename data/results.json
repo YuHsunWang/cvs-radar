@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T08:46:15+08:00",
+  "generated_at": "2026-10-16T11:38:28+08:00",
   "reports": [
     {
       "brand": "全家",
@@ -61360,50 +61360,6 @@
     },
     {
       "brand": "全家",
-      "product_name": "兩粒飯糰",
-      "fair_score": 46.0,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "n_eff": 4.0,
-      "score_std": 0.264,
-      "n_posts": 1,
-      "n_comments": 5,
-      "n_eligible_comments": 3,
-      "n_unique_commenters": 3,
-      "score_weight_sum": 3.9466,
-      "score_weighted_sum": 1.775575,
-      "score_weight_square_sum": 3.89544186,
-      "positive_weight": 1.0,
-      "neutral_weight": 0.9531,
-      "negative_weight": 1.9935,
-      "contributors": [],
-      "rep_positive": [
-        "兩個一起吃很有飽足感",
-        "兩個一起咬，吃起來很讚"
-      ],
-      "rep_negative": [
-        "海報上的飯糰內餡很誇張",
-        "單顆更輕，感覺沒有比較划算"
-      ],
-      "product_key": "全家:兩粒飯糰",
-      "score_mean": 0.4499,
-      "price": 55,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2025-04-30T09:08:32+08:00",
-      "review_excerpt": "飯糰吃很飽，兩個一起吃很讚",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1745975314.A.ADF.html"
-      ]
-    },
-    {
-      "brand": "全家",
       "product_name": "玫梅雙餡餅乾三明治",
       "fair_score": 46.0,
       "consensus": "褒貶不一",
@@ -63323,7 +63279,7 @@
       ],
       "product_key": "其他:延世大學栗子提拉米蘇生乳包",
       "score_mean": 0.444,
-      "price": 3400,
+      "price": 80,
       "category": "麵包",
       "competitor_mention_count": 2,
       "competitor_preference_count": 0,
@@ -64358,7 +64314,7 @@
       ],
       "product_key": "全家:海鮮粥",
       "score_mean": 0.4405,
-      "price": 1,
+      "price": 79,
       "category": "便當",
       "competitor_mention_count": 0,
       "competitor_preference_count": 0,
@@ -73714,6 +73670,57 @@
     },
     {
       "brand": "全家",
+      "product_name": "兩粒飯糰",
+      "fair_score": 37.7,
+      "consensus": "一致負評",
+      "confidence": "高",
+      "n_eff": 35.95,
+      "score_std": 0.206,
+      "n_posts": 3,
+      "n_comments": 66,
+      "n_eligible_comments": 38,
+      "n_unique_commenters": 34,
+      "score_weight_sum": 35.0496,
+      "score_weighted_sum": 13.099409999999999,
+      "score_weight_square_sum": 34.1761851,
+      "positive_weight": 4.8279,
+      "neutral_weight": 3.976,
+      "negative_weight": 26.2457,
+      "contributors": [],
+      "rep_positive": [
+        "一粒吃不飽的時候,下次試試看XD",
+        "有創意",
+        "飯糰還是最愛素鬆~幾乎都是買這口味"
+      ],
+      "rep_negative": [
+        "不就兩顆綁一起價格乘以二",
+        "嘖 看起來都沒料。我前兩天吃一顆49元的口味 也都沒料都吃美乃滋",
+        "其實有味道也能吃粗飽 但是全家飯糰的飯不好吃 不會想買...之前吃一見鍾情米沒什麼感覺,但是接著吃普通的忽然就 差好多xD"
+      ],
+      "product_key": "全家:兩粒飯糰",
+      "score_mean": 0.3737,
+      "price": 55,
+      "category": "便當",
+      "competitor_mention_count": 3,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "7-11",
+        "其他"
+      ],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2025-04-30T09:08:32+08:00",
+      "review_excerpt": "用10塊錢對比，大概要15個10元才能鋪滿。 內餡也超爆餡，我必須分同事一半。 原則上是不太會踩雷的口味。",
+      "review_provisional": true,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1745902679.A.79A.html",
+        "https://www.ptt.cc/bbs/CVS/M.1745915474.A.CD6.html",
+        "https://www.ptt.cc/bbs/CVS/M.1745975314.A.ADF.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "高球國度檸檬風味調酒",
       "fair_score": 37.7,
       "consensus": "一致負評",
@@ -74683,55 +74690,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1747713991.A.52D.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "飯糰",
-      "fair_score": 37.0,
-      "consensus": "一致負評",
-      "confidence": "高",
-      "n_eff": 32.95,
-      "score_std": 0.195,
-      "n_posts": 2,
-      "n_comments": 61,
-      "n_eligible_comments": 35,
-      "n_unique_commenters": 32,
-      "score_weight_sum": 32.0561,
-      "score_weighted_sum": 11.736845,
-      "score_weight_square_sum": 31.18914285,
-      "positive_weight": 3.8279,
-      "neutral_weight": 3.976,
-      "negative_weight": 24.2522,
-      "contributors": [],
-      "rep_positive": [
-        "培根蛋沙拉與鮪魚雙口味",
-        "吃兩顆真的很飽"
-      ],
-      "rep_negative": [
-        "看起來沒料，幾乎都是美乃滋",
-        "比一般三角飯糰還小",
-        "兩顆55元沒比較好"
-      ],
-      "product_key": "全家:飯糰",
-      "score_mean": 0.3661,
-      "price": 28,
-      "category": "便當",
-      "competitor_mention_count": 3,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "7-11",
-        "其他"
-      ],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2025-04-29T16:31:12+08:00",
-      "review_excerpt": "兩粒飯糰含培根蛋沙拉與鮪魚，吃完很飽",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1745902679.A.79A.html",
-        "https://www.ptt.cc/bbs/CVS/M.1745915474.A.CD6.html"
       ]
     },
     {
@@ -80011,7 +79969,7 @@
       ],
       "product_key": "全家:西西里雞肉冷義大利麵",
       "score_mean": 0.3038,
-      "price": 0,
+      "price": 85,
       "category": "便當",
       "competitor_mention_count": 3,
       "competitor_preference_count": 1,
@@ -85325,7 +85283,7 @@
       "rep_negative": [],
       "product_key": "7-11:citycafe中熱美",
       "score_mean": 1.0,
-      "price": 0,
+      "price": null,
       "category": "飲料",
       "competitor_mention_count": 0,
       "competitor_preference_count": 0,
@@ -95210,7 +95168,7 @@
       ],
       "product_key": "7-11:unidesign洋芋片經典原味",
       "score_mean": 0.7,
-      "price": 5,
+      "price": 30,
       "category": "零食",
       "competitor_mention_count": 0,
       "competitor_preference_count": 0,
