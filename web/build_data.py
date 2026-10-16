@@ -249,7 +249,11 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 )
                 merged["fairScore"] = round(merged_fair_score)
                 merged["consensus"] = _classify(mean01, std, n_eff)
-                merged["confidence"] = _confidence(n_eff)
+                # The merged commenter count is a lower bound (max of members),
+                # so a merge can only stay gated, never be wrongly un-gated.
+                merged["confidence"] = gate_confidence(
+                    _confidence(n_eff), merged.get("uniqueEligibleCommenters", 0)
+                )
                 publishable_score = _has_publishable_score(
                     merged["confidence"], merged["consensus"]
                 )
@@ -368,26 +372,45 @@ def _has_publishable_score(confidence: str, consensus: str) -> bool:
     return confidence != "低" and consensus != "資料不足"
 
 
+# A score needs this many distinct commenters. n_eff alone let two or three
+# people who all liked something publish a 95+.
+MIN_SCORED_COMMENTERS = 4
+
+
+def gate_confidence(confidence: str, commenters: int) -> str:
+    """Treat too few distinct commenters as low confidence: no score, no split."""
+
+    return "低" if commenters < MIN_SCORED_COMMENTERS else confidence
+
+
+def _report_confidence(report: Any) -> str:
+    commenters = getattr(report, "n_unique_commenters", None)
+    if commenters is None:
+        commenters = report.n_comments
+    return gate_confidence(report.confidence, commenters)
+
+
 def calibrate_recommendation_scores(reports: list[Any]) -> dict[str, int]:
     return {
         report.product_key: calibrate_recommendation_score(report.fair_score)
         for report in reports
         if report.fair_score is not None
-        and _has_publishable_score(report.confidence, report.consensus)
+        and _has_publishable_score(_report_confidence(report), report.consensus)
     }
 
 
 def display_confidence(report: Any) -> str:
     """Keep public confidence labels from overstating a single discussion thread."""
 
-    if report.n_posts < 2 and report.confidence == "高":
+    confidence = _report_confidence(report)
+    if report.n_posts < 2 and confidence == "高":
         return "中"
-    return report.confidence
+    return confidence
 
 
 def to_product(report: Any, recommendation_score: int | None = None) -> dict[str, Any]:
     distribution = None
-    if _has_publishable_score(report.confidence, report.consensus):
+    if _has_publishable_score(_report_confidence(report), report.consensus):
         aggregate_weights = (
             getattr(report, "positive_weight", 0.0),
             getattr(report, "neutral_weight", 0.0),
