@@ -1416,6 +1416,10 @@ class ExtractionRegressionTest(unittest.TestCase):
             ("： 核桃腰果稻禾壽司組/55 /38時光", "全家", [("核桃腰果稻禾壽司組", 55)]),
             # 酷碰券 優惠券 + 杯型
             ("：厚奶拿鐵/酷碰券特大杯59", "全家", [("厚奶拿鐵", 59)]),
+            # 三杯 is the dish, not a cup count: stripping it published 「雞燴飯」
+            ("：三杯雞燴飯 $99", "7-11", [("三杯雞燴飯", 99)]),
+            # ...but a cup count before a drink is still noise
+            ("：三杯咖啡100元", "7-11", [("咖啡", 100)]),
         ]
         for raw_name, brand, expected in cases:
             with self.subTest(raw_name=raw_name):

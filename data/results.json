@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T11:38:28+08:00",
+  "generated_at": "2026-10-16T13:33:25+08:00",
   "reports": [
     {
       "brand": "全家",
@@ -251,46 +251,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1733662694.A.965.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "贅沢巧克力",
-      "fair_score": 80.7,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "n_eff": 4.0,
-      "score_std": 0.022,
-      "n_posts": 1,
-      "n_comments": 8,
-      "n_eligible_comments": 3,
-      "n_unique_commenters": 3,
-      "score_weight_sum": 3.8481,
-      "score_weighted_sum": 3.41329,
-      "score_weight_square_sum": 3.70622361,
-      "positive_weight": 3.8481,
-      "neutral_weight": 0,
-      "negative_weight": 0,
-      "contributors": [],
-      "rep_positive": [
-        "巧克力搭抹茶好吃"
-      ],
-      "rep_negative": [],
-      "product_key": "全家:贅沢巧克力",
-      "score_mean": 0.887,
-      "price": null,
-      "category": "零食",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-03-15T02:08:14+08:00",
-      "review_excerpt": "巧克力味微苦",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1773511696.A.C70.html"
       ]
     },
     {
@@ -3140,52 +3100,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1736344507.A.94D.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "木瓜是芭樂系霜淇淋",
-      "fair_score": 75.7,
-      "consensus": "一致好評",
-      "confidence": "高",
-      "n_eff": 13.0,
-      "score_std": 0.214,
-      "n_posts": 1,
-      "n_comments": 17,
-      "n_eligible_comments": 12,
-      "n_unique_commenters": 12,
-      "score_weight_sum": 12.9657,
-      "score_weighted_sum": 10.071145,
-      "score_weight_square_sum": 12.93219481,
-      "positive_weight": 10.9696,
-      "neutral_weight": 0,
-      "negative_weight": 1.9961,
-      "contributors": [],
-      "rep_positive": [
-        "芭樂有辦桌芭樂汁的味道",
-        "木瓜牛奶不太甜，奶味清爽",
-        "普通造型的霜淇淋意外很大隻"
-      ],
-      "rep_negative": [
-        "芭樂口味普通，帶有化學味"
-      ],
-      "product_key": "全家:木瓜是芭樂系霜淇淋",
-      "score_mean": 0.7768,
-      "price": 19,
-      "category": "冰品",
-      "competitor_mention_count": 1,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "其他"
-      ],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2024-09-02T16:02:02+08:00",
-      "review_excerpt": "芭樂像芭樂汁，木瓜牛奶不甜，餅杯硬脆",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1725264125.A.FE4.html"
       ]
     },
     {
@@ -21100,7 +21014,7 @@
     },
     {
       "brand": "全家",
-      "product_name": "塔香蘿蔔糕",
+      "product_name": "塔香三杯蘿蔔糕",
       "fair_score": 64.9,
       "consensus": "褒貶不一",
       "confidence": "高",
@@ -21126,7 +21040,7 @@
         "醬料偏鹹",
         "塔香太突出，不會回購"
       ],
-      "product_key": "全家:塔香蘿蔔糕",
+      "product_key": "全家:塔香三杯蘿蔔糕",
       "score_mean": 0.6643,
       "price": 59,
       "category": "鹹食",
@@ -23929,6 +23843,61 @@
         "https://www.ptt.cc/bbs/CVS/M.1765255028.A.2B6.html",
         "https://www.ptt.cc/bbs/CVS/M.1765421567.A.7A6.html",
         "https://www.ptt.cc/bbs/CVS/M.1765955352.A.EF2.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "是芭樂系x木瓜牛奶霜淇淋",
+      "fair_score": 63.4,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 96.83,
+      "score_std": 0.229,
+      "n_posts": 7,
+      "n_comments": 165,
+      "n_eligible_comments": 104,
+      "n_unique_commenters": 93,
+      "score_weight_sum": 95.7145,
+      "score_weighted_sum": 60.82326833333333,
+      "score_weight_square_sum": 94.60951695,
+      "positive_weight": 60.5105,
+      "neutral_weight": 18.6288,
+      "negative_weight": 16.5752,
+      "contributors": [],
+      "rep_positive": [
+        "木瓜牛奶還是不錯啦 芭樂還沒吃",
+        "樓上的份量也太豪華",
+        "昨天單吃芭樂  不錯"
+      ],
+      "rep_negative": [
+        "一起吃沒有什麼木瓜味,都被芭樂味蓋掉,單吃才有木瓜味",
+        "為什麼樓上那支那麼大支XD 我買的大概只有他的2/3",
+        "綜合不太搭 芭樂味道太重木瓜變得很不顯眼 比較喜歡木瓜牛奶"
+      ],
+      "product_key": "全家:是芭樂系x木瓜牛奶霜淇淋",
+      "score_mean": 0.6355,
+      "price": 49,
+      "category": "冰品",
+      "competitor_mention_count": 5,
+      "competitor_preference_count": 2,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "7-11",
+        "其他"
+      ],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2025-03-27T19:33:02+08:00",
+      "review_excerpt": "木瓜牛奶微甜不膩，芭樂味較淡；芭樂像芭樂汁，木瓜牛奶不甜，餅杯硬脆；芭樂清爽不甜，木瓜味濃會蓋過芭樂；芭樂清爽像芭樂汁不甜，與濃郁木瓜牛奶搭配剛好；芭樂味蓋過木瓜牛奶，最後只滴到一滴；味道清爽甜度低，口感滑順綿密；芭樂清爽，木瓜牛奶中規中矩，搭配不衝突",
+      "review_provisional": true,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1722827620.A.93F.html",
+        "https://www.ptt.cc/bbs/CVS/M.1722845116.A.4D9.html",
+        "https://www.ptt.cc/bbs/CVS/M.1723127700.A.09D.html",
+        "https://www.ptt.cc/bbs/CVS/M.1723870111.A.342.html",
+        "https://www.ptt.cc/bbs/CVS/M.1724833823.A.00C.html",
+        "https://www.ptt.cc/bbs/CVS/M.1725264125.A.FE4.html",
+        "https://www.ptt.cc/bbs/CVS/M.1743075184.A.977.html"
       ]
     },
     {
@@ -27241,59 +27210,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1783339051.A.D8C.html",
         "https://www.ptt.cc/bbs/CVS/M.1783428783.A.BCA.html",
         "https://www.ptt.cc/bbs/CVS/M.1783476176.A.84B.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "是芭樂系x木瓜牛奶霜淇淋",
-      "fair_score": 61.9,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 87.83,
-      "score_std": 0.227,
-      "n_posts": 6,
-      "n_comments": 148,
-      "n_eligible_comments": 92,
-      "n_unique_commenters": 84,
-      "score_weight_sum": 86.7145,
-      "score_weighted_sum": 53.7828075,
-      "score_weight_square_sum": 85.60951695,
-      "positive_weight": 52.5092,
-      "neutral_weight": 18.6301,
-      "negative_weight": 15.5752,
-      "contributors": [],
-      "rep_positive": [
-        "芭樂微酸能中和木瓜的甜",
-        "芭樂清爽不會太甜"
-      ],
-      "rep_negative": [
-        "綜合時芭樂味太重，木瓜不明顯",
-        "新餅乾口徑變小，冰淇淋也少",
-        "冰渣很多，口感不綿"
-      ],
-      "product_key": "全家:是芭樂系x木瓜牛奶霜淇淋",
-      "score_mean": 0.6202,
-      "price": 49,
-      "category": "冰品",
-      "competitor_mention_count": 4,
-      "competitor_preference_count": 2,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "7-11",
-        "其他"
-      ],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2025-03-27T19:33:02+08:00",
-      "review_excerpt": "木瓜牛奶微甜不膩，芭樂味較淡；芭樂清爽不甜，木瓜味濃會蓋過芭樂；芭樂清爽像芭樂汁不甜，與濃郁木瓜牛奶搭配剛好；芭樂味蓋過木瓜牛奶，最後只滴到一滴；味道清爽甜度低，口感滑順綿密；芭樂清爽，木瓜牛奶中規中矩，搭配不衝突",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1722827620.A.93F.html",
-        "https://www.ptt.cc/bbs/CVS/M.1722845116.A.4D9.html",
-        "https://www.ptt.cc/bbs/CVS/M.1723127700.A.09D.html",
-        "https://www.ptt.cc/bbs/CVS/M.1723870111.A.342.html",
-        "https://www.ptt.cc/bbs/CVS/M.1724833823.A.00C.html",
-        "https://www.ptt.cc/bbs/CVS/M.1743075184.A.977.html"
       ]
     },
     {
@@ -30999,6 +30915,58 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1724915512.A.08D.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "贅沢巧克力霜淇淋",
+      "fair_score": 60.4,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 61.86,
+      "score_std": 0.258,
+      "n_posts": 5,
+      "n_comments": 114,
+      "n_eligible_comments": 73,
+      "n_unique_commenters": 58,
+      "score_weight_sum": 60.2915,
+      "score_weighted_sum": 36.52575625,
+      "score_weight_square_sum": 58.76272875,
+      "positive_weight": 34.6088,
+      "neutral_weight": 10.7986,
+      "negative_weight": 14.8841,
+      "contributors": [],
+      "rep_positive": [
+        "比比利時巧克力甜嗎?久違的有巧克力+牛奶  月初可以回來吃全家了近幾個月都是吃隔壁家的",
+        "綜合不錯 牛奶偏甜 巧克力微苦",
+        "剛吃 還不錯 有點苦味 加購的金鏟子很可愛"
+      ],
+      "rep_negative": [
+        "這顏色好淡 感覺還是買整桶來挖比較過癮",
+        "吃了個寂寞..QAQ 好淡,不知道是不是我這家的關係",
+        "比較喜歡濃的巧克力,感謝滅火"
+      ],
+      "product_key": "全家:贅沢巧克力霜淇淋",
+      "score_mean": 0.6058,
+      "price": 25,
+      "category": "冰品",
+      "competitor_mention_count": 1,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [
+        "其他"
+      ],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-03-15T02:08:14+08:00",
+      "review_excerpt": "巧克力味微苦；滑順濃郁、甜度適中不膩，整體無可挑剔；巧克力味濃厚帶苦，甜而不膩；巧克力味保守，份量小，餅乾杯有缺角；巧克力味較比利時淡，但整體好吃",
+      "review_provisional": true,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1770175271.A.571.html",
+        "https://www.ptt.cc/bbs/CVS/M.1770259783.A.4B0.html",
+        "https://www.ptt.cc/bbs/CVS/M.1770801857.A.973.html",
+        "https://www.ptt.cc/bbs/CVS/M.1770896914.A.33C.html",
+        "https://www.ptt.cc/bbs/CVS/M.1773511696.A.C70.html"
       ]
     },
     {
@@ -34738,57 +34706,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1756909733.A.C8E.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "贅沢巧克力霜淇淋",
-      "fair_score": 58.8,
-      "consensus": "評價兩極",
-      "confidence": "高",
-      "n_eff": 59.86,
-      "score_std": 0.263,
-      "n_posts": 4,
-      "n_comments": 106,
-      "n_eligible_comments": 70,
-      "n_unique_commenters": 56,
-      "score_weight_sum": 58.4184,
-      "score_weighted_sum": 34.42434125,
-      "score_weight_square_sum": 57.00713014,
-      "positive_weight": 32.7357,
-      "neutral_weight": 9.7986,
-      "negative_weight": 15.8841,
-      "contributors": [],
-      "rep_positive": [
-        "巧克力味濃，微苦好吃",
-        "苦味明顯，吃起來比較不膩",
-        "想吃苦可選全巧克力，牛奶可淡化苦味"
-      ],
-      "rep_negative": [
-        "尺寸小得過分",
-        "不太甜，但像廉價可可粉",
-        "融化速度特別快"
-      ],
-      "product_key": "全家:贅沢巧克力霜淇淋",
-      "score_mean": 0.5893,
-      "price": 25,
-      "category": "冰品",
-      "competitor_mention_count": 1,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [
-        "其他"
-      ],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-02-12T19:48:31+08:00",
-      "review_excerpt": "滑順濃郁、甜度適中不膩，整體無可挑剔；巧克力味濃厚帶苦，甜而不膩；巧克力味保守，份量小，餅乾杯有缺角；巧克力味較比利時淡，但整體好吃",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1770175271.A.571.html",
-        "https://www.ptt.cc/bbs/CVS/M.1770259783.A.4B0.html",
-        "https://www.ptt.cc/bbs/CVS/M.1770801857.A.973.html",
-        "https://www.ptt.cc/bbs/CVS/M.1770896914.A.33C.html"
       ]
     },
     {
@@ -44620,7 +44537,7 @@
     },
     {
       "brand": "7-11",
-      "product_name": "美福米其林1星米香餐廳雞燴飯",
+      "product_name": "美福米其林1星米香餐廳三杯雞燴飯",
       "fair_score": 54.3,
       "consensus": "評價兩極",
       "confidence": "中",
@@ -44645,7 +44562,7 @@
         "鈉很恐怖",
         "料少、靠醬汁撐，價格不划算"
       ],
-      "product_key": "7-11:美福米其林1星米香餐廳雞燴飯",
+      "product_key": "7-11:美福米其林1星米香餐廳三杯雞燴飯",
       "score_mean": 0.5518,
       "price": 64,
       "category": "便當",
@@ -51815,7 +51732,7 @@
     },
     {
       "brand": "全家",
-      "product_name": "味丹味味A炒泡麵爆香風味",
+      "product_name": "味丹味味A炒泡麵爆香三杯風味",
       "fair_score": 50.8,
       "consensus": "褒貶不一",
       "confidence": "高",
@@ -51839,7 +51756,7 @@
       "rep_negative": [
         "味道偏淡"
       ],
-      "product_key": "全家:味丹味味a炒泡麵爆香風味",
+      "product_key": "全家:味丹味味a炒泡麵爆香三杯風味",
       "score_mean": 0.5087,
       "price": 39,
       "category": "泡麵",
@@ -57470,6 +57387,52 @@
     },
     {
       "brand": "7-11",
+      "product_name": "三杯雞燴飯",
+      "fair_score": 48.0,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 19.82,
+      "score_std": 0.208,
+      "n_posts": 2,
+      "n_comments": 23,
+      "n_eligible_comments": 20,
+      "n_unique_commenters": 18,
+      "score_weight_sum": 19.1315,
+      "score_weighted_sum": 9.16133,
+      "score_weight_square_sum": 18.46483477,
+      "positive_weight": 4.976,
+      "neutral_weight": 3.7834,
+      "negative_weight": 10.3721,
+      "contributors": [],
+      "rep_positive": [
+        "調味下飯，會越吃越香",
+        "雞肉和薑片給得算多"
+      ],
+      "rep_negative": [
+        "醬汁太少",
+        "味道偏鹹",
+        "沒有九層塔味道"
+      ],
+      "product_key": "7-11:三杯雞燴飯",
+      "score_mean": 0.4789,
+      "price": 99,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-01-15T03:30:17+08:00",
+      "review_excerpt": "調味下飯，雞肉薑片多，但缺九層塔；雞肉搭杏鮑菇蒜頭好吃，但缺少九層塔香",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1762490491.A.83E.html",
+        "https://www.ptt.cc/bbs/CVS/M.1768419019.A.8CF.html"
+      ]
+    },
+    {
+      "brand": "7-11",
       "product_name": "愛文芒果雪酪冰沙",
       "fair_score": 48.0,
       "consensus": "評價兩極",
@@ -57552,52 +57515,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1778861808.A.A39.html"
-      ]
-    },
-    {
-      "brand": "7-11",
-      "product_name": "雞燴飯",
-      "fair_score": 48.0,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 19.82,
-      "score_std": 0.208,
-      "n_posts": 2,
-      "n_comments": 23,
-      "n_eligible_comments": 20,
-      "n_unique_commenters": 18,
-      "score_weight_sum": 19.1315,
-      "score_weighted_sum": 9.16133,
-      "score_weight_square_sum": 18.46483477,
-      "positive_weight": 4.976,
-      "neutral_weight": 3.7834,
-      "negative_weight": 10.3721,
-      "contributors": [],
-      "rep_positive": [
-        "調味下飯，會越吃越香",
-        "雞肉和薑片給得算多"
-      ],
-      "rep_negative": [
-        "醬汁太少",
-        "味道偏鹹",
-        "沒有九層塔味道"
-      ],
-      "product_key": "7-11:雞燴飯",
-      "score_mean": 0.4789,
-      "price": 99,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-01-15T03:30:17+08:00",
-      "review_excerpt": "調味下飯，雞肉薑片多，但缺九層塔；雞肉搭杏鮑菇蒜頭好吃，但缺少九層塔香",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1762490491.A.83E.html",
-        "https://www.ptt.cc/bbs/CVS/M.1768419019.A.8CF.html"
       ]
     },
     {
@@ -73711,7 +73628,7 @@
       "shill_ratio": 0.0,
       "shill_flag": false,
       "latest_post_date": "2025-04-30T09:08:32+08:00",
-      "review_excerpt": "用10塊錢對比，大概要15個10元才能鋪滿。 內餡也超爆餡，我必須分同事一半。 原則上是不太會踩雷的口味。",
+      "review_excerpt": "飯糰吃很飽，兩個一起吃很讚；兩粒飯糰含培根蛋沙拉與鮪魚，吃完很飽",
       "review_provisional": true,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1745902679.A.79A.html",
