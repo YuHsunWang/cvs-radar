@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T13:33:25+08:00",
+  "generatedAt": "2026-10-17T08:41:19+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -9756,8 +9756,22 @@
         "https://www.ptt.cc/bbs/CVS/M.1739242618.A.F7A.html"
       ],
       "latestDate": "2025-02-11",
-      "kcal": null,
-      "nutrition": null
+      "kcal": 174,
+      "nutrition": {
+        "servingSize": "76 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 174.0,
+          "protein": 5.4,
+          "fat": 5.5,
+          "saturatedFat": 3.2,
+          "transFat": 0.0,
+          "carbohydrate": 25.8,
+          "sugar": 4.9,
+          "sodium": 217.0
+        }
+      }
     },
     {
       "id": "萊爾富::白醬蝦仁燉飯",
@@ -9879,42 +9893,6 @@
           "sodium": 365.0
         }
       }
-    },
-    {
-      "id": "全家::滿滿奶霜芋頭麵包",
-      "brand": "全家",
-      "productName": "滿滿奶霜芋頭麵包",
-      "price": 35,
-      "category": "麵包",
-      "fairScore": 70,
-      "recommendationScore": null,
-      "consensus": "一致好評",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 3,
-      "rawComments": 4,
-      "eligibleComments": 3,
-      "uniqueEligibleCommenters": 3,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "麵包不大，但料應該很多",
-        "熱吃外酥內軟，但芋泥偏冷"
-      ],
-      "cautions": [
-        "奶霜沒融入麵包，可能加熱不足"
-      ],
-      "excerpt": "熱吃好吃，外酥內軟但芋泥冷；麵包不大、料應不少",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792104406.A.C70.html"
-      ],
-      "latestDate": "2026-10-16",
-      "kcal": null,
-      "nutrition": null
     },
     {
       "id": "全家::焦糖烤布蕾塔",
@@ -13125,7 +13103,7 @@
       "confidence": "中",
       "nPosts": 1,
       "nComments": 5,
-      "rawComments": 8,
+      "rawComments": 9,
       "eligibleComments": 5,
       "uniqueEligibleCommenters": 5,
       "independentThreads": 1,
@@ -13134,12 +13112,11 @@
       "neutralPct": 0,
       "negativePct": 33,
       "likes": [
-        "下層像義美巧克力酥片，口感更紮實",
-        "脆絲沒有油耗味"
+        "下層像巧克力酥片，口感更紮實",
+        "脆絲無油耗味，吃起來好吃"
       ],
       "cautions": [
-        "份量縮小，優惠改為七折",
-        "脆絲曾被誤以為是異物"
+        "份量縮小，優惠從1+1變7折"
       ],
       "excerpt": "巧克力醬多，脆粒增添口感，整體不錯",
       "reviewProvisional": false,
@@ -19642,17 +19619,17 @@
       "neutralPct": 20,
       "negativePct": 17,
       "likes": [
-        "木瓜牛奶還是不錯啦 芭樂還沒吃",
-        "樓上的份量也太豪華",
-        "昨天單吃芭樂 不錯"
+        "芭樂微酸，能中和木瓜甜味",
+        "芭樂口味列前段班，一週吃四次",
+        "雙圓造型不錯，但不明顯"
       ],
       "cautions": [
-        "一起吃沒有什麼木瓜味,都被芭樂味蓋掉,單吃才有木瓜味",
-        "為什麼樓上那支那麼大支XD 我買的大概只有他的2/3",
-        "綜合不太搭 芭樂味道太重木瓜變得很不顯眼 比較喜歡木瓜牛奶"
+        "綜合不太搭，芭樂味蓋過木瓜",
+        "芭樂普通，帶化學味",
+        "新餅乾口徑變小，冰淇淋少了約20%"
       ],
       "excerpt": "木瓜牛奶微甜不膩，芭樂味較淡；芭樂像芭樂汁，木瓜牛奶不甜，餅杯硬脆；芭樂清爽不甜，木瓜味濃會蓋過芭樂；芭樂清爽像芭樂汁不甜，與濃郁木瓜牛奶搭配剛好；芭樂味蓋過木瓜牛奶，最後只滴到一滴；味道清爽甜度低，口感滑順綿密；芭樂清爽，木瓜牛奶中規中矩，搭配不衝突",
-      "reviewProvisional": true,
+      "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1722827620.A.93F.html",
         "https://www.ptt.cc/bbs/CVS/M.1722845116.A.4D9.html",
@@ -19702,6 +19679,56 @@
       "latestDate": "2025-09-30",
       "kcal": null,
       "nutrition": null
+    },
+    {
+      "id": "全家::滿滿奶霜芋頭麵包",
+      "brand": "全家",
+      "productName": "滿滿奶霜芋頭麵包",
+      "price": 35,
+      "category": "麵包",
+      "fairScore": 63,
+      "recommendationScore": 72,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 9,
+      "rawComments": 24,
+      "eligibleComments": 9,
+      "uniqueEligibleCommenters": 9,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 70,
+      "neutralPct": 20,
+      "negativePct": 10,
+      "likes": [
+        "冷凍後回溫，麵包有酵母香，配熱美式剛好"
+      ],
+      "cautions": [
+        "加熱後奶霜沒有融進麵包",
+        "奶霜甜度蓋過芋泥餡，怕甜勿買"
+      ],
+      "excerpt": "熱吃好吃，外酥內軟但芋泥冷；麵包不大、料應不少",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792104406.A.C70.html"
+      ],
+      "latestDate": "2026-10-16",
+      "kcal": 250,
+      "nutrition": {
+        "servingSize": "83 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 250.0,
+          "protein": 6.1,
+          "fat": 6.1,
+          "saturatedFat": 3.1,
+          "transFat": 0.0,
+          "carbohydrate": 42.5,
+          "sugar": 13.8,
+          "sodium": 242.0
+        }
+      }
     },
     {
       "id": "全家::特醇巧克力風味乖乖",
@@ -25628,17 +25655,17 @@
       "neutralPct": 18,
       "negativePct": 25,
       "likes": [
-        "比比利時巧克力甜嗎?久違的有巧克力+牛奶 月初可以回來吃全家了近幾個月都是吃隔壁家的",
-        "綜合不錯 牛奶偏甜 巧克力微苦",
-        "剛吃 還不錯 有點苦味 加購的金鏟子很可愛"
+        "綜合口味不錯，牛奶偏甜、巧克力微苦",
+        "巧克力味濃、微苦，覺得好吃",
+        "想吃苦選巧克力，怕苦搭牛奶"
       ],
       "cautions": [
-        "這顏色好淡 感覺還是買整桶來挖比較過癮",
-        "吃了個寂寞..QAQ 好淡,不知道是不是我這家的關係",
-        "比較喜歡濃的巧克力,感謝滅火"
+        "不太甜但像可可粉，味道偏廉價",
+        "份量小得過分",
+        "融化很快，覺得比利時更好吃"
       ],
       "excerpt": "巧克力味微苦；滑順濃郁、甜度適中不膩，整體無可挑剔；巧克力味濃厚帶苦，甜而不膩；巧克力味保守，份量小，餅乾杯有缺角；巧克力味較比利時淡，但整體好吃",
-      "reviewProvisional": true,
+      "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1770175271.A.571.html",
         "https://www.ptt.cc/bbs/CVS/M.1770259783.A.4B0.html",
@@ -27784,7 +27811,7 @@
         "https://www.ptt.cc/bbs/CVS/M.1762967721.A.574.html"
       ],
       "latestDate": "2025-11-13",
-      "kcal": 532,
+      "kcal": 490,
       "nutrition": null
     },
     {
@@ -33911,8 +33938,22 @@
         "https://www.ptt.cc/bbs/CVS/M.1753166870.A.7A5.html"
       ],
       "latestDate": "2025-07-22",
-      "kcal": 405,
-      "nutrition": null
+      "kcal": 371,
+      "nutrition": {
+        "servingSize": "75 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 371.0,
+          "protein": 5.1,
+          "fat": 21.4,
+          "saturatedFat": 13.3,
+          "transFat": 0.0,
+          "carbohydrate": 39.6,
+          "sugar": 17.6,
+          "sodium": 240.0
+        }
+      }
     },
     {
       "id": "全家::莫札瑞拉青醬火腿貝果",
@@ -40441,9 +40482,9 @@
       "uniqueEligibleCommenters": 16,
       "independentThreads": 3,
       "volumeLevel": "充足",
-      "positivePct": 53,
+      "positivePct": 52,
       "neutralPct": 5,
-      "negativePct": 42,
+      "negativePct": 43,
       "likes": [
         "奶蓋帶鹹味，單吃很好吃",
         "怕甜可冰過，吃起來更好",
@@ -60801,17 +60842,17 @@
       "neutralPct": 18,
       "negativePct": 70,
       "likes": [
-        "一粒吃不飽的時候,下次試試看XD",
-        "有創意",
-        "飯糰還是最愛素鬆~幾乎都是買這口味"
+        "兩顆飯糰真的會吃飽",
+        "兩粒飯糰熱量很低",
+        "兩粒飯糰一起買很方便"
       ],
       "cautions": [
-        "不就兩顆綁一起價格乘以二",
-        "嘖 看起來都沒料。我前兩天吃一顆49元的口味 也都沒料都吃美乃滋",
-        "其實有味道也能吃粗飽 但是全家飯糰的飯不好吃 不會想買...之前吃一見鍾情米沒什麼感覺,但是接著吃普通的忽然就 差好多xD"
+        "料少，兩顆55元也不划算",
+        "口味綁定，不能自行搭配",
+        "單吃容易膩，配菜較好"
       ],
       "excerpt": "熱量不高但餡少，僅適合吃粗飽",
-      "reviewProvisional": true,
+      "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1745902679.A.79A.html",
         "https://www.ptt.cc/bbs/CVS/M.1745915474.A.CD6.html",
@@ -62811,44 +62852,6 @@
       "nutrition": null
     },
     {
-      "id": "7-11::統一布丁焦糖爆走丁丁",
-      "brand": "7-11",
-      "productName": "統一布丁焦糖爆走丁丁",
-      "price": 18,
-      "category": "甜點",
-      "fairScore": 36,
-      "recommendationScore": 26,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 19,
-      "rawComments": 36,
-      "eligibleComments": 19,
-      "uniqueEligibleCommenters": 19,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 20,
-      "neutralPct": 10,
-      "negativePct": 70,
-      "likes": [
-        "這版熱量比正常布丁低"
-      ],
-      "cautions": [
-        "成分無黑糖，像糖水加色素",
-        "感覺甜度很高",
-        "吃過一次就好，僅供嘗鮮"
-      ],
-      "excerpt": "口感像果凍，僅適合嘗鮮、不推薦",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791810933.A.23F.html",
-        "https://www.ptt.cc/bbs/CVS/M.1792045537.A.783.html"
-      ],
-      "latestDate": "2026-10-15",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
       "id": "全家::味全高鈣高蛋白雙效營養牛乳",
       "brand": "全家",
       "productName": "味全高鈣高蛋白雙效營養牛乳",
@@ -63234,6 +63237,43 @@
       ],
       "latestDate": "2026-09-12",
       "kcal": 809,
+      "nutrition": null
+    },
+    {
+      "id": "7-11::統一布丁焦糖爆走丁丁",
+      "brand": "7-11",
+      "productName": "統一布丁焦糖爆走丁丁",
+      "price": 18,
+      "category": "甜點",
+      "fairScore": 35,
+      "recommendationScore": 25,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 21,
+      "rawComments": 40,
+      "eligibleComments": 22,
+      "uniqueEligibleCommenters": 21,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 18,
+      "neutralPct": 14,
+      "negativePct": 68,
+      "likes": [
+        "熱量比正常布丁低"
+      ],
+      "cautions": [
+        "成分無黑糖，被批像糖水加色素果凍",
+        "口感偏水，吃起來很糟"
+      ],
+      "excerpt": "口感像果凍，僅適合嘗鮮、不推薦",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791810933.A.23F.html",
+        "https://www.ptt.cc/bbs/CVS/M.1792045537.A.783.html"
+      ],
+      "latestDate": "2026-10-15",
+      "kcal": null,
       "nutrition": null
     },
     {
@@ -76929,6 +76969,42 @@
       "nutrition": null
     },
     {
+      "id": "全家::滿滿奶霜紅豆麵包",
+      "brand": "全家",
+      "productName": "滿滿奶霜紅豆麵包",
+      "price": 35,
+      "category": "麵包",
+      "fairScore": 65,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 0,
+      "rawComments": 1,
+      "eligibleComments": 0,
+      "uniqueEligibleCommenters": 0,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "餡料很多，奶霜沒融化更好食用",
+        "甜度適中，不會太誇張"
+      ],
+      "cautions": [
+        "單價35元，友善時光才會買"
+      ],
+      "excerpt": "餡料多，奶霜未融化較方便；甜度適中，麵包烤過更好吃",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792190904.A.8F7.html"
+      ],
+      "latestDate": "2026-10-17",
+      "kcal": 236,
+      "nutrition": null
+    },
+    {
       "id": "全家::火烤培根起司",
       "brand": "全家",
       "productName": "火烤培根起司",
@@ -82538,7 +82614,7 @@
         "https://www.ptt.cc/bbs/CVS/M.1782770397.A.8ED.html"
       ],
       "latestDate": "2026-06-30",
-      "kcal": null,
+      "kcal": 419,
       "nutrition": null
     },
     {
