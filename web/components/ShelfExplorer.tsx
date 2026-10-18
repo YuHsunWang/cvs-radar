@@ -28,6 +28,7 @@ import {
   isDataStale,
   sortProducts,
 } from '@/lib/data'
+import { DEFAULT_SORT, readViewParams, viewSearch } from '@/lib/view-url'
 
 const PAGE_SIZE = 30
 
@@ -140,7 +141,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [query, setQuery] = useState('')
   const [brand, setBrand] = useState<string | null>(null)
   const [category, setCategory] = useState<CategoryKey | null>(null)
-  const [sortKey, setSortKey] = useState<SortKey>('comprehensiveDesc')
+  const [sortKey, setSortKey] = useState<SortKey>(DEFAULT_SORT)
   const [hideNoScore, setHideNoScore] = useState(false)
   const [filters, setFilters] = useState<AdvancedFilters>({ fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
@@ -166,6 +167,11 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   // refresh, so at build time the data is always fresh; only the visitor's clock can
   // tell that refreshes have stopped.
   const [dataStale, setDataStale] = useState(false)
+  // The product most recently opened, carried in the URL so the address bar shares it.
+  const [openedId, setOpenedId] = useState<string | null>(null)
+  // URL writes wait until the shared view has been read, or the first render would erase it.
+  const [restored, setRestored] = useState(false)
+  const pendingScroll = useRef<string | null>(null)
 
   function openSheet(section = 'sort') {
     if (closeTimer.current) clearTimeout(closeTimer.current)
@@ -285,6 +291,52 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     )
   }, [brand, category, filters, hideNoScore, products, query, sortKey])
 
+  // Static export: only the client sees the query string, so restore it after mount.
+  useEffect(() => {
+    const view = readViewParams(window.location.search)
+    setQuery(view.query)
+    setBrand(view.brand)
+    setCategory(view.category)
+    setSortKey(view.sortKey)
+    setHideNoScore(view.hideNoScore)
+    const preset = DATE_PRESETS.find((item) => item.key === view.datePreset)
+    if (preset && preset.key !== 'all') {
+      setDatePreset(preset.key)
+      setFilters({ fromDate: preset.from(), toDate: '' })
+    }
+    if (view.product) {
+      setExpanded(new Set([view.product]))
+      setOpenedId(view.product)
+      pendingScroll.current = view.product
+    }
+    setRestored(true)
+  }, [])
+
+  useEffect(() => {
+    if (!restored) return
+    const search = viewSearch({ query, brand, category, datePreset, sortKey, hideNoScore, product: openedId })
+    window.history.replaceState(null, '', `${window.location.pathname}${search}`)
+  }, [restored, query, brand, category, datePreset, sortKey, hideNoScore, openedId])
+
+  // A shared product may sit past the first page: grow the list to it, then scroll there.
+  // Gated on `restored`: the restore effect's state lands one render later, and
+  // reading the default ordering first would consume the scroll at the wrong index.
+  useEffect(() => {
+    const id = pendingScroll.current
+    if (!restored || !id) return
+    const index = visibleProducts.findIndex((product) => product.id === id)
+    if (index < 0) {
+      pendingScroll.current = null
+      return
+    }
+    if (index >= visibleCount) {
+      setVisibleCount(index + 1)
+      return
+    }
+    pendingScroll.current = null
+    document.getElementById(`p-${id}`)?.scrollIntoView({ block: 'start' })
+  }, [restored, visibleProducts, visibleCount])
+
   const searchHitCount = useMemo(() => filterBySearch(products, query).length, [products, query])
 
   useEffect(() => {
@@ -310,6 +362,8 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   }
 
   function toggleProduct(product: Product) {
+    const closing = expanded.has(product.id)
+    setOpenedId((current) => (closing ? (current === product.id ? null : current) : product.id))
     setExpanded((current) => {
       const next = new Set(current)
       if (next.has(product.id)) {
