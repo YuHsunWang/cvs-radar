@@ -381,6 +381,20 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     })
   }
 
+  function toggleBrand(name: string) {
+    const next = brand === name ? null : name
+    setBrand(next)
+    resetPage()
+    if (next) trackFilterApply('brand', next)
+  }
+
+  function toggleCategory(key: CategoryKey) {
+    const next = category === key ? null : key
+    setCategory(next)
+    resetPage()
+    if (next) trackFilterApply('category', next)
+  }
+
   function clearAll() {
     setQuery('')
     setBrand(null)
@@ -412,12 +426,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             key={key}
             type="button"
             className={`sl-chip-btn${category === key ? ' sl-on' : ''}`}
-            onClick={() => {
-              const next = category === key ? null : key
-              setCategory(next)
-              resetPage()
-              if (next) trackFilterApply('category', next)
-            }}
+            onClick={() => toggleCategory(key)}
           >
             {key}
           </button>
@@ -445,12 +454,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
               key={name}
               type="button"
               className={`sl-chip-btn${brand === name ? ' sl-on' : ''}`}
-              onClick={() => {
-                const next = brand === name ? null : name
-                setBrand(next)
-                resetPage()
-                if (next) trackFilterApply('brand', next)
-              }}
+              onClick={() => toggleBrand(name)}
             >
               {name}
             </button>
@@ -533,17 +537,41 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         </div>
       </header>
 
-      <div className="sl-aislebar">
-        {dataStale ? (
-          <>
-            <span className="sl-ab-stale" role="status">
-              已超過 {DATA_STALE_DAYS} 天未更新
-            </span>
-            <span className="sl-ab-sep">·</span>
-          </>
-        ) : null}
-        <span>分數滿分 100</span>
-      </div>
+      {/* Phones only: one-tap brand and category toggles, so the common filters
+          don't sit behind the sheet. The "其他" buckets stay in the sheet. */}
+      <nav className="sl-quick" aria-label="快速篩選">
+        {brands.filter((name) => name !== '其他').map((name) => (
+          <button
+            key={name}
+            type="button"
+            className={`sl-quick-btn${brand === name ? ' sl-on' : ''}`}
+            aria-pressed={brand === name}
+            onClick={() => toggleBrand(name)}
+          >
+            {name}
+          </button>
+        ))}
+        <span className="sl-quick-sep" aria-hidden="true" />
+        {categoryKeys.filter((key) => key !== '其他').map((key) => (
+          <button
+            key={key}
+            type="button"
+            className={`sl-quick-btn${category === key ? ' sl-on' : ''}`}
+            aria-pressed={category === key}
+            onClick={() => toggleCategory(key)}
+          >
+            {key}
+          </button>
+        ))}
+      </nav>
+
+      {dataStale ? (
+        <div className="sl-aislebar">
+          <span className="sl-ab-stale" role="status">
+            已超過 {DATA_STALE_DAYS} 天未更新
+          </span>
+        </div>
+      ) : null}
 
       {/* Desktop / wide screens: filters inline. Hidden on mobile (sheet used). */}
       <div className="sl-controls" ref={inlineControls}>
@@ -554,28 +582,18 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <div className="sl-toolbar-row">{hideToggle}</div>
       </div>
 
-      <div className="sl-count">
-        <button
-          type="button"
-          className="sl-context-button"
-          title={sortKey === 'recentRecommendationDesc' ? '綜合評分結合心得新近程度與討論量' : undefined}
-          onClick={() => revealSection('sort')}
-        >
-          排序：{SORT_OPTIONS.find((option) => option.key === sortKey)?.label}
-        </button>
-        <div className="sl-filter-context">
+      {/* Phones only (CSS hides it on wide screens, where the inline bar already
+          shows every choice): names what the sheet has applied. */}
+      {activeFilterCount > 0 ? (
+        <div className="sl-count">
           <span className="sl-active-context">
-            {activeFilterCount === 0 ? '全部商品' : null}
             {brand ? <button type="button" className="sl-context-button" onClick={() => revealSection('brand')}>品牌：{brand}</button> : null}
             {category ? <button type="button" className="sl-context-button" onClick={() => revealSection('category')}>分類：{category}</button> : null}
             {datePreset !== 'all' ? <button type="button" className="sl-context-button" onClick={() => revealSection('date')}>最新心得：{DATE_PRESETS.find((preset) => preset.key === datePreset)?.label}</button> : null}
             {hideNoScore ? <button type="button" className="sl-context-button" onClick={() => revealSection('score')}>隱藏暫無綜合評分</button> : null}
           </span>
-          <button type="button" className="sl-context-button" onClick={() => revealSection()}>
-            篩選 {activeFilterCount}
-          </button>
         </div>
-      </div>
+      ) : null}
 
       <main className="sl-shelf">
         {visibleProducts.length === 0 ? (

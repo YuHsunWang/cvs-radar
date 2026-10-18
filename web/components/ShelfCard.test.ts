@@ -179,13 +179,14 @@ describe('truthful shelf results', () => {
     const html = renderToStaticMarkup(React.createElement(ShelfExplorer, { initialPayload: {
       products: [], generatedAt: '', siteBuiltAt: '2026-09-08T00:00:00Z',
     } }))
-    // Default sort is recent recommendation: raw score put one-review 100s at the top.
-    expect(html).toContain('排序：近期推薦')
-    expect(html).toContain('全部商品')
+    // The sort chips stay reachable; the 排序/全部商品/篩選 0 summary row and 分數滿分 100 were removed by the user.
+    expect(html).toContain('近期推薦')
+    expect(html).not.toContain('全部商品')
+    expect(html).not.toContain('分數滿分')
     // Product counts were dropped from the page on purpose; they add nothing to picking a product.
     expect(html).not.toContain('本區')
     expect(html).not.toContain('項商品')
-    expect(html).toContain('篩選 0')
+    expect(html).not.toContain('篩選 0')
     expect(html).toContain('沒有符合條件的商品')
     expect(html).toContain('更新時間不明')
     expect(html).not.toContain('2026/09/08')
