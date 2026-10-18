@@ -319,9 +319,11 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   }, [restored, query, brand, category, datePreset, sortKey, hideNoScore, openedId])
 
   // A shared product may sit past the first page: grow the list to it, then scroll there.
+  // Gated on `restored`: the restore effect's state lands one render later, and
+  // reading the default ordering first would consume the scroll at the wrong index.
   useEffect(() => {
     const id = pendingScroll.current
-    if (!id) return
+    if (!restored || !id) return
     const index = visibleProducts.findIndex((product) => product.id === id)
     if (index < 0) {
       pendingScroll.current = null
@@ -333,7 +335,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     }
     pendingScroll.current = null
     document.getElementById(`p-${id}`)?.scrollIntoView({ block: 'start' })
-  }, [visibleProducts, visibleCount])
+  }, [restored, visibleProducts, visibleCount])
 
   const searchHitCount = useMemo(() => filterBySearch(products, query).length, [products, query])
 
