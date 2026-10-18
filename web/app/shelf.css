@@ -278,8 +278,6 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   text-underline-offset: 3px;
   cursor: pointer;
 }
-.sl-filter-context { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.sl-filter-context > button { flex: none; }
 .sl-active-context {
   min-width: 0;
   display: -webkit-box;
@@ -536,16 +534,12 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   .sl-page:not(.ss-page) .sl-sign-title { font-size: 22px; }
   .sl-update-date { flex: 1; text-align: right; font-size: 12px; }
   .sl-searchwrap { order: 2; width: 100%; }
-  .sl-count > .sl-context-button { display: none; }
   .sl-shelf { margin-top: 12px; }
   .sl-score { width: 60px; height: 52px; font-size: 26px; }
   /* Phones: the summary line already tells cards apart, and the tile's width
      would wrap it. Category stays reachable through the filter sheet. */
   .sl-cat { display: none; }
   .sl-row { grid-template-columns: minmax(0, 1fr) auto; }
-  .sl-filter-context { flex-basis: 100%; }
-  .sl-filter-context > button { display: none; }
-  .sl-count { justify-content: space-between; }
   .sl-count .sl-context-button { text-decoration: none; font-size: 14px; }
 
   /* Inline filter bar is replaced by the sheet on phones. */
@@ -1025,9 +1019,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   }
   .sl-quick-btn.sl-on { background: var(--sl-accent); border-color: var(--sl-accent); color: #ffffff; }
   .sl-quick-sep { flex: none; width: 1px; margin: 6px 2px; background: var(--sl-line); }
-  /* With nothing applied the row only says 全部商品; the strip above already
-     shows that, so give the space to the first card. */
-  .sl-page:not(.ss-page) .sl-count.sl-idle { display: none; }
+}
+@media (min-width: 641px) {
+  .sl-page:not(.ss-page) .sl-count { display: none; }
 }
 
 /* ---- wide screens: two columns of cards ----
