@@ -942,3 +942,101 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 @media (max-width: 640px) {
   .sl-k-src a { min-height: 44px; min-width: 72px; }
 }
+
+/* ---- main list: controls and sheet follow the white/indigo header ----
+   The chips, sheet and load-more button still wore the retired shelf look
+   (near-black, yellow dot, beige) under the newer header. Scoped to the main
+   list; the soft-serve page keeps its own look. */
+.sl-page:not(.ss-page) {
+  --sl-accent: #312e81;
+  --sl-accent-soft: #eef0fb;
+  --sl-line: #e5e7eb;
+}
+.sl-page:not(.ss-page) .sl-chip-btn,
+.sl-page:not(.ss-page) .sl-datebtn {
+  border-color: var(--sl-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1f2937;
+  box-shadow: none;
+}
+.sl-page:not(.ss-page) .sl-chip-btn { padding-left: 12px; }
+.sl-page:not(.ss-page) .sl-chip-btn::before { display: none; }
+.sl-page:not(.ss-page) .sl-chip-btn.sl-on,
+.sl-page:not(.ss-page) .sl-datebtn.sl-on:not(.sl-on-pill) {
+  background: var(--sl-accent);
+  border-color: var(--sl-accent);
+  color: #ffffff;
+}
+.sl-page:not(.ss-page) .sl-chip-pill { border-radius: 999px; background: var(--sl-accent); }
+/* Sort buttons stay see-through so the sliding pill behind them shows. */
+.sl-page:not(.ss-page) .sl-datebtn.sl-on-pill { background: transparent; }
+.sl-page:not(.ss-page) .sl-datebtn.sl-on-pill.sl-on { color: #ffffff; border-color: var(--sl-accent); }
+.sl-page:not(.ss-page) .sl-eyebrow { font-family: var(--sl-cjk); letter-spacing: 0.04em; color: #6b7280; }
+.sl-page:not(.ss-page) .sl-check input { accent-color: var(--sl-accent); }
+.sl-page:not(.ss-page) :focus-visible { outline-color: #6366f1; }
+.sl-page:not(.ss-page) .sl-count { border-color: var(--sl-line); }
+.sl-page:not(.ss-page) .sl-loadmore button {
+  border: 1px solid var(--sl-line);
+  border-radius: 12px;
+  color: var(--sl-accent);
+}
+.sl-page:not(.ss-page) .sl-loadmore button:hover { background: var(--sl-accent-soft); }
+.sl-page:not(.ss-page) .sl-empty { border-color: var(--sl-line); border-radius: 14px; }
+.sl-page:not(.ss-page) .sl-empty button { color: var(--sl-accent); }
+.sl-page:not(.ss-page) .sl-foot { border-color: var(--sl-line); }
+@media (max-width: 640px) {
+  .sl-page:not(.ss-page) .sl-sheet { background: #ffffff; }
+  .sl-page:not(.ss-page) .sl-sheet-head,
+  .sl-page:not(.ss-page) .sl-sheet-foot { border-color: var(--sl-line); }
+  .sl-page:not(.ss-page) .sl-grabber { background: #d1d5db; }
+  .sl-page:not(.ss-page) .sl-sheet-backdrop { background: rgba(17, 24, 39, 0.4); }
+  .sl-page:not(.ss-page) .sl-sheet-clear { border-color: var(--sl-line); border-radius: 12px; }
+  .sl-page:not(.ss-page) .sl-sheet-apply { background: var(--sl-accent); border-color: var(--sl-accent); border-radius: 12px; }
+  .sl-page:not(.ss-page) .sl-fab-badge { background: #ffffff; border-color: var(--sl-accent); color: var(--sl-accent); }
+}
+
+/* ---- phones: quick filter strip under the search bar ---- */
+.sl-quick { display: none; }
+@media (max-width: 640px) {
+  .sl-quick {
+    display: flex;
+    gap: 8px;
+    margin: 0 -16px;
+    padding: 12px 16px 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .sl-quick::-webkit-scrollbar { display: none; }
+  .sl-quick-btn {
+    flex: none;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--sl-line);
+    border-radius: 999px;
+    background: #ffffff;
+    color: #1f2937;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .sl-quick-btn.sl-on { background: var(--sl-accent); border-color: var(--sl-accent); color: #ffffff; }
+  .sl-quick-sep { flex: none; width: 1px; margin: 6px 2px; background: var(--sl-line); }
+  /* With nothing applied the row only says 全部商品; the strip above already
+     shows that, so give the space to the first card. */
+  .sl-page:not(.ss-page) .sl-count.sl-idle { display: none; }
+}
+
+/* ---- wide screens: two columns of cards ----
+   align-items: start so opening one card doesn't stretch its neighbour. */
+@media (min-width: 900px) {
+  .sl-page:not(.ss-page) .sl-shelf {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 12px;
+  }
+}

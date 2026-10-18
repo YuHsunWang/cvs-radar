@@ -381,6 +381,20 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     })
   }
 
+  function toggleBrand(name: string) {
+    const next = brand === name ? null : name
+    setBrand(next)
+    resetPage()
+    if (next) trackFilterApply('brand', next)
+  }
+
+  function toggleCategory(key: CategoryKey) {
+    const next = category === key ? null : key
+    setCategory(next)
+    resetPage()
+    if (next) trackFilterApply('category', next)
+  }
+
   function clearAll() {
     setQuery('')
     setBrand(null)
@@ -412,12 +426,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             key={key}
             type="button"
             className={`sl-chip-btn${category === key ? ' sl-on' : ''}`}
-            onClick={() => {
-              const next = category === key ? null : key
-              setCategory(next)
-              resetPage()
-              if (next) trackFilterApply('category', next)
-            }}
+            onClick={() => toggleCategory(key)}
           >
             {key}
           </button>
@@ -445,12 +454,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
               key={name}
               type="button"
               className={`sl-chip-btn${brand === name ? ' sl-on' : ''}`}
-              onClick={() => {
-                const next = brand === name ? null : name
-                setBrand(next)
-                resetPage()
-                if (next) trackFilterApply('brand', next)
-              }}
+              onClick={() => toggleBrand(name)}
             >
               {name}
             </button>
@@ -533,6 +537,34 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         </div>
       </header>
 
+      {/* Phones only: one-tap brand and category toggles, so the common filters
+          don't sit behind the sheet. The "其他" buckets stay in the sheet. */}
+      <nav className="sl-quick" aria-label="快速篩選">
+        {brands.filter((name) => name !== '其他').map((name) => (
+          <button
+            key={name}
+            type="button"
+            className={`sl-quick-btn${brand === name ? ' sl-on' : ''}`}
+            aria-pressed={brand === name}
+            onClick={() => toggleBrand(name)}
+          >
+            {name}
+          </button>
+        ))}
+        <span className="sl-quick-sep" aria-hidden="true" />
+        {categoryKeys.filter((key) => key !== '其他').map((key) => (
+          <button
+            key={key}
+            type="button"
+            className={`sl-quick-btn${category === key ? ' sl-on' : ''}`}
+            aria-pressed={category === key}
+            onClick={() => toggleCategory(key)}
+          >
+            {key}
+          </button>
+        ))}
+      </nav>
+
       <div className="sl-aislebar">
         {dataStale ? (
           <>
@@ -554,7 +586,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <div className="sl-toolbar-row">{hideToggle}</div>
       </div>
 
-      <div className="sl-count">
+      <div className={`sl-count${activeFilterCount === 0 && !query.trim() ? ' sl-idle' : ''}`}>
         <button
           type="button"
           className="sl-context-button"
