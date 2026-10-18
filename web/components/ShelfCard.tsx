@@ -41,7 +41,7 @@ export default function ShelfCard({ product, isExpanded, onToggle }: ShelfCardPr
   const summary = (product.excerpt || '').split('；')[0].trim()
 
   return (
-    <article className="sl-label">
+    <article className="sl-label" id={`p-${product.id}`}>
       <button
         type="button"
         aria-expanded={isExpanded}
