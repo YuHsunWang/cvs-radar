@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-19T08:42:07+08:00",
+  "generatedAt": "2026-10-20T08:40:17+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -13092,41 +13092,6 @@
       "nutrition": null
     },
     {
-      "id": "7-11::黑金雙醬辣雞刈包",
-      "brand": "7-11",
-      "productName": "黑金雙醬辣雞刈包",
-      "price": 88,
-      "category": "鹹食",
-      "fairScore": 67,
-      "recommendationScore": 78,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 5,
-      "rawComments": 6,
-      "eligibleComments": 5,
-      "uniqueEligibleCommenters": 5,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 66,
-      "neutralPct": 17,
-      "negativePct": 17,
-      "likes": [
-        "辣度不高，酸黃瓜醬很搭"
-      ],
-      "cautions": [
-        "單個含667大卡"
-      ],
-      "excerpt": "芥末香、起司濃，炸雞有份量但偏軟",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792243643.A.F54.html"
-      ],
-      "latestDate": "2026-10-17",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
       "id": "全家::冰心可可脆絲蛋糕",
       "brand": "全家",
       "productName": "冰心可可脆絲蛋糕",
@@ -13173,6 +13138,58 @@
           "carbohydrate": 34.4,
           "sugar": 18.3,
           "sodium": 314.0
+        }
+      }
+    },
+    {
+      "id": "全家::滿滿奶霜芋頭麵包",
+      "brand": "全家",
+      "productName": "滿滿奶霜芋頭麵包",
+      "price": 35,
+      "category": "麵包",
+      "fairScore": 67,
+      "recommendationScore": 78,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 13,
+      "rawComments": 30,
+      "eligibleComments": 13,
+      "uniqueEligibleCommenters": 13,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 79,
+      "neutralPct": 14,
+      "negativePct": 7,
+      "likes": [
+        "麵包體有酵母香，配熱美式剛好",
+        "芋頭好吃，奶霜份量足",
+        "微烤後外酥內有固態奶霜，像甜點"
+      ],
+      "cautions": [
+        "加熱後奶霜沒融入麵包，可能是溫度低",
+        "奶霜甜度蓋過芋泥餡，怕甜者避開"
+      ],
+      "excerpt": "熱吃好吃，外酥內軟但芋泥冷；麵包不大、料應不少",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792104406.A.C70.html"
+      ],
+      "latestDate": "2026-10-16",
+      "kcal": 250,
+      "nutrition": {
+        "servingSize": "83 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 250.0,
+          "protein": 6.1,
+          "fat": 6.1,
+          "saturatedFat": 3.1,
+          "transFat": 0.0,
+          "carbohydrate": 42.5,
+          "sugar": 13.8,
+          "sodium": 242.0
         }
       }
     },
@@ -16792,58 +16809,6 @@
       "nutrition": null
     },
     {
-      "id": "全家::滿滿奶霜芋頭麵包",
-      "brand": "全家",
-      "productName": "滿滿奶霜芋頭麵包",
-      "price": 35,
-      "category": "麵包",
-      "fairScore": 65,
-      "recommendationScore": 75,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 11,
-      "rawComments": 27,
-      "eligibleComments": 11,
-      "uniqueEligibleCommenters": 11,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 75,
-      "neutralPct": 17,
-      "negativePct": 8,
-      "likes": [
-        "冷藏後口感很棒",
-        "冷凍後回溫，麵包體像生乳卷，配熱美式剛好",
-        "芋頭好吃，奶霜份量足"
-      ],
-      "cautions": [
-        "奶霜太甜，怕甜者避開",
-        "不建議加熱，常溫或冷藏吃"
-      ],
-      "excerpt": "熱吃好吃，外酥內軟但芋泥冷；麵包不大、料應不少",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792104406.A.C70.html"
-      ],
-      "latestDate": "2026-10-16",
-      "kcal": 250,
-      "nutrition": {
-        "servingSize": "83 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 250.0,
-          "protein": 6.1,
-          "fat": 6.1,
-          "saturatedFat": 3.1,
-          "transFat": 0.0,
-          "carbohydrate": 42.5,
-          "sugar": 13.8,
-          "sodium": 242.0
-        }
-      }
-    },
-    {
       "id": "全家::滿滿果乾切片軟歐",
       "brand": "全家",
       "productName": "滿滿果乾切片軟歐",
@@ -19367,6 +19332,41 @@
         "https://www.ptt.cc/bbs/CVS/M.1753331029.A.25F.html"
       ],
       "latestDate": "2025-07-24",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
+      "id": "7-11::姚德和牛蒡茶",
+      "brand": "7-11",
+      "productName": "姚德和牛蒡茶",
+      "price": 25,
+      "category": "飲料",
+      "fairScore": 63,
+      "recommendationScore": 72,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 5,
+      "rawComments": 6,
+      "eligibleComments": 5,
+      "uniqueEligibleCommenters": 5,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 67,
+      "neutralPct": 33,
+      "negativePct": 0,
+      "likes": [
+        "牛蒡味不重，整體喝起來順"
+      ],
+      "cautions": [
+        "牛蒡茶只能勉強喝完"
+      ],
+      "excerpt": "牛蒡味還原，初喝奇妙後越喝越順",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791450973.A.914.html"
+      ],
+      "latestDate": "2026-10-08",
       "kcal": null,
       "nutrition": null
     },
@@ -22500,39 +22500,6 @@
       "nutrition": null
     },
     {
-      "id": "7-11::姚德和牛蒡茶",
-      "brand": "7-11",
-      "productName": "姚德和牛蒡茶",
-      "price": 25,
-      "category": "飲料",
-      "fairScore": 62,
-      "recommendationScore": 70,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 4,
-      "rawComments": 5,
-      "eligibleComments": 4,
-      "uniqueEligibleCommenters": 4,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 60,
-      "neutralPct": 40,
-      "negativePct": 0,
-      "likes": [
-        "牛蒡味不重，整體喝起來很順"
-      ],
-      "cautions": [],
-      "excerpt": "牛蒡味還原，初喝奇妙後越喝越順",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791450973.A.914.html"
-      ],
-      "latestDate": "2026-10-08",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
       "id": "萊爾富::KIRIN冰結調酒甘王草莓",
       "brand": "萊爾富",
       "productName": "KIRIN冰結調酒甘王草莓",
@@ -22790,56 +22757,6 @@
       "latestDate": "2025-05-15",
       "kcal": null,
       "nutrition": null
-    },
-    {
-      "id": "全家::滿滿奶霜紅豆麵包",
-      "brand": "全家",
-      "productName": "滿滿奶霜紅豆麵包",
-      "price": 35,
-      "category": "麵包",
-      "fairScore": 62,
-      "recommendationScore": 70,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 5,
-      "rawComments": 15,
-      "eligibleComments": 5,
-      "uniqueEligibleCommenters": 5,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 67,
-      "neutralPct": 33,
-      "negativePct": 0,
-      "likes": [
-        "冷藏後奶霜冰涼，口感加分"
-      ],
-      "cautions": [
-        "當早餐可能太甜",
-        "感覺像重新包裝的類似產品"
-      ],
-      "excerpt": "餡料多，奶霜未融化較方便；甜度適中，麵包烤過更好吃",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792190904.A.8F7.html"
-      ],
-      "latestDate": "2026-10-17",
-      "kcal": 236,
-      "nutrition": {
-        "servingSize": "83 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 236.0,
-          "protein": 6.1,
-          "fat": 5.3,
-          "saturatedFat": 2.9,
-          "transFat": 0.0,
-          "carbohydrate": 40.8,
-          "sugar": 15.4,
-          "sodium": 234.0
-        }
-      }
     },
     {
       "id": "全家::滿滿起司燻腸洋芋堡",
@@ -23719,37 +23636,36 @@
       "nutrition": null
     },
     {
-      "id": "全家::仙女奶茶霜淇淋",
-      "brand": "全家",
-      "productName": "仙女奶茶霜淇淋",
-      "price": 28,
-      "category": "冰品",
+      "id": "7-11::黑金雙醬辣雞刈包",
+      "brand": "7-11",
+      "productName": "黑金雙醬辣雞刈包",
+      "price": 88,
+      "category": "鹹食",
       "fairScore": 61,
       "recommendationScore": 69,
       "consensus": "評價兩極",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 14,
-      "rawComments": 26,
-      "eligibleComments": 15,
-      "uniqueEligibleCommenters": 14,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 56,
-      "neutralPct": 19,
-      "negativePct": 25,
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 10,
+      "rawComments": 12,
+      "eligibleComments": 10,
+      "uniqueEligibleCommenters": 10,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 64,
+      "neutralPct": 9,
+      "negativePct": 27,
       "likes": [
-        "茶味和奶味都很重，蠻好吃",
-        "仙女口味偏甜不膩，口感偏雪酪"
+        "微辣，酸黃瓜醬很搭"
       ],
       "cautions": [
-        "不太清爽，粉末感很重"
+        "一個就有667卡",
+        "吃完覺得很油"
       ],
-      "excerpt": "茶香足，奶茶比例約2:1，甜度剛好且清爽；尾韻有淡淡紅茶香，不死甜",
+      "excerpt": "芥末香、起司濃，炸雞有份量但偏軟",
       "reviewProvisional": false,
       "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791120967.A.4D8.html",
-        "https://www.ptt.cc/bbs/CVS/M.1792237630.A.586.html"
+        "https://www.ptt.cc/bbs/CVS/M.1792243643.A.F54.html"
       ],
       "latestDate": "2026-10-17",
       "kcal": null,
@@ -30337,6 +30253,56 @@
       "nutrition": null
     },
     {
+      "id": "全家::滿滿奶霜紅豆麵包",
+      "brand": "全家",
+      "productName": "滿滿奶霜紅豆麵包",
+      "price": 35,
+      "category": "麵包",
+      "fairScore": 58,
+      "recommendationScore": 63,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 7,
+      "rawComments": 19,
+      "eligibleComments": 8,
+      "uniqueEligibleCommenters": 7,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 50,
+      "neutralPct": 37,
+      "negativePct": 13,
+      "likes": [
+        "冷藏吃奶霜涼涼的，口感加分"
+      ],
+      "cautions": [
+        "冷藏退冰一小時，甜到爆炸",
+        "冷藏剛好，冷凍後不好咬"
+      ],
+      "excerpt": "餡料多，奶霜未融化較方便；甜度適中，麵包烤過更好吃",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792190904.A.8F7.html"
+      ],
+      "latestDate": "2026-10-17",
+      "kcal": 236,
+      "nutrition": {
+        "servingSize": "83 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 236.0,
+          "protein": 6.1,
+          "fat": 5.3,
+          "saturatedFat": 2.9,
+          "transFat": 0.0,
+          "carbohydrate": 40.8,
+          "sugar": 15.4,
+          "sodium": 234.0
+        }
+      }
+    },
+    {
       "id": "全家::西京燒鱈魚燕麥飯糰",
       "brand": "全家",
       "productName": "西京燒鱈魚燕麥飯糰",
@@ -32030,6 +31996,46 @@
         "https://www.ptt.cc/bbs/CVS/M.1765633718.A.F43.html"
       ],
       "latestDate": "2025-12-13",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
+      "id": "全家::仙女奶茶霜淇淋",
+      "brand": "全家",
+      "productName": "仙女奶茶霜淇淋",
+      "price": 28,
+      "category": "冰品",
+      "fairScore": 57,
+      "recommendationScore": 62,
+      "consensus": "評價兩極",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 17,
+      "rawComments": 32,
+      "eligibleComments": 18,
+      "uniqueEligibleCommenters": 17,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 47,
+      "neutralPct": 21,
+      "negativePct": 32,
+      "likes": [
+        "下午5點至8:59特價29元",
+        "茶味、奶味都偏重，蠻好吃",
+        "茶味夠、不死甜，單口味較好吃"
+      ],
+      "cautions": [
+        "偏甜，喝起來像立頓奶茶",
+        "不太清爽，粉末感很重",
+        "吃到後面很甜很膩"
+      ],
+      "excerpt": "茶香足，奶茶比例約2:1，甜度剛好且清爽；尾韻有淡淡紅茶香，不死甜",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791120967.A.4D8.html",
+        "https://www.ptt.cc/bbs/CVS/M.1792237630.A.586.html"
+      ],
+      "latestDate": "2026-10-17",
       "kcal": null,
       "nutrition": null
     },
@@ -34296,6 +34302,41 @@
         "https://www.ptt.cc/bbs/CVS/M.1783390157.A.3D5.html"
       ],
       "latestDate": "2026-07-07",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
+      "id": "7-11::茅根涼茶",
+      "brand": "7-11",
+      "productName": "茅根涼茶",
+      "price": 25,
+      "category": "飲料",
+      "fairScore": 56,
+      "recommendationScore": 60,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 11,
+      "rawComments": 14,
+      "eligibleComments": 11,
+      "uniqueEligibleCommenters": 11,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 58,
+      "neutralPct": 17,
+      "negativePct": 25,
+      "likes": [
+        "茅根加薄荷，喝起來很消暑"
+      ],
+      "cautions": [
+        "茅根涼茶喝沒幾口就倒掉"
+      ],
+      "excerpt": "無糖帶自然甜味，冰喝清爽且口感回涼",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791450973.A.914.html"
+      ],
+      "latestDate": "2026-10-08",
       "kcal": null,
       "nutrition": null
     },
@@ -39692,42 +39733,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1784470043.A.B77.html"
       ],
       "latestDate": "2026-07-19",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
-      "id": "7-11::茅根涼茶",
-      "brand": "7-11",
-      "productName": "茅根涼茶",
-      "price": 25,
-      "category": "飲料",
-      "fairScore": 53,
-      "recommendationScore": 55,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 9,
-      "rawComments": 12,
-      "eligibleComments": 9,
-      "uniqueEligibleCommenters": 9,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 60,
-      "neutralPct": 10,
-      "negativePct": 30,
-      "likes": [
-        "不算特別好喝，卻會想一直喝",
-        "加薄荷，喝起來蠻消暑"
-      ],
-      "cautions": [
-        "茅根涼茶喝沒幾口就倒掉"
-      ],
-      "excerpt": "無糖帶自然甜味，冰喝清爽且口感回涼",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791450973.A.914.html"
-      ],
-      "latestDate": "2026-10-08",
       "kcal": null,
       "nutrition": null
     },
