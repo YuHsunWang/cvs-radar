@@ -2740,6 +2740,30 @@ class ExcerptLabelCacheTest(unittest.TestCase):
             )
         excerpt_module._cached_excerpt_labels.cache_clear()
 
+    def test_semicolon_inside_one_rewrite_does_not_look_like_a_second_post(self) -> None:
+        # The UI counts 「；」-separated parts as posts ("N 篇整理") next to the
+        # source-link count; one post must stay one part.
+        from cvs_radar.scoring import excerpt as excerpt_module
+
+        post = Post(id="M.1", product_name="芋頭麵包", review_text="熱吃好吃。麵包不大。")
+        key = excerpt_fingerprint_v2(
+            post.id,
+            post.product_name,
+            post.review_text,
+            brand=post.brand,
+            other_products=excerpt_module.format_other_products(post.sibling_products),
+            candidate_sentences=_body_candidates([post]),
+        )
+        with patch.object(
+            excerpt_module,
+            "load_excerpt_labels",
+            return_value={key: ExcerptLabel((0,), "熱吃好吃；麵包不大")},
+        ):
+            excerpt_module._cached_excerpt_labels.cache_clear()
+            text = excerpt_module._labelled_excerpt([post], max_len=200)
+        excerpt_module._cached_excerpt_labels.cache_clear()
+        self.assertEqual(text, "熱吃好吃，麵包不大")
+
     def test_sibling_products_are_part_of_the_current_key(self) -> None:
         # Every split item keeps the whole review_text, so the sibling list is the
         # only thing keeping a thread-mate's sentences out of this excerpt. If
