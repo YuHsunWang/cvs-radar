@@ -124,7 +124,9 @@ def _labelled_excerpt(posts: list[Post], max_len: int) -> str | None:
         if any(index >= len(candidates) for index in label.source_indices):
             missing_label = True
             continue
-        rewrite = label.rewrite
+        # The joiner marks post boundaries, so a 「；」 inside one rewrite would be
+        # read downstream as a second post. Keep it a comma.
+        rewrite = (label.rewrite or "").replace(EXCERPT_JOINER, "，")
         if not rewrite or any(_review_sentences_similar(rewrite, item) for item in chosen):
             continue
         candidate = EXCERPT_JOINER.join([*chosen, rewrite])
