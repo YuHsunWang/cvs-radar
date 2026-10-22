@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T08:42:30+08:00",
+  "generatedAt": "2026-10-22T08:41:16+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -3432,7 +3432,7 @@
       "cautions": [
         "辣肉燥有點鹹"
       ],
-      "excerpt": "辣肉燥偏鹹，需拌勻；整體好吃",
+      "excerpt": "辣肉燥偏鹹，需拌勻，整體好吃",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1752154900.A.318.html"
@@ -10978,6 +10978,58 @@
       "nutrition": null
     },
     {
+      "id": "全家::滿滿奶霜芋頭麵包",
+      "brand": "全家",
+      "productName": "滿滿奶霜芋頭麵包",
+      "price": 35,
+      "category": "麵包",
+      "fairScore": 69,
+      "recommendationScore": 81,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 16,
+      "rawComments": 33,
+      "eligibleComments": 16,
+      "uniqueEligibleCommenters": 16,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 82,
+      "neutralPct": 12,
+      "negativePct": 6,
+      "likes": [
+        "冷凍退冰後有酵母香，配熱美式剛好",
+        "芋頭好吃，奶霜夠多",
+        "微烤後表面酥脆、內餡仍固態"
+      ],
+      "cautions": [
+        "加熱後奶霜未融化，可能因溫度低",
+        "奶霜甜度蓋過芋泥餡，怕甜慎買"
+      ],
+      "excerpt": "熱吃好吃，外酥內軟但芋泥冷，麵包不大、料應不少",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792104406.A.C70.html"
+      ],
+      "latestDate": "2026-10-16",
+      "kcal": 250,
+      "nutrition": {
+        "servingSize": "83 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 250.0,
+          "protein": 6.1,
+          "fat": 6.1,
+          "saturatedFat": 3.1,
+          "transFat": 0.0,
+          "carbohydrate": 42.5,
+          "sugar": 13.8,
+          "sodium": 242.0
+        }
+      }
+    },
+    {
       "id": "全家::瑪利歐抹茶菠蘿",
       "brand": "全家",
       "productName": "瑪利歐抹茶菠蘿",
@@ -11306,6 +11358,43 @@
       "nutrition": null
     },
     {
+      "id": "全家::海鮮烘蛋燴飯",
+      "brand": "全家",
+      "productName": "海鮮烘蛋燴飯",
+      "price": 95,
+      "category": "便當",
+      "fairScore": 68,
+      "recommendationScore": 80,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 17,
+      "rawComments": 18,
+      "eligibleComments": 17,
+      "uniqueEligibleCommenters": 17,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 78,
+      "neutralPct": 17,
+      "negativePct": 5,
+      "likes": [
+        "烘蛋燴飯醬汁不錯",
+        "配料不錯但調味偏甜",
+        "友善價可回購"
+      ],
+      "cautions": [
+        "肚子很餓也吃不完"
+      ],
+      "excerpt": "烘蛋濕潤、海鮮無腥味，會回購",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1731316770.A.C4C.html"
+      ],
+      "latestDate": "2024-11-11",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
       "id": "全家::起司牛奶鍋",
       "brand": "全家",
       "productName": "起司牛奶鍋",
@@ -11536,43 +11625,6 @@
           "sodium": 35.0
         }
       }
-    },
-    {
-      "id": "全家::海鮮烘蛋燴飯",
-      "brand": "全家",
-      "productName": "海鮮烘蛋燴飯",
-      "price": 95,
-      "category": "便當",
-      "fairScore": 68,
-      "recommendationScore": 80,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 17,
-      "rawComments": 18,
-      "eligibleComments": 17,
-      "uniqueEligibleCommenters": 17,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 78,
-      "neutralPct": 17,
-      "negativePct": 5,
-      "likes": [
-        "烘蛋燴飯醬汁不錯",
-        "配料不錯但調味偏甜",
-        "友善價可回購"
-      ],
-      "cautions": [
-        "肚子很餓也吃不完"
-      ],
-      "excerpt": "烘蛋濕潤、海鮮無腥味，會回購",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1731316770.A.C4C.html"
-      ],
-      "latestDate": "2024-11-11",
-      "kcal": null,
-      "nutrition": null
     },
     {
       "id": "全家::紅心芭樂牛奶",
@@ -12232,58 +12284,6 @@
       "nutrition": null
     },
     {
-      "id": "全家::滿滿奶霜芋頭麵包",
-      "brand": "全家",
-      "productName": "滿滿奶霜芋頭麵包",
-      "price": 35,
-      "category": "麵包",
-      "fairScore": 68,
-      "recommendationScore": 80,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 15,
-      "rawComments": 32,
-      "eligibleComments": 15,
-      "uniqueEligibleCommenters": 15,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 81,
-      "neutralPct": 13,
-      "negativePct": 6,
-      "likes": [
-        "冷藏後口感很棒",
-        "芋頭好吃，奶霜份量足",
-        "冷凍微烤後外酥，奶霜仍維持固態"
-      ],
-      "cautions": [
-        "奶霜甜度蓋過芋泥，怕甜者避開",
-        "單吃偏甜，配咖啡較適合"
-      ],
-      "excerpt": "熱吃好吃，外酥內軟但芋泥冷；麵包不大、料應不少",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792104406.A.C70.html"
-      ],
-      "latestDate": "2026-10-16",
-      "kcal": 250,
-      "nutrition": {
-        "servingSize": "83 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 250.0,
-          "protein": 6.1,
-          "fat": 6.1,
-          "saturatedFat": 3.1,
-          "transFat": 0.0,
-          "carbohydrate": 42.5,
-          "sugar": 13.8,
-          "sodium": 242.0
-        }
-      }
-    },
-    {
       "id": "全家::玩具總動員光敏印章",
       "brand": "全家",
       "productName": "玩具總動員光敏印章",
@@ -12459,7 +12459,7 @@
       "cautions": [
         "椰奶人工味很重"
       ],
-      "excerpt": "比撞奶不甜，椰奶濃厚清爽；怕甜可少加珍珠",
+      "excerpt": "比撞奶不甜，椰奶濃厚清爽，怕甜可少加珍珠",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1723101829.A.4FF.html"
@@ -12717,7 +12717,7 @@
       "cautions": [
         "味道特別，但不會回購"
       ],
-      "excerpt": "花生香菜味明顯，越吃越涮嘴；39元只買一次；先香菜後花生糖，味道很還原",
+      "excerpt": "花生香菜味明顯，越吃越涮嘴，39元只買一次；先香菜後花生糖，味道很還原",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1767708610.A.431.html",
@@ -14061,7 +14061,7 @@
         "起司奶味充足，微波後更好吃"
       ],
       "cautions": [],
-      "excerpt": "日式蛋捲口感，起司奶味足；微波後更美味",
+      "excerpt": "日式蛋捲口感，起司奶味足，微波後更美味",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1777024333.A.A9D.html"
@@ -20735,6 +20735,43 @@
       "nutrition": null
     },
     {
+      "id": "7-11::黑金雙醬辣雞刈包",
+      "brand": "7-11",
+      "productName": "黑金雙醬辣雞刈包",
+      "price": 88,
+      "category": "鹹食",
+      "fairScore": 63,
+      "recommendationScore": 71,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 12,
+      "rawComments": 15,
+      "eligibleComments": 12,
+      "uniqueEligibleCommenters": 12,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 62,
+      "neutralPct": 15,
+      "negativePct": 23,
+      "likes": [
+        "辣度低，搭酸黃瓜醬",
+        "部分雞肉酥脆，醬料夠配"
+      ],
+      "cautions": [
+        "一個就667卡",
+        "吃完只覺得油"
+      ],
+      "excerpt": "芥末香、起司濃，炸雞有份量但偏軟",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792243643.A.F54.html"
+      ],
+      "latestDate": "2026-10-17",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
       "id": "全家::摩登燒",
       "brand": "全家",
       "productName": "摩登燒",
@@ -21339,6 +21376,57 @@
       "nutrition": null
     },
     {
+      "id": "全家::滿滿奶霜紅豆麵包",
+      "brand": "全家",
+      "productName": "滿滿奶霜紅豆麵包",
+      "price": 35,
+      "category": "麵包",
+      "fairScore": 62,
+      "recommendationScore": 71,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 9,
+      "rawComments": 23,
+      "eligibleComments": 10,
+      "uniqueEligibleCommenters": 9,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 60,
+      "neutralPct": 30,
+      "negativePct": 10,
+      "likes": [
+        "冷藏吃，奶霜涼爽且增加口感",
+        "冷凍後烤過蠻好吃"
+      ],
+      "cautions": [
+        "甜到爆炸，不太OK",
+        "冷凍後不好咬"
+      ],
+      "excerpt": "餡料多，奶霜未融化較方便，甜度適中，麵包烤過更好吃",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792190904.A.8F7.html"
+      ],
+      "latestDate": "2026-10-17",
+      "kcal": 236,
+      "nutrition": {
+        "servingSize": "83 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 236.0,
+          "protein": 6.1,
+          "fat": 5.3,
+          "saturatedFat": 2.9,
+          "transFat": 0.0,
+          "carbohydrate": 40.8,
+          "sugar": 15.4,
+          "sodium": 234.0
+        }
+      }
+    },
+    {
       "id": "全家::牛排館風味奶香餐包",
       "brand": "全家",
       "productName": "牛排館風味奶香餐包",
@@ -21404,7 +21492,7 @@
       "cautions": [
         "蒜味重到發臭，湯也太鹹"
       ],
-      "excerpt": "蒜味濃，芡不稠，肉塊大且嫩；蒜味濃，肉約4至5塊；湯非南部味",
+      "excerpt": "蒜味濃，芡不稠，肉塊大且嫩；蒜味濃，肉約4至5塊，湯非南部味",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1756965108.A.3E6.html",
@@ -21519,6 +21607,41 @@
         "https://www.ptt.cc/bbs/CVS/M.1759542060.A.640.html"
       ],
       "latestDate": "2025-10-04",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
+      "id": "7-11::飛燕煉乳炸銀絲卷",
+      "brand": "7-11",
+      "productName": "飛燕煉乳炸銀絲卷",
+      "price": 49,
+      "category": "鹹食",
+      "fairScore": 62,
+      "recommendationScore": 71,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 12,
+      "rawComments": 16,
+      "eligibleComments": 13,
+      "uniqueEligibleCommenters": 12,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 69,
+      "neutralPct": 8,
+      "negativePct": 23,
+      "likes": [
+        "份量約三個小饅頭，還不錯"
+      ],
+      "cautions": [
+        "加上煉乳後偏甜"
+      ],
+      "excerpt": "煉乳偏甜但好吃，份量約三個小饅頭",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1776688011.A.F8B.html"
+      ],
+      "latestDate": "2026-04-20",
       "kcal": null,
       "nutrition": null
     },
@@ -21755,41 +21878,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1733275663.A.70E.html"
       ],
       "latestDate": "2024-12-04",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
-      "id": "7-11::飛燕煉乳炸銀絲卷",
-      "brand": "7-11",
-      "productName": "飛燕煉乳炸銀絲卷",
-      "price": 49,
-      "category": "鹹食",
-      "fairScore": 62,
-      "recommendationScore": 70,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 12,
-      "rawComments": 16,
-      "eligibleComments": 13,
-      "uniqueEligibleCommenters": 12,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 69,
-      "neutralPct": 8,
-      "negativePct": 23,
-      "likes": [
-        "份量約三個小饅頭，還不錯"
-      ],
-      "cautions": [
-        "加上煉乳後偏甜"
-      ],
-      "excerpt": "煉乳偏甜但好吃，份量約三個小饅頭",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1776688011.A.F8B.html"
-      ],
-      "latestDate": "2026-04-20",
       "kcal": null,
       "nutrition": null
     },
@@ -23669,42 +23757,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1777608345.A.AB2.html"
       ],
       "latestDate": "2026-05-01",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
-      "id": "7-11::黑金雙醬辣雞刈包",
-      "brand": "7-11",
-      "productName": "黑金雙醬辣雞刈包",
-      "price": 88,
-      "category": "鹹食",
-      "fairScore": 61,
-      "recommendationScore": 69,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 10,
-      "rawComments": 13,
-      "eligibleComments": 10,
-      "uniqueEligibleCommenters": 10,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 64,
-      "neutralPct": 9,
-      "negativePct": 27,
-      "likes": [
-        "辣度低，酸黃瓜醬很搭"
-      ],
-      "cautions": [
-        "單個熱量667大卡",
-        "吃完只覺得油膩"
-      ],
-      "excerpt": "芥末香、起司濃，炸雞有份量但偏軟",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792243643.A.F54.html"
-      ],
-      "latestDate": "2026-10-17",
       "kcal": null,
       "nutrition": null
     },
@@ -25591,7 +25643,7 @@
         "有人覺得一顆45元偏貴",
         "葡萄與豆沙不搭，整體普普"
       ],
-      "excerpt": "綠葡萄多汁，白豆沙有顆粒感；大福皮Q彈，綠葡萄脆甜多汁；白鳳豆餡清爽但豆味明顯；綠葡萄甜爆汁，搭豆泥和諧，沒有咬籽感",
+      "excerpt": "綠葡萄多汁，白豆沙有顆粒感；大福皮Q彈，綠葡萄脆甜多汁，白鳳豆餡清爽但豆味明顯；綠葡萄甜爆汁，搭豆泥和諧，沒有咬籽感",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1756203560.A.153.html",
@@ -25867,57 +25919,6 @@
       "nutrition": null
     },
     {
-      "id": "全家::滿滿奶霜紅豆麵包",
-      "brand": "全家",
-      "productName": "滿滿奶霜紅豆麵包",
-      "price": 35,
-      "category": "麵包",
-      "fairScore": 60,
-      "recommendationScore": 67,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 8,
-      "rawComments": 20,
-      "eligibleComments": 9,
-      "uniqueEligibleCommenters": 8,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 56,
-      "neutralPct": 33,
-      "negativePct": 11,
-      "likes": [
-        "冷藏後奶霜冰涼，口感更好",
-        "冷藏吃紅豆餡蠻好吃",
-        "冷凍後烤過也好吃"
-      ],
-      "cautions": [
-        "冷藏退冰後甜到爆"
-      ],
-      "excerpt": "餡料多，奶霜未融化較方便；甜度適中，麵包烤過更好吃",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792190904.A.8F7.html"
-      ],
-      "latestDate": "2026-10-17",
-      "kcal": 236,
-      "nutrition": {
-        "servingSize": "83 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 236.0,
-          "protein": 6.1,
-          "fat": 5.3,
-          "saturatedFat": 2.9,
-          "transFat": 0.0,
-          "carbohydrate": 40.8,
-          "sugar": 15.4,
-          "sodium": 234.0
-        }
-      }
-    },
-    {
       "id": "全家::焙茶酥頂點心杯",
       "brand": "全家",
       "productName": "焙茶酥頂點心杯",
@@ -26020,7 +26021,7 @@
         "巧克力偏甜，約半糖以上",
         "花生奶油吃多會偏鹹"
       ],
-      "excerpt": "巧克力苦甜，花生醬濃郁帶鹹；分開吃較好；巧克力奶油好吃，花生奶油顆粒多但偏鹹",
+      "excerpt": "巧克力苦甜，花生醬濃郁帶鹹，分開吃較好；巧克力奶油好吃，花生奶油顆粒多但偏鹹",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1762944202.A.5C6.html",
@@ -26119,8 +26120,8 @@
       "independentThreads": 8,
       "volumeLevel": "充足",
       "positivePct": 65,
-      "neutralPct": 17,
-      "negativePct": 18,
+      "neutralPct": 16,
+      "negativePct": 19,
       "likes": [
         "15元一支很值得，還買四支囤",
         "紅豆搭牛奶很合"
@@ -26576,7 +26577,7 @@
         "不會回購",
         "喝到後段變難喝"
       ],
-      "excerpt": "酒香像輕盈版奶酒，甜度使高粱更順口好喝；糖漿降低酒精感，讓拿鐵酒香融合；甜度約微糖至半糖",
+      "excerpt": "酒香像輕盈版奶酒，甜度使高粱更順口好喝；糖漿降低酒精感，讓拿鐵酒香融合，甜度約微糖至半糖",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1732790941.A.583.html",
@@ -27191,7 +27192,7 @@
         "蛋黃是加工醬，不是真蛋黃",
         "飯糰很小"
       ],
-      "excerpt": "蛋黃流心，熱食似滷肉飯，但飯糰易散；蛋黃僅一點但有流心，飯糰口感單調；味道還行，燒肉偏少；蛋黃爆汁",
+      "excerpt": "蛋黃流心，熱食似滷肉飯，但飯糰易散；蛋黃僅一點但有流心，飯糰口感單調；味道還行，燒肉偏少，蛋黃爆汁",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1756919624.A.54A.html",
@@ -27668,7 +27669,7 @@
         "味道像很甜的即溶咖啡",
         "喝起來只是咖啡廣場的味道"
       ],
-      "excerpt": "偏甜但咖啡香濃，冰塊融化不影響味道；味道偏甜易膩，像即溶咖啡；附保冰提袋實用",
+      "excerpt": "偏甜但咖啡香濃，冰塊融化不影響味道；味道偏甜易膩，像即溶咖啡，附保冰提袋實用",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1724227827.A.771.html",
@@ -27932,7 +27933,7 @@
         "偏好圓麵，扁麵口感普通",
         "味道不錯但份量很少"
       ],
-      "excerpt": "味道較原版淡，原價70分；點數換購很可以",
+      "excerpt": "味道較原版淡，原價70分，點數換購很可以",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1755684310.A.E4D.html"
@@ -28088,7 +28089,7 @@
         "麵多但配料少",
         "醬汁超鹹，不會回購"
       ],
-      "excerpt": "麵條細有口感，微辣帶花椒香；油豆腐少",
+      "excerpt": "麵條細有口感，微辣帶花椒香，油豆腐少",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1752146718.A.A6B.html"
@@ -28693,6 +28694,46 @@
       "nutrition": null
     },
     {
+      "id": "全家::仙女奶茶霜淇淋",
+      "brand": "全家",
+      "productName": "仙女奶茶霜淇淋",
+      "price": 28,
+      "category": "冰品",
+      "fairScore": 59,
+      "recommendationScore": 65,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 23,
+      "rawComments": 40,
+      "eligibleComments": 24,
+      "uniqueEligibleCommenters": 23,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 52,
+      "neutralPct": 20,
+      "negativePct": 28,
+      "likes": [
+        "單口味茶味夠、不死甜",
+        "仙女口味偏雪酪，甜但不膩",
+        "不錯吃，已回購"
+      ],
+      "cautions": [
+        "不夠清爽，粉末感重",
+        "吃到後面很甜很膩，比原本更甜",
+        "味道像奶茶冰沙，表現普通"
+      ],
+      "excerpt": "茶香足，奶茶比例約2:1，甜度剛好且清爽；尾韻有淡淡紅茶香，不死甜",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791120967.A.4D8.html",
+        "https://www.ptt.cc/bbs/CVS/M.1792237630.A.586.html"
+      ],
+      "latestDate": "2026-10-17",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
       "id": "全家::多喝水STAYCOOL酷涼礦物質補給飲",
       "brand": "全家",
       "productName": "多喝水STAYCOOL酷涼礦物質補給飲",
@@ -28721,7 +28762,7 @@
         "喝起來超難喝",
         "買一瓶喝不完"
       ],
-      "excerpt": "含海鹽代糖，有薄荷涼感；冰喝尚可但不算好喝",
+      "excerpt": "含海鹽代糖，有薄荷涼感，冰喝尚可但不算好喝",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1733576344.A.77C.html"
@@ -29210,7 +29251,7 @@
         "南瓜子太多，吃起來很膩",
         "價格太貴"
       ],
-      "excerpt": "黑糖餡多不膩，肉桂淡、南瓜子多；麵包鬆軟；肉桂味明顯、甜度高，內餡給得滿；麵包偏乾，烤過後肉桂香濃但偏甜；堅果種類較少，入口肉桂味重，甜度約七分",
+      "excerpt": "黑糖餡多不膩，肉桂淡、南瓜子多，麵包鬆軟；肉桂味明顯、甜度高，內餡給得滿；麵包偏乾，烤過後肉桂香濃但偏甜；堅果種類較少，入口肉桂味重，甜度約七分",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1719746919.A.FB0.html",
@@ -29322,7 +29363,7 @@
         "辣度偏低",
         "原價雞肉有點少"
       ],
-      "excerpt": "醬汁帶香微麻，基本不辣；雞肉不少",
+      "excerpt": "醬汁帶香微麻，基本不辣，雞肉不少",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1756621614.A.ED7.html"
@@ -29966,45 +30007,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1728739496.A.B8E.html"
       ],
       "latestDate": "2024-10-12",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
-      "id": "全家::仙女奶茶霜淇淋",
-      "brand": "全家",
-      "productName": "仙女奶茶霜淇淋",
-      "price": 28,
-      "category": "冰品",
-      "fairScore": 58,
-      "recommendationScore": 64,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 20,
-      "rawComments": 36,
-      "eligibleComments": 21,
-      "uniqueEligibleCommenters": 20,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 50,
-      "neutralPct": 23,
-      "negativePct": 27,
-      "likes": [
-        "茶味與奶味都濃，整體好吃",
-        "茶味足，不會死甜"
-      ],
-      "cautions": [
-        "偏甜，像立頓奶茶",
-        "不清爽，粉末感重",
-        "吃到後面偏甜且膩，比原版更甜"
-      ],
-      "excerpt": "茶香足，奶茶比例約2:1，甜度剛好且清爽；尾韻有淡淡紅茶香，不死甜",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791120967.A.4D8.html",
-        "https://www.ptt.cc/bbs/CVS/M.1792237630.A.586.html"
-      ],
-      "latestDate": "2026-10-17",
       "kcal": null,
       "nutrition": null
     },
@@ -34711,7 +34713,7 @@
       "cautions": [
         "外皮太軟爛，不好吃"
       ],
-      "excerpt": "皮偏軟，奶油餡空洞，吃完有點空虛；內餡過甜，麻糬皮Q軟；冷藏太軟易破",
+      "excerpt": "皮偏軟，奶油餡空洞，吃完有點空虛；內餡過甜，麻糬皮Q軟，冷藏太軟易破",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1741159162.A.452.html",
@@ -35012,7 +35014,7 @@
       "cautions": [
         "粉紅色那卷味道很可怕"
       ],
-      "excerpt": "綠色酸辣清爽有青木瓜絲；粉色醬香濃但口味單一",
+      "excerpt": "綠色酸辣清爽有青木瓜絲，粉色醬香濃但口味單一",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1724921180.A.222.html"
@@ -35661,7 +35663,7 @@
       "cautions": [
         "牛奶甜味蓋過仙草味"
       ],
-      "excerpt": "仙草味濃郁不膩，單吃清爽；綜合時牛奶搶味",
+      "excerpt": "仙草味濃郁不膩，單吃清爽，綜合時牛奶搶味",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1751474209.A.74B.html"
@@ -36213,7 +36215,7 @@
         "好喝，但真的很甜",
         "吸管不合，吸不起來"
       ],
-      "excerpt": "甜味來自配料，粉角Q且帶冬瓜糖味；熱量偏高",
+      "excerpt": "甜味來自配料，粉角Q且帶冬瓜糖味，熱量偏高",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1755233184.A.32D.html"
@@ -36434,7 +36436,7 @@
       "cautions": [
         "適合嚐鮮，但不特別喜歡也不回購"
       ],
-      "excerpt": "椰奶味濃，像剉冰；作飲料偏厚重",
+      "excerpt": "椰奶味濃，像剉冰，作飲料偏厚重",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1724980535.A.ACE.html"
@@ -37581,7 +37583,7 @@
         "牛肉換成巴拉圭牛",
         "飯多料少，味道普通"
       ],
-      "excerpt": "肉片約3至4片，滑蛋成塊；飯量多",
+      "excerpt": "肉片約3至4片，滑蛋成塊，飯量多",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1756515564.A.143.html"
@@ -38185,9 +38187,9 @@
       "uniqueEligibleCommenters": 9,
       "independentThreads": 1,
       "volumeLevel": "中等",
-      "positivePct": 51,
+      "positivePct": 50,
       "neutralPct": 0,
-      "negativePct": 49,
+      "negativePct": 50,
       "likes": [
         "小七版本吃起來不錯"
       ],
@@ -39743,7 +39745,7 @@
       "price": 59,
       "category": "便當",
       "fairScore": 53,
-      "recommendationScore": 54,
+      "recommendationScore": 55,
       "consensus": "褒貶不一",
       "confidence": "中",
       "nPosts": 1,
@@ -40425,13 +40427,50 @@
       "cautions": [
         "御飯糰價格漲到55元"
       ],
-      "excerpt": "蛋黃流動，蛋液使飯糰濕潤似燒肉丼；加熱過久會燙",
+      "excerpt": "蛋黃流動，蛋液使飯糰濕潤似燒肉丼，加熱過久會燙",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1752561004.A.D4D.html"
       ],
       "latestDate": "2025-07-15",
       "kcal": null,
+      "nutrition": null
+    },
+    {
+      "id": "7-11::藍莓起司霜淇淋",
+      "brand": "7-11",
+      "productName": "藍莓起司霜淇淋",
+      "price": 49,
+      "category": "冰品",
+      "fairScore": 52,
+      "recommendationScore": 54,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "nPosts": 3,
+      "nComments": 12,
+      "rawComments": 34,
+      "eligibleComments": 13,
+      "uniqueEligibleCommenters": 12,
+      "independentThreads": 3,
+      "volumeLevel": "充足",
+      "positivePct": 50,
+      "neutralPct": 15,
+      "negativePct": 35,
+      "likes": [
+        "藍莓優酪乳風味，滿喜歡"
+      ],
+      "cautions": [
+        "口味很清淡，幾乎沒味道"
+      ],
+      "excerpt": "味道清淡不甜，藍莓果酸淡，起司尾韻微弱；藍莓味淡、尾韻澀，整體表現失敗；藍莓味淡，起司帶鹹味",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1738065149.A.99C.html",
+        "https://www.ptt.cc/bbs/CVS/M.1738151847.A.AC5.html",
+        "https://www.ptt.cc/bbs/CVS/M.1738829366.A.058.html"
+      ],
+      "latestDate": "2025-02-06",
+      "kcal": 192,
       "nutrition": null
     },
     {
@@ -40521,43 +40560,6 @@
       }
     },
     {
-      "id": "7-11::藍莓起司霜淇淋",
-      "brand": "7-11",
-      "productName": "藍莓起司霜淇淋",
-      "price": 49,
-      "category": "冰品",
-      "fairScore": 52,
-      "recommendationScore": 54,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "nPosts": 3,
-      "nComments": 12,
-      "rawComments": 34,
-      "eligibleComments": 13,
-      "uniqueEligibleCommenters": 12,
-      "independentThreads": 3,
-      "volumeLevel": "充足",
-      "positivePct": 50,
-      "neutralPct": 15,
-      "negativePct": 35,
-      "likes": [
-        "藍莓優酪乳風味，滿喜歡"
-      ],
-      "cautions": [
-        "口味很清淡，幾乎沒味道"
-      ],
-      "excerpt": "味道清淡不甜，藍莓果酸淡，起司尾韻微弱；藍莓味淡、尾韻澀，整體表現失敗；藍莓味淡，起司帶鹹味",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1738065149.A.99C.html",
-        "https://www.ptt.cc/bbs/CVS/M.1738151847.A.AC5.html",
-        "https://www.ptt.cc/bbs/CVS/M.1738829366.A.058.html"
-      ],
-      "latestDate": "2025-02-06",
-      "kcal": 192,
-      "nutrition": null
-    },
-    {
       "id": "全家::棉被午茉綠慕斯杯",
       "brand": "全家",
       "productName": "棉被午茉綠慕斯杯",
@@ -40587,7 +40589,7 @@
         "海綿蛋糕偏乾",
         "價格不友善"
       ],
-      "excerpt": "綠茶慕斯較綿密，白慕斯似蛋白泡沫；蛋糕偏乾；慕斯杯較好吃，需從上挖到底，麻吉餡增加層次；蛋糕濕潤、麻吉Q彈，但奶蓋偏甜且慕斯苦澀",
+      "excerpt": "綠茶慕斯較綿密，白慕斯似蛋白泡沫，蛋糕偏乾；慕斯杯較好吃，需從上挖到底，麻吉餡增加層次；蛋糕濕潤、麻吉Q彈，但奶蓋偏甜且慕斯苦澀",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1720975090.A.FC3.html",
@@ -40625,7 +40627,7 @@
         "過度期待，結果沒喝完",
         "不喜歡加椰奶"
       ],
-      "excerpt": "芋頭牛奶濃郁好喝，含芋頭顆粒；原價偏高",
+      "excerpt": "芋頭牛奶濃郁好喝，含芋頭顆粒，原價偏高",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1754040489.A.1B5.html"
@@ -43494,7 +43496,7 @@
         "油味偏重，適合分著吃",
         "吃到最後會出現苦味"
       ],
-      "excerpt": "口味普通，友人覺得麵糰久嚼帶苦；不回購；口感像傳統甜甜圈，卡士達餡多且不膩；卡士達醬好吃，糕體偏乾但搭醬，整體很甜；卡士達餡不爆滿，像路邊炸甜甜圈；49元，內餡好吃且會爆餡；麵體微Q帶酸，卡士達餡較不膩",
+      "excerpt": "口味普通，友人覺得麵糰久嚼帶苦，不回購；口感像傳統甜甜圈，卡士達餡多且不膩；卡士達醬好吃，糕體偏乾但搭醬，整體很甜；卡士達餡不爆滿，像路邊炸甜甜圈；49元，內餡好吃且會爆餡；麵體微Q帶酸，卡士達餡較不膩",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1760532460.A.F0C.html",
@@ -43958,7 +43960,7 @@
         "比半糖更甜，而且偏稀",
         "香蕉泥太多，口感不好"
       ],
-      "excerpt": "過熟香蕉味明顯，火龍果只剩顏色，味道被蓋掉；香蕉味蓋過火龍果，可試一次但不用特地喝；香蕉味為主，火龍果味淡；甜度略高可接受；冰塊多需攪勻，香蕉味主導並有火龍果籽粒",
+      "excerpt": "過熟香蕉味明顯，火龍果只剩顏色，味道被蓋掉；香蕉味蓋過火龍果，可試一次但不用特地喝；香蕉味為主，火龍果味淡，甜度略高可接受；冰塊多需攪勻，香蕉味主導並有火龍果籽粒",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1755754852.A.10F.html",
@@ -45712,7 +45714,7 @@
         "太甜，仙草味又淡",
         "有感冒糖漿的化學感"
       ],
-      "excerpt": "死甜、仙草味淡；仙草味足不草，後段像糖漿且偏甜；冰品容易倒塌，帶奶精仙草凍味；仙草草味不重，單吃即可；仙草味淡不太甜，像微糖仙草飲；綜合時牛奶搶味",
+      "excerpt": "死甜、仙草味淡；仙草味足不草，後段像糖漿且偏甜；冰品容易倒塌，帶奶精仙草凍味；仙草草味不重，單吃即可；仙草味淡不太甜，像微糖仙草飲，綜合時牛奶搶味",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1751454273.A.CCB.html",
@@ -46781,6 +46783,43 @@
       }
     },
     {
+      "id": "萊爾富::SANGARIA蜂蜜檸檬風味飲料",
+      "brand": "萊爾富",
+      "productName": "SANGARIA蜂蜜檸檬風味飲料",
+      "price": 39,
+      "category": "飲料",
+      "fairScore": 49,
+      "recommendationScore": 48,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "nPosts": 2,
+      "nComments": 6,
+      "rawComments": 11,
+      "eligibleComments": 6,
+      "uniqueEligibleCommenters": 6,
+      "independentThreads": 2,
+      "volumeLevel": "中等",
+      "positivePct": 33,
+      "neutralPct": 17,
+      "negativePct": 50,
+      "likes": [
+        "黃檸檬香氣明顯，酸味不重"
+      ],
+      "cautions": [
+        "檸檬果汁僅1%，水和糖超過98%",
+        "蜂蜜味不太天然"
+      ],
+      "excerpt": "黃檸檬香氣、不太酸，熱量不高但稍甜",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1786665833.A.088.html",
+        "https://www.ptt.cc/bbs/CVS/M.1786934124.A.876.html"
+      ],
+      "latestDate": "2026-08-17",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
       "id": "7-11::吉伊卡哇草莓卡士達麻糬泡芙",
       "brand": "7-11",
       "productName": "吉伊卡哇草莓卡士達麻糬泡芙",
@@ -46921,43 +46960,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1786276695.A.7B9.html"
       ],
       "latestDate": "2026-08-09",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
-      "id": "萊爾富::SANGARIA蜂蜜檸檬風味飲料",
-      "brand": "萊爾富",
-      "productName": "SANGARIA蜂蜜檸檬風味飲料",
-      "price": 39,
-      "category": "飲料",
-      "fairScore": 48,
-      "recommendationScore": 48,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "nPosts": 2,
-      "nComments": 6,
-      "rawComments": 11,
-      "eligibleComments": 6,
-      "uniqueEligibleCommenters": 6,
-      "independentThreads": 2,
-      "volumeLevel": "中等",
-      "positivePct": 33,
-      "neutralPct": 17,
-      "negativePct": 50,
-      "likes": [
-        "黃檸檬香氣明顯，酸味不重"
-      ],
-      "cautions": [
-        "檸檬果汁僅1%，水和糖超過98%",
-        "蜂蜜味不太天然"
-      ],
-      "excerpt": "黃檸檬香氣、不太酸，熱量不高但稍甜",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1786665833.A.088.html",
-        "https://www.ptt.cc/bbs/CVS/M.1786934124.A.876.html"
-      ],
-      "latestDate": "2026-08-17",
       "kcal": null,
       "nutrition": null
     },
@@ -49019,7 +49021,7 @@
         "豬血糕是敗筆，想換成豆腐",
         "吃完很空虛"
       ],
-      "excerpt": "雞肉不柴、米血過軟；湯頭濃好喝但量少",
+      "excerpt": "雞肉不柴、米血過軟，湯頭濃好喝但量少",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1771873049.A.59A.html"
@@ -49127,7 +49129,7 @@
       "cautions": [
         "這是舊商品變相漲價4元"
       ],
-      "excerpt": "豬排配微甜濃咖哩，起司味不明顯且微辣；豬排外皮軟、肉紮實不柴；咖哩濃甜微辣",
+      "excerpt": "豬排配微甜濃咖哩，起司味不明顯且微辣；豬排外皮軟、肉紮實不柴，咖哩濃甜微辣",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1729834494.A.E2D.html",
@@ -49333,7 +49335,7 @@
       "cautions": [
         "黑糖奶茶味道淡，茶味奶味不足"
       ],
-      "excerpt": "三款中最甜，黑糖味重；加冰可稀釋",
+      "excerpt": "三款中最甜，黑糖味重，加冰可稀釋",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1753199204.A.E6A.html"
@@ -49905,7 +49907,7 @@
         "芝麻味太搶，像在吃燒餅",
         "吃到後面有點膩"
       ],
-      "excerpt": "麵包Q彈不乾，火腿起司融合好；芝麻一直掉",
+      "excerpt": "麵包Q彈不乾，火腿起司融合好，芝麻一直掉",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1775058385.A.6ED.html"
@@ -49978,7 +49980,7 @@
         "原價不值得，折扣才會買",
         "鈉含量1330mg"
       ],
-      "excerpt": "咖哩味足，配雞肉花椰菜；普通不驚艷",
+      "excerpt": "咖哩味足，配雞肉花椰菜，普通不驚艷",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1756268435.A.660.html"
@@ -51143,7 +51145,7 @@
       "cautions": [
         "裡面蔬菜很難吃"
       ],
-      "excerpt": "冷食不可微波；高麗菜脆甜、雞肉鮮嫩多汁",
+      "excerpt": "冷食不可微波，高麗菜脆甜、雞肉鮮嫩多汁",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1791117058.A.64C.html",
@@ -51767,6 +51769,55 @@
       "nutrition": null
     },
     {
+      "id": "全家::阿奇儂極濃義式開心果雪糕",
+      "brand": "全家",
+      "productName": "阿奇儂極濃義式開心果雪糕",
+      "price": 40,
+      "category": "冰品",
+      "fairScore": 46,
+      "recommendationScore": 42,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 13,
+      "rawComments": 18,
+      "eligibleComments": 13,
+      "uniqueEligibleCommenters": 13,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 28,
+      "neutralPct": 22,
+      "negativePct": 50,
+      "likes": [
+        "以價格來看，開心果味算有"
+      ],
+      "cautions": [
+        "只有外殼有開心果味，雪糕沒有"
+      ],
+      "excerpt": "開心果味足不太甜，有香料感且份量偏小",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1770378669.A.45B.html"
+      ],
+      "latestDate": "2026-02-06",
+      "kcal": 184,
+      "nutrition": {
+        "servingSize": "68 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 184.0,
+          "protein": 2.2,
+          "fat": 12.4,
+          "saturatedFat": 8.6,
+          "transFat": 0.0,
+          "carbohydrate": 15.8,
+          "sugar": 11.5,
+          "sodium": 44.0
+        }
+      }
+    },
+    {
       "id": "7-11::台韓半半炸雞便當",
       "brand": "7-11",
       "productName": "台韓半半炸雞便當",
@@ -51838,55 +51889,6 @@
       "latestDate": "2024-10-16",
       "kcal": null,
       "nutrition": null
-    },
-    {
-      "id": "全家::阿奇儂極濃義式開心果雪糕",
-      "brand": "全家",
-      "productName": "阿奇儂極濃義式開心果雪糕",
-      "price": 40,
-      "category": "冰品",
-      "fairScore": 45,
-      "recommendationScore": 42,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 13,
-      "rawComments": 18,
-      "eligibleComments": 13,
-      "uniqueEligibleCommenters": 13,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 28,
-      "neutralPct": 22,
-      "negativePct": 50,
-      "likes": [
-        "以價格來看，開心果味算有"
-      ],
-      "cautions": [
-        "只有外殼有開心果味，雪糕沒有"
-      ],
-      "excerpt": "開心果味足不太甜，有香料感且份量偏小",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1770378669.A.45B.html"
-      ],
-      "latestDate": "2026-02-06",
-      "kcal": 184,
-      "nutrition": {
-        "servingSize": "68 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 184.0,
-          "protein": 2.2,
-          "fat": 12.4,
-          "saturatedFat": 8.6,
-          "transFat": 0.0,
-          "carbohydrate": 15.8,
-          "sugar": 11.5,
-          "sodium": 44.0
-        }
-      }
     },
     {
       "id": "7-11::明太子雞肉溏心蛋三明治",
@@ -52282,7 +52284,7 @@
       "cautions": [
         "價格450元，難以下手"
       ],
-      "excerpt": "原想買一隻，最後全買了；最左是夜光版",
+      "excerpt": "原想買一隻，最後全買了，最左是夜光版",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1733709895.A.E58.html"
@@ -53014,7 +53016,7 @@
         "焙茶奶味重，像奶茶",
         "綜合口感粉粉的，很怪"
       ],
-      "excerpt": "煎茶清爽低糖，焙茶較濃但仍低糖，茶霜淇淋沒失望；份量大且划算，茶味明顯不甜，但融化很快；煎茶茶香但太不甜；焙茶較水、甜度正常；煎茶很淡不甜，焙茶稍甜尾韻淡；加茶粉變好吃；茶味很淡且不甜，兩種口味難分辨",
+      "excerpt": "煎茶清爽低糖，焙茶較濃但仍低糖，茶霜淇淋沒失望；份量大且划算，茶味明顯不甜，但融化很快；煎茶茶香但太不甜，焙茶較水、甜度正常；煎茶很淡不甜，焙茶稍甜尾韻淡，加茶粉變好吃；茶味很淡且不甜，兩種口味難分辨",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1725282958.A.719.html",
@@ -54074,7 +54076,7 @@
         "尺寸偏小，底部一開始就滴",
         "咖啡味不濃"
       ],
-      "excerpt": "咖啡味重、起司味淡；當次尺寸偏小且滴水",
+      "excerpt": "咖啡味重、起司味淡，當次尺寸偏小且滴水",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1776509174.A.773.html"
@@ -54970,7 +54972,7 @@
         "不喜歡巧克力外層，整體普通",
         "份量小，35元偏貴"
       ],
-      "excerpt": "蛋糕濕潤，夾咖啡奶霜與巧克力碎；尺寸不大適合解饞",
+      "excerpt": "蛋糕濕潤，夾咖啡奶霜與巧克力碎，尺寸不大適合解饞",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1757068125.A.BF2.html"
@@ -55161,7 +55163,7 @@
         "原價太貴，只考慮珍食",
         "原價89元偏貴"
       ],
-      "excerpt": "麵條有彈性，蛋吸湯多汁；湯濃但偏鹹",
+      "excerpt": "麵條有彈性，蛋吸湯多汁，湯濃但偏鹹",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1769144962.A.F23.html",
@@ -56437,7 +56439,7 @@
       "cautions": [
         "甜味主要來自糖粉"
       ],
-      "excerpt": "外層內餡偏甜，茶香不明顯；泡芙皮有脆度",
+      "excerpt": "外層內餡偏甜，茶香不明顯，泡芙皮有脆度",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1723439493.A.174.html"
@@ -58136,7 +58138,7 @@
         "89元才會考慮，109元不買",
         "控肉偏肥"
       ],
-      "excerpt": "控肉驚艷，配菜沾醬好吃；109元不回購",
+      "excerpt": "控肉驚艷，配菜沾醬好吃，109元不回購",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1754219943.A.6B6.html"
@@ -58608,7 +58610,7 @@
       "cautions": [
         "白鳳豆沙比例高，像豆沙餡"
       ],
-      "excerpt": "鹹蛋黃味濃，芋頭味淡；偏愛金沙者較適合",
+      "excerpt": "鹹蛋黃味濃，芋頭味淡，偏愛金沙者較適合",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1722616120.A.5B1.html"
@@ -58933,7 +58935,7 @@
         "份量偏少",
         "99元太貴"
       ],
-      "excerpt": "醬汁香辣鹹甜、很涮嘴；小辣，細麵飽足感較弱",
+      "excerpt": "醬汁香辣鹹甜、很涮嘴，小辣，細麵飽足感較弱",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1788752017.A.1EE.html",
@@ -60105,7 +60107,7 @@
       "cautions": [
         "沒什麼特別，價格又貴"
       ],
-      "excerpt": "茶味較重有香氣，但不喜金萱香；價格35元",
+      "excerpt": "茶味較重有香氣，但不喜金萱香，價格35元",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1776225558.A.E27.html"
@@ -60141,7 +60143,7 @@
         "難吃，友善價也嫌貴",
         "i珍食也只想嚐鮮一次"
       ],
-      "excerpt": "豆腐棒鬆軟，調味適中但太貴；口感鬆軟清爽，毛豆碎增添口感；79元且保存期10天",
+      "excerpt": "豆腐棒鬆軟，調味適中但太貴；口感鬆軟清爽，毛豆碎增添口感，79元且保存期10天",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1736344817.A.F94.html",
@@ -61356,7 +61358,7 @@
         "口感不細緻，煉乳味偏膩",
         "外觀可愛，但29元也不回購"
       ],
-      "excerpt": "口感不細緻、煉乳味膩；外觀可愛但不回購",
+      "excerpt": "口感不細緻、煉乳味膩，外觀可愛但不回購",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1756822375.A.8AD.html"
@@ -63712,44 +63714,6 @@
       "nutrition": null
     },
     {
-      "id": "7-11::統一布丁焦糖爆走丁丁",
-      "brand": "7-11",
-      "productName": "統一布丁焦糖爆走丁丁",
-      "price": 18,
-      "category": "甜點",
-      "fairScore": 35,
-      "recommendationScore": 24,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 22,
-      "rawComments": 42,
-      "eligibleComments": 23,
-      "uniqueEligibleCommenters": 22,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 17,
-      "neutralPct": 13,
-      "negativePct": 70,
-      "likes": [
-        "熱量比正常布丁低"
-      ],
-      "cautions": [
-        "沒有黑糖，像糖水加色素",
-        "口感很糟，超水",
-        "吃過一次，嘗鮮就好"
-      ],
-      "excerpt": "口感像果凍，僅適合嘗鮮、不推薦",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1791810933.A.23F.html",
-        "https://www.ptt.cc/bbs/CVS/M.1792045537.A.783.html"
-      ],
-      "latestDate": "2026-10-15",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
       "id": "全家::bbqCHICKEN蜂蜜柚橘x莊園牛奶霜淇淋",
       "brand": "全家",
       "productName": "bbqCHICKEN蜂蜜柚橘x莊園牛奶霜淇淋",
@@ -64225,7 +64189,7 @@
         "聯名系列餡料偏少",
         "當早餐可能要吃兩個才有飽足感"
       ],
-      "excerpt": "份量少，早餐至少要兩個；原價不會買",
+      "excerpt": "份量少，早餐至少要兩個，原價不會買",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1790209734.A.B2D.html"
@@ -64281,6 +64245,42 @@
         "https://www.ptt.cc/bbs/CVS/M.1718515590.A.A89.html"
       ],
       "latestDate": "2024-06-16",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
+      "id": "7-11::統一布丁焦糖爆走丁丁",
+      "brand": "7-11",
+      "productName": "統一布丁焦糖爆走丁丁",
+      "price": 18,
+      "category": "甜點",
+      "fairScore": 34,
+      "recommendationScore": 24,
+      "consensus": "一致負評",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 23,
+      "rawComments": 43,
+      "eligibleComments": 24,
+      "uniqueEligibleCommenters": 23,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 17,
+      "neutralPct": 12,
+      "negativePct": 71,
+      "likes": [],
+      "cautions": [
+        "沒黑糖，像糖水加色素果凍",
+        "只適合嘗鮮，吃過一次就好",
+        "口感很糟，超水"
+      ],
+      "excerpt": "不推薦，無雞蛋成分，多了焦糖液體，口感像果凍",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1791810933.A.23F.html",
+        "https://www.ptt.cc/bbs/CVS/M.1792045537.A.783.html"
+      ],
+      "latestDate": "2026-10-15",
       "kcal": null,
       "nutrition": null
     },
@@ -64656,7 +64656,7 @@
         "冷掉後太硬，熱狗普通",
         "原價吃完不會回購"
       ],
-      "excerpt": "外層又硬又乾，熱狗普通，不推；薯塊外層酥脆，但一開始偏難咬；份量像點心",
+      "excerpt": "外層又硬又乾，熱狗普通，不推；薯塊外層酥脆，但一開始偏難咬，份量像點心",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1721905571.A.63A.html",
@@ -65355,6 +65355,43 @@
         "https://www.ptt.cc/bbs/CVS/M.1723736091.A.072.html"
       ],
       "latestDate": "2024-08-15",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
+      "id": "7-11::炙燒霜降豚溫時蔬",
+      "brand": "7-11",
+      "productName": "炙燒霜降豚溫時蔬",
+      "price": 89,
+      "category": "便當",
+      "fairScore": 32,
+      "recommendationScore": 21,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 9,
+      "rawComments": 10,
+      "eligibleComments": 9,
+      "uniqueEligibleCommenters": 9,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 11,
+      "neutralPct": 11,
+      "negativePct": 78,
+      "likes": [
+        "味道好吃"
+      ],
+      "cautions": [
+        "份量少又貴",
+        "口味太鹹",
+        "想要菜多一點、肉少一點"
+      ],
+      "excerpt": "無炙燒霜降感，黑胡椒豬肉重口味，蔬菜脆口",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792495318.A.604.html"
+      ],
+      "latestDate": "2026-10-20",
       "kcal": null,
       "nutrition": null
     },
@@ -66126,7 +66163,7 @@
         "醬汁太稠，吃起來很膩",
         "醬汁難吃，雞肉也很小"
       ],
-      "excerpt": "醬汁偏稠像稀青醬，不喜歡；義大利麵Q彈",
+      "excerpt": "醬汁偏稠像稀青醬，不喜歡，義大利麵Q彈",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1747980857.A.31A.html"
@@ -66781,7 +66818,7 @@
         "不吃辣卻吃到嗆辣",
         "份量看起來很少"
       ],
-      "excerpt": "湯飯偏鹹，柴魚味重；鰻魚小塊但好吃；山葵味超濃，未標示嗆辣而整碗倒掉",
+      "excerpt": "湯飯偏鹹，柴魚味重，鰻魚小塊但好吃；山葵味超濃，未標示嗆辣而整碗倒掉",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1722917787.A.95D.html",
@@ -68546,7 +68583,7 @@
         "料很空虛，原價偏貴"
       ],
       "cautions": [],
-      "excerpt": "鰻魚很薄易碎，味道不差；原價太貴",
+      "excerpt": "鰻魚很薄易碎，味道不差，原價太貴",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1754486641.A.C7A.html"
@@ -71063,7 +71100,7 @@
         "特價兩杯88元"
       ],
       "cautions": [],
-      "excerpt": "含桑葚果肉，酸甜順口；特價2杯88元",
+      "excerpt": "含桑葚果肉，酸甜順口，特價2杯88元",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1787529287.A.1F7.html"
@@ -71866,7 +71903,7 @@
       "cautions": [
         "蒜泥味幾乎吃不出"
       ],
-      "excerpt": "蒜味明顯、微麻辣；火腿表現普通",
+      "excerpt": "蒜味明顯、微麻辣，火腿表現普通",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1753596743.A.05C.html"
@@ -73043,7 +73080,7 @@
       "confidence": "低",
       "nPosts": 1,
       "nComments": 1,
-      "rawComments": 3,
+      "rawComments": 4,
       "eligibleComments": 1,
       "uniqueEligibleCommenters": 1,
       "independentThreads": 1,
@@ -73052,9 +73089,9 @@
       "neutralPct": null,
       "negativePct": null,
       "likes": [
-        "真的有火腿絲",
-        "麵體Q彈有嚼勁",
-        "醬料與麵體搭配剛好"
+        "確實有火腿絲",
+        "麵體Q且有彈性",
+        "醬料和麵體搭配剛好"
       ],
       "cautions": [],
       "excerpt": "有火腿絲，麵體Q彈，醬麵搭配剛好",
@@ -76845,7 +76882,7 @@
         "不加熱時油感很重",
         "有人覺得口味偏鹹"
       ],
-      "excerpt": "未加熱油感重，需微波；有人覺得偏鹹",
+      "excerpt": "未加熱油感重，需微波，有人覺得偏鹹",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1756208707.A.6DA.html"
@@ -77618,6 +77655,42 @@
       "nutrition": null
     },
     {
+      "id": "全家::金色三麥伯爵茶調酒",
+      "brand": "全家",
+      "productName": "金色三麥伯爵茶調酒",
+      "price": 109,
+      "category": "飲料",
+      "fairScore": 65,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 2,
+      "nComments": 1,
+      "rawComments": 1,
+      "eligibleComments": 1,
+      "uniqueEligibleCommenters": 1,
+      "independentThreads": 2,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "伯爵茶與琴酒味道明顯"
+      ],
+      "cautions": [
+        "伯爵味不明顯，檸檬味偏重"
+      ],
+      "excerpt": "伯爵茶與琴酒味明顯，茶味重微苦後續乏味；伯爵茶調酒沒特色，價格貴且無優惠不買",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1746278659.A.745.html",
+        "https://www.ptt.cc/bbs/CVS/M.1746802247.A.383.html"
+      ],
+      "latestDate": "2025-05-09",
+      "kcal": null,
+      "nutrition": null
+    },
+    {
       "id": "全家::金色三麥威士忌冬瓜調酒",
       "brand": "全家",
       "productName": "金色三麥威士忌冬瓜調酒",
@@ -77718,42 +77791,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1727273039.A.2AB.html"
       ],
       "latestDate": "2024-09-25",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
-      "id": "全家::金色三麥伯爵茶調酒",
-      "brand": "全家",
-      "productName": "金色三麥伯爵茶調酒",
-      "price": 109,
-      "category": "飲料",
-      "fairScore": 65,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 2,
-      "nComments": 1,
-      "rawComments": 1,
-      "eligibleComments": 1,
-      "uniqueEligibleCommenters": 1,
-      "independentThreads": 2,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "伯爵茶與琴酒味道明顯"
-      ],
-      "cautions": [
-        "伯爵味不明顯，檸檬味偏重"
-      ],
-      "excerpt": "伯爵茶與琴酒味明顯，茶味重微苦後續乏味；伯爵茶調酒沒特色，價格貴且無優惠不買",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1746278659.A.745.html",
-        "https://www.ptt.cc/bbs/CVS/M.1746802247.A.383.html"
-      ],
-      "latestDate": "2025-05-09",
       "kcal": null,
       "nutrition": null
     },
@@ -83143,7 +83180,7 @@
         "芝麻容易掉",
         "不好吃又麻煩"
       ],
-      "excerpt": "芝麻易掉，微波後像麻糬；不太好吃又麻煩",
+      "excerpt": "芝麻易掉，微波後像麻糬，不太好吃又麻煩",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1792242091.A.D66.html"
@@ -83421,7 +83458,7 @@
         "綠茶味不明顯",
         "吃起來不怪但不特別"
       ],
-      "excerpt": "茶味不明顯，芋頭味約七成；整體普通",
+      "excerpt": "茶味不明顯，芋頭味約七成，整體普通",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1722246685.A.4D9.html"
@@ -83552,7 +83589,7 @@
       "cautions": [
         "有一點怪怪的塑膠味"
       ],
-      "excerpt": "順口不過甜、氣泡足；退冰後有塑膠味",
+      "excerpt": "順口不過甜、氣泡足，退冰後有塑膠味",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1767845845.A.DF1.html"
@@ -83862,7 +83899,7 @@
         "配菜多樣，但飯量不多",
         "多一片肉，價格卻直接翻倍"
       ],
-      "excerpt": "雞腿燒肉雙拼，配菜多但飯量少；折後較合理",
+      "excerpt": "雞腿燒肉雙拼，配菜多但飯量少，折後較合理",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1753690512.A.6EF.html"
@@ -86775,42 +86812,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1741680689.A.786.html"
       ],
       "latestDate": "2025-03-11",
-      "kcal": null,
-      "nutrition": null
-    },
-    {
-      "id": "7-11::炙燒霜降豚溫時蔬",
-      "brand": "7-11",
-      "productName": "炙燒霜降豚溫時蔬",
-      "price": 89,
-      "category": "便當",
-      "fairScore": 30,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 2,
-      "rawComments": 3,
-      "eligibleComments": 2,
-      "uniqueEligibleCommenters": 2,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "微波後蔬菜仍有脆口感"
-      ],
-      "cautions": [
-        "份量少又貴",
-        "沒有包手設計"
-      ],
-      "excerpt": "無炙燒霜降感，黑胡椒豬肉重口味，蔬菜脆口",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792495318.A.604.html"
-      ],
-      "latestDate": "2026-10-20",
       "kcal": null,
       "nutrition": null
     },
