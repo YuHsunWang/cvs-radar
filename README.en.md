@@ -44,6 +44,14 @@ running live.
   original thread.
 </p>
 
+The home page includes quick filters on mobile. Its URL preserves search, brand,
+category, date preset, sort order, the option to hide unscored products and the last opened product;
+copy it to share the current shelf.
+
+Product details can also reveal official nutrition labels: whole-package calories
+from 7-11 and FamilyMart, plus per-serving nutrients, serving size and package serving
+count for some FamilyMart products. Unmatched data stays blank.
+
 ## The problem
 
 Discussion of a new convenience-store product is scattered across separate posts and
@@ -71,7 +79,7 @@ those signals into comparable, product-level information:
 1. **Collect public reviews** — read product posts and comments from the PTT CVS board.
 2. **Consolidate into one product** — identify chain, product name and price, and merge
    entries that are named differently but are the same item.
-3. **Preserve the actual experience** — author verdicts keep their original sentences;
+3. **Preserve the actual experience** — author verdicts become concise summaries traceable to source sentences;
    comments are classified positive, neutral or negative, excluding tangents, bare
    agreement and talk about a different chain. When a post covers several products,
    sentences about the neighbouring product are excluded.
@@ -87,7 +95,7 @@ those signals into comparable, product-level information:
   <img src="docs/architecture-overview.png" width="1100" alt="Architecture: crawl, LLM labelling, scoring, frontend data build, static site" />
 </p>
 
-Only a single static JSON file runs in the user's browser; all semantic reading and
+Both pages read the same `web/public/data.json` at build time; all semantic reading and
 statistics happen in the batch pipeline before publication. Once loaded, search and
 filtering run locally with no backend.
 
@@ -95,11 +103,91 @@ filtering run locally with no backend.
 |---|---|
 | Data collection | Python, Requests, Beautiful Soup |
 | Semantic labelling | Five LLM layers (sentiment, product name, excerpt, representative comments, category), each cached by content fingerprint in `data/labels/*.csv` |
-| Scoring | Rule-based sentiment, SnowNLP adapter, Bayesian shrinkage, time decay |
-| Service layer | Framework-independent query API with a FastAPI adapter |
+| Scoring | Rule-based sentiment, SnowNLP adapter, Bayesian shrinkage, configurable time decay (currently disabled) |
+| Service layer | Framework-independent query API with a local FastAPI adapter; the public site makes no API calls |
 | Web | Next.js 15, React 19, TypeScript, Tailwind CSS, Lucide |
 | Quality | Pytest, Vitest, Ruff, TypeScript / Next.js production build |
 | Deployment | Vercel (primary) plus a GitHub Actions / GitHub Pages static mirror |
+
+## How scoring works
+
+A comment is first checked for eligibility, then weighted and combined with the other
+opinions about the product. The implementation is in `cvs_radar/scoring/compute.py`,
+with parameters in `config.yaml`.
+
+### 1. Weighting each opinion
+
+```
+weight = credibility(account) × role_weight(role) × exp(−λ · age_in_days)
+```
+
+- **Time decay** is currently disabled (`λ = 0.0`), so age does not change an opinion's
+  scoring weight. The frontend's recency and buzz rankings still use a separate 24-day
+  half-life.
+- **Role weights** are `1.0` for both authors and commenters.
+- **Account credibility** is `max(0.1, 1 − suspicion)`, reducing suspicious accounts'
+  influence without removing them.
+
+### 2. Suspicion signals (`cvs_radar/preference.py`)
+
+Five weak signals are computed from account activity, but only three currently have
+non-zero weights. Accounts with fewer than 5 eligible comments receive no penalty.
+
+| Feature | Weight | Signal |
+|---|---|---|
+| `one_sided` | 0.00 | Praising one brand while criticizing others (observation only) |
+| `single_brand` | 0.00 | Activity concentrated on one brand (observation only) |
+| `extreme` | 0.15 | Sentiment repeatedly at \|sentiment\| ≥ 0.85 |
+| `burst` | 0.45 | At least 3 comments about one brand within 24 hours |
+| `template_like` | 0.40 | Repeated wording with character-bigram Jaccard similarity ≥ 0.8 |
+
+The score **only reduces weight internally; no account is publicly labelled**.
+`cvs_radar/store.py` removes and validates account identity fields at the write boundary;
+`tests/test_publish_privacy.py` checks the published snapshot. Raw posts in
+`data/posts.jsonl` are local pipeline input and are excluded from version control.
+
+The separate `SHILL_DETECTION` mechanism discounts the accused post's author, rather
+than everyone discussing the product. It requires at least two distinct accusers and
+an accusation ratio of at least 5% in a thread with at least three non-empty comments.
+
+### 3. One person, one stance
+
+`per_user_cap` combines an account's author and comment contributions for the same
+product into one weighted stance before product-level aggregation. Repeating a comment
+does not turn one person into several voters.
+
+### 4. Bayesian shrinkage and withholding a score
+
+```
+fair01 = (prior_strength · μ₀ + Σ wᵢsᵢ) / (prior_strength + Σ wᵢ)     # μ₀ = 0.5, prior_strength = 1.0
+n_eff  = (Σ wᵢ)² / Σ wᵢ²
+```
+
+`n_eff` is the effective sample size: concentrated weights make it smaller. Below 3,
+consensus becomes "insufficient data" and the frontend shows neither a score nor a
+positive/neutral/negative percentage split. Roughly a quarter of products have no score.
+`web/build_data.py` also requires at least 4 distinct eligible commenters; fewer means
+low confidence and no score or split. Authors contribute to the score but cannot replace
+those four commenters.
+
+Consensus uses weighted mean `μ` and standard deviation `σ`: `σ ≥ 0.26` means polarized;
+`μ ≥ 0.68` and `σ ≤ 0.25` means consistently positive; `μ ≤ 0.45` and `σ ≤ 0.25` means
+consistently negative; everything else is mixed.
+
+### 5. Reproducibility with LLM labels
+
+All five semantic layers cache their results in version-controlled `data/labels/*.csv`.
+Fingerprints include the context seen by the model and the prompt version. For example,
+`sentiment_fingerprint_v2` in `cvs_radar/sentiment.py` hashes:
+
+```
+SHA-256( post ID | comment tag | NFKC-normalized comment | brand | product name | post title | prompt version )
+```
+
+Brand and product context can change the meaning of a comment, so changing that context
+must invalidate its old label. Compare complete pipeline outputs before and after a
+scoring change using the same posts and labels; unit tests alone do not establish the
+effect on the catalogue.
 
 ## What this project is meant to show
 
@@ -110,7 +198,7 @@ filtering run locally with no backend.
   It also makes growing the corpus nearly free: when the archive went from 800 to 2,700
   posts in August 2026, the re-crawled older threads hit the existing cache exactly, so
   only genuinely new material had to be paid for.
-- **Don't overreach statistically.** Bayesian shrinkage, per-user caps, time decay, and no
+- **Don't overreach statistically.** Bayesian shrinkage, per-user caps, at least four eligible commenters, and no
   score at all below the sample threshold. Being willing to leave a gap in the product is
   harder than producing a good-looking ranking.
 - **Built end to end, and actually running.** Crawler, labelling pipeline, scoring and
@@ -126,24 +214,33 @@ Details in [scoring decisions](docs/DECISIONS.md), the
 
 ```text
 cvs_radar/                 parsing, sentiment, scoring, service and reporting
+config.yaml                scoring, sentiment and crawler parameters
+crawl_job.py               PTT crawling, storage and recompute entry point
+run.py                     offline demo, snapshot queries and pipeline CLI
 scripts/                   audit, labelling and excerpt rebuild utilities
+  ops/                     local publishing pipeline and cron wrapper
 tests/                     backend and data-build regression tests
 web/
   app/                     Next.js App Router entry
   components/              filters, product cards and detail views
   lib/                     typed search, filter and sort logic
+  build_data.py            projects results and label caches into public data
   public/data.json         product-level payload the browser reads
 data/results.json          precomputed product-level snapshot
-data/labels/               fingerprint-keyed LLM label caches
+data/labels/               LLM labels, manual overrides and official nutrition caches
 docs/screenshots/          screenshots generated from the production build
 .github/workflows/         CI and the GitHub Pages mirror deployment
 ```
 
 ## Run locally
 
+Python 3.12 or newer is required; frontend CI uses Node.js 20. Start each set of
+steps below from the repository root.
+
 ### Web app
 
 ```bash
+python -m pip install ".[core]"
 cd web
 npm ci
 npm run build:data
@@ -162,16 +259,53 @@ python -m uvicorn cvs_radar.api:app --reload
 ```
 
 The demo source is offline and uses synthetic sample posts. Crawling requires network access
-and should respect the source site's rate limits and terms.
+and should respect the source site's rate limits and terms. The API is an optional local
+service; the static site does not need it running.
+
+### FamilyMart food-safety data (standalone batch tool)
+
+`scripts/crawl_family_food.py` reads public pages from FamilyMart's food-safety catalogue
+separately from the PTT-only `PttCrawler`. Check the site's current `robots.txt` and terms
+before use, respect its load (the default request delay is 1 second), and do not bypass
+CAPTCHA, login or other access controls. Images remain official URLs unless
+`--download-images` is explicitly supplied; the output directory is ignored by git.
+
+```bash
+python scripts/crawl_family_food.py --start-page 1 --max-pages 3 \
+  --request-delay 1.5 --output data/family_food/products.jsonl
+python scripts/crawl_family_food.py --max-pages 1 --download-images \
+  --image-dir data/family_food/images
+```
+
+These commands create the ignored output directories. Each JSONL row contains a product's
+`product_id`, `name`, `detail_url`, `image_urls`, `serving_size`, `servings_per_container`,
+eight nutrient fields (`calories`, `protein`, `fat`, `saturated_fat`, `trans_fat`,
+`carbohydrates`, `sugar`, `sodium`), `ingredients`, `allergens` and a UTC `crawled_at`.
+Measurements contain `{"value", "unit", "raw_text"}`. Missing fields are `null`;
+unparseable measurements retain `raw_text` with a `null` value instead of becoming zero.
+
+Live rendering mode, API responses and current robots/terms remain unverified. Before
+running, use the browser Network panel to check pagination at `/Web_FFD_2022/results/{page}`,
+product IDs, detail URLs and JSON envelopes. If the HTML or API changes, save a response
+without personal data as a local fixture, then update the `parse_list_html`,
+`parse_api_response` or `parse_product_html` selectors and tests. Tests must not contact
+the official site.
 
 ## Verification
 
+Run from the repository root, following the CI checks:
+
 ```bash
+python -m pip install ".[core,api,dev]"
 python -m pytest -q
 ruff check .
 
 cd web
+npm ci
+npm run build:data
+git diff --exit-code -- public/data.json
 npm test
+npx tsc --noEmit
 npm run build
 ```
 
@@ -194,6 +328,15 @@ Both serve the same `web/public/data.json`. That file is recomputed and committe
 by an externally scheduled host running this project's cron wrapper; the repository neither
 contains nor proves that host's crontab. If the schedule stalls, the repository does not
 update itself; `scripts/check_data_freshness.py` is the observable guard. CI runs backend and frontend checks independently through `.github/workflows/ci.yml`.
+
+The local publisher starts at `scripts/ops/rebackfill-cron.sh` and
+`scripts/ops/rebackfill.sh`, which crawls, labels, recomputes and builds the public data.
+Before the build, `scripts/fetch_official_kcal.py` and `scripts/fetch_official_nutrition.py`
+refresh official nutrition caches, retaining cached values on failure. See
+[the ops pipeline](docs/ops-pipeline.md) for the TypeSafe Jev and local Codex CLI setup
+required by the five label layers. `.github/workflows/refresh-data.yml` is a manual
+recovery fallback that runs none of those five labelers, so it is not a complete
+semantic refresh.
 
 ## Limitations and next steps
 
