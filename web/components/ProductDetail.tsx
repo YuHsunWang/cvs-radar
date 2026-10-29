@@ -1,7 +1,7 @@
 'use client'
 
 import { ExternalLink, ThumbsUp, TriangleAlert } from 'lucide-react'
-import { trackOutboundPttClick } from '@/lib/analytics'
+import { trackNutritionOpen, trackOutboundPttClick } from '@/lib/analytics'
 import { Nutrition, Product } from '@/lib/data'
 
 type ProductDetailProps = {
@@ -90,7 +90,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
       {product.kcal != null ? (
         // Folded by default: most readers came for the reviews, not the numbers.
-        <details className="sl-nutri-fold">
+        <details
+          className="sl-nutri-fold"
+          onToggle={(e) => {
+            if (e.currentTarget.open) trackNutritionOpen(product.id, product.brand, product.nutrition != null)
+          }}
+        >
           <summary>看營養標示</summary>
           {product.nutrition ? (
             <NutritionLabel nutrition={product.nutrition} />
