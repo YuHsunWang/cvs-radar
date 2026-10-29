@@ -27,6 +27,13 @@ export function trackSearch(query: string, resultCount: number) {
   const queryLength = query.trim().length
   if (!queryLength) return
   trackEvent('search', { query_length: queryLength, result_count: resultCount })
+  // Text only for misses: those name products the site lacks, which is the content gap.
+  if (resultCount === 0) trackEvent('search_no_result', { search_term: query.trim().slice(0, 50) })
+}
+
+/** A fresh visit that opens on a product from the URL, i.e. someone sent the link. */
+export function trackSharedLinkLanding(productId: string) {
+  trackEvent('shared_link_landing', { product_id: productId })
 }
 
 export function trackProductExpand(params: {

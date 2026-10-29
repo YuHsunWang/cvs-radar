@@ -8,6 +8,7 @@ import {
   trackFilterApply,
   trackProductExpand,
   trackSearch,
+  trackSharedLinkLanding,
   trackSortChange,
 } from '@/lib/analytics'
 import {
@@ -305,6 +306,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       setFilters({ fromDate: preset.from(), toDate: '' })
     }
     if (view.product) {
+      // The URL keeps the open product while browsing, so a reload or back/forward
+      // would also land here; only a plain navigation counts as a shared link.
+      const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
+      if (nav?.type === 'navigate') trackSharedLinkLanding(view.product)
       setExpanded(new Set([view.product]))
       setOpenedId(view.product)
       pendingScroll.current = view.product
