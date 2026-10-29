@@ -374,7 +374,8 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     const byId = new Map(displayedProducts.map((product, index) => [product.id, { product, index }]))
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue
+        // The first callback fires for any overlap; the threshold alone doesn't filter it.
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.5) continue
         const id = entry.target.id.slice(2)
         const listed = byId.get(id)
         observer.unobserve(entry.target)
@@ -390,6 +391,21 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     }
     return () => observer.disconnect()
   }, [displayedProducts])
+
+  // A dwell clock runs exactly while a product is both expanded and rendered, so
+  // URL-restored details count and a card hidden by a filter stops counting.
+  useEffect(() => {
+    const shown = new Map(displayedProducts.map((product) => [product.id, product]))
+    for (const id of Array.from(dwellStart.current.keys())) {
+      if (!shown.has(id) || !expanded.has(id)) endDwell(id)
+    }
+    for (const id of Array.from(expanded)) {
+      const product = shown.get(id)
+      if (product && !dwellStart.current.has(id)) {
+        dwellStart.current.set(id, { brand: product.brand, since: Date.now() })
+      }
+    }
+  }, [displayedProducts, expanded])
 
   useEffect(() => {
     const flush = () => {
@@ -429,15 +445,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
 
   function toggleProduct(product: Product, index: number) {
     const closing = expanded.has(product.id)
-    if (closing) {
-      endDwell(product.id)
-    } else {
-      dwellStart.current.set(product.id, { brand: product.brand, since: Date.now() })
-      // Once per product per visit, matching impressions, so CTR stays a share of viewers.
-      if (!clicked.current.has(product.id)) {
-        clicked.current.add(product.id)
-        trackSelectItem({ product, index })
-      }
+    // Once per product per visit, matching impressions, so CTR stays a share of viewers.
+    if (!closing && !clicked.current.has(product.id)) {
+      clicked.current.add(product.id)
+      trackSelectItem({ product, index })
     }
     setOpenedId((current) => (closing ? (current === product.id ? null : current) : product.id))
     setExpanded((current) => {
