@@ -45,9 +45,15 @@ export function fairScoreBucket(score: number | null): string {
   return '<50'
 }
 
+// Zhuyin symbols and tone marks only appear while an IME is still composing; a
+// pause mid-composition would otherwise log half-typed text as a no-result search.
+export function hasUnfinishedZhuyin(query: string): boolean {
+  return /[㄀-ㄯㆠ-ㆿˇˉ-ˋ˙]/.test(query)
+}
+
 export function trackSearch(query: string, resultCount: number) {
   const queryLength = query.trim().length
-  if (!queryLength) return
+  if (!queryLength || hasUnfinishedZhuyin(query)) return
   trackEvent('search', { query_length: queryLength, result_count: resultCount })
   // Text only for misses: those name products the site lacks, which is the content gap.
   if (resultCount === 0) trackEvent('search_no_result', { search_term: query.trim().slice(0, 50) })
