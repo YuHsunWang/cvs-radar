@@ -4,15 +4,37 @@
 
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
 
+import type { Product } from '@/lib/data'
+
+type GtagParams = Record<string, string | number | Record<string, string | number>[]>
+
 type GtagWindow = Window & {
-  gtag?: (command: 'event', name: string, params?: Record<string, string | number>) => void
+  gtag?: (command: 'event', name: string, params?: GtagParams) => void
 }
 
-function trackEvent(name: string, params?: Record<string, string | number>) {
+// gtag is defined by an afterInteractive script that runs after the page's mount
+// effects, so events fired on load (shared-link landing, first impressions) wait here.
+const pending: [string, GtagParams | undefined][] = []
+let retryTimer: number | null = null
+
+function trackEvent(name: string, params?: GtagParams) {
   if (!GA_ID || typeof window === 'undefined') return
+  pending.push([name, params])
+  flushPending()
+}
+
+function flushPending(attempt = 0) {
   const gtag = (window as GtagWindow).gtag
-  if (typeof gtag !== 'function') return
-  gtag('event', name, params)
+  if (typeof gtag === 'function') {
+    for (const [name, params] of pending.splice(0)) gtag('event', name, params)
+    return
+  }
+  // Give up after ~10s (blocked by an ad blocker, say) rather than retry forever.
+  if (retryTimer !== null || attempt >= 40) return
+  retryTimer = window.setTimeout(() => {
+    retryTimer = null
+    flushPending(attempt + 1)
+  }, 250)
 }
 
 /** Buckets keep score params low-cardinality instead of leaking exact values. */
@@ -27,6 +49,47 @@ export function trackSearch(query: string, resultCount: number) {
   const queryLength = query.trim().length
   if (!queryLength) return
   trackEvent('search', { query_length: queryLength, result_count: resultCount })
+  // Text only for misses: those name products the site lacks, which is the content gap.
+  if (resultCount === 0) trackEvent('search_no_result', { search_term: query.trim().slice(0, 50) })
+}
+
+// Per-product CTR uses GA4's ecommerce list events, so the built-in
+// itemsViewedInList / itemsClickedInList metrics work by itemId with no custom
+// dimensions. `index` is the position in the current list: CTR is position-biased.
+type ListedProduct = { product: Pick<Product, 'id' | 'productName' | 'brand' | 'category'>; index: number }
+
+const LIST = { item_list_id: 'shelf', item_list_name: 'shelf' }
+// Keeps each hit well under GA4's payload limit.
+const ITEMS_PER_HIT = 30
+
+function listItem({ product, index }: ListedProduct) {
+  return {
+    item_id: product.id,
+    item_name: product.productName,
+    item_brand: product.brand,
+    item_category: product.category,
+    index,
+  }
+}
+
+export function trackListImpressions(listed: ListedProduct[]) {
+  for (let start = 0; start < listed.length; start += ITEMS_PER_HIT) {
+    trackEvent('view_item_list', { ...LIST, items: listed.slice(start, start + ITEMS_PER_HIT).map(listItem) })
+  }
+}
+
+export function trackSelectItem(listed: ListedProduct) {
+  trackEvent('select_item', { ...LIST, items: [listItem(listed)] })
+}
+
+/** Seconds a product's detail stayed open (visible tab only), capped so a forgotten tab can't skew averages. */
+export function trackProductDwell(productId: string, brand: string, seconds: number) {
+  trackEvent('product_dwell', { product_id: productId, brand, dwell_seconds: Math.min(Math.round(seconds), 1800) })
+}
+
+/** A fresh visit that opens on a product from the URL, i.e. someone sent the link. */
+export function trackSharedLinkLanding(productId: string) {
+  trackEvent('shared_link_landing', { product_id: productId })
 }
 
 export function trackProductExpand(params: {

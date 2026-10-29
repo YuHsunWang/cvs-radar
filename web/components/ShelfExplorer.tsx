@@ -6,8 +6,12 @@ import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
 import {
   trackFilterApply,
+  trackListImpressions,
+  trackProductDwell,
   trackProductExpand,
   trackSearch,
+  trackSelectItem,
+  trackSharedLinkLanding,
   trackSortChange,
 } from '@/lib/analytics'
 import {
@@ -172,6 +176,19 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   // URL writes wait until the shared view has been read, or the first render would erase it.
   const [restored, setRestored] = useState(false)
   const pendingScroll = useRef<string | null>(null)
+  // Analytics bookkeeping only; none of it drives rendering.
+  const seen = useRef(new Set<string>())
+  const clicked = useRef(new Set<string>())
+  const impressionQueue = useRef<{ product: Product; index: number }[]>([])
+  const dwellStart = useRef(new Map<string, { brand: string; since: number }>())
+
+  // `paused` keeps the entry so the clock restarts when the tab is visible again.
+  function endDwell(id: string, paused = false) {
+    const entry = dwellStart.current.get(id)
+    if (!entry) return
+    trackProductDwell(id, entry.brand, (Date.now() - entry.since) / 1000)
+    if (!paused) dwellStart.current.delete(id)
+  }
 
   function openSheet(section = 'sort') {
     if (closeTimer.current) clearTimeout(closeTimer.current)
@@ -305,6 +322,10 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       setFilters({ fromDate: preset.from(), toDate: '' })
     }
     if (view.product) {
+      // The URL keeps the open product while browsing, so a reload or back/forward
+      // would also land here; only a plain navigation counts as a shared link.
+      const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
+      if (nav?.type === 'navigate') trackSharedLinkLanding(view.product)
       setExpanded(new Set([view.product]))
       setOpenedId(view.product)
       pendingScroll.current = view.product
@@ -346,6 +367,67 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   }, [query, searchHitCount])
 
   const displayedProducts = visibleProducts.slice(0, visibleCount)
+
+  // A card counts as seen once per visit, when half of it is on screen. Batched,
+  // because a fast scroll would otherwise send one hit per card.
+  useEffect(() => {
+    const byId = new Map(displayedProducts.map((product, index) => [product.id, { product, index }]))
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        // The first callback fires for any overlap; the threshold alone doesn't filter it.
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.5) continue
+        const id = entry.target.id.slice(2)
+        const listed = byId.get(id)
+        observer.unobserve(entry.target)
+        if (!listed || seen.current.has(id)) continue
+        seen.current.add(id)
+        impressionQueue.current.push(listed)
+      }
+    }, { threshold: 0.5 })
+    for (const product of displayedProducts) {
+      if (seen.current.has(product.id)) continue
+      const card = document.getElementById(`p-${product.id}`)
+      if (card) observer.observe(card)
+    }
+    return () => observer.disconnect()
+  }, [displayedProducts])
+
+  // A dwell clock runs exactly while a product is both expanded and rendered, so
+  // URL-restored details count and a card hidden by a filter stops counting.
+  useEffect(() => {
+    const shown = new Map(displayedProducts.map((product) => [product.id, product]))
+    for (const id of Array.from(dwellStart.current.keys())) {
+      if (!shown.has(id) || !expanded.has(id)) endDwell(id)
+    }
+    for (const id of Array.from(expanded)) {
+      const product = shown.get(id)
+      if (product && !dwellStart.current.has(id)) {
+        dwellStart.current.set(id, { brand: product.brand, since: Date.now() })
+      }
+    }
+  }, [displayedProducts, expanded])
+
+  useEffect(() => {
+    const flush = () => {
+      if (impressionQueue.current.length) trackListImpressions(impressionQueue.current.splice(0))
+    }
+    const timer = window.setInterval(flush, 3000)
+    // Hidden tab: send what is pending and stop the dwell clocks; restart them on return.
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        flush()
+        for (const id of Array.from(dwellStart.current.keys())) endDwell(id, true)
+      } else {
+        for (const entry of Array.from(dwellStart.current.values())) entry.since = Date.now()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.clearInterval(timer)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [])
+
   const remainingCount = visibleProducts.length - displayedProducts.length
   const activeFilterCount =
     (category ? 1 : 0) + (brand ? 1 : 0) + (datePreset !== 'all' ? 1 : 0) + (hideNoScore ? 1 : 0)
@@ -361,8 +443,13 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     if (preset.key !== 'all') trackFilterApply('date_range', preset.key)
   }
 
-  function toggleProduct(product: Product) {
+  function toggleProduct(product: Product, index: number) {
     const closing = expanded.has(product.id)
+    // Once per product per visit, matching impressions, so CTR stays a share of viewers.
+    if (!closing && !clicked.current.has(product.id)) {
+      clicked.current.add(product.id)
+      trackSelectItem({ product, index })
+    }
     setOpenedId((current) => (closing ? (current === product.id ? null : current) : product.id))
     setExpanded((current) => {
       const next = new Set(current)
@@ -605,12 +692,12 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
           </div>
         ) : (
           <>
-            {displayedProducts.map((product) => (
+            {displayedProducts.map((product, index) => (
               <ShelfCard
                 key={product.id}
                 product={product}
                 isExpanded={expanded.has(product.id)}
-                onToggle={() => toggleProduct(product)}
+                onToggle={() => toggleProduct(product, index)}
               />
             ))}
             {remainingCount > 0 ? (
