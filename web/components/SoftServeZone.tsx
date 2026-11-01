@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useMemo, useState, type CSSProperties } from 'react'
 import ShelfCard from '@/components/ShelfCard'
+import ThemeToggle from '@/components/ThemeToggle'
 import { trackProductExpand } from '@/lib/analytics'
 import {
   DataPayload,
@@ -98,9 +99,12 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
             </h1>
           </div>
         </div>
-        <Link href="/" className="ss-back">
-          ← 回貨架
-        </Link>
+        <div className="ss-sign-actions">
+          <ThemeToggle />
+          <Link href="/" className="ss-back">
+            ← 回貨架
+          </Link>
+        </div>
       </header>
 
       <div className="sl-aislebar">

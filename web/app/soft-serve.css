@@ -77,7 +77,7 @@
   margin-top: 5px;
   height: 6px;
   border-radius: 3px;
-  background: #e9e6dd;
+  background: var(--sl-surface-2);
   overflow: hidden;
 }
 .ss-bar-fill { display: block; height: 100%; width: var(--ss-w); border-radius: 3px; }

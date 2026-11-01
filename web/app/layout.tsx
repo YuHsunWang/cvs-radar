@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { GA_ID } from '@/lib/analytics'
 import { getSiteUrl } from '@/lib/site-url'
+import { themeInitScript } from '@/lib/theme'
 import './globals.css'
 
 const siteUrl = getSiteUrl()
@@ -37,7 +38,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-Hant-TW">
+    <html lang="zh-Hant-TW" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>{children}</body>
       {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
     </html>
