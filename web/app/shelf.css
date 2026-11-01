@@ -1034,3 +1034,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
     gap: 12px;
   }
 }
+
+/* Reviewed product images use the static export's native browser image path. */
+.sl-product-image { margin: 0; display: grid; gap: 6px; justify-items: start; }
+.sl-image-full { width: 320px; height: 240px; max-width: 100%; object-fit: contain; }
+.sl-product-image figcaption, .sl-image-missing { font-size: 12px; color: #6e685e; }
+.sl-product-image a { text-decoration: underline; }

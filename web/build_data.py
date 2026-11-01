@@ -26,9 +26,11 @@ from cvs_radar.scoring.compute import _classify, _confidence  # noqa: E402
 from cvs_radar.product_categories import resolve_category  # noqa: E402
 from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
 from cvs_radar.store import load_results  # noqa: E402
+from web.product_images import load_product_images, valid_image  # noqa: E402
 
 
 PRODUCT_OVERRIDES_PATH = ROOT / "data" / "labels" / "product_overrides.csv"
+PRODUCT_IMAGES_PATH = ROOT / "data" / "labels" / "product_images.csv"
 CLEAR_VALUE = "__CLEAR__"
 REPRESENTATIVE_LIMIT = 3
 DATA_STALE_DAYS = 14
@@ -487,7 +489,7 @@ def validate_payload(payload: dict[str, Any]) -> None:
         "eligibleComments", "uniqueEligibleCommenters", "independentThreads",
         "volumeLevel", "positivePct",
         "neutralPct", "negativePct", "likes", "cautions", "excerpt", "reviewProvisional", "postUrls", "latestDate",
-        "kcal", "nutrition",
+        "kcal", "nutrition", "image",
     }
     for index, product in enumerate(payload["products"]):
         if not isinstance(product, dict) or set(product) != required_fields:
@@ -499,6 +501,8 @@ def validate_payload(payload: dict[str, Any]) -> None:
             raise ValueError(f"public payload product {index} has invalid kcal")
         if not valid_nutrition(product["nutrition"]):
             raise ValueError(f"public payload product {index} has invalid nutrition")
+        if not valid_image(product["image"]):
+            raise ValueError(f"public payload product {index} has invalid image metadata")
         if not isinstance(product["reviewProvisional"], bool):
             raise ValueError(f"public payload product {index} has invalid excerpt provenance")
         count_fields = (
@@ -582,9 +586,11 @@ def main(
     # After merge and overrides, so the match is on the name the site shows.
     kcal_lookup = load_kcal_lookup()
     nutrition_lookup = load_nutrition_lookup(kcal_lookup)
+    images = load_product_images(PRODUCT_IMAGES_PATH)
     for product in products:
         product["kcal"] = kcal_lookup.kcal_for(product["brand"], product["productName"])
         product["nutrition"] = nutrition_lookup.nutrition_for(product["brand"], product["productName"])
+        product["image"] = images.get(product["id"])
     assert_no_product_collapse(existing_product_count(output), len(products))
     generated_at, site_built_at_iso = resolve_data_timestamps(source, site_built_at)
     payload = {

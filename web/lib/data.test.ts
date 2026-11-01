@@ -13,12 +13,55 @@ import {
   filterHasScore,
   formatDisplayDate,
   isDataStale,
+  isProductImage,
+  parseDataPayload,
   normalizeDateRange,
   offsetToDate,
   recentRecommendationScore,
   sentimentSegments,
   sortProducts,
 } from './data'
+
+// Synthetic URLs only; these are never added to the public snapshot.
+const fixtureImage = {
+  imageUrl: 'https://images.example/test-fixture.png',
+  sourcePageUrl: 'https://retailer.example/product/0904302',
+  sourceKind: 'official_retailer',
+} as const
+
+describe('public image metadata boundary', () => {
+  it('accepts missing imagery as null and preserves traceable approved imagery', () => {
+    const products = [product({ image: null }), product({ image: fixtureImage })]
+    expect(parseDataPayload(JSON.stringify({ generatedAt: '', siteBuiltAt: '', products })).products).toEqual(products)
+  })
+
+  it.each([
+    undefined, {}, { imageUrl: fixtureImage.imageUrl },
+    { ...fixtureImage, sourceKind: 'unknown' },
+    { ...fixtureImage, sourceKind: ['official_retailer'] },
+    { ...fixtureImage, privatePermissionNote: 'Keep out of public data' },
+    { ...fixtureImage, sourceKind: 'ptt' },
+  ])('rejects untraceable or unexpected image metadata: %j', (image) => {
+    expect(isProductImage(image)).toBe(false)
+    expect(() => parseDataPayload(JSON.stringify({ products: [{ image }] }))).toThrow('Invalid public product image metadata')
+  })
+
+  it.each([
+    'http://images.example/a', 'javascript:alert(1)', 'data:image/png;base64,test',
+    '//images.example/a', 'https://user:pass@images.example/a', 'https://@images.example/a',
+    'https://images.example\\@evil.example/a', 'https://images.example/\na',
+    'https://images.example/%0aX', 'https://images.example/%5cX',
+    'https://images.example:bad/a', 'https://images.example:8443/a',
+    'https://127.0.0.1/a', 'https://localhost/a', 'https://host.local/a',
+  ])('rejects unsafe image and source URLs: %s', (url) => {
+    expect(isProductImage({ ...fixtureImage, imageUrl: url })).toBe(false)
+    expect(isProductImage({ ...fixtureImage, sourcePageUrl: url })).toBe(false)
+  })
+
+  it('accepts a reviewed supplementary PTT post source without account metadata', () => {
+    expect(isProductImage({ ...fixtureImage, sourceKind: 'ptt', sourcePageUrl: 'https://www.ptt.cc/bbs/CVS/M.1781407692.A.2B4.html' })).toBe(true)
+  })
+})
 
 function product(overrides: Partial<Product>): Product {
   return {
@@ -48,7 +91,7 @@ function product(overrides: Partial<Product>): Product {
     postUrls: [],
     latestDate: '2026-06-15',
     kcal: null,
-    nutrition: null,
+    nutrition: null, image: null,
     ...overrides,
   }
 }
