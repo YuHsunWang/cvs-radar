@@ -850,6 +850,7 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   font-size: 13px;
 }
 .sl-nutri caption {
+  background: #fff;
   border: 1.5px solid #17130e;
   border-bottom: 0;
   padding: 4px 0;
