@@ -439,6 +439,10 @@ class ScoringTest(unittest.TestCase):
         reports = score_all(processed, {})
 
         self.assertEqual(canonical_product_name("7-11", "小7 阜杭饅頭豬排蛋 心得"), "阜杭豆漿饅頭夾豬排蛋")
+        # Only one rainbow soup exists; its package reads 彩虹10蔬湯(青醬風味).
+        self.assertEqual(canonical_product_name("全家", "彩虹10蔬湯青醬風味"), "彩虹10蔬湯")
+        # 植覺生活 is FamilyMart's vegetarian line name; both posts show the same 隨緣素 bowl.
+        self.assertEqual(canonical_product_name("全家", "植覺生活隨緣素魷魚羹麵"), "隨緣素魷魚羹麵")
         self.assertIn("抹茶霜淇淋", [post.product_name for post in processed])
         self.assertTrue(groups)
         self.assertEqual(report.product_name, "阜杭豆漿饅頭夾豬排蛋")
