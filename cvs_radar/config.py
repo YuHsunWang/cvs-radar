@@ -57,6 +57,9 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         "7-11": {
             "阜杭饅頭豬排蛋": "阜杭豆漿饅頭夾豬排蛋",
         },
+        "全家": {
+            "彩虹10蔬湯青醬風味": "彩虹10蔬湯",
+        },
     },
     "BRAND_COMPARISON": {
         "comparison_terms": [
