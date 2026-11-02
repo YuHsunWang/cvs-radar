@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
+import ThemeToggle from '@/components/ThemeToggle'
 import {
   trackFilterApply,
   trackListImpressions,
@@ -622,6 +623,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             }}
           />
         </div>
+        <ThemeToggle />
       </header>
 
       {/* Phones only: one-tap brand and category toggles, so the common filters
