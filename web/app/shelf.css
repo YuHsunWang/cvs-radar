@@ -367,7 +367,8 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-channel-dot[data-brand="OK"] { background: #f5a623; }
 .sl-channel-dot[data-brand="美廉社"] { background: #6c3dbf; }
 .sl-card-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.sl-card-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+/* Wraps so a vegetarian chip never pushes the row into the score column on narrow phones. */
+.sl-card-top { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-width: 0; }
 .sl-pname {
   margin: 0;
   color: var(--sl-ink);
