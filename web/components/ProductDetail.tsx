@@ -3,6 +3,7 @@
 import { ExternalLink, ThumbsUp, TriangleAlert } from 'lucide-react'
 import { trackNutritionOpen, trackOutboundPttClick } from '@/lib/analytics'
 import { Nutrition, Product } from '@/lib/data'
+import ProductImage from '@/components/ProductImage'
 
 type ProductDetailProps = {
   product: Product
@@ -46,6 +47,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="sl-k">
+      <ProductImage product={product} />
       <div className="sl-detail-meta">
         <span>{product.latestDate ? `最新心得 ${product.latestDate.replaceAll('-', '/')}` : '心得日期不明'}</span>
         <span>共識：{product.consensus}</span>

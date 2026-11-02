@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import SoftServeZone from '@/components/SoftServeZone'
-import type { DataPayload } from '@/lib/data'
+import { parseDataPayload, type DataPayload } from '@/lib/data'
 import '../shelf.css'
 import '../soft-serve.css'
 
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 async function loadInitialPayload(): Promise<DataPayload> {
   const source = await readFile(join(process.cwd(), 'public', 'data.json'), 'utf8')
-  return JSON.parse(source) as DataPayload
+  return parseDataPayload(source)
 }
 
 export default async function SoftServePage() {

@@ -13,6 +13,19 @@ import { Product, sortProducts } from '../lib/data'
 const require = createRequire(import.meta.url)
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const modules = new Map<string, { exports: Record<string, unknown> }>()
+// No DOM dependency is installed. For the image's event tests, retain its one
+// React state cell and call the actual rendered onError handler between renders.
+type ImageState = { key: string; broken: boolean }
+let imageHookTest = false
+let imageState: ImageState | undefined
+const imageReact = {
+  ...React,
+  useState: (initial: ImageState) => {
+    if (!imageHookTest) return React.useState(initial)
+    imageState ??= initial
+    return [imageState, (next: ImageState) => { imageState = next }] as const
+  },
+}
 function loadSource(filename: string): Record<string, unknown> {
   const cached = modules.get(filename)
   if (cached) return cached.exports
@@ -23,6 +36,7 @@ function loadSource(filename: string): Record<string, unknown> {
     fileName: filename,
   }).outputText
   const localRequire = (id: string): unknown => {
+    if (id === 'react' && filename.endsWith('/ProductImage.tsx')) return imageReact
     if (!id.startsWith('@/') && !id.startsWith('.')) return require(id)
     const path = id.startsWith('@/') ? resolve(webRoot, id.slice(2)) : resolve(dirname(filename), id)
     return loadSource(`${path}${path.includes('/components/') ? '.tsx' : '.ts'}`)
@@ -33,6 +47,7 @@ function loadSource(filename: string): Record<string, unknown> {
 const ShelfCard = loadSource(resolve(webRoot, 'components/ShelfCard.tsx')).default as typeof import('./ShelfCard').default
 const ShelfExplorer = loadSource(resolve(webRoot, 'components/ShelfExplorer.tsx')).default as typeof import('./ShelfExplorer').default
 const SoftServeZone = loadSource(resolve(webRoot, 'components/SoftServeZone.tsx')).default as typeof import('./SoftServeZone').default
+const ProductImage = loadSource(resolve(webRoot, 'components/ProductImage.tsx')).default as typeof import('./ProductImage').default
 
 function product(overrides: Partial<Product> = {}): Product {
   return {
@@ -42,7 +57,7 @@ function product(overrides: Partial<Product> = {}): Product {
     rawComments: 2, eligibleComments: 2, uniqueEligibleCommenters: 2,
     independentThreads: 1, volumeLevel: '中等', positivePct: 60,
     neutralPct: 20, negativePct: 20, likes: [], cautions: [], excerpt: '',
-    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null, nutrition: null,
+    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null, nutrition: null, image: null,
     ...overrides,
   }
 }
@@ -52,6 +67,91 @@ function card(item: Product, expanded = false) {
     React.createElement(ShelfCard, { product: item, isExpanded: expanded, onToggle: () => {} }),
   )
 }
+
+describe('reviewed static product images (synthetic fixtures)', () => {
+  const image = {
+    imageUrl: 'https://images.example/test-fixture.png',
+    sourcePageUrl: 'https://retailer.example/product/0904302',
+    sourceKind: 'official_retailer',
+  } as const
+
+  it('renders native contained images with alt text and a safe traceable detail source', () => {
+    const html = card(product({ image }), true)
+    expect(html).toContain('src="https://images.example/test-fixture.png"')
+    expect(html).toContain('alt="測試商品的商品圖片"')
+    expect(html).toContain('width="320" height="240"')
+    expect(html).toContain('loading="lazy"')
+    expect(html).toContain('href="https://retailer.example/product/0904302" target="_blank" rel="noopener noreferrer"')
+    expect(html).toContain('圖片來源：通路官方')
+    expect(html).not.toContain('/_next/image')
+    const css = readFileSync(resolve(webRoot, 'app/shelf.css'), 'utf8')
+    expect(css).toContain('max-width: 100%; object-fit: contain;')
+  })
+
+  it('requests nothing for a collapsed card, so a shelf of cards costs no third-party image load', () => {
+    const html = card(product({ image }), false)
+    expect(html).not.toContain('<img')
+    expect(html).not.toContain('images.example')
+    expect(html).toContain('sl-cat')
+  })
+
+  it('makes no image request for absent imagery and keeps the category fallback', () => {
+    const html = card(product({ image: null }), true)
+    expect(html).not.toContain('<img')
+    expect(html).not.toContain('images.example')
+    expect(html).not.toContain('暫無商品圖片')
+    expect(html).not.toContain('sl-image-missing')
+    expect(html).toContain('sl-cat')
+  })
+
+  it('also fails closed when a caller supplies unsafe metadata directly', () => {
+    const html = card(product({ image: { ...image, imageUrl: 'javascript:alert(1)' } }), true)
+    expect(html).not.toContain('<img')
+    expect(html).not.toContain('javascript:')
+  })
+
+  it('handles an actual onError and retries on item, URL, or source changes', () => {
+    imageHookTest = true
+    imageState = undefined
+    try {
+      const item = product({ image })
+      const view = (item: Product) => {
+        const rendered = ProductImage({ product: item }) as React.ReactElement<{ children: React.ReactElement[] }>
+        return (rendered?.type === 'figure' ? rendered.props.children[0] : rendered) as React.ReactElement<{ onError: () => void; ref: (element: unknown) => void }>
+      }
+      expect(view(item).type).toBe('img')
+      // A lazy image still waiting to load must stay; one that failed before hydration must not.
+      view(item).props.ref({ complete: false, naturalWidth: 0 })
+      view(item).props.ref({ complete: true, naturalWidth: 48 })
+      expect(view(item).type).toBe('img')
+      view(item).props.ref({ complete: true, naturalWidth: 0 })
+      expect(renderToStaticMarkup(view(item))).toContain('圖片暫時無法載入')
+      imageState = undefined
+      expect(view(item).type).toBe('img')
+      view(item).props.onError()
+      const failed = renderToStaticMarkup(view(item))
+      expect(failed).toContain('圖片暫時無法載入')
+      expect(failed).not.toContain('<img')
+      // Same URL on a new product must retry; returning to the old item also resets.
+      const next = product({ id: 'different-item', image })
+      expect(view(next).type).toBe('img')
+      view(next).props.onError()
+      expect(view(item).type).toBe('img')
+      view(item).props.onError()
+      const changedUrl = product({ image: { ...image, imageUrl: 'https://images.example/other-fixture.png' } })
+      expect(view(changedUrl).type).toBe('img')
+      view(changedUrl).props.onError()
+      const changedSource = product({ image: { ...changedUrl.image!, sourcePageUrl: 'https://brand.example/fixture', sourceKind: 'official_brand' } })
+      expect(view(changedSource).type).toBe('img')
+      view(changedSource).props.onError()
+      expect(renderToStaticMarkup(view(product({ image: null })))).toBe('')
+      expect(view(changedSource).type).toBe('img')
+    } finally {
+      imageHookTest = false
+      imageState = undefined
+    }
+  })
+})
 
 describe('truthful shelf results', () => {
   it('never awards the lowest scores for occupying the first three ascending-sort positions', () => {

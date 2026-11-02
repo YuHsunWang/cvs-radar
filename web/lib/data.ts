@@ -28,6 +28,47 @@ export type Product = {
   kcal: number | null
   // FamilyMart's full packaging label, per serving as printed; null when absent.
   nutrition: Nutrition | null
+  image: ProductImage | null
+}
+
+export type ProductImage = {
+  imageUrl: string
+  sourcePageUrl: string
+  sourceKind: 'official_retailer' | 'official_brand' | 'ptt'
+}
+
+function safeImageHttpsUrl(value: unknown): value is string {
+  if (typeof value !== 'string' || !value.startsWith('https://') || /[\s\u0000-\u001f\u007f\\]/.test(value) || /%(?:0[0-9a-f]|1[0-9a-f]|7f|5c)/i.test(value)) return false
+  try {
+    const url = new URL(value)
+    // Check the written authority too: URL normalizes an empty userinfo away.
+    const authority = value.slice(8).split(/[/?#]/)[0]
+    return !authority.includes('@') && !url.username && !url.password && (!url.port || url.port === '443')
+      && /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}$/.test(url.hostname)
+      && !/\.(?:localhost|local|internal)$/i.test(url.hostname)
+  } catch {
+    return false
+  }
+}
+
+export function isProductImage(value: unknown): value is ProductImage | null {
+  if (value === null) return true
+  if (typeof value !== 'object' || value === null) return false
+  const image = value as Record<string, unknown>
+  return Object.keys(image).sort().join(',') === 'imageUrl,sourceKind,sourcePageUrl'
+    && ['official_retailer', 'official_brand', 'ptt'].includes(image.sourceKind as string)
+    && safeImageHttpsUrl(image.imageUrl) && safeImageHttpsUrl(image.sourcePageUrl)
+    && (image.sourceKind !== 'ptt' || /^https:\/\/www\.ptt\.cc\/bbs\/CVS\/M\.\d+\.A\.[0-9A-F]+\.html$/.test(image.sourcePageUrl))
+}
+
+// The existing payload comes from the Python whitelist. Validate the new image
+// boundary before rendering, including source traceability and absent images.
+export function parseDataPayload(source: string): DataPayload {
+  const payload = JSON.parse(source) as DataPayload
+  if (!payload || !Array.isArray(payload.products) || payload.products.some((product) => !product || !isProductImage(product.image))) {
+    throw new Error('Invalid public product image metadata')
+  }
+  return payload
 }
 
 export type Nutrition = {
