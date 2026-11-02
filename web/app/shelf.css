@@ -378,6 +378,7 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 }
 .sl-meta { color: var(--sl-soft); font-size: 12px; white-space: nowrap; }
 .sl-price { color: var(--sl-ink); font-size: 14px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sl-veg { color: var(--sl-good); border: 1px solid currentColor; border-radius: 999px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
 /* One-line takeaway from reviewers; two lines at most so cards keep a steady rhythm. */
 .sl-summary {
   margin: 0;

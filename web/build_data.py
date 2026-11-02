@@ -26,11 +26,12 @@ from cvs_radar.scoring.compute import _classify, _confidence  # noqa: E402
 from cvs_radar.product_categories import resolve_category  # noqa: E402
 from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
 from cvs_radar.store import load_results  # noqa: E402
-from web.product_images import load_product_images, valid_image  # noqa: E402
+from web.product_images import PTT_POST, load_product_images, valid_image  # noqa: E402
 
 
 PRODUCT_OVERRIDES_PATH = ROOT / "data" / "labels" / "product_overrides.csv"
 PRODUCT_IMAGES_PATH = ROOT / "data" / "labels" / "product_images.csv"
+VEGETARIAN_PATH = ROOT / "data" / "labels" / "vegetarian.csv"
 CLEAR_VALUE = "__CLEAR__"
 REPRESENTATIVE_LIMIT = 3
 DATA_STALE_DAYS = 14
@@ -129,6 +130,28 @@ def load_product_overrides(path: Path = PRODUCT_OVERRIDES_PATH) -> dict[str, dic
                 raise ValueError(f"invalid product override exclude flag for {product_id}: {exclude!r}")
             overrides[product_id] = values
     return overrides
+
+
+def load_vegetarian_labels(path: Path = VEGETARIAN_PATH) -> dict[str, str]:
+    """Reviewed vegetarian wording keyed by product ID.
+
+    The label is the package's own mark copied as printed, or 「素食」 when the
+    package has no mark and its ingredient list shows nothing animal. Every row
+    names the PTT post whose photo shows that evidence.
+    """
+    labels: dict[str, str] = {}
+    with path.open(encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames != ["product_id", "label", "source_page_url", "checked_at"]:
+            raise ValueError("invalid vegetarian label columns")
+        for line, row in enumerate(reader, start=2):
+            product_id, label = row["product_id"], row["label"]
+            if not product_id or not label or product_id in labels:
+                raise ValueError(f"invalid vegetarian label row at line {line}")
+            if not PTT_POST.fullmatch(row["source_page_url"]):
+                raise ValueError(f"vegetarian label at line {line} needs its PTT evidence post")
+            labels[product_id] = label
+    return labels
 
 
 def apply_product_override(
@@ -489,7 +512,7 @@ def validate_payload(payload: dict[str, Any]) -> None:
         "eligibleComments", "uniqueEligibleCommenters", "independentThreads",
         "volumeLevel", "positivePct",
         "neutralPct", "negativePct", "likes", "cautions", "excerpt", "reviewProvisional", "postUrls", "latestDate",
-        "kcal", "nutrition", "image",
+        "kcal", "nutrition", "image", "vegetarian",
     }
     for index, product in enumerate(payload["products"]):
         if not isinstance(product, dict) or set(product) != required_fields:
@@ -503,6 +526,8 @@ def validate_payload(payload: dict[str, Any]) -> None:
             raise ValueError(f"public payload product {index} has invalid nutrition")
         if not valid_image(product["image"]):
             raise ValueError(f"public payload product {index} has invalid image metadata")
+        if product["vegetarian"] is not None and not (isinstance(product["vegetarian"], str) and product["vegetarian"]):
+            raise ValueError(f"public payload product {index} has an invalid vegetarian label")
         if not isinstance(product["reviewProvisional"], bool):
             raise ValueError(f"public payload product {index} has invalid excerpt provenance")
         count_fields = (
@@ -587,10 +612,12 @@ def main(
     kcal_lookup = load_kcal_lookup()
     nutrition_lookup = load_nutrition_lookup(kcal_lookup)
     images = load_product_images(PRODUCT_IMAGES_PATH)
+    vegetarian = load_vegetarian_labels(VEGETARIAN_PATH)
     for product in products:
         product["kcal"] = kcal_lookup.kcal_for(product["brand"], product["productName"])
         product["nutrition"] = nutrition_lookup.nutrition_for(product["brand"], product["productName"])
         product["image"] = images.get(product["id"])
+        product["vegetarian"] = vegetarian.get(product["id"])
     assert_no_product_collapse(existing_product_count(output), len(products))
     generated_at, site_built_at_iso = resolve_data_timestamps(source, site_built_at)
     payload = {
