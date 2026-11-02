@@ -59,6 +59,7 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         },
         "全家": {
             "彩虹10蔬湯青醬風味": "彩虹10蔬湯",
+            "植覺生活隨緣素魷魚羹麵": "隨緣素魷魚羹麵",
         },
     },
     "BRAND_COMPARISON": {
