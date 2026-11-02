@@ -4,6 +4,56 @@
 
 :root {
   color-scheme: light;
+  --sl-html-bg: #f7f5ef;
+  --sl-page-bg: #f6f7f9;
+  --sl-aisle-top: #edebe3;
+  --sl-sign-bg: #17130e;
+  --sl-glass: rgba(255, 255, 255, 0.88);
+  --sl-indigo: #312e81;
+  --sl-muted: #6b7280;
+  --sl-surface-2: #f1f2f6;
+  --sl-on-ink: #f6f3ea;
+  --sl-on-accent: #ffffff;
+  --sl-tint-up: #f4f9f5;
+  --sl-tint-dn: #fdf5f3;
+}
+
+/* Selected by the script in app/layout.tsx. The extra selector weight also beats
+   the token blocks on .sl-page in shelf.css. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --sl-html-bg: #14161b;
+  --sl-page-bg: #14161b;
+  --sl-aisle-top: #1b1e24;
+  --sl-sign-bg: #0d0f12;
+  --sl-glass: rgba(28, 31, 38, 0.88);
+  --sl-indigo: #c7d2fe;
+  --sl-muted: #a3a9b5;
+  --sl-surface-2: #2a2e37;
+  --sl-on-ink: #14161b;
+  --sl-on-accent: #14161b;
+  --sl-tint-up: #1a2a20;
+  --sl-tint-dn: #2f1e1c;
+}
+:root[data-theme="dark"] .sl-page {
+  --sl-aisle: #14161b;
+  --sl-tag: #1f2229;
+  --sl-ink: #eceef2;
+  --sl-soft: #a3a9b5;
+  --sl-hair: #363b45;
+  --sl-hot: #ff7a6b;
+  --sl-good: #5fce8c;
+  --sl-mid: #e8b04f;
+  --sl-low: #ff8b7e;
+  --sl-na: #8d93a0;
+  --sl-accent: #c7d2fe;
+  --sl-accent-soft: #2b2f45;
+  --sl-line: #363b45;
+}
+/* SearchBar uses Tailwind light utilities. */
+:root[data-theme="dark"] .sl-page .sl-searchwrap input[type="search"] {
+  background: var(--sl-surface-2);
+  color: var(--sl-ink);
 }
 
 * {
@@ -11,7 +61,7 @@
 }
 
 html {
-  background: #f7f5ef;
+  background: var(--sl-html-bg);
 }
 
 body {
