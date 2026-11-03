@@ -57,7 +57,7 @@ function product(overrides: Partial<Product> = {}): Product {
     rawComments: 2, eligibleComments: 2, uniqueEligibleCommenters: 2,
     independentThreads: 1, volumeLevel: '中等', positivePct: 60,
     neutralPct: 20, negativePct: 20, likes: [], cautions: [], excerpt: '',
-    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null, nutrition: null, image: null,
+    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null, nutrition: null, image: null, vegetarian: null,
     ...overrides,
   }
 }
@@ -102,6 +102,16 @@ describe('reviewed static product images (synthetic fixtures)', () => {
     expect(html).not.toContain('<img')
     expect(html).not.toContain('images.example')
     expect(html).toContain('sl-cat')
+  })
+
+  it('shows the package mark short on the card and in full when opened, and nothing for unmarked products', () => {
+    const closed = card(product({ vegetarian: '植物五辛素（含奶蛋）' }), false)
+    expect(closed).toContain('sl-veg')
+    expect(closed).toContain('>植物五辛素<')
+    expect(closed).not.toContain('素食標示')
+    expect(card(product({ vegetarian: '植物五辛素（含奶蛋）' }), true)).toContain('素食標示：植物五辛素（含奶蛋）')
+    // Unreviewed products must never look vegetarian.
+    expect(card(product({ vegetarian: null }), true)).not.toMatch(/sl-veg|素食標示/)
   })
 
   it('makes no image request for absent imagery and keeps the category fallback', () => {

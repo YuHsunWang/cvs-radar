@@ -1,7 +1,7 @@
 import { CakeSlice, Cookie, Croissant, CupSoda, IceCreamCone, Package, Soup, type LucideIcon } from 'lucide-react'
 import { useId, useState } from 'react'
 import ProductDetail from '@/components/ProductDetail'
-import { Product, comprehensiveScore, displayBrand, displayCategory } from '@/lib/data'
+import { Product, comprehensiveScore, displayBrand, displayCategory, vegetarianShort } from '@/lib/data'
 
 // One icon per category group so neighbouring cards differ at a glance.
 const CATEGORY_ICON: Record<string, LucideIcon> = {
@@ -59,6 +59,7 @@ export default function ShelfCard({ product, isExpanded, onToggle }: ShelfCardPr
             <div className="sl-card-top">
               <span className="sl-channel"><span className="sl-channel-dot" data-brand={channel} aria-hidden="true" />{channel}</span>
               {product.price != null ? <span className="sl-price">${product.price}</span> : null}
+              {product.vegetarian ? <span className="sl-veg">{vegetarianShort(product.vegetarian)}</span> : null}
               <span className="sl-meta">{product.nPosts} 篇心得</span>
             </div>
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>

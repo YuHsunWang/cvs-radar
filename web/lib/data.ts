@@ -29,6 +29,13 @@ export type Product = {
   // FamilyMart's full packaging label, per serving as printed; null when absent.
   nutrition: Nutrition | null
   image: ProductImage | null
+  // The package's own vegetarian mark as printed, or 素食 from the ingredient list.
+  vegetarian: string | null
+}
+
+// Card chip: the mark's main word, e.g. 植物五辛素（含奶蛋） → 植物五辛素.
+export function vegetarianShort(label: string): string {
+  return label.split('（')[0]
 }
 
 export type ProductImage = {

@@ -53,6 +53,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         <span>共識：{product.consensus}</span>
         <span>討論量：{product.nPosts + product.nComments}</span>
         {product.confidence === '低' ? <span>樣本少</span> : null}
+        {product.vegetarian ? <span>素食標示：{product.vegetarian}</span> : null}
       </div>
       {/* Rendered when there is a summary OR the row is provisional: a provisional
           row with no summary still has to admit it is a rule fallback, otherwise
