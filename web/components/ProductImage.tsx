@@ -22,7 +22,7 @@ export default function ProductImage({ product }: Props) {
       alt={`${product.productName?.trim() || '商品'}的商品圖片`}
       width={320}
       height={240}
-      className="sl-image-full"
+      className={image.rotate ? `sl-image-full sl-rot-${image.rotate}` : 'sl-image-full'}
       loading="lazy"
       referrerPolicy="no-referrer"
       onError={() => setState({ key, broken: true })}
@@ -32,7 +32,8 @@ export default function ProductImage({ product }: Props) {
   )
   return (
     <figure className="sl-product-image">
-      {picture}
+      {/* A turned photo sits in a fixed 4:3 box so its rotated corners never spill out. */}
+      {image.rotate ? <span className="sl-image-box">{picture}</span> : picture}
       <figcaption>
         <a href={image.sourcePageUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
           圖片來源：{image.sourceKind === 'ptt' ? 'PTT 補充圖片' : image.sourceKind === 'official_brand' ? '品牌官方' : '通路官方'}

@@ -11,8 +11,10 @@ from urllib.parse import urlsplit
 
 IMAGE_FIELDS = (
     "product_id", "official_id", "source_kind", "source_page_url", "image_url",
-    "identity_status", "rights_status", "enabled", "checked_at", "takedown_reason",
+    "identity_status", "rights_status", "enabled", "checked_at", "takedown_reason", "rotate",
 )
+# Clockwise degrees the page turns a photo so its package text reads upright.
+ROTATIONS = {"0", "90", "180", "270"}
 SOURCE_KINDS = {"official_retailer", "official_brand", "ptt"}
 PTT_POST = re.compile(r"https://www\.ptt\.cc/bbs/CVS/M\.\d+\.A\.[0-9A-F]+\.html")
 
@@ -44,13 +46,14 @@ def safe_https_url(value: Any) -> bool:
 def valid_image(image: Any) -> bool:
     if image is None:
         return True
-    if not isinstance(image, dict) or set(image) != {"imageUrl", "sourcePageUrl", "sourceKind"}:
+    if not isinstance(image, dict) or set(image) != {"imageUrl", "sourcePageUrl", "sourceKind", "rotate"}:
         return False
     return (
         isinstance(image["sourceKind"], str) and image["sourceKind"] in SOURCE_KINDS
         and safe_https_url(image["imageUrl"])
         and safe_https_url(image["sourcePageUrl"])
         and (image["sourceKind"] != "ptt" or bool(PTT_POST.fullmatch(image["sourcePageUrl"])))
+        and type(image["rotate"]) is int and str(image["rotate"]) in ROTATIONS
     )
 
 
@@ -77,6 +80,8 @@ def load_product_images(path: Path) -> dict[str, dict[str, str]]:
             seen.add(product_id)
             if row["enabled"] not in {"0", "1"}:
                 raise ValueError(f"invalid product image enabled flag at line {line}")
+            if row["rotate"] not in ROTATIONS:
+                raise ValueError(f"invalid product image rotation at line {line}")
             if (
                 row["enabled"] != "1" or row["identity_status"] != "verified"
                 or row["rights_status"] != "verified" or row["takedown_reason"].strip()
@@ -87,6 +92,7 @@ def load_product_images(path: Path) -> dict[str, dict[str, str]]:
                 "imageUrl": row["image_url"],
                 "sourcePageUrl": row["source_page_url"],
                 "sourceKind": row["source_kind"],
+                "rotate": int(row["rotate"]),
             }
             if valid_image(image):
                 images[product_id] = image

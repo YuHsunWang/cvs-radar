@@ -1,9 +1,11 @@
 # Product images
 
 The static frontend shows reviewed images. The manifest has 79 7-11 images, 141
-FamilyMart images and 1523 PTT images, checked by eye against the product name on
+FamilyMart images and 1779 PTT images, checked by eye against the product name on
 review sheets in 2026-11. Pick a photo of the package front or the food; a product
-whose only photos show the package back gets no image. The repo owner approved official 7-11 and FamilyMart
+whose only photos show the package back gets no image. For a post that reviews several products, the photo must show that
+product itself; when two products share one photo and it cannot tell them apart,
+neither gets it. The repo owner approved official 7-11 and FamilyMart
 images, and approved PTT images without asking each author first: every PTT image
 links to its source article and is removed on objection (see removal below).
 PTT photos show what a poster bought, so the package may differ from today's.
@@ -15,6 +17,10 @@ Edit `data/labels/product_images.csv` with UTF-8 BOM and CRLF. Keep `official_id
 as text, including the leading zero in `0904302`. Use one retained row per exact
 public `product_id` (`brand::productName`, including case). Duplicate product IDs
 abort the build, including an official/PTT pair or an enabled/removal pair.
+
+`rotate` is the clockwise turn, `0`, `90`, `180` or `270`, that makes the
+package text read upright. The page turns the photo inside a fixed 4:3 box; the
+file itself is never changed. Any other value aborts the build.
 
 Review retailer/brand sources first (`official_retailer`, `official_brand`). Use
 `ptt` only as a manually reviewed supplement when no suitable official image has

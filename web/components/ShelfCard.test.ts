@@ -73,7 +73,16 @@ describe('reviewed static product images (synthetic fixtures)', () => {
     imageUrl: 'https://images.example/test-fixture.png',
     sourcePageUrl: 'https://retailer.example/product/0904302',
     sourceKind: 'official_retailer',
+    rotate: 0,
   } as const
+
+  it('turns a sideways package photo inside a fixed box, and leaves upright photos untouched', () => {
+    const turned = card(product({ image: { ...image, rotate: 270 } }), true)
+    expect(turned).toContain('class="sl-image-box"')
+    expect(turned).toContain('class="sl-image-full sl-rot-270"')
+    const upright = card(product({ image }), true)
+    expect(upright).not.toMatch(/sl-image-box|sl-rot-/)
+  })
 
   it('renders native contained images with alt text and a safe traceable detail source', () => {
     const html = card(product({ image }), true)

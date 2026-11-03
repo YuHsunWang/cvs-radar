@@ -16,7 +16,7 @@ def image_row(**changes: str) -> dict[str, str]:
         "source_kind": "official_retailer", "source_page_url": "https://retailer.example/product/0904302",
         "image_url": "https://images.example/test-fixture.png", "identity_status": "verified",
         "rights_status": "verified", "enabled": "1", "checked_at": "2026-11-01",
-        "takedown_reason": "", **changes,
+        "takedown_reason": "", "rotate": "0", **changes,
     }
 
 
@@ -68,7 +68,7 @@ def test_traceability_without_private_review_fields(tmp_path: Path, kind: str) -
     row = image_row(source_kind=kind, source_page_url=source)
     images = load_product_images(manifest(tmp_path, row))
     assert images[row["product_id"]] == {
-        "imageUrl": row["image_url"], "sourcePageUrl": source, "sourceKind": kind,
+        "imageUrl": row["image_url"], "sourcePageUrl": source, "sourceKind": kind, "rotate": 0,
     }
     assert valid_image(images[row["product_id"]])
     assert "official_id" not in json.dumps(images)
@@ -132,6 +132,7 @@ def test_projection_uses_final_exact_id_and_never_first_post_image(tmp_path: Pat
     {"imageUrl": "https://images.example/test.png"},
     {"imageUrl": "https://images.example/test.png", "sourcePageUrl": "http://brand.example", "sourceKind": "official_brand"},
     {"imageUrl": "https://images.example/test.png", "sourcePageUrl": "https://brand.example", "sourceKind": []},
+    {"imageUrl": "https://images.example/test.png", "sourcePageUrl": "https://brand.example", "sourceKind": "official_brand", "rotate": 45},
 ])
 def test_public_write_rejects_untraceable_metadata(tmp_path: Path, image: dict) -> None:
     payload = json.loads((Path(__file__).parents[1] / "web/public/data.json").read_text())

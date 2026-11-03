@@ -27,6 +27,7 @@ const fixtureImage = {
   imageUrl: 'https://images.example/test-fixture.png',
   sourcePageUrl: 'https://retailer.example/product/0904302',
   sourceKind: 'official_retailer',
+  rotate: 0,
 } as const
 
 describe('public image metadata boundary', () => {
@@ -41,6 +42,8 @@ describe('public image metadata boundary', () => {
     { ...fixtureImage, sourceKind: ['official_retailer'] },
     { ...fixtureImage, privatePermissionNote: 'Keep out of public data' },
     { ...fixtureImage, sourceKind: 'ptt' },
+    { ...fixtureImage, rotate: 45 },
+    { ...fixtureImage, rotate: '90' },
   ])('rejects untraceable or unexpected image metadata: %j', (image) => {
     expect(isProductImage(image)).toBe(false)
     expect(() => parseDataPayload(JSON.stringify({ products: [{ image }] }))).toThrow('Invalid public product image metadata')
