@@ -1,6 +1,7 @@
 ﻿fingerprint,rewrite,source_text,verdict,model,prompt_version
 0005a467337d58317f00d18bfb1ee539537d67857b236f1a4655b40c206016ac,吃起來很乾,我覺得超乾耶~~被包裝吸引了,grounded,gpt-5.6-luna,grounding-v1
 0327fb81d66139a2640e800a8fe4fdd8447325a0febd2a5155e78a1e86454ee5,無糖奶青茶香較重，奶味偏淡,但口味就沒有那種韓式辣醬味還是我醬加太多吃不出來QQ但酸黃瓜醬真的好好吃XD。,ungrounded,gpt-5.6-luna,grounding-v1
+03bcc696eb36602389353a172da1394a5cc611ce29f4fd39d8f99853f3f8691e,吃起來臭臭苦苦的,叫它卡娜赫拉或吉伊卡哇義大利麵可能比較沒問題,ungrounded,jev,grounding-v1
 04a4e8b1c1329d71dd2824215a8213ac30b921cd22c963940b44ce6aba7097ef,巧克力味太淡,"吃了個寂寞..QAQ 好淡,不知道是不是我這家的關係",grounded,gpt-5.6-luna,grounding-v1
 057a1ed61bf0678faca5e0df3fd774c0cf11db2760f3d88e44676c4d0e64342b,霜淇淋份量偏少,這個量真的可以扣20分,grounded,gpt-5.6-luna,grounding-v1
 084be1e25c489a37aa0fef8cc5a49f34f013bc1648094d9edc2dc5164781aa76,鈉含量讓人猶豫,"椒麻很好吃,可是那個鈉看了都要思考好幾下",grounded,gpt-5.6-luna,grounding-v1

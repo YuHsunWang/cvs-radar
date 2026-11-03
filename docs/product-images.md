@@ -1,7 +1,7 @@
 # Product images
 
 The static frontend shows reviewed images. The manifest has 79 7-11 images, 141
-FamilyMart images and 1525 PTT images, checked by eye against the product name on
+FamilyMart images and 1523 PTT images, checked by eye against the product name on
 review sheets in 2026-11. Pick a photo of the package front or the food; a product
 whose only photos show the package back gets no image. The repo owner approved official 7-11 and FamilyMart
 images, and approved PTT images without asking each author first: every PTT image
