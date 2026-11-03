@@ -6,7 +6,7 @@ describe('shareable shelf links', () => {
     // Product ids look like 「7-11::麻油雞飯糰」; a link pasted on PTT must reopen that exact card.
     const state = {
       query: '布丁', brand: '全家', category: '甜點' as const, datePreset: '1m',
-      sortKey: 'comprehensiveDesc' as const, hideNoScore: true, product: '7-11::麻油雞飯糰',
+      sortKey: 'comprehensiveDesc' as const, hideNoScore: true, vegOnly: true, product: '7-11::麻油雞飯糰',
     }
     expect(readViewParams(viewSearch(state))).toEqual(state)
   })

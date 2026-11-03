@@ -11,6 +11,7 @@ export type ViewState = {
   datePreset: string
   sortKey: SortKey
   hideNoScore: boolean
+  vegOnly: boolean
   product: string | null
 }
 
@@ -32,6 +33,7 @@ export function readViewParams(search: string): ViewState {
     datePreset: pick('date', DATE_KEYS) ?? 'all',
     sortKey: pick('sort', SORT_KEYS) ?? DEFAULT_SORT,
     hideNoScore: params.get('hide') === '1',
+    vegOnly: params.get('veg') === '1',
     product: params.get('p') || null,
   }
 }
@@ -44,6 +46,7 @@ export function viewSearch(state: ViewState): string {
   if (state.datePreset !== 'all') params.set('date', state.datePreset)
   if (state.sortKey !== DEFAULT_SORT) params.set('sort', state.sortKey)
   if (state.hideNoScore) params.set('hide', '1')
+  if (state.vegOnly) params.set('veg', '1')
   if (state.product) params.set('p', state.product)
   const search = params.toString()
   return search ? `?${search}` : ''
