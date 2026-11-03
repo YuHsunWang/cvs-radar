@@ -10,7 +10,9 @@ import {
   displayBrand,
   displayCategory,
   filterByCategory,
+  filterBySearch,
   filterHasScore,
+  filterVegetarian,
   formatDisplayDate,
   isDataStale,
   isProductImage,
@@ -168,6 +170,24 @@ describe('filterHasScore', () => {
 
     expect(filterHasScore(products, true).map(({ id }) => id)).toEqual(['scored'])
     expect(filterHasScore(products, false)).toEqual(products)
+  })
+})
+
+describe('filterBySearch', () => {
+  it('finds curry under either spelling', () => {
+    // GA4 after the PTT launch: 咖喱 was the top zero-result search while the data says 咖哩.
+    const products = [product({ id: 'curry', productName: '咖哩豬排飯' }), product({ id: 'rice', productName: '白飯' })]
+    expect(filterBySearch(products, '咖喱').map(({ id }) => id)).toEqual(['curry'])
+    expect(filterBySearch(products, '咖哩').map(({ id }) => id)).toEqual(['curry'])
+  })
+})
+
+describe('filterVegetarian', () => {
+  it('keeps only products with a checked vegetarian label', () => {
+    // Unchecked products (null) must not be shown as vegetarian.
+    const products = [product({ id: 'veg', vegetarian: '全素' }), product({ id: 'unknown', vegetarian: null })]
+    expect(filterVegetarian(products, true).map(({ id }) => id)).toEqual(['veg'])
+    expect(filterVegetarian(products, false)).toEqual(products)
   })
 })
 

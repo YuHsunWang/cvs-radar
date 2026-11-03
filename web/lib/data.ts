@@ -151,12 +151,22 @@ export function isDataStale(generatedAt: string, now = Date.now()): boolean {
   return ageDays !== null && ageDays > DATA_STALE_DAYS
 }
 
+// Both spellings of curry are in use (咖喱 / 咖哩); search treats them as one.
+function searchText(value: string): string {
+  return normalizeText(value).replaceAll('喱', '哩')
+}
+
 export function filterBySearch(products: Product[], query: string): Product[] {
-  const needle = normalizeText(query.trim())
+  const needle = searchText(query.trim())
   if (!needle) return products
   return products.filter((product) =>
-    normalizeText(`${product.productName} ${product.brand}`).includes(needle),
+    searchText(`${product.productName} ${product.brand}`).includes(needle),
   )
+}
+
+export function filterVegetarian(products: Product[], vegOnly: boolean): Product[] {
+  if (!vegOnly) return products
+  return products.filter((product) => product.vegetarian !== null)
 }
 
 export function filterByBrand(products: Product[], brand: string | null): Product[] {

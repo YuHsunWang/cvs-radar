@@ -29,6 +29,7 @@ import {
   filterByCategory,
   filterHasScore,
   filterBySearch,
+  filterVegetarian,
   formatDisplayDate,
   isDataStale,
   sortProducts,
@@ -148,6 +149,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const [category, setCategory] = useState<CategoryKey | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>(DEFAULT_SORT)
   const [hideNoScore, setHideNoScore] = useState(false)
+  const [vegOnly, setVegOnly] = useState(false)
   const [filters, setFilters] = useState<AdvancedFilters>({ fromDate: '', toDate: '' })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
@@ -299,15 +301,18 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   const visibleProducts = useMemo(() => {
     return sortProducts(
       applyAdvanced(
-        filterHasScore(
-          filterByCategory(filterByBrand(filterBySearch(products, query), brand), category),
-          hideNoScore,
+        filterVegetarian(
+          filterHasScore(
+            filterByCategory(filterByBrand(filterBySearch(products, query), brand), category),
+            hideNoScore,
+          ),
+          vegOnly,
         ),
         filters,
       ),
       sortKey,
     )
-  }, [brand, category, filters, hideNoScore, products, query, sortKey])
+  }, [brand, category, filters, hideNoScore, products, query, sortKey, vegOnly])
 
   // Static export: only the client sees the query string, so restore it after mount.
   useEffect(() => {
@@ -317,6 +322,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     setCategory(view.category)
     setSortKey(view.sortKey)
     setHideNoScore(view.hideNoScore)
+    setVegOnly(view.vegOnly)
     const preset = DATE_PRESETS.find((item) => item.key === view.datePreset)
     if (preset && preset.key !== 'all') {
       setDatePreset(preset.key)
@@ -336,9 +342,9 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
 
   useEffect(() => {
     if (!restored) return
-    const search = viewSearch({ query, brand, category, datePreset, sortKey, hideNoScore, product: openedId })
+    const search = viewSearch({ query, brand, category, datePreset, sortKey, hideNoScore, vegOnly, product: openedId })
     window.history.replaceState(null, '', `${window.location.pathname}${search}`)
-  }, [restored, query, brand, category, datePreset, sortKey, hideNoScore, openedId])
+  }, [restored, query, brand, category, datePreset, sortKey, hideNoScore, vegOnly, openedId])
 
   // A shared product may sit past the first page: grow the list to it, then scroll there.
   // Gated on `restored`: the restore effect's state lands one render later, and
@@ -431,7 +437,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
 
   const remainingCount = visibleProducts.length - displayedProducts.length
   const activeFilterCount =
-    (category ? 1 : 0) + (brand ? 1 : 0) + (datePreset !== 'all' ? 1 : 0) + (hideNoScore ? 1 : 0)
+    (category ? 1 : 0) + (brand ? 1 : 0) + (datePreset !== 'all' ? 1 : 0) + (hideNoScore ? 1 : 0) + (vegOnly ? 1 : 0)
 
   function resetPage() {
     setVisibleCount(PAGE_SIZE)
@@ -483,11 +489,18 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     if (next) trackFilterApply('category', next)
   }
 
+  function toggleVeg(next: boolean) {
+    setVegOnly(next)
+    resetPage()
+    if (next) trackFilterApply('vegetarian', 'on')
+  }
+
   function clearAll() {
     setQuery('')
     setBrand(null)
     setCategory(null)
     setHideNoScore(false)
+    setVegOnly(false)
     setFilters({ fromDate: '', toDate: '' })
     setDatePreset('all')
     resetPage()
@@ -598,6 +611,13 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
     </label>
   )
 
+  const vegToggle = (
+    <label className="sl-check" data-section="veg">
+      <input type="checkbox" checked={vegOnly} onChange={(event) => toggleVeg(event.target.checked)} />
+      只看素食
+    </label>
+  )
+
   return (
     <div className="sl-page">
       <header className="sl-sign">
@@ -652,6 +672,15 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             {key}
           </button>
         ))}
+        <span className="sl-quick-sep" aria-hidden="true" />
+        <button
+          type="button"
+          className={`sl-quick-btn${vegOnly ? ' sl-on' : ''}`}
+          aria-pressed={vegOnly}
+          onClick={() => toggleVeg(!vegOnly)}
+        >
+          素食
+        </button>
       </nav>
 
       {dataStale ? (
@@ -668,7 +697,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         {brandGroup}
         {dateGroup}
         {sortGroup}
-        <div className="sl-toolbar-row">{hideToggle}</div>
+        <div className="sl-toolbar-row">{hideToggle}{vegToggle}</div>
       </div>
 
       {/* Phones only (CSS hides it on wide screens, where the inline bar already
@@ -680,6 +709,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             {category ? <button type="button" className="sl-context-button" onClick={() => revealSection('category')}>分類：{category}</button> : null}
             {datePreset !== 'all' ? <button type="button" className="sl-context-button" onClick={() => revealSection('date')}>最新心得：{DATE_PRESETS.find((preset) => preset.key === datePreset)?.label}</button> : null}
             {hideNoScore ? <button type="button" className="sl-context-button" onClick={() => revealSection('score')}>隱藏暫無綜合評分</button> : null}
+            {vegOnly ? <button type="button" className="sl-context-button" onClick={() => revealSection('veg')}>只看素食</button> : null}
           </span>
         </div>
       ) : null}
@@ -774,6 +804,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
               {brandGroup}
               {dateGroup}
               {hideToggle}
+              {vegToggle}
             </div>
             <div className="sl-sheet-foot">
               <button type="button" className="sl-sheet-clear" onClick={clearAll}>
