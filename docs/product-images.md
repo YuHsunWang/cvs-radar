@@ -16,6 +16,10 @@ as text, including the leading zero in `0904302`. Use one retained row per exact
 public `product_id` (`brand::productName`, including case). Duplicate product IDs
 abort the build, including an official/PTT pair or an enabled/removal pair.
 
+`rotate` is the clockwise turn, `0`, `90`, `180` or `270`, that makes the
+package text read upright. The page turns the photo inside a fixed 4:3 box; the
+file itself is never changed. Any other value aborts the build.
+
 Review retailer/brand sources first (`official_retailer`, `official_brand`). Use
 `ptt` only as a manually reviewed supplement when no suitable official image has
 been established. A PTT source must link to its CVS article, never an account
