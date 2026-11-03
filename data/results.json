@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-02T08:42:25+08:00",
+  "generated_at": "2026-11-03T08:57:27+08:00",
   "reports": [
     {
       "brand": "全家",
@@ -17895,10 +17895,10 @@
       "n_comments": 37,
       "n_eligible_comments": 24,
       "n_unique_commenters": 24,
-      "score_weight_sum": 24.7461,
-      "score_weighted_sum": 16.5956525,
-      "score_weight_square_sum": 24.50279625,
-      "positive_weight": 18.7739,
+      "score_weight_sum": 24.7336,
+      "score_weighted_sum": 16.58784,
+      "score_weight_square_sum": 24.4779525,
+      "positive_weight": 18.761400000000002,
       "neutral_weight": 2.0,
       "negative_weight": 3.9722,
       "contributors": [],
@@ -17912,7 +17912,7 @@
         "咖啡味淡，奶味較重"
       ],
       "product_key": "全家:ucc炭燒咖啡x莊園牛奶",
-      "score_mean": 0.6706,
+      "score_mean": 0.6707,
       "price": 49,
       "category": "飲料",
       "competitor_mention_count": 1,
@@ -22524,48 +22524,6 @@
     },
     {
       "brand": "全家",
-      "product_name": "牛肉燥飯飯糰",
-      "fair_score": 64.2,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "n_eff": 6.99,
-      "score_std": 0.275,
-      "n_posts": 1,
-      "n_comments": 39,
-      "n_eligible_comments": 6,
-      "n_unique_commenters": 6,
-      "score_weight_sum": 6.8144,
-      "score_weighted_sum": 4.514455,
-      "score_weight_square_sum": 6.64456568,
-      "positive_weight": 4.9282,
-      "neutral_weight": 0,
-      "negative_weight": 1.8862,
-      "contributors": [],
-      "rep_positive": [
-        "牛肉燥飯糰好吃，吃完開胃"
-      ],
-      "rep_negative": [
-        "滷料香料味重，不喜歡"
-      ],
-      "product_key": "全家:牛肉燥飯飯糰",
-      "score_mean": 0.6625,
-      "price": 42,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2024-11-01T18:42:15+08:00",
-      "review_excerpt": "瘦肉搭菇類，味道偏鹹帶中藥味",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1730457737.A.617.html"
-      ]
-    },
-    {
-      "brand": "全家",
       "product_name": "萌寵可愛箱",
       "fair_score": 64.2,
       "consensus": "褒貶不一",
@@ -22739,6 +22697,48 @@
       ]
     },
     {
+      "brand": "全家",
+      "product_name": "牛肉燥飯飯糰",
+      "fair_score": 64.1,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "n_eff": 6.99,
+      "score_std": 0.275,
+      "n_posts": 1,
+      "n_comments": 39,
+      "n_eligible_comments": 6,
+      "n_unique_commenters": 6,
+      "score_weight_sum": 6.8019,
+      "score_weighted_sum": 4.5047675,
+      "score_weight_square_sum": 6.61972193,
+      "positive_weight": 4.9157,
+      "neutral_weight": 0,
+      "negative_weight": 1.8862,
+      "contributors": [],
+      "rep_positive": [
+        "牛肉燥飯糰好吃，吃完開胃"
+      ],
+      "rep_negative": [
+        "滷料香料味重，不喜歡"
+      ],
+      "product_key": "全家:牛肉燥飯飯糰",
+      "score_mean": 0.6623,
+      "price": 42,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2024-11-01T18:42:15+08:00",
+      "review_excerpt": "瘦肉搭菇類，味道偏鹹帶中藥味",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1730457737.A.617.html"
+      ]
+    },
+    {
       "brand": "7-11",
       "product_name": "懷舊滷雙拼便當",
       "fair_score": 64.0,
@@ -22796,10 +22796,10 @@
       "n_comments": 18,
       "n_eligible_comments": 10,
       "n_unique_commenters": 10,
-      "score_weight_sum": 10.9528,
-      "score_weighted_sum": 7.14907,
-      "score_weight_square_sum": 10.90642534,
-      "positive_weight": 7.9528,
+      "score_weight_sum": 10.9403,
+      "score_weighted_sum": 7.139695000000001,
+      "score_weight_square_sum": 10.88158159,
+      "positive_weight": 7.9403,
       "neutral_weight": 0,
       "negative_weight": 3.0,
       "contributors": [],
@@ -22810,7 +22810,7 @@
       ],
       "rep_negative": [],
       "product_key": "全家:醇黑可可波蘿奶酥",
-      "score_mean": 0.6527,
+      "score_mean": 0.6526,
       "price": 39,
       "category": "麵包",
       "competitor_mention_count": 0,
@@ -35389,10 +35389,10 @@
       "n_comments": 18,
       "n_eligible_comments": 14,
       "n_unique_commenters": 14,
-      "score_weight_sum": 14.8159,
-      "score_weighted_sum": 8.75798,
-      "score_weight_square_sum": 14.63947069,
-      "positive_weight": 5.8466000000000005,
+      "score_weight_sum": 14.8034,
+      "score_weighted_sum": 8.748605,
+      "score_weight_square_sum": 14.61462694,
+      "positive_weight": 5.8341,
       "neutral_weight": 5.9875,
       "negative_weight": 2.9818,
       "contributors": [],
@@ -35404,7 +35404,7 @@
         "恢復原價會改選全家"
       ],
       "product_key": "7-11:鹿兒島濃焙茶拿鐵",
-      "score_mean": 0.5911,
+      "score_mean": 0.591,
       "price": 65,
       "category": "飲料",
       "competitor_mention_count": 4,
@@ -45612,10 +45612,10 @@
       "n_comments": 87,
       "n_eligible_comments": 57,
       "n_unique_commenters": 54,
-      "score_weight_sum": 56.244,
-      "score_weighted_sum": 30.371755,
-      "score_weight_square_sum": 55.55298982,
-      "positive_weight": 20.7595,
+      "score_weight_sum": 56.2315,
+      "score_weighted_sum": 30.36238,
+      "score_weight_square_sum": 55.52814607,
+      "positive_weight": 20.747,
       "neutral_weight": 19.5708,
       "negative_weight": 15.9137,
       "contributors": [],
@@ -51475,11 +51475,11 @@
       "n_comments": 46,
       "n_eligible_comments": 10,
       "n_unique_commenters": 10,
-      "score_weight_sum": 11.5539,
-      "score_weighted_sum": 5.885675,
-      "score_weight_square_sum": 11.19522873,
+      "score_weight_sum": 11.5414,
+      "score_weighted_sum": 5.879425,
+      "score_weight_square_sum": 11.17038498,
       "positive_weight": 4.6162,
-      "neutral_weight": 3.975,
+      "neutral_weight": 3.9625,
       "negative_weight": 2.9627,
       "contributors": [],
       "rep_positive": [
@@ -56776,6 +56776,53 @@
       ]
     },
     {
+      "brand": "全家",
+      "product_name": "隨緣素魷魚羹麵",
+      "fair_score": 48.5,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "n_eff": 28.87,
+      "score_std": 0.246,
+      "n_posts": 2,
+      "n_comments": 33,
+      "n_eligible_comments": 31,
+      "n_unique_commenters": 27,
+      "score_weight_sum": 27.915399999999998,
+      "score_weighted_sum": 13.5313,
+      "score_weight_square_sum": 26.99671208,
+      "positive_weight": 9.3446,
+      "neutral_weight": 8.7154,
+      "negative_weight": 9.8554,
+      "contributors": [],
+      "rep_positive": [
+        "麵條口感不錯",
+        "素魷魚仿真度高",
+        "加熱水後味道較剛好，加辣粉很讚"
+      ],
+      "rep_negative": [
+        "太鹹，吃完口乾且鈉含量高",
+        "份量大概只有一半",
+        "價格太貴"
+      ],
+      "product_key": "全家:隨緣素魷魚羹麵",
+      "score_mean": 0.4847,
+      "price": 85,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2024-12-03T18:53:45+08:00",
+      "review_excerpt": "素魷魚像蒟蒻但仿得不錯，麵不軟爛且85元偏貴；羹麵濕潤，醋香沙茶味明顯，麵體剛好",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1731990113.A.723.html",
+        "https://www.ptt.cc/bbs/CVS/M.1733223227.A.559.html"
+      ]
+    },
+    {
       "brand": "7-11",
       "product_name": "日式鹽醬豆腐",
       "fair_score": 48.4,
@@ -59593,49 +59640,6 @@
       ]
     },
     {
-      "brand": "全家",
-      "product_name": "隨緣素魷魚羹麵",
-      "fair_score": 47.1,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "n_eff": 22.88,
-      "score_std": 0.24,
-      "n_posts": 1,
-      "n_comments": 24,
-      "n_eligible_comments": 22,
-      "n_unique_commenters": 22,
-      "score_weight_sum": 22.048,
-      "score_weighted_sum": 10.34779,
-      "score_weight_square_sum": 21.24874964,
-      "positive_weight": 6.3498,
-      "neutral_weight": 7.729,
-      "negative_weight": 7.9692,
-      "contributors": [],
-      "rep_positive": [
-        "黃麵口感不錯",
-        "素魷魚完成度很高"
-      ],
-      "rep_negative": [
-        "太鹹、份量少，價格也偏貴"
-      ],
-      "product_key": "全家:隨緣素魷魚羹麵",
-      "score_mean": 0.4693,
-      "price": 60,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2024-11-19T12:21:51+08:00",
-      "review_excerpt": "羹麵濕潤，醋香沙茶味明顯，麵體剛好",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1731990113.A.723.html"
-      ]
-    },
-    {
       "brand": "萊爾富",
       "product_name": "黑糖醇奶茶",
       "fair_score": 47.1,
@@ -60071,49 +60075,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1741629813.A.BEF.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "植覺生活隨緣素魷魚羹麵",
-      "fair_score": 46.8,
-      "consensus": "評價兩極",
-      "confidence": "高",
-      "n_eff": 8.99,
-      "score_std": 0.302,
-      "n_posts": 1,
-      "n_comments": 9,
-      "n_eligible_comments": 9,
-      "n_unique_commenters": 8,
-      "score_weight_sum": 8.8558,
-      "score_weighted_sum": 4.111865,
-      "score_weight_square_sum": 8.72482972,
-      "positive_weight": 3.989,
-      "neutral_weight": 0.9864,
-      "negative_weight": 3.8804,
-      "contributors": [],
-      "rep_positive": [
-        "湯味不錯，素魷魚像真魷味"
-      ],
-      "rep_negative": [
-        "太貴、太鹹，份量少",
-        "吃起來還是很鹹"
-      ],
-      "product_key": "全家:植覺生活隨緣素魷魚羹麵",
-      "score_mean": 0.4643,
-      "price": 85,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2024-12-03T18:53:45+08:00",
-      "review_excerpt": "素魷魚像蒟蒻但仿得不錯，麵不軟爛且85元偏貴",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1733223227.A.559.html"
       ]
     },
     {
@@ -63996,11 +63957,11 @@
       "n_comments": 23,
       "n_eligible_comments": 13,
       "n_unique_commenters": 13,
-      "score_weight_sum": 14.4864,
-      "score_weighted_sum": 6.44065,
-      "score_weight_square_sum": 14.06018448,
+      "score_weight_sum": 14.4739,
+      "score_weighted_sum": 6.4344,
+      "score_weight_square_sum": 14.03534073,
       "positive_weight": 3.73,
-      "neutral_weight": 4.864,
+      "neutral_weight": 4.8515,
       "negative_weight": 5.8924,
       "contributors": [],
       "rep_positive": [
@@ -66088,51 +66049,6 @@
     },
     {
       "brand": "全家",
-      "product_name": "彩虹10蔬湯",
-      "fair_score": 43.7,
-      "consensus": "評價兩極",
-      "confidence": "高",
-      "n_eff": 10.98,
-      "score_std": 0.293,
-      "n_posts": 2,
-      "n_comments": 17,
-      "n_eligible_comments": 9,
-      "n_unique_commenters": 9,
-      "score_weight_sum": 10.6346,
-      "score_weighted_sum": 4.579865,
-      "score_weight_square_sum": 10.29721932,
-      "positive_weight": 3.9061,
-      "neutral_weight": 0.946,
-      "negative_weight": 5.7825,
-      "contributors": [],
-      "rep_positive": [
-        "有10種食材，喜歡南瓜可考慮"
-      ],
-      "rep_negative": [
-        "湯非常鹹",
-        "蔬菜少得像沒有",
-        "蔬菜湯卻放很多南瓜馬鈴薯"
-      ],
-      "product_key": "全家:彩虹10蔬湯",
-      "score_mean": 0.4307,
-      "price": 69,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2025-08-19T12:36:20+08:00",
-      "review_excerpt": "料多、蔬菜軟，青醬味重；熱量低但湯頭偏油，單吃不飽",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1750900399.A.EB2.html",
-        "https://www.ptt.cc/bbs/CVS/M.1755578182.A.09A.html"
-      ]
-    },
-    {
-      "brand": "全家",
       "product_name": "無敵家蔥蔥玉子拌麵",
       "fair_score": 43.7,
       "consensus": "一致負評",
@@ -67736,6 +67652,52 @@
     },
     {
       "brand": "全家",
+      "product_name": "彩虹10蔬湯",
+      "fair_score": 42.7,
+      "consensus": "評價兩極",
+      "confidence": "高",
+      "n_eff": 16.98,
+      "score_std": 0.283,
+      "n_posts": 3,
+      "n_comments": 22,
+      "n_eligible_comments": 14,
+      "n_unique_commenters": 14,
+      "score_weight_sum": 16.5354,
+      "score_weighted_sum": 6.9876,
+      "score_weight_square_sum": 16.1016577,
+      "positive_weight": 5.8861,
+      "neutral_weight": 0.946,
+      "negative_weight": 9.7033,
+      "contributors": [],
+      "rep_positive": [
+        "南瓜很好吃"
+      ],
+      "rep_negative": [
+        "湯很鹹",
+        "蔬菜少得幾乎沒有",
+        "不喜歡蔬菜湯裡有南瓜、馬鈴薯"
+      ],
+      "product_key": "全家:彩虹10蔬湯",
+      "score_mean": 0.4226,
+      "price": 69,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2025-08-19T12:36:20+08:00",
+      "review_excerpt": "料多、蔬菜軟，青醬味重；口感缺乏咀嚼感，湯頭不清淡且偏油膩；熱量低但湯頭偏油，單吃不飽",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1750900399.A.EB2.html",
+        "https://www.ptt.cc/bbs/CVS/M.1753962481.A.EF8.html",
+        "https://www.ptt.cc/bbs/CVS/M.1755578182.A.09A.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "極萃咖啡拿鐵",
       "fair_score": 42.7,
       "consensus": "一致負評",
@@ -68437,49 +68399,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1746437402.A.19E.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "彩虹10蔬湯青醬風味",
-      "fair_score": 42.1,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "n_eff": 6.0,
-      "score_std": 0.263,
-      "n_posts": 1,
-      "n_comments": 5,
-      "n_eligible_comments": 5,
-      "n_unique_commenters": 5,
-      "score_weight_sum": 5.9008,
-      "score_weighted_sum": 2.4077349999999997,
-      "score_weight_square_sum": 5.80443838,
-      "positive_weight": 1.98,
-      "neutral_weight": 0,
-      "negative_weight": 3.9208,
-      "contributors": [],
-      "rep_positive": [
-        "49元八折買值得",
-        "份量很足"
-      ],
-      "rep_negative": [
-        "這款很鹹"
-      ],
-      "product_key": "全家:彩虹10蔬湯青醬風味",
-      "score_mean": 0.408,
-      "price": 49,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2025-07-31T19:47:57+08:00",
-      "review_excerpt": "口感缺乏咀嚼感，湯頭不清淡且偏油膩",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1753962481.A.EF8.html"
       ]
     },
     {
@@ -69610,50 +69529,6 @@
     },
     {
       "brand": "全家",
-      "product_name": "立頓紅龜粿奶茶",
-      "fair_score": 41.5,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "n_eff": 8.0,
-      "score_std": 0.294,
-      "n_posts": 1,
-      "n_comments": 11,
-      "n_eligible_comments": 7,
-      "n_unique_commenters": 7,
-      "score_weight_sum": 7.9065,
-      "score_weighted_sum": 3.1917475,
-      "score_weight_square_sum": 7.81607713,
-      "positive_weight": 2.9447,
-      "neutral_weight": 1.0,
-      "negative_weight": 3.9618,
-      "contributors": [],
-      "rep_positive": [
-        "紅龜粿風味很還原"
-      ],
-      "rep_negative": [
-        "有紅豆奶茶底子，但有股粉味",
-        "多家全家都找不到，價格牌也消失",
-        "特價10元也不會再喝"
-      ],
-      "product_key": "全家:立頓紅龜粿奶茶",
-      "score_mean": 0.4037,
-      "price": null,
-      "category": "飲料",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-10-31T14:44:00+08:00",
-      "review_excerpt": "10元，味道難喝又怪異",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1793429042.A.AB9.html"
-      ]
-    },
-    {
-      "brand": "全家",
       "product_name": "奶昔炭燒咖啡",
       "fair_score": 41.4,
       "consensus": "一致負評",
@@ -70132,6 +70007,49 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1731320925.A.C8E.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "立頓紅龜粿奶茶",
+      "fair_score": 41.0,
+      "consensus": "評價兩極",
+      "confidence": "高",
+      "n_eff": 10.0,
+      "score_std": 0.267,
+      "n_posts": 1,
+      "n_comments": 13,
+      "n_eligible_comments": 9,
+      "n_unique_commenters": 9,
+      "score_weight_sum": 9.9065,
+      "score_weighted_sum": 3.9692475000000003,
+      "score_weight_square_sum": 9.81607713,
+      "positive_weight": 2.9447,
+      "neutral_weight": 2.0,
+      "negative_weight": 4.9618,
+      "contributors": [],
+      "rep_positive": [
+        "紅龜粿風味還原"
+      ],
+      "rep_negative": [
+        "有紅豆奶茶底，但帶粉味",
+        "免費送也不再喝"
+      ],
+      "product_key": "全家:立頓紅龜粿奶茶",
+      "score_mean": 0.4007,
+      "price": null,
+      "category": "飲料",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-10-31T14:44:00+08:00",
+      "review_excerpt": "10元，味道難喝又怪異",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793429042.A.AB9.html"
       ]
     },
     {
@@ -71355,12 +71273,12 @@
       "n_comments": 27,
       "n_eligible_comments": 22,
       "n_unique_commenters": 21,
-      "score_weight_sum": 21.6401,
-      "score_weighted_sum": 8.579205,
-      "score_weight_square_sum": 21.29970959,
+      "score_weight_sum": 21.6276,
+      "score_weighted_sum": 8.575455,
+      "score_weight_square_sum": 21.27486584,
       "positive_weight": 4.8321000000000005,
       "neutral_weight": 4.8351,
-      "negative_weight": 11.9729,
+      "negative_weight": 11.9604,
       "contributors": [],
       "rep_positive": [
         "這款比白醬好吃",
@@ -71372,7 +71290,7 @@
         "現在漲價後更不想拿"
       ],
       "product_key": "全家:日式豬排佐咖哩歐姆蛋燴飯",
-      "score_mean": 0.3964,
+      "score_mean": 0.3965,
       "price": 95,
       "category": "便當",
       "competitor_mention_count": 1,
@@ -77584,6 +77502,50 @@
     },
     {
       "brand": "全家",
+      "product_name": "花生巧克力髒髒可頌",
+      "fair_score": 34.6,
+      "consensus": "一致負評",
+      "confidence": "高",
+      "n_eff": 10.98,
+      "score_std": 0.243,
+      "n_posts": 1,
+      "n_comments": 11,
+      "n_eligible_comments": 10,
+      "n_unique_commenters": 10,
+      "score_weight_sum": 10.7501,
+      "score_weighted_sum": 3.559716,
+      "score_weight_square_sum": 10.52219283,
+      "positive_weight": 2.0,
+      "neutral_weight": 1.0,
+      "negative_weight": 7.7501,
+      "contributors": [],
+      "rep_positive": [
+        "有六折可買來嚐鮮"
+      ],
+      "rep_negative": [
+        "六折吃仍覺得普通，原價不回購",
+        "聯名系列餡料偏少",
+        "當早餐可能要吃兩個才有飽足感"
+      ],
+      "product_key": "全家:花生巧克力髒髒可頌",
+      "score_mean": 0.3311,
+      "price": 49,
+      "category": "麵包",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-09-24T08:28:51+08:00",
+      "review_excerpt": "份量少，早餐至少要兩個，原價不會買",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1790209734.A.B2D.html"
+      ]
+    },
+    {
+      "brand": "全家",
       "product_name": "鮮蝦燴意麵",
       "fair_score": 34.6,
       "consensus": "評價兩極",
@@ -77813,50 +77775,6 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1788035432.A.3C4.html"
-      ]
-    },
-    {
-      "brand": "全家",
-      "product_name": "花生巧克力髒髒可頌",
-      "fair_score": 34.5,
-      "consensus": "一致負評",
-      "confidence": "高",
-      "n_eff": 10.98,
-      "score_std": 0.243,
-      "n_posts": 1,
-      "n_comments": 11,
-      "n_eligible_comments": 10,
-      "n_unique_commenters": 10,
-      "score_weight_sum": 10.7626,
-      "score_weighted_sum": 3.5631535,
-      "score_weight_square_sum": 10.54703658,
-      "positive_weight": 2.0,
-      "neutral_weight": 1.0,
-      "negative_weight": 7.7626,
-      "contributors": [],
-      "rep_positive": [
-        "有六折可買來嚐鮮"
-      ],
-      "rep_negative": [
-        "六折吃仍覺得普通，原價不回購",
-        "聯名系列餡料偏少",
-        "當早餐可能要吃兩個才有飽足感"
-      ],
-      "product_key": "全家:花生巧克力髒髒可頌",
-      "score_mean": 0.3311,
-      "price": 49,
-      "category": "麵包",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-09-24T08:28:51+08:00",
-      "review_excerpt": "份量少，早餐至少要兩個，原價不會買",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1790209734.A.B2D.html"
       ]
     },
     {
@@ -81374,12 +81292,12 @@
       "n_comments": 40,
       "n_eligible_comments": 35,
       "n_unique_commenters": 33,
-      "score_weight_sum": 34.2553,
-      "score_weighted_sum": 10.0312825,
-      "score_weight_square_sum": 33.57117625,
+      "score_weight_sum": 34.2428,
+      "score_weighted_sum": 10.030032499999999,
+      "score_weight_square_sum": 33.5463325,
       "positive_weight": 6.7974,
       "neutral_weight": 2.9763,
-      "negative_weight": 24.4816,
+      "negative_weight": 24.4691,
       "contributors": [],
       "rep_positive": [
         "鰻魚雖小塊但好吃"
@@ -81390,7 +81308,7 @@
         "份量看起來很少"
       ],
       "product_key": "全家:日式柴魚茶泡鰻魚飯",
-      "score_mean": 0.2928,
+      "score_mean": 0.2929,
       "price": 99,
       "category": "便當",
       "competitor_mention_count": 0,
@@ -83962,50 +83880,6 @@
     },
     {
       "brand": "全家",
-      "product_name": "卡波納拉義大利麵",
-      "fair_score": 25.0,
-      "consensus": "一致負評",
-      "confidence": "高",
-      "n_eff": 13.88,
-      "score_std": 0.237,
-      "n_posts": 1,
-      "n_comments": 15,
-      "n_eligible_comments": 13,
-      "n_unique_commenters": 13,
-      "score_weight_sum": 13.411,
-      "score_weighted_sum": 3.10494275,
-      "score_weight_square_sum": 12.9596668,
-      "positive_weight": 1.5539,
-      "neutral_weight": 0,
-      "negative_weight": 11.857099999999999,
-      "contributors": [],
-      "rep_positive": [
-        "99元起司味濃，當正餐很足"
-      ],
-      "rep_negative": [
-        "和Carbonara毫無關係",
-        "底下都是油，吃起來很噁",
-        "吃起來臭臭苦苦的"
-      ],
-      "product_key": "全家:卡波納拉義大利麵",
-      "score_mean": 0.2315,
-      "price": 99,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-10-27T00:08:22+08:00",
-      "review_excerpt": "起司味濃但尾韻微苦，培根偏少",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1793030904.A.5D6.html"
-      ]
-    },
-    {
-      "brand": "全家",
       "product_name": "台式傳統飯糰",
       "fair_score": 25.0,
       "consensus": "一致負評",
@@ -84308,6 +84182,50 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1729613186.A.859.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "卡波納拉義大利麵",
+      "fair_score": 23.4,
+      "consensus": "一致負評",
+      "confidence": "高",
+      "n_eff": 14.88,
+      "score_std": 0.235,
+      "n_posts": 1,
+      "n_comments": 16,
+      "n_eligible_comments": 14,
+      "n_unique_commenters": 14,
+      "score_weight_sum": 14.411,
+      "score_weighted_sum": 3.11244275,
+      "score_weight_square_sum": 13.9596668,
+      "positive_weight": 1.5539,
+      "neutral_weight": 0,
+      "negative_weight": 12.857099999999999,
+      "contributors": [],
+      "rep_positive": [
+        "99元起司味濃，560大卡當正餐很夠"
+      ],
+      "rep_negative": [
+        "吃到下面都是油",
+        "吃起來有臭味，味道苦",
+        "蛋的人工感很重，讓人不敢買"
+      ],
+      "product_key": "全家:卡波納拉義大利麵",
+      "score_mean": 0.216,
+      "price": 99,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-10-27T00:08:22+08:00",
+      "review_excerpt": "起司味濃但尾韻微苦，培根偏少",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793030904.A.5D6.html"
       ]
     },
     {
@@ -84674,12 +84592,12 @@
       "n_comments": 48,
       "n_eligible_comments": 41,
       "n_unique_commenters": 41,
-      "score_weight_sum": 41.2869,
-      "score_weighted_sum": 8.529825,
-      "score_weight_square_sum": 40.64481603,
+      "score_weight_sum": 41.2744,
+      "score_weighted_sum": 8.527325,
+      "score_weight_square_sum": 40.61997228,
       "positive_weight": 0.9958,
       "neutral_weight": 2.8874,
-      "negative_weight": 37.4037,
+      "negative_weight": 37.3912,
       "contributors": [],
       "rep_positive": [
         "這捲有三塊雞肉"
@@ -85348,6 +85266,46 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1728977232.A.D83.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "蠟筆小新布丁風味奶茶造型瓶蓋",
+      "fair_score": 78.9,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "n_eff": 2.0,
+      "score_std": 0.035,
+      "n_posts": 1,
+      "n_comments": 1,
+      "n_eligible_comments": 1,
+      "n_unique_commenters": 1,
+      "score_weight_sum": 1.9875,
+      "score_weighted_sum": 1.857875,
+      "score_weight_square_sum": 1.97515625,
+      "positive_weight": 1.9875,
+      "neutral_weight": 0,
+      "negative_weight": 0,
+      "contributors": [],
+      "rep_positive": [
+        "10元一瓶很划算，喜歡小新的可買"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:蠟筆小新布丁風味奶茶造型瓶蓋",
+      "score_mean": 0.9348,
+      "price": 10,
+      "category": "甜點",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-11-02T09:25:51+08:00",
+      "review_excerpt": "奶茶帶淡淡布丁味，10元一瓶附公仔",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793582753.A.F79.html"
       ]
     },
     {
@@ -93824,6 +93782,46 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1755591327.A.8E2.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "井村屋麝香葡萄麻糬冰淇淋",
+      "fair_score": 65.0,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "n_eff": 1.0,
+      "score_std": 0.0,
+      "n_posts": 1,
+      "n_comments": 0,
+      "n_eligible_comments": 0,
+      "n_unique_commenters": 0,
+      "score_weight_sum": 1.0,
+      "score_weighted_sum": 0.8,
+      "score_weight_square_sum": 1.0,
+      "positive_weight": 1.0,
+      "neutral_weight": 0,
+      "negative_weight": 0,
+      "contributors": [],
+      "rep_positive": [
+        "香草冰淇淋和底下餅乾不錯吃"
+      ],
+      "rep_negative": [],
+      "product_key": "全家:井村屋麝香葡萄麻糬冰淇淋",
+      "score_mean": 0.8,
+      "price": 39,
+      "category": "冰品",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-11-02T15:42:30+08:00",
+      "review_excerpt": "葡萄味不明顯，香草冰淇淋和餅乾好吃",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793605354.A.78A.html"
       ]
     },
     {
@@ -106462,6 +106460,44 @@
       "review_provisional": true,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1733682213.A.0F7.html"
+      ]
+    },
+    {
+      "brand": "萊爾富",
+      "product_name": "天使的禮讚",
+      "fair_score": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "n_eff": 0.0,
+      "score_std": 0.0,
+      "n_posts": 1,
+      "n_comments": 0,
+      "n_eligible_comments": 0,
+      "n_unique_commenters": 0,
+      "score_weight_sum": 0.0,
+      "score_weighted_sum": 0.0,
+      "score_weight_square_sum": 0.0,
+      "positive_weight": 0,
+      "neutral_weight": 0,
+      "negative_weight": 0,
+      "contributors": [],
+      "rep_positive": [],
+      "rep_negative": [],
+      "product_key": "萊爾富:天使的禮讚",
+      "score_mean": 0.0,
+      "price": null,
+      "category": "其他",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-11-02T12:00:05+08:00",
+      "review_excerpt": "",
+      "review_provisional": true,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793592007.A.33E.html"
       ]
     }
   ],
