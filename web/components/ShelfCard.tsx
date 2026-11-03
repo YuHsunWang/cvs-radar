@@ -63,7 +63,8 @@ export default function ShelfCard({ product, isExpanded, onToggle }: ShelfCardPr
               <span className="sl-meta">{product.nPosts} 篇心得</span>
             </div>
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
-            {summary ? <p className="sl-summary">{summary}</p> : null}
+            {/* Open, the same line leads the 大家怎麼說 list; showing it twice reads as a repeat. */}
+            {summary && !isExpanded ? <p className="sl-summary">{summary}</p> : null}
           </div>
           <span className={`sl-score ${scoreTone(score)}`}>{score === null ? '—' : score}</span>
         </div>
