@@ -356,4 +356,9 @@ describe('truthful shelf results', () => {
     expect(html).not.toContain('<p class="sl-summary">蝦仁彈牙韭菜香；偏鹹</p>')
     expect(card(product({ excerpt: '' }))).not.toContain('sl-summary')
   })
+
+  it('drops the summary once the card is open', () => {
+    // The user ruled the open card repeated its first takeaway; the list already shows it.
+    expect(card(product({ excerpt: '蝦仁彈牙韭菜香；偏鹹' }), true)).not.toContain('sl-summary')
+  })
 })
