@@ -35,6 +35,8 @@ export type ProductImage = {
   imageUrl: string
   sourcePageUrl: string
   sourceKind: 'official_retailer' | 'official_brand' | 'ptt'
+  // Clockwise degrees that turn the photo so its package text reads upright.
+  rotate: 0 | 90 | 180 | 270
 }
 
 function safeImageHttpsUrl(value: unknown): value is string {
@@ -55,7 +57,8 @@ export function isProductImage(value: unknown): value is ProductImage | null {
   if (value === null) return true
   if (typeof value !== 'object' || value === null) return false
   const image = value as Record<string, unknown>
-  return Object.keys(image).sort().join(',') === 'imageUrl,sourceKind,sourcePageUrl'
+  return Object.keys(image).sort().join(',') === 'imageUrl,rotate,sourceKind,sourcePageUrl'
+    && [0, 90, 180, 270].includes(image.rotate as number)
     && ['official_retailer', 'official_brand', 'ptt'].includes(image.sourceKind as string)
     && safeImageHttpsUrl(image.imageUrl) && safeImageHttpsUrl(image.sourcePageUrl)
     && (image.sourceKind !== 'ptt' || /^https:\/\/www\.ptt\.cc\/bbs\/CVS\/M\.\d+\.A\.[0-9A-F]+\.html$/.test(image.sourcePageUrl))
