@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
+import TourButton, { startTour, tourSeen } from '@/components/SiteTour'
 import ThemeToggle from '@/components/ThemeToggle'
 import {
   trackFilterApply,
@@ -338,6 +339,11 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       pendingScroll.current = view.product
     }
     setRestored(true)
+    // First visit only. A shared product link came for that product, not a tour.
+    // The delay lets the restored view render the cards the tour points at.
+    if (view.product || tourSeen()) return
+    const timer = window.setTimeout(startTour, 600)
+    return () => window.clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -643,8 +649,14 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             }}
           />
         </div>
+        <TourButton />
         <ThemeToggle />
       </header>
+
+      <section className="sl-hero">
+        <p className="sl-hero-title">PTT 網友心得整理的超商新品評分</p>
+        <p className="sl-hero-sub">目前共有 <b>{products.length}</b> 項商品</p>
+      </section>
 
       {/* Phones only: one-tap brand and category toggles, so the common filters
           don't sit behind the sheet. The "其他" buckets stay in the sheet. */}
