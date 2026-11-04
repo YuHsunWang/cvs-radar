@@ -8,86 +8,95 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
-**[Live demo](https://cvs-radar.vercel.app/)** ·
-**[繁體中文](README.md)**
+**[Live demo](https://cvs-radar.vercel.app/)** · **[繁體中文](README.md)**
 
-Whether a new convenience-store product is any good is an answer buried in a thousand-odd
-reviews and replies on Taiwan's PTT CVS board. CVS Radar turns that into something you can
-use while standing in the aisle: search it, compare it, see *why* people recommend it or
-don't, and jump back to the original thread in one tap.
+Whether a new convenience-store product is any good is an answer scattered across review posts and replies on Taiwan's PTT CVS board. CVS Radar turns that into one ranked shelf: one card per product, one score, one line of takeaway, and a tap to see what everyone said and jump back to the original posts.
 
-The site covers roughly 2,300 products, drawn from more than 2,700 posts and 46,000
-comments going back to June 2024. Crawling, semantic reading, statistical scoring and
-the frontend are all built here, recomputed and republished by a daily schedule, and
-running live.
+It covers about 2,400 products from nearly 2,800 review posts going back to June 2024, across 7-Eleven, FamilyMart, Hi-Life and OK Mart. The UI is in Traditional Chinese.
 
 ## Product preview
 
 <p align="center">
-  <img src="docs/screenshots/app-overview.png" width="920" alt="Home page: search, brand and category filters, recency and buzz sorting, consensus distribution" />
+  <img src="docs/screenshots/app-overview.png" width="920" alt="Desktop home: search; category, brand, date and sort filters; vegetarian-only and hide-unscored toggles; two-column product cards" />
 </p>
 
 <p align="center">
-  The default ranking surfaces recently well-reviewed products; switching to "buzz" shows
-  what people are talking about right now.
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/app-mobile.png" width="260" alt="Mobile home: shelf header, search, ranked cards and a floating filter button" />
+  <img src="docs/screenshots/app-mobile.png" width="260" alt="Mobile home: brand and category quick filters, product cards, and a sort-and-filter button at the bottom right" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/product-detail.png" width="560" alt="Expanded product card: numbered per-review summaries, positive and negative evidence, links to each source thread" />
+  <img src="docs/screenshots/product-detail.png" width="520" alt="Open product card: photo, latest review date and consensus, one takeaway per review, pros and cons, nutrition label and links to each PTT post" />
 </p>
 
-<p align="center">
-  A mobile-first ranked card list. Expand any card to read a numbered summary of every
-  review, the positive and negative points drawn from comments, and a link back to each
-  original thread.
-</p>
+**Finding a product**
 
-The home page includes quick filters on mobile. Its URL preserves search, brand,
-category, date preset, sort order, the option to hide unscored products and the last opened product;
-copy it to share the current shelf.
+- The default sort is "recent recommendation": well-reviewed products that people discussed recently come first. Discussion volume and plain score are the other sorts.
+- Filter by category (meals, desserts, frozen treats, drinks, bread, snacks), brand and review date. On phones a quick-filter row sits above the list, so the common filters don't need the sheet.
+- "Vegetarian only" lists products whose package or ingredient list was checked by hand; unchecked products are never shown as vegetarian.
+- Search treats the two spellings of curry (咖喱 / 咖哩) as one word.
+- The URL keeps the search, filters, sort and the open product, so a copied link reopens the same view.
 
-Product details can also reveal official nutrition labels: whole-package calories
-from 7-11 and FamilyMart, plus per-serving nutrients, serving size and package serving
-count for some FamilyMart products. Unmatched data stays blank.
+**Reading a product**
 
-## The problem
+- A closed card shows only the chain, price, number of reviews, name, one takeaway and the score.
+- Opened, it shows a product photo, one takeaway per review, pros and cons, and a link to every PTT post.
+- More than 80% of products have a photo, from the chain's official site or a PTT review, each with its source.
+- Products with an official nutrition label can expand it; 7-Eleven and FamilyMart give calories, and some FamilyMart products give the full table.
+- Dark mode is supported.
 
-Discussion of a new convenience-store product is scattered across separate posts and
-replies. Reading a single review means inheriting one person's palate; reading the replies
-means judging sarcasm, off-topic tangents and sample size yourself. CVS Radar consolidates
-those signals into comparable, product-level information:
-
-- **What should I eat today?** Narrow down by hot food, dessert, ice cream, drinks, bread
-  or snacks. (The labelling layer is finer-grained — 11 categories including bento, instant
-  noodles, dairy and merchandise — which the frontend folds into these six plus "other".)
-- **Is it worth buying?** The collapsed card already shows score, consensus, volume, date
-  and price.
-- **Why do people like or dislike it?** Expand to read the author's verdict, then comment
-  sentiment, then the source.
-- **Can I trust this number?** Low-sample products show **no** score and no percentage
-  distribution. About a quarter of products stay blank for this reason — better to say
-  nothing than to publish a precise-looking number that three people produced.
-
-## From one review to a buying decision
+## From a review post to a score
 
 <p align="center">
   <img src="docs/workflow-overview.png" width="1100" alt="Five stages: public posts, product consolidation, semantic reading, consensus aggregation, fast verification" />
 </p>
 
-1. **Collect public reviews** — read product posts and comments from the PTT CVS board.
-2. **Consolidate into one product** — identify chain, product name and price, and merge
-   entries that are named differently but are the same item.
-3. **Preserve the actual experience** — author verdicts become concise summaries traceable to source sentences;
-   comments are classified positive, neutral or negative, excluding tangents, bare
-   agreement and talk about a different chain. When a post covers several products,
-   sentences about the neighbouring product are excluded.
-4. **Aggregate consensus and recency** — one person repeating themselves is not amplified,
-   and insufficient samples get no score. Recency ranking balances rating against freshness
-   (24-day half-life); buzz answers what people are discussing now.
-5. **Return to the evidence** — the card gives the summary; expanding it still yields the
-   author verdict, representative comments and links to the source.
+1. **Collect** product posts and replies from the PTT CVS board.
+2. **Identify the product**: chain, name and price, merging differently written names of the same item. A post that reviews several products is split.
+3. **Read the meaning**: each reply is positive, neutral or negative; off-topic replies, bare agreement and talk about other chains are dropped. Each author's review is rewritten as one line that traces back to the source.
+4. **Aggregate**: one account counts once, however many times it replies; too few people means no score.
+5. **Verify**: the card gives the quick answer, and every claim links back to its post.
+
+## How the score works
+
+A reply is not one vote. It is first judged to count or not, then weighted, then pooled with every other opinion on the product. Code: `cvs_radar/scoring/compute.py`; parameters: `config.yaml`.
+
+**Weight of each opinion**
+
+```
+weight = credibility(account) × role_weight(role) × exp(−λ · days)
+```
+
+- Authors and repliers both have role weight `1.0`.
+- Time decay is off (`λ = 0`): an old review is not discounted for being old. Freshness only drives the "recent recommendation" sort (24-day half-life), not the score.
+- Account credibility is `max(0.1, 1 − suspicion)`. Suspicion uses only the three signals that describe astroturfing: same-brand bursts within 24 hours (0.45), near-duplicate replies (0.40) and always-extreme ratings (0.15). Accounts with fewer than 5 replies are not scored.
+- Suspicion only **down-weights internally; no account is ever labelled publicly**. Published data has no account fields; `cvs_radar/store.py` strips and validates them at write time.
+
+**One person, one vote**: all of an account's opinions on a product are averaged into a single stance before pooling. Otherwise one person booing five times counts as five people.
+
+**Paid-review accusations**: when replies call a post paid promotion, the accused post's author is down-weighted. It takes at least two different accounts to count.
+
+**No score without enough people**
+
+```
+fair01 = (prior_strength · μ₀ + Σ wᵢsᵢ) / (prior_strength + Σ wᵢ)     # μ₀ = 0.5, prior_strength = 1.0
+n_eff  = (Σ wᵢ)² / Σ wᵢ²
+```
+
+`n_eff` is the effective sample size: the more the weight sits on a few people, the smaller it gets. Below `n_eff < 3` a product is "not enough data" and shows neither a score nor a positive/neutral/negative split — about a quarter of products stay blank. Fewer than 4 qualifying repliers also hides the score. A blank beats a precise-looking number that three people produced.
+
+**Consensus labels** come from the weighted mean `μ` and standard deviation `σ`: `σ ≥ 0.26` is polarised; `μ ≥ 0.68` with `σ ≤ 0.25` is consistently positive; `μ ≤ 0.45` with `σ ≤ 0.25` is consistently negative; the rest is mixed.
+
+Details: [scoring decisions](docs/DECISIONS.md) and [labelling guideline](docs/labeling_guideline.md).
+
+## LLM in the loop, still reproducible
+
+Five semantic layers — sentiment, product name, review takeaway, representative reply and category — are read by an LLM. Every result is cached in `data/labels/*.csv`, keyed by a content fingerprint, and committed.
+
+The fingerprint holds everything the model saw. For sentiment:
+
+```
+SHA-256( post ID | push tag | NFKC-normalised reply | brand | product name | post title | prompt version )
+```
+
+So the same input never calls the model again and always yields the same score, and changing a prompt invalidates the old answers by itself. That keeps CI runnable and cost bounded. A change is verified by running the full pipeline before and after and diffing the whole result set, not by green unit tests alone.
 
 ## Architecture
 
@@ -95,205 +104,45 @@ those signals into comparable, product-level information:
   <img src="docs/architecture-overview.png" width="1100" alt="Architecture: crawl, LLM labelling, scoring, frontend data build, static site" />
 </p>
 
-Both pages read the same `web/public/data.json` at build time; all semantic reading and
-statistics happen in the batch pipeline before publication. Once loaded, search and
-filtering run locally with no backend.
+All reading and scoring happens in a batch pipeline before publishing and produces one `web/public/data.json`. The site is static: search and filtering run in the browser, with no backend.
 
-| Layer | Technology |
+| Layer | Stack |
 |---|---|
-| Data collection | Python, Requests, Beautiful Soup |
-| Semantic labelling | Five LLM layers (sentiment, product name, excerpt, representative comments, category), each cached by content fingerprint in `data/labels/*.csv` |
-| Scoring | Rule-based sentiment, SnowNLP adapter, Bayesian shrinkage, configurable time decay (currently disabled) |
-| Service layer | Framework-independent query API with a local FastAPI adapter; the public site makes no API calls |
-| Web | Next.js 15, React 19, TypeScript, Tailwind CSS, Lucide |
-| Quality | Pytest, Vitest, Ruff, TypeScript / Next.js production build |
-| Deployment | Vercel (primary) plus a GitHub Actions / GitHub Pages static mirror |
+| Collection | Python, Requests, Beautiful Soup |
+| Semantic labels | Five LLM layers, cached by content fingerprint in `data/labels/*.csv` |
+| Scoring | Rule-based sentiment, Bayesian shrinkage, one vote per account, account down-weighting |
+| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS |
+| Quality | Pytest, Vitest, Ruff, TypeScript, Next.js production build |
+| Hosting | Vercel (primary), GitHub Pages (static mirror) |
 
-## How scoring works
+## Run it locally
 
-A comment is first checked for eligibility, then weighted and combined with the other
-opinions about the product. The implementation is in `cvs_radar/scoring/compute.py`,
-with parameters in `config.yaml`.
+Needs Python 3.12+ and Node.js 20. Start from the repo root.
 
-### 1. Weighting each opinion
-
-```
-weight = credibility(account) × role_weight(role) × exp(−λ · age_in_days)
-```
-
-- **Time decay** is currently disabled (`λ = 0.0`), so age does not change an opinion's
-  scoring weight. The frontend's recency and buzz rankings still use a separate 24-day
-  half-life.
-- **Role weights** are `1.0` for both authors and commenters.
-- **Account credibility** is `max(0.1, 1 − suspicion)`, reducing suspicious accounts'
-  influence without removing them.
-
-### 2. Suspicion signals (`cvs_radar/preference.py`)
-
-Five weak signals are computed from account activity, but only three currently have
-non-zero weights. Accounts with fewer than 5 eligible comments receive no penalty.
-
-| Feature | Weight | Signal |
-|---|---|---|
-| `one_sided` | 0.00 | Praising one brand while criticizing others (observation only) |
-| `single_brand` | 0.00 | Activity concentrated on one brand (observation only) |
-| `extreme` | 0.15 | Sentiment repeatedly at \|sentiment\| ≥ 0.85 |
-| `burst` | 0.45 | At least 3 comments about one brand within 24 hours |
-| `template_like` | 0.40 | Repeated wording with character-bigram Jaccard similarity ≥ 0.8 |
-
-The score **only reduces weight internally; no account is publicly labelled**.
-`cvs_radar/store.py` removes and validates account identity fields at the write boundary;
-`tests/test_publish_privacy.py` checks the published snapshot. Raw posts in
-`data/posts.jsonl` are local pipeline input and are excluded from version control.
-
-The separate `SHILL_DETECTION` mechanism discounts the accused post's author, rather
-than everyone discussing the product. It requires at least two distinct accusers and
-an accusation ratio of at least 5% in a thread with at least three non-empty comments.
-
-### 3. One person, one stance
-
-`per_user_cap` combines an account's author and comment contributions for the same
-product into one weighted stance before product-level aggregation. Repeating a comment
-does not turn one person into several voters.
-
-### 4. Bayesian shrinkage and withholding a score
-
-```
-fair01 = (prior_strength · μ₀ + Σ wᵢsᵢ) / (prior_strength + Σ wᵢ)     # μ₀ = 0.5, prior_strength = 1.0
-n_eff  = (Σ wᵢ)² / Σ wᵢ²
-```
-
-`n_eff` is the effective sample size: concentrated weights make it smaller. Below 3,
-consensus becomes "insufficient data" and the frontend shows neither a score nor a
-positive/neutral/negative percentage split. Roughly a quarter of products have no score.
-`web/build_data.py` also requires at least 4 distinct eligible commenters; fewer means
-low confidence and no score or split. Authors contribute to the score but cannot replace
-those four commenters.
-
-Consensus uses weighted mean `μ` and standard deviation `σ`: `σ ≥ 0.26` means polarized;
-`μ ≥ 0.68` and `σ ≤ 0.25` means consistently positive; `μ ≤ 0.45` and `σ ≤ 0.25` means
-consistently negative; everything else is mixed.
-
-### 5. Reproducibility with LLM labels
-
-All five semantic layers cache their results in version-controlled `data/labels/*.csv`.
-Fingerprints include the context seen by the model and the prompt version. For example,
-`sentiment_fingerprint_v2` in `cvs_radar/sentiment.py` hashes:
-
-```
-SHA-256( post ID | comment tag | NFKC-normalized comment | brand | product name | post title | prompt version )
-```
-
-Brand and product context can change the meaning of a comment, so changing that context
-must invalidate its old label. Compare complete pipeline outputs before and after a
-scoring change using the same posts and labels; unit tests alone do not establish the
-effect on the catalogue.
-
-## What this project is meant to show
-
-- **Use an LLM without making the results irreproducible.** All five semantic layers are
-  LLM-judged, but every result is cached into version control under a content fingerprint
-  that includes the prompt version. The same input recomputes without calling the model
-  again and yields identical scores — which is what makes CI viable and the cost bounded.
-  It also makes growing the corpus nearly free: when the archive went from 800 to 2,700
-  posts in August 2026, the re-crawled older threads hit the existing cache exactly, so
-  only genuinely new material had to be paid for.
-- **Don't overreach statistically.** Bayesian shrinkage, per-user caps, at least four eligible commenters, and no
-  score at all below the sample threshold. Being willing to leave a gap in the product is
-  harder than producing a good-looking ranking.
-- **Built end to end, and actually running.** Crawler, labelling pipeline, scoring and
-  static frontend, recomputed and republished on a daily schedule — not a one-off demo.
-- **Acceptance criteria have to match what you actually want to verify.** The pipeline is
-  deterministic given the same input, so a change is validated by running the full pipeline
-  before and after and diffing the result set, not by watching unit tests go green.
-
-Details in [scoring decisions](docs/DECISIONS.md), the
-[labelling guideline](docs/labeling_guideline.md) and [the ops pipeline](docs/ops-pipeline.md).
-
-## Repository structure
-
-```text
-cvs_radar/                 parsing, sentiment, scoring, service and reporting
-config.yaml                scoring, sentiment and crawler parameters
-crawl_job.py               PTT crawling, storage and recompute entry point
-run.py                     offline demo, snapshot queries and pipeline CLI
-scripts/                   audit, labelling and excerpt rebuild utilities
-  ops/                     local publishing pipeline and cron wrapper
-tests/                     backend and data-build regression tests
-web/
-  app/                     Next.js App Router entry
-  components/              filters, product cards and detail views
-  lib/                     typed search, filter and sort logic
-  build_data.py            projects results and label caches into public data
-  public/data.json         product-level payload the browser reads
-data/results.json          precomputed product-level snapshot
-data/labels/               LLM labels, manual overrides and official nutrition caches
-docs/screenshots/          screenshots generated from the production build
-.github/workflows/         CI and the GitHub Pages mirror deployment
-```
-
-## Run locally
-
-Python 3.12 or newer is required; frontend CI uses Node.js 20. Start each set of
-steps below from the repository root.
-
-### Web app
+**Website**
 
 ```bash
 python -m pip install ".[core]"
 cd web
 npm ci
 npm run build:data
-npm test
 npm run dev
 ```
 
 Open `http://localhost:3000`.
 
-### Data pipeline and API
+**Pipeline (offline demo)**
 
 ```bash
 python -m pip install -r requirements.txt
 python run.py --demo
-python -m uvicorn cvs_radar.api:app --reload
 ```
 
-The demo source is offline and uses synthetic sample posts. Crawling requires network access
-and should respect the source site's rate limits and terms. The API is an optional local
-service; the static site does not need it running.
-
-### FamilyMart food-safety data (standalone batch tool)
-
-`scripts/crawl_family_food.py` reads public pages from FamilyMart's food-safety catalogue
-separately from the PTT-only `PttCrawler`. Check the site's current `robots.txt` and terms
-before use, respect its load (the default request delay is 1 second), and do not bypass
-CAPTCHA, login or other access controls. Images remain official URLs unless
-`--download-images` is explicitly supplied; the output directory is ignored by git.
-
-```bash
-python scripts/crawl_family_food.py --start-page 1 --max-pages 3 \
-  --request-delay 1.5 --output data/family_food/products.jsonl
-python scripts/crawl_family_food.py --max-pages 1 --download-images \
-  --image-dir data/family_food/images
-```
-
-These commands create the ignored output directories. Each JSONL row contains a product's
-`product_id`, `name`, `detail_url`, `image_urls`, `serving_size`, `servings_per_container`,
-eight nutrient fields (`calories`, `protein`, `fat`, `saturated_fat`, `trans_fat`,
-`carbohydrates`, `sugar`, `sodium`), `ingredients`, `allergens` and a UTC `crawled_at`.
-Measurements contain `{"value", "unit", "raw_text"}`. Missing fields are `null`;
-unparseable measurements retain `raw_text` with a `null` value instead of becoming zero.
-
-Live rendering mode, API responses and current robots/terms remain unverified. Before
-running, use the browser Network panel to check pagination at `/Web_FFD_2022/results/{page}`,
-product IDs, detail URLs and JSON envelopes. If the HTML or API changes, save a response
-without personal data as a local fixture, then update the `parse_list_html`,
-`parse_api_response` or `parse_product_html` selectors and tests. Tests must not contact
-the official site.
+`--demo` uses synthetic posts and needs no network. Real crawling must respect the source site's rate limits and terms. `cvs_radar/api.py` also offers a local FastAPI query service; the public site does not use it.
 
 ## Verification
 
-Run from the repository root, following the CI checks:
+Same checks as CI:
 
 ```bash
 python -m pip install ".[core,api,dev]"
@@ -309,45 +158,41 @@ npx tsc --noEmit
 npm run build
 ```
 
-Three hundred-plus automated tests cover parsing edge cases, product normalization,
-sentiment attribution, one-user caps, consensus distribution, author excerpt extraction,
-score calibration, search, category and brand filtering, date boundaries, four sort modes
-and the static production export.
+Over four hundred backend tests and over a hundred frontend tests cover parsing edge cases, product merging, sentiment attribution, one vote per account, score calibration, search and filters, shareable links and the static export.
 
-## Deployment
+## Deployment and data updates
 
-The primary deployment is <https://cvs-radar.vercel.app/>. Vercel is connected to this
-repository with `web/` as its Root Directory, and every push to `main` creates a new
-production deployment. The app is a Next.js static export (`output: 'export'`).
+The site lives at <https://cvs-radar.vercel.app/>. Every push to `main` redeploys on Vercel with `web/` as the root; <https://yuhsunwang.github.io/cvs-radar/> is a static mirror built by `.github/workflows/pages.yml`. Both read the same `web/public/data.json`.
 
-<https://yuhsunwang.github.io/cvs-radar/> is a static mirror of the same site, rebuilt by
-`.github/workflows/pages.yml` on every push to `main`: rebuild the payload, build the static
-export with the `/cvs-radar` base path, upload and deploy.
+Data is refreshed by a scheduling host outside this repo running `scripts/ops/rebackfill-cron.sh`: crawl, label, rescore, build the public data, and commit it back to `main`. The repository neither contains nor proves that host's crontab; if the schedule stops, the repo does not update itself, and `scripts/check_data_freshness.py` checks for stale data. `.github/workflows/refresh-data.yml` is a manual fallback only and runs none of the five labelling layers. Full flow: [Ops pipeline](docs/ops-pipeline.md).
 
-Both serve the same `web/public/data.json`. That file is recomputed and committed to `main`
-by an externally scheduled host running this project's cron wrapper; the repository neither
-contains nor proves that host's crontab. If the schedule stalls, the repository does not
-update itself; `scripts/check_data_freshness.py` is the observable guard. CI runs backend and frontend checks independently through `.github/workflows/ci.yml`.
+## Layout
 
-The local publisher starts at `scripts/ops/rebackfill-cron.sh` and
-`scripts/ops/rebackfill.sh`, which crawls, labels, recomputes and builds the public data.
-Before the build, `scripts/fetch_official_kcal.py` and `scripts/fetch_official_nutrition.py`
-refresh official nutrition caches, retaining cached values on failure. See
-[the ops pipeline](docs/ops-pipeline.md) for the TypeSafe Jev and local Codex CLI setup
-required by the five label layers. `.github/workflows/refresh-data.yml` is a manual
-recovery fallback that runs none of those five labelers, so it is not a complete
-semantic refresh.
+```text
+cvs_radar/              parsing, sentiment, scoring, service and reports
+config.yaml             scoring, sentiment and crawler parameters
+crawl_job.py            PTT crawl, storage and recompute entry point
+run.py                  offline demo and pipeline CLI
+scripts/                labelling, audits, official nutrition data
+  ops/                  local publishing pipeline and cron wrapper
+tests/                  backend and data-build tests
+web/
+  components/           product cards, filters and detail
+  lib/                  search, filter, sort and shareable-link logic
+  build_data.py         turns results and label caches into public data
+  public/data.json      product data the browser reads
+data/labels/            LLM labels, manual overrides, vegetarian marks, photo manifest
+docs/                   scoring decisions, pipeline, trap log and screenshots
+```
 
-## Limitations and next steps
+## Limits
 
-- Semantic classification can still misread sarcasm, memes and comparisons with an elided
-  subject, which is why manual overrides and source links are kept.
-- Product grouping relies on normalized names and may split or merge unusual naming variants.
-- The public site is a precomputed snapshot, not a real-time feed.
-- Next: a larger manually labelled gold set, calibrated model comparison, more public sources.
+- Semantic reading can still misread sarcasm, memes and comparisons with a dropped subject, so manual overrides and source links stay.
+- Product merging relies on normalised names; rare name variants can still split or merge wrongly.
+- The site is a precomputed snapshot, not live data.
+- Photos for new products are added by hand, so a new item may have none at first.
+- Vegetarian marks cover only the few products checked by hand; no mark does not mean not vegetarian.
 
 ## Disclaimer
 
-This is an independent portfolio project and is not affiliated with PTT or any
-convenience-store brand. Product opinions are derived from public user-generated content and
-should be treated as decision support, not objective product quality claims.
+This is an independent portfolio project with no affiliation to PTT or any convenience-store chain. Reviews come from public user content and are a buying aid, not an objective quality claim. How photos are used and removed: [product images](docs/product-images.md).
