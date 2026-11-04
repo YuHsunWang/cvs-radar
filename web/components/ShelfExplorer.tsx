@@ -654,8 +654,8 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       </header>
 
       <section className="sl-hero">
+        {/* No product count here: counts were dropped from the page on purpose (cf87c5c). */}
         <p className="sl-hero-title">PTT 網友心得整理的超商新品評分</p>
-        <p className="sl-hero-sub">目前共有 <b>{products.length}</b> 項商品</p>
       </section>
 
       {/* Phones only: one-tap brand and category toggles, so the common filters

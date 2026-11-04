@@ -1,7 +1,6 @@
 'use client'
 
 import { driver, type DriveStep } from 'driver.js'
-import 'driver.js/dist/driver.css'
 import { CircleHelp } from 'lucide-react'
 
 export const TOUR_DONE_KEY = 'cvs-radar-tour-done'

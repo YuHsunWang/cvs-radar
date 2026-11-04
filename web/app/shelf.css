@@ -1072,8 +1072,6 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-hero { margin: 18px 2px 0; }
 .sl-hero p { margin: 0; }
 .sl-hero-title { font-size: 18px; font-weight: 700; color: var(--sl-ink); }
-.sl-hero-sub { margin-top: 2px !important; font-size: 13px; color: var(--sl-muted); }
-.sl-hero-sub b { color: var(--sl-indigo); font-family: var(--sl-mono); }
 @media (max-width: 640px) {
   .sl-hero { margin-top: 12px; }
   .sl-hero-title { font-size: 16px; }
