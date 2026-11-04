@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-03T08:57:27+08:00",
+  "generated_at": "2026-11-04T08:52:44+08:00",
   "reports": [
     {
       "brand": "全家",
@@ -2516,49 +2516,6 @@
       ]
     },
     {
-      "brand": "全家",
-      "product_name": "鹽蔥生鮭飯糰",
-      "fair_score": 76.4,
-      "consensus": "一致好評",
-      "confidence": "中",
-      "n_eff": 6.0,
-      "score_std": 0.038,
-      "n_posts": 2,
-      "n_comments": 4,
-      "n_eligible_comments": 4,
-      "n_unique_commenters": 4,
-      "score_weight_sum": 5.9030000000000005,
-      "score_weighted_sum": 4.7735875,
-      "score_weight_square_sum": 5.811809,
-      "positive_weight": 5.9030000000000005,
-      "neutral_weight": 0,
-      "negative_weight": 0,
-      "contributors": [],
-      "rep_positive": [
-        "生食等級鮭魚",
-        "風味走港式料理路線",
-        "鹽蔥提味不錯"
-      ],
-      "rep_negative": [],
-      "product_key": "全家:鹽蔥生鮭飯糰",
-      "score_mean": 0.8087,
-      "price": 36,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-10-30T16:27:54+08:00",
-      "review_excerpt": "提味不錯，鮭魚肉條是生食；鮭魚較原味，鹽蔥提味",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1776681103.A.7FE.html",
-        "https://www.ptt.cc/bbs/CVS/M.1793348878.A.BC7.html"
-      ]
-    },
-    {
       "brand": "7-11",
       "product_name": "雷神濃巧克力風味布朗尼",
       "fair_score": 76.3,
@@ -4058,6 +4015,48 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1767869058.A.5C0.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "鹽蔥生鮭飯糰",
+      "fair_score": 74.7,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "n_eff": 7.0,
+      "score_std": 0.072,
+      "n_posts": 2,
+      "n_comments": 5,
+      "n_eligible_comments": 5,
+      "n_unique_commenters": 5,
+      "score_weight_sum": 6.9030000000000005,
+      "score_weighted_sum": 5.4035874999999995,
+      "score_weight_square_sum": 6.811809,
+      "positive_weight": 6.9030000000000005,
+      "neutral_weight": 0,
+      "negative_weight": 0,
+      "contributors": [],
+      "rep_positive": [],
+      "rep_negative": [
+        "擔心生鮭魚，選擇先跳過",
+        "即期品不敢買"
+      ],
+      "product_key": "全家:鹽蔥生鮭飯糰",
+      "score_mean": 0.7828,
+      "price": 36,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-10-30T16:27:54+08:00",
+      "review_excerpt": "提味不錯，鮭魚肉條是生食；鮭魚較原味，鹽蔥提味",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1776681103.A.7FE.html",
+        "https://www.ptt.cc/bbs/CVS/M.1793348878.A.BC7.html"
       ]
     },
     {
@@ -42500,48 +42499,6 @@
     },
     {
       "brand": "全家",
-      "product_name": "拿坡里燻腸義大利麵",
-      "fair_score": 55.3,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "n_eff": 5.0,
-      "score_std": 0.246,
-      "n_posts": 1,
-      "n_comments": 4,
-      "n_eligible_comments": 4,
-      "n_unique_commenters": 4,
-      "score_weight_sum": 4.9667,
-      "score_weighted_sum": 2.8006495,
-      "score_weight_square_sum": 4.93409389,
-      "positive_weight": 2.975,
-      "neutral_weight": 1.0,
-      "negative_weight": 0.9917,
-      "contributors": [],
-      "rep_positive": [
-        "有特價券時可以買"
-      ],
-      "rep_negative": [
-        "吃完底部偏油，有點怕"
-      ],
-      "product_key": "全家:拿坡里燻腸義大利麵",
-      "score_mean": 0.5639,
-      "price": 53,
-      "category": "便當",
-      "competitor_mention_count": 0,
-      "competitor_preference_count": 0,
-      "competitor_own_preference_count": 0,
-      "competitor_brands": [],
-      "shill_ratio": 0.0,
-      "shill_flag": false,
-      "latest_post_date": "2026-11-01T13:46:15+08:00",
-      "review_excerpt": "麵體偏硬，醬汁多，帶些起司",
-      "review_provisional": false,
-      "post_urls": [
-        "https://www.ptt.cc/bbs/CVS/M.1793511979.A.940.html"
-      ]
-    },
-    {
-      "brand": "全家",
       "product_name": "海底撈清油麻辣鍋",
       "fair_score": 55.3,
       "consensus": "褒貶不一",
@@ -45647,6 +45604,50 @@
         "https://www.ptt.cc/bbs/CVS/M.1725359647.A.079.html",
         "https://www.ptt.cc/bbs/CVS/M.1725370875.A.F4A.html",
         "https://www.ptt.cc/bbs/CVS/M.1725424526.A.0A1.html"
+      ]
+    },
+    {
+      "brand": "全家",
+      "product_name": "拿坡里燻腸義大利麵",
+      "fair_score": 53.9,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "n_eff": 7.0,
+      "score_std": 0.25,
+      "n_posts": 1,
+      "n_comments": 6,
+      "n_eligible_comments": 6,
+      "n_unique_commenters": 6,
+      "score_weight_sum": 6.9667,
+      "score_weighted_sum": 3.7906495000000002,
+      "score_weight_square_sum": 6.93409389,
+      "positive_weight": 3.975,
+      "neutral_weight": 1.0,
+      "negative_weight": 1.9917,
+      "contributors": [],
+      "rep_positive": [
+        "有特價券時可以買",
+        "味道不錯"
+      ],
+      "rep_negative": [
+        "吃完底部偏油，讓人有點怕",
+        "全家義大利麵醬量偏少"
+      ],
+      "product_key": "全家:拿坡里燻腸義大利麵",
+      "score_mean": 0.5441,
+      "price": 53,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-11-01T13:46:15+08:00",
+      "review_excerpt": "麵體偏硬，醬汁多，帶些起司",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793511979.A.940.html"
       ]
     },
     {
@@ -70018,7 +70019,7 @@
       "n_eff": 10.0,
       "score_std": 0.267,
       "n_posts": 1,
-      "n_comments": 13,
+      "n_comments": 14,
       "n_eligible_comments": 9,
       "n_unique_commenters": 9,
       "score_weight_sum": 9.9065,
@@ -70029,11 +70030,11 @@
       "negative_weight": 4.9618,
       "contributors": [],
       "rep_positive": [
-        "紅龜粿風味還原"
+        "紅龜粿味很還原"
       ],
       "rep_negative": [
-        "有紅豆奶茶底，但帶粉味",
-        "免費送也不再喝"
+        "有紅豆奶茶底子，但有粉味",
+        "特價10元也不會再喝"
       ],
       "product_key": "全家:立頓紅龜粿奶茶",
       "score_mean": 0.4007,
@@ -85294,7 +85295,7 @@
       "product_key": "全家:蠟筆小新布丁風味奶茶造型瓶蓋",
       "score_mean": 0.9348,
       "price": 10,
-      "category": "甜點",
+      "category": "周邊",
       "competitor_mention_count": 0,
       "competitor_preference_count": 0,
       "competitor_own_preference_count": 0,
@@ -100707,6 +100708,48 @@
       ]
     },
     {
+      "brand": "全家",
+      "product_name": "櫻桃巧克力霜淇淋",
+      "fair_score": 55.1,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "n_eff": 2.0,
+      "score_std": 0.174,
+      "n_posts": 1,
+      "n_comments": 2,
+      "n_eligible_comments": 1,
+      "n_unique_commenters": 1,
+      "score_weight_sum": 2.0,
+      "score_weighted_sum": 1.1524999999999999,
+      "score_weight_square_sum": 2.0,
+      "positive_weight": 1.0,
+      "neutral_weight": 1.0,
+      "negative_weight": 0,
+      "contributors": [],
+      "rep_positive": [
+        "綜合口味比較喜歡"
+      ],
+      "rep_negative": [
+        "單一口味有微微香精味"
+      ],
+      "product_key": "全家:櫻桃巧克力霜淇淋",
+      "score_mean": 0.5762,
+      "price": 49,
+      "category": "冰品",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-11-03T22:19:07+08:00",
+      "review_excerpt": "微有香精味，巧克力苦甜濃郁",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793715551.A.C52.html"
+      ]
+    },
+    {
       "brand": "7-11",
       "product_name": "HomealxSN剝皮辣椒雞細扁麵",
       "fair_score": 55.0,
@@ -106486,7 +106529,7 @@
       "product_key": "萊爾富:天使的禮讚",
       "score_mean": 0.0,
       "price": null,
-      "category": "其他",
+      "category": "甜點",
       "competitor_mention_count": 0,
       "competitor_preference_count": 0,
       "competitor_own_preference_count": 0,
