@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-04T08:52:44+08:00",
+  "generatedAt": "2026-11-05T08:51:34+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -27721,50 +27721,6 @@
       "vegetarian": null
     },
     {
-      "id": "全家::墨西哥奶酥麵包",
-      "brand": "全家",
-      "productName": "墨西哥奶酥麵包",
-      "price": 35,
-      "category": "麵包",
-      "fairScore": 61,
-      "recommendationScore": 69,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 13,
-      "rawComments": 16,
-      "eligibleComments": 13,
-      "uniqueEligibleCommenters": 13,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 64,
-      "neutralPct": 14,
-      "negativePct": 22,
-      "likes": [
-        "早餐會買來配黑咖啡"
-      ],
-      "cautions": [
-        "甜度高，少數奶酥類吃不下",
-        "奶酥不集中，幾乎都在吃白麵包",
-        "麵包老了，吃後胃酸大爆發"
-      ],
-      "excerpt": "奶酥份量中等，不太甜，加熱有油滋爆漿感",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1788248685.A.ED3.html"
-      ],
-      "latestDate": "2026-09-01",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://pimg.1px.tw/blog/dressingfrad/album/303510220/925237159210533233.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1788248685.A.ED3.html",
-        "sourceKind": "ptt",
-        "rotate": 90
-      },
-      "vegetarian": null
-    },
-    {
       "id": "全家::康貝特200PEX能量飲料",
       "brand": "全家",
       "productName": "康貝特200PEX能量飲料",
@@ -28360,6 +28316,50 @@
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1752821068.A.6E5.html",
         "sourceKind": "ptt",
         "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
+      "id": "全家::墨西哥奶酥麵包",
+      "brand": "全家",
+      "productName": "墨西哥奶酥麵包",
+      "price": 35,
+      "category": "麵包",
+      "fairScore": 61,
+      "recommendationScore": 68,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 13,
+      "rawComments": 16,
+      "eligibleComments": 13,
+      "uniqueEligibleCommenters": 13,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 64,
+      "neutralPct": 14,
+      "negativePct": 22,
+      "likes": [
+        "早餐會買來配黑咖啡"
+      ],
+      "cautions": [
+        "甜度高，少數奶酥類吃不下",
+        "奶酥不集中，幾乎都在吃白麵包",
+        "麵包老了，吃後胃酸大爆發"
+      ],
+      "excerpt": "奶酥份量中等，不太甜，加熱有油滋爆漿感",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1788248685.A.ED3.html"
+      ],
+      "latestDate": "2026-09-01",
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://pimg.1px.tw/blog/dressingfrad/album/303510220/925237159210533233.jpg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1788248685.A.ED3.html",
+        "sourceKind": "ptt",
+        "rotate": 90
       },
       "vegetarian": null
     },
@@ -33193,6 +33193,44 @@
         "sourceKind": "ptt",
         "rotate": 0
       },
+      "vegetarian": null
+    },
+    {
+      "id": "全家::櫻桃巧克力霜淇淋",
+      "brand": "全家",
+      "productName": "櫻桃巧克力霜淇淋",
+      "price": 49,
+      "category": "冰品",
+      "fairScore": 59,
+      "recommendationScore": 65,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 6,
+      "rawComments": 8,
+      "eligibleComments": 6,
+      "uniqueEligibleCommenters": 6,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 57,
+      "neutralPct": 43,
+      "negativePct": 0,
+      "likes": [
+        "像無酒精的櫻桃酒心巧克力",
+        "建議先從綜合口味開始"
+      ],
+      "cautions": [
+        "單口味濃到有點膩"
+      ],
+      "excerpt": "微有香精味，巧克力苦甜濃郁",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793715551.A.C52.html"
+      ],
+      "latestDate": "2026-11-03",
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
       "vegetarian": null
     },
     {
@@ -38311,6 +38349,64 @@
       "kcal": null,
       "nutrition": null,
       "image": null,
+      "vegetarian": null
+    },
+    {
+      "id": "全家::拿坡里燻腸義大利麵",
+      "brand": "全家",
+      "productName": "拿坡里燻腸義大利麵",
+      "price": 53,
+      "category": "便當",
+      "fairScore": 57,
+      "recommendationScore": 61,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 7,
+      "rawComments": 7,
+      "eligibleComments": 7,
+      "uniqueEligibleCommenters": 7,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 62,
+      "neutralPct": 13,
+      "negativePct": 25,
+      "likes": [
+        "有特價券時可以買",
+        "味道不錯",
+        "午餐會搭配溫泉蛋吃"
+      ],
+      "cautions": [
+        "吃完底部很油，讓人有點怕"
+      ],
+      "excerpt": "麵體偏硬，醬汁多，帶些起司",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793511979.A.940.html"
+      ],
+      "latestDate": "2026-11-01",
+      "kcal": 708,
+      "nutrition": {
+        "servingSize": "363 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 708.0,
+          "protein": 30.5,
+          "fat": 28.7,
+          "saturatedFat": 7.6,
+          "transFat": 0.0,
+          "carbohydrate": 81.7,
+          "sugar": 19.6,
+          "sodium": 1601.0
+        }
+      },
+      "image": {
+        "imageUrl": "https://pimg.1px.tw/blog/dressingfrad/album/303510220/954562445601164454.jpg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1793511979.A.940.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
       "vegetarian": null
     },
     {
@@ -44326,64 +44422,6 @@
       "image": {
         "imageUrl": "https://i.imgur.com/sIYZT2b.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1725359647.A.079.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::拿坡里燻腸義大利麵",
-      "brand": "全家",
-      "productName": "拿坡里燻腸義大利麵",
-      "price": 53,
-      "category": "便當",
-      "fairScore": 54,
-      "recommendationScore": 56,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 6,
-      "rawComments": 6,
-      "eligibleComments": 6,
-      "uniqueEligibleCommenters": 6,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 57,
-      "neutralPct": 14,
-      "negativePct": 29,
-      "likes": [
-        "有特價券時可以買",
-        "味道不錯"
-      ],
-      "cautions": [
-        "吃完底部偏油，讓人有點怕",
-        "全家義大利麵醬量偏少"
-      ],
-      "excerpt": "麵體偏硬，醬汁多，帶些起司",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1793511979.A.940.html"
-      ],
-      "latestDate": "2026-11-01",
-      "kcal": 708,
-      "nutrition": {
-        "servingSize": "363 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 708.0,
-          "protein": 30.5,
-          "fat": 28.7,
-          "saturatedFat": 7.6,
-          "transFat": 0.0,
-          "carbohydrate": 81.7,
-          "sugar": 19.6,
-          "sodium": 1601.0
-        }
-      },
-      "image": {
-        "imageUrl": "https://pimg.1px.tw/blog/dressingfrad/album/303510220/954562445601164454.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1793511979.A.940.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -61004,6 +61042,51 @@
       "vegetarian": null
     },
     {
+      "id": "全家::日式甜醬油山葵風味霜淇淋綜合",
+      "brand": "全家",
+      "productName": "日式甜醬油山葵風味霜淇淋綜合",
+      "price": 49,
+      "category": "冰品",
+      "fairScore": 45,
+      "recommendationScore": 42,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 33,
+      "rawComments": 39,
+      "eligibleComments": 33,
+      "uniqueEligibleCommenters": 33,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 24,
+      "neutralPct": 32,
+      "negativePct": 44,
+      "likes": [
+        "山葵味道很讚",
+        "綜合能中和山葵嗆味"
+      ],
+      "cautions": [
+        "山葵和甜醬油都難吃",
+        "還原度高但不會再吃",
+        "單吃沒辦法"
+      ],
+      "excerpt": "醬油鹹、山葵直衝腦門，不會回購",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1775663147.A.4E2.html"
+      ],
+      "latestDate": "2026-04-08",
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/u0MQ5U7.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1775663147.A.4E2.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "7-11::明太子雞肉溏心蛋三明治",
       "brand": "7-11",
       "productName": "明太子雞肉溏心蛋三明治",
@@ -61126,51 +61209,6 @@
       "image": {
         "imageUrl": "https://i.mopix.cc/0CCwzd.jpg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1763986125.A.18C.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::日式甜醬油山葵風味霜淇淋綜合",
-      "brand": "全家",
-      "productName": "日式甜醬油山葵風味霜淇淋綜合",
-      "price": 49,
-      "category": "冰品",
-      "fairScore": 45,
-      "recommendationScore": 42,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 33,
-      "rawComments": 39,
-      "eligibleComments": 33,
-      "uniqueEligibleCommenters": 33,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 24,
-      "neutralPct": 32,
-      "negativePct": 44,
-      "likes": [
-        "山葵味道很讚",
-        "綜合能中和山葵嗆味"
-      ],
-      "cautions": [
-        "山葵和甜醬油都難吃",
-        "還原度高但不會再吃",
-        "單吃沒辦法"
-      ],
-      "excerpt": "醬油鹹、山葵直衝腦門，不會回購",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1775663147.A.4E2.html"
-      ],
-      "latestDate": "2026-04-08",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/u0MQ5U7.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1775663147.A.4E2.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -72550,7 +72588,7 @@
       "price": 69,
       "category": "零食",
       "fairScore": 37,
-      "recommendationScore": 28,
+      "recommendationScore": 29,
       "consensus": "一致負評",
       "confidence": "中",
       "nPosts": 1,
@@ -82634,6 +82672,42 @@
         "https://www.ptt.cc/bbs/CVS/M.1719482598.A.91F.html"
       ],
       "latestDate": "2024-06-27",
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::韓式半半起司熱狗",
+      "brand": "7-11",
+      "productName": "韓式半半起司熱狗",
+      "price": 59,
+      "category": "鹹食",
+      "fairScore": 77,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 2,
+      "rawComments": 4,
+      "eligibleComments": 2,
+      "uniqueEligibleCommenters": 2,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "59元，比夜市和餐車便宜",
+        "可請他們加熱"
+      ],
+      "cautions": [],
+      "excerpt": "起司牽絲長，魚肉腸Q彈清爽，麵衣外酥內鬆軟",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793754668.A.1BD.html"
+      ],
+      "latestDate": "2026-11-04",
       "kcal": null,
       "nutrition": null,
       "image": null,
@@ -97240,43 +97314,6 @@
         "sourceKind": "ptt",
         "rotate": 0
       },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::櫻桃巧克力霜淇淋",
-      "brand": "全家",
-      "productName": "櫻桃巧克力霜淇淋",
-      "price": 49,
-      "category": "冰品",
-      "fairScore": 55,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 1,
-      "rawComments": 2,
-      "eligibleComments": 1,
-      "uniqueEligibleCommenters": 1,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "綜合口味比較喜歡"
-      ],
-      "cautions": [
-        "單一口味有微微香精味"
-      ],
-      "excerpt": "微有香精味，巧克力苦甜濃郁",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1793715551.A.C52.html"
-      ],
-      "latestDate": "2026-11-03",
-      "kcal": null,
-      "nutrition": null,
-      "image": null,
       "vegetarian": null
     },
     {
