@@ -241,6 +241,26 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-datebtn.sl-on { background: var(--sl-ink); color: var(--sl-on-ink); border-color: var(--sl-ink); }
 
 .sl-toolbar-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sl-context-text { margin-right: 8px; }
+/* Ends the applied-filters line, after the conditions it resets. */
+.sl-clear-all {
+  flex: none;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sl-hot);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sl-clear-all:hover { background: rgba(127, 127, 127, 0.14); }
 
 .sl-check {
   display: inline-flex;
@@ -1023,9 +1043,6 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   .sl-quick-btn.sl-on { background: var(--sl-accent); border-color: var(--sl-accent); color: var(--sl-on-accent); }
   .sl-quick-sep { flex: none; width: 1px; margin: 6px 2px; background: var(--sl-line); }
 }
-@media (min-width: 641px) {
-  .sl-page:not(.ss-page) .sl-count { display: none; }
-}
 
 /* ---- wide screens: two columns of cards ----
    align-items: start so opening one card doesn't stretch its neighbour. */
@@ -1067,3 +1084,45 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 }
 .sl-theme-toggle:hover { background: rgba(127, 127, 127, 0.18); }
 .ss-sign-actions { display: flex; flex: none; align-items: center; gap: 6px; }
+
+/* ---- hero line under the header ---- */
+.sl-hero { margin: 18px 2px 0; }
+.sl-hero p { margin: 0; }
+.sl-hero-title { font-size: 18px; font-weight: 700; color: var(--sl-ink); }
+@media (max-width: 640px) {
+  .sl-hero { margin-top: 12px; }
+  .sl-hero-title { font-size: 16px; }
+}
+
+/* ---- first-visit tour (driver.js). The popover is appended to <body>, outside
+   .sl-page, so only the :root tokens from globals.css reach it. ---- */
+.driver-popover.sl-tour {
+  --sl-tour-bg: #ffffff;
+  --sl-tour-ink: #17130e;
+  background: var(--sl-tour-bg);
+  color: var(--sl-tour-ink);
+  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  border-radius: 14px;
+  padding: 18px;
+}
+:root[data-theme="dark"] .driver-popover.sl-tour { --sl-tour-bg: #1f2229; --sl-tour-ink: #eceef2; }
+.sl-tour .driver-popover-title { font-size: 17px; font-weight: 700; }
+.sl-tour .driver-popover-description { font-size: 15px; line-height: 1.6; color: inherit; }
+.sl-tour .driver-popover-progress-text { color: var(--sl-muted); font-size: 13px; }
+.sl-tour .driver-popover-close-btn { color: inherit; opacity: 0.6; width: 40px; height: 40px; }
+.sl-tour .driver-popover-footer-btn {
+  padding: 8px 14px;
+  font-size: 14px;
+  text-shadow: none;
+  border: 0;
+  border-radius: 10px;
+  background: var(--sl-surface-2);
+  color: var(--sl-tour-ink);
+}
+.sl-tour .driver-popover-next-btn { background: var(--sl-indigo); color: var(--sl-on-accent); }
+.sl-tour .driver-popover-footer-btn:hover,
+.sl-tour .driver-popover-footer-btn:focus { filter: brightness(0.95); }
+.sl-tour .driver-popover-arrow-side-left { border-left-color: var(--sl-tour-bg); }
+.sl-tour .driver-popover-arrow-side-right { border-right-color: var(--sl-tour-bg); }
+.sl-tour .driver-popover-arrow-side-top { border-top-color: var(--sl-tour-bg); }
+.sl-tour .driver-popover-arrow-side-bottom { border-bottom-color: var(--sl-tour-bg); }

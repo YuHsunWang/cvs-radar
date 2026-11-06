@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
+import TourButton, { startTour, tourSeen } from '@/components/SiteTour'
 import ThemeToggle from '@/components/ThemeToggle'
 import {
   trackFilterApply,
@@ -338,6 +339,11 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
       pendingScroll.current = view.product
     }
     setRestored(true)
+    // First visit only. A shared product link came for that product, not a tour.
+    // The delay lets the restored view render the cards the tour points at.
+    if (view.product || tourSeen()) return
+    const timer = window.setTimeout(startTour, 600)
+    return () => window.clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -643,8 +649,14 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             }}
           />
         </div>
+        <TourButton />
         <ThemeToggle />
       </header>
+
+      <section className="sl-hero">
+        {/* No product count here: counts were dropped from the page on purpose (cf87c5c). */}
+        <p className="sl-hero-title">PTT 網友心得整理的超商新品評分</p>
+      </section>
 
       {/* Phones only: one-tap brand and category toggles, so the common filters
           don't sit behind the sheet. The "其他" buckets stay in the sheet. */}
@@ -700,17 +712,22 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <div className="sl-toolbar-row">{hideToggle}{vegToggle}</div>
       </div>
 
-      {/* Phones only (CSS hides it on wide screens, where the inline bar already
-          shows every choice): names what the sheet has applied. */}
-      {activeFilterCount > 0 ? (
+      {/* Names everything 清除全部 will reset, so the button can't be read as
+          clearing only its neighbour. Sort is not a filter and stays. */}
+      {activeFilterCount > 0 || query.trim() ? (
         <div className="sl-count">
           <span className="sl-active-context">
+            {query.trim() ? <span className="sl-context-text">搜尋：{query.trim()}</span> : null}
             {brand ? <button type="button" className="sl-context-button" onClick={() => revealSection('brand')}>品牌：{brand}</button> : null}
             {category ? <button type="button" className="sl-context-button" onClick={() => revealSection('category')}>分類：{category}</button> : null}
             {datePreset !== 'all' ? <button type="button" className="sl-context-button" onClick={() => revealSection('date')}>最新心得：{DATE_PRESETS.find((preset) => preset.key === datePreset)?.label}</button> : null}
             {hideNoScore ? <button type="button" className="sl-context-button" onClick={() => revealSection('score')}>隱藏暫無綜合評分</button> : null}
             {vegOnly ? <button type="button" className="sl-context-button" onClick={() => revealSection('veg')}>只看素食</button> : null}
           </span>
+          <button type="button" className="sl-clear-all" onClick={clearAll}>
+            <X size={14} aria-hidden="true" />
+            清除全部
+          </button>
         </div>
       ) : null}
 
