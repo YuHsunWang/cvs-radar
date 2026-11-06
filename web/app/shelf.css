@@ -241,8 +241,10 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-datebtn.sl-on { background: var(--sl-ink); color: var(--sl-on-ink); border-color: var(--sl-ink); }
 
 .sl-toolbar-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-/* Auto margin pushes it beside 只看素食 instead of into the middle of the row. */
+.sl-context-text { margin-right: 8px; }
+/* Ends the applied-filters line, after the conditions it resets. */
 .sl-clear-all {
+  flex: none;
   margin-left: auto;
   display: inline-flex;
   align-items: center;
@@ -1040,9 +1042,6 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   }
   .sl-quick-btn.sl-on { background: var(--sl-accent); border-color: var(--sl-accent); color: var(--sl-on-accent); }
   .sl-quick-sep { flex: none; width: 1px; margin: 6px 2px; background: var(--sl-line); }
-}
-@media (min-width: 641px) {
-  .sl-page:not(.ss-page) .sl-count { display: none; }
 }
 
 /* ---- wide screens: two columns of cards ----

@@ -709,30 +709,25 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         {brandGroup}
         {dateGroup}
         {sortGroup}
-        <div className="sl-toolbar-row">
-          {hideToggle}
-          {/* Phones clear from the sheet; this bar is desktop-only. */}
-          {activeFilterCount > 0 || query.trim() ? (
-            <button type="button" className="sl-clear-all" onClick={clearAll}>
-              <X size={14} aria-hidden="true" />
-              清除全部
-            </button>
-          ) : null}
-          {vegToggle}
-        </div>
+        <div className="sl-toolbar-row">{hideToggle}{vegToggle}</div>
       </div>
 
-      {/* Phones only (CSS hides it on wide screens, where the inline bar already
-          shows every choice): names what the sheet has applied. */}
-      {activeFilterCount > 0 ? (
+      {/* Names everything 清除全部 will reset, so the button can't be read as
+          clearing only its neighbour. Sort is not a filter and stays. */}
+      {activeFilterCount > 0 || query.trim() ? (
         <div className="sl-count">
           <span className="sl-active-context">
+            {query.trim() ? <span className="sl-context-text">搜尋：{query.trim()}</span> : null}
             {brand ? <button type="button" className="sl-context-button" onClick={() => revealSection('brand')}>品牌：{brand}</button> : null}
             {category ? <button type="button" className="sl-context-button" onClick={() => revealSection('category')}>分類：{category}</button> : null}
             {datePreset !== 'all' ? <button type="button" className="sl-context-button" onClick={() => revealSection('date')}>最新心得：{DATE_PRESETS.find((preset) => preset.key === datePreset)?.label}</button> : null}
             {hideNoScore ? <button type="button" className="sl-context-button" onClick={() => revealSection('score')}>隱藏暫無綜合評分</button> : null}
             {vegOnly ? <button type="button" className="sl-context-button" onClick={() => revealSection('veg')}>只看素食</button> : null}
           </span>
+          <button type="button" className="sl-clear-all" onClick={clearAll}>
+            <X size={14} aria-hidden="true" />
+            清除全部
+          </button>
         </div>
       ) : null}
 
