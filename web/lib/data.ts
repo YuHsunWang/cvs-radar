@@ -151,16 +151,23 @@ export function isDataStale(generatedAt: string, now = Date.now()): boolean {
   return ageDays !== null && ageDays > DATA_STALE_DAYS
 }
 
-// Both spellings of curry are in use (咖喱 / 咖哩); search treats them as one.
+// Spelling pairs both in use (咖喱 / 咖哩, 起士 / 起司) are folded into one.
+// Spaces, punctuation, symbols and accents are dropped, so "let's cafe" finds
+// LetsCafé and an emoji doesn't sink a query.
 function searchText(value: string): string {
-  return normalizeText(value).replaceAll('喱', '哩')
+  return normalizeText(value)
+    .normalize('NFD')
+    .replace(/[\s\p{P}\p{S}\p{M}]/gu, '')
+    .replaceAll('喱', '哩')
+    .replaceAll('起士', '起司')
 }
 
 export function filterBySearch(products: Product[], query: string): Product[] {
-  const needle = searchText(query.trim())
+  const needle = searchText(query)
   if (!needle) return products
   return products.filter((product) =>
-    searchText(`${product.productName} ${product.brand}`).includes(needle),
+    // A vegetarian mark is searchable as 素食, since people type it instead of using the toggle.
+    searchText(`${product.productName} ${product.brand} ${product.vegetarian ? `素食${product.vegetarian}` : ''}`).includes(needle),
   )
 }
 

@@ -180,6 +180,31 @@ describe('filterBySearch', () => {
     expect(filterBySearch(products, '咖喱').map(({ id }) => id)).toEqual(['curry'])
     expect(filterBySearch(products, '咖哩').map(({ id }) => id)).toEqual(['curry'])
   })
+
+  // The rest are zero-result searches from GA4, 2026-10-29 to 11-06.
+  it('finds 起司 when searched as 起士', () => {
+    const products = [product({ id: 'cheese', productName: '起司馬鈴薯' }), product({ id: 'bus', productName: '巴士造型餅乾' })]
+    expect(filterBySearch(products, '起士').map(({ id }) => id)).toEqual(['cheese'])
+    // Only the 起士 pair folds; a lone 士 still has to match itself.
+    expect(filterBySearch(products, '巴士').map(({ id }) => id)).toEqual(['bus'])
+  })
+
+  it('ignores spaces, punctuation, emoji and accents', () => {
+    const products = [product({ id: 'lets', productName: 'LetsCafé香蕉風味咖啡拿鐵' }), product({ id: 'tea', productName: '綠茶' })]
+    expect(filterBySearch(products, "let's cafe").map(({ id }) => id)).toEqual(['lets'])
+    expect(filterBySearch(products, '☕️拿鐵').map(({ id }) => id)).toEqual(['lets'])
+    // A query of only symbols filters nothing rather than hiding everything.
+    expect(filterBySearch(products, ' / ')).toEqual(products)
+  })
+
+  it('finds products with a vegetarian mark when searched as 素食', () => {
+    const products = [
+      product({ id: 'veg', productName: '麻油菇菇拌飯', vegetarian: '植物五辛素' }),
+      product({ id: 'meat', productName: '雞腿便當', vegetarian: null }),
+    ]
+    expect(filterBySearch(products, '素食').map(({ id }) => id)).toEqual(['veg'])
+    expect(filterBySearch(products, '五辛素').map(({ id }) => id)).toEqual(['veg'])
+  })
 })
 
 describe('filterVegetarian', () => {
