@@ -709,7 +709,17 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         {brandGroup}
         {dateGroup}
         {sortGroup}
-        <div className="sl-toolbar-row">{hideToggle}{vegToggle}</div>
+        <div className="sl-toolbar-row">
+          {hideToggle}
+          {/* Phones clear from the sheet; this bar is desktop-only. */}
+          {activeFilterCount > 0 || query.trim() ? (
+            <button type="button" className="sl-clear-all" onClick={clearAll}>
+              <X size={14} aria-hidden="true" />
+              清除全部
+            </button>
+          ) : null}
+          {vegToggle}
+        </div>
       </div>
 
       {/* Phones only (CSS hides it on wide screens, where the inline bar already

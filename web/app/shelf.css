@@ -241,6 +241,24 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-datebtn.sl-on { background: var(--sl-ink); color: var(--sl-on-ink); border-color: var(--sl-ink); }
 
 .sl-toolbar-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+/* Auto margin pushes it beside 只看素食 instead of into the middle of the row. */
+.sl-clear-all {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sl-hot);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sl-clear-all:hover { background: rgba(127, 127, 127, 0.14); }
 
 .sl-check {
   display: inline-flex;
