@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-10T08:56:45+08:00",
+  "generatedAt": "2026-11-11T09:04:44+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -25212,7 +25212,7 @@
       "confidence": "中",
       "nPosts": 1,
       "nComments": 5,
-      "rawComments": 6,
+      "rawComments": 8,
       "eligibleComments": 5,
       "uniqueEligibleCommenters": 5,
       "independentThreads": 1,
@@ -25221,10 +25221,10 @@
       "neutralPct": 35,
       "negativePct": 0,
       "likes": [
-        "味道不錯"
+        "蔬菜很多"
       ],
       "cautions": [
-        "份量偏少"
+        "份量偏少，需另買食物"
       ],
       "excerpt": "配料豐富，吃起來像小吃攤冬粉湯麵",
       "reviewProvisional": false,
@@ -32941,8 +32941,8 @@
       "independentThreads": 1,
       "volumeLevel": "中等",
       "positivePct": 58,
-      "neutralPct": 14,
-      "negativePct": 28,
+      "neutralPct": 21,
+      "negativePct": 21,
       "likes": [
         "味道不錯、醬汁剛好但略鹹",
         "吃起來不覺得辣",
@@ -33039,6 +33039,61 @@
       "latestDate": "2026-05-28",
       "kcal": null,
       "nutrition": null,
+      "image": null,
+      "vegetarian": null
+    },
+    {
+      "id": "全家::聖多諾黑塔",
+      "brand": "全家",
+      "productName": "聖多諾黑塔",
+      "price": 59,
+      "category": "甜點",
+      "fairScore": 59,
+      "recommendationScore": 65,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 16,
+      "rawComments": 18,
+      "eligibleComments": 17,
+      "uniqueEligibleCommenters": 16,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 47,
+      "neutralPct": 35,
+      "negativePct": 18,
+      "likes": [
+        "上層泡芙好吃",
+        "焦糖偏硬，愛吃焦糖者會喜歡",
+        "兩件七折，覺得好吃又划算"
+      ],
+      "cautions": [
+        "下層塔很普通",
+        "焦糖又硬又厚",
+        "泡芙太小顆"
+      ],
+      "excerpt": "甜得要命，泡芙外層焦糖偏軟，價格不親民",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793944625.A.65B.html"
+      ],
+      "latestDate": "2026-11-06",
+      "kcal": 260,
+      "nutrition": {
+        "servingSize": "70 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 260.0,
+          "protein": 3.8,
+          "fat": 11.5,
+          "saturatedFat": 6.0,
+          "transFat": 0.0,
+          "carbohydrate": 35.3,
+          "sugar": 16.0,
+          "sodium": 88.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -33890,6 +33945,48 @@
       "vegetarian": null
     },
     {
+      "id": "全家::櫻桃巧克力霜淇淋",
+      "brand": "全家",
+      "productName": "櫻桃巧克力霜淇淋",
+      "price": 49,
+      "category": "冰品",
+      "fairScore": 59,
+      "recommendationScore": 65,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 27,
+      "rawComments": 32,
+      "eligibleComments": 28,
+      "uniqueEligibleCommenters": 27,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 58,
+      "neutralPct": 21,
+      "negativePct": 21,
+      "likes": [
+        "單吃也不錯，會回購",
+        "巧克力不甜，帶一點酒味",
+        "櫻桃味融入巧克力，像酒香且好吃"
+      ],
+      "cautions": [
+        "單口味濃到有點膩",
+        "單一口味偏甜，櫻桃與巧克力味道分離",
+        "個人吃不出櫻桃味"
+      ],
+      "excerpt": "甜度低略苦，櫻桃存在感明顯，甜香不化學；微有香精味，巧克力苦甜濃郁",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1793715551.A.C52.html",
+        "https://www.ptt.cc/bbs/CVS/M.1793879531.A.FCB.html"
+      ],
+      "latestDate": "2026-11-05",
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
+      "vegetarian": null
+    },
+    {
       "id": "全家::義式單品咖啡義式拿鐵",
       "brand": "全家",
       "productName": "義式單品咖啡義式拿鐵",
@@ -34320,59 +34417,6 @@
         "sourceKind": "official_retailer",
         "rotate": 0
       },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::聖多諾黑塔",
-      "brand": "全家",
-      "productName": "聖多諾黑塔",
-      "price": 59,
-      "category": "甜點",
-      "fairScore": 59,
-      "recommendationScore": 64,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 16,
-      "rawComments": 17,
-      "eligibleComments": 16,
-      "uniqueEligibleCommenters": 16,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 41,
-      "neutralPct": 41,
-      "negativePct": 18,
-      "likes": [
-        "兩件七折時覺得划算，也好吃"
-      ],
-      "cautions": [
-        "塔底表現普通",
-        "焦糖超硬、超厚",
-        "太甜，泡芙太小顆"
-      ],
-      "excerpt": "甜得要命，泡芙外層焦糖偏軟，價格不親民",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1793944625.A.65B.html"
-      ],
-      "latestDate": "2026-11-06",
-      "kcal": 260,
-      "nutrition": {
-        "servingSize": "70 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 260.0,
-          "protein": 3.8,
-          "fat": 11.5,
-          "saturatedFat": 6.0,
-          "transFat": 0.0,
-          "carbohydrate": 35.3,
-          "sugar": 16.0,
-          "sodium": 88.0
-        }
-      },
-      "image": null,
       "vegetarian": null
     },
     {
@@ -35146,47 +35190,6 @@
         "sourceKind": "official_retailer",
         "rotate": 0
       },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::櫻桃巧克力霜淇淋",
-      "brand": "全家",
-      "productName": "櫻桃巧克力霜淇淋",
-      "price": 49,
-      "category": "冰品",
-      "fairScore": 58,
-      "recommendationScore": 64,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 26,
-      "rawComments": 31,
-      "eligibleComments": 27,
-      "uniqueEligibleCommenters": 26,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 57,
-      "neutralPct": 22,
-      "negativePct": 21,
-      "likes": [
-        "綜合、單吃都不錯，會回購",
-        "巧克力不甜，帶一點酒味",
-        "櫻桃味融在巧克力中像酒香"
-      ],
-      "cautions": [
-        "單口味濃到有點膩",
-        "單口味偏甜，櫻桃與巧克力味分離"
-      ],
-      "excerpt": "甜度低略苦，櫻桃存在感明顯，甜香不化學；微有香精味，巧克力苦甜濃郁",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1793715551.A.C52.html",
-        "https://www.ptt.cc/bbs/CVS/M.1793879531.A.FCB.html"
-      ],
-      "latestDate": "2026-11-05",
-      "kcal": null,
-      "nutrition": null,
-      "image": null,
       "vegetarian": null
     },
     {
@@ -40848,46 +40851,6 @@
       "vegetarian": null
     },
     {
-      "id": "全家::LetsCafe厚奶拿鐵",
-      "brand": "全家",
-      "productName": "LetsCafe厚奶拿鐵",
-      "price": 59,
-      "category": "飲料",
-      "fairScore": 56,
-      "recommendationScore": 59,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 5,
-      "rawComments": 14,
-      "eligibleComments": 5,
-      "uniqueEligibleCommenters": 5,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 50,
-      "neutralPct": 17,
-      "negativePct": 33,
-      "likes": [
-        "大杯喝得很過癮",
-        "奶味足，咖啡味慢慢出來",
-        "牛奶清甜，喝起來順口"
-      ],
-      "cautions": [
-        "奶味不夠，整體很普通",
-        "59元價格偏高"
-      ],
-      "excerpt": "奶味足，咖啡味後出，清甜順口且偏清爽",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1781513593.A.EDA.html"
-      ],
-      "latestDate": "2026-06-15",
-      "kcal": null,
-      "nutrition": null,
-      "image": null,
-      "vegetarian": null
-    },
-    {
       "id": "全家::阿奇儂QSWEET法式水果軟糖優酪雪糕",
       "brand": "全家",
       "productName": "阿奇儂QSWEET法式水果軟糖優酪雪糕",
@@ -41157,6 +41120,46 @@
         "sourceKind": "ptt",
         "rotate": 0
       },
+      "vegetarian": null
+    },
+    {
+      "id": "全家::LetsCafe厚奶拿鐵",
+      "brand": "全家",
+      "productName": "LetsCafe厚奶拿鐵",
+      "price": 59,
+      "category": "飲料",
+      "fairScore": 56,
+      "recommendationScore": 59,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 5,
+      "rawComments": 14,
+      "eligibleComments": 5,
+      "uniqueEligibleCommenters": 5,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 50,
+      "neutralPct": 17,
+      "negativePct": 33,
+      "likes": [
+        "大杯喝得很過癮",
+        "奶味足，咖啡味慢慢出來",
+        "牛奶清甜，喝起來順口"
+      ],
+      "cautions": [
+        "奶味不夠，整體很普通",
+        "59元價格偏高"
+      ],
+      "excerpt": "奶味足，咖啡味後出，清甜順口且偏清爽",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1781513593.A.EDA.html"
+      ],
+      "latestDate": "2026-06-15",
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
       "vegetarian": null
     },
     {
@@ -43537,8 +43540,22 @@
         "https://www.ptt.cc/bbs/CVS/M.1756882511.A.A28.html"
       ],
       "latestDate": "2025-09-03",
-      "kcal": null,
-      "nutrition": null,
+      "kcal": 195,
+      "nutrition": {
+        "servingSize": "92 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 195.0,
+          "protein": 8.4,
+          "fat": 7.5,
+          "saturatedFat": 2.7,
+          "transFat": 0.0,
+          "carbohydrate": 23.6,
+          "sugar": 4.8,
+          "sodium": 335.0
+        }
+      },
       "image": {
         "imageUrl": "https://i.imgur.com/FZDVPue.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1756882511.A.A28.html",
@@ -59036,6 +59053,63 @@
       "vegetarian": null
     },
     {
+      "id": "全家::丹麥波蘿可頌",
+      "brand": "全家",
+      "productName": "丹麥波蘿可頌",
+      "price": 39,
+      "category": "麵包",
+      "fairScore": 46,
+      "recommendationScore": 44,
+      "consensus": "評價兩極",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 8,
+      "rawComments": 10,
+      "eligibleComments": 8,
+      "uniqueEligibleCommenters": 8,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 33,
+      "neutralPct": 34,
+      "negativePct": 33,
+      "likes": [
+        "喜歡這種高糖高油高熱量碳水"
+      ],
+      "cautions": [
+        "改版後不如從前，也輸7-11"
+      ],
+      "excerpt": "外層較脆，內裡是丹麥麵包，不太油膩；波蘿皮酥甜，內裡奶油香，整體不油膩",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1737705010.A.EE2.html",
+        "https://www.ptt.cc/bbs/CVS/M.1794294994.A.1EE.html"
+      ],
+      "latestDate": "2026-11-10",
+      "kcal": 463,
+      "nutrition": {
+        "servingSize": "100 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 463.0,
+          "protein": 8.6,
+          "fat": 25.0,
+          "saturatedFat": 10.7,
+          "transFat": 0.0,
+          "carbohydrate": 50.8,
+          "sugar": 11.9,
+          "sodium": 463.0
+        }
+      },
+      "image": {
+        "imageUrl": "https://foodsafety.family.com.tw/product_img/003004.1502725.jpg",
+        "sourcePageUrl": "https://foodsafety.family.com.tw/Web_FFD_2022/product/1502725",
+        "sourceKind": "official_retailer",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "全家::可可椪糖風味餅乾",
       "brand": "全家",
       "productName": "可可椪糖風味餅乾",
@@ -59123,6 +59197,60 @@
         "sourceKind": "ptt",
         "rotate": 0
       },
+      "vegetarian": null
+    },
+    {
+      "id": "全家::小黃瓜壽司卷",
+      "brand": "全家",
+      "productName": "小黃瓜壽司卷",
+      "price": 55,
+      "category": "便當",
+      "fairScore": 46,
+      "recommendationScore": 44,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 13,
+      "rawComments": 15,
+      "eligibleComments": 13,
+      "uniqueEligibleCommenters": 13,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 29,
+      "neutralPct": 7,
+      "negativePct": 64,
+      "likes": [
+        "雖然貴，仍很愛吃這款",
+        "清爽好吃"
+      ],
+      "cautions": [
+        "價格太高",
+        "太清淡，加莎莎醬或味噌會更好吃",
+        "只有壽司飯和小黃瓜"
+      ],
+      "excerpt": "小黃瓜清爽鮮脆帶淡鹹，無美乃滋且會回購",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794100016.A.53F.html"
+      ],
+      "latestDate": "2026-11-08",
+      "kcal": 171,
+      "nutrition": {
+        "servingSize": "164 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 171.0,
+          "protein": 3.8,
+          "fat": 0.8,
+          "saturatedFat": 0.2,
+          "transFat": 0.0,
+          "carbohydrate": 36.9,
+          "sugar": 6.6,
+          "sodium": 233.0
+        }
+      },
+      "image": null,
       "vegetarian": null
     },
     {
@@ -69372,58 +69500,6 @@
         "sourceKind": "official_retailer",
         "rotate": 0
       },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::小黃瓜壽司卷",
-      "brand": "全家",
-      "productName": "小黃瓜壽司卷",
-      "price": 55,
-      "category": "便當",
-      "fairScore": 40,
-      "recommendationScore": 33,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 10,
-      "rawComments": 11,
-      "eligibleComments": 10,
-      "uniqueEligibleCommenters": 10,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 19,
-      "neutralPct": 9,
-      "negativePct": 72,
-      "likes": [
-        "很愛吃這款，雖然覺得很貴"
-      ],
-      "cautions": [
-        "味道太清淡，搭莎莎醬或味噌更好吃",
-        "少美乃滋卻沒便宜，覺得不划算"
-      ],
-      "excerpt": "小黃瓜清爽鮮脆帶淡鹹，無美乃滋且會回購",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1794100016.A.53F.html"
-      ],
-      "latestDate": "2026-11-08",
-      "kcal": 171,
-      "nutrition": {
-        "servingSize": "164 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 171.0,
-          "protein": 3.8,
-          "fat": 0.8,
-          "saturatedFat": 0.2,
-          "transFat": 0.0,
-          "carbohydrate": 36.9,
-          "sugar": 6.6,
-          "sodium": 233.0
-        }
-      },
-      "image": null,
       "vegetarian": null
     },
     {
@@ -89958,62 +90034,6 @@
         "imageUrl": "https://i.imgur.com/5DEbave.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1732697382.A.8FA.html",
         "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::丹麥波蘿可頌",
-      "brand": "全家",
-      "productName": "丹麥波蘿可頌",
-      "price": 35,
-      "category": "麵包",
-      "fairScore": 66,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 1,
-      "rawComments": 2,
-      "eligibleComments": 1,
-      "uniqueEligibleCommenters": 1,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "波蘿皮酥脆又帶甜味",
-        "可頌奶油香明顯",
-        "兩種口感融合，不太油膩"
-      ],
-      "cautions": [],
-      "excerpt": "波蘿皮酥甜，內裡奶油香，整體不油膩",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1737705010.A.EE2.html"
-      ],
-      "latestDate": "2025-01-24",
-      "kcal": 463,
-      "nutrition": {
-        "servingSize": "100 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 463.0,
-          "protein": 8.6,
-          "fat": 25.0,
-          "saturatedFat": 10.7,
-          "transFat": 0.0,
-          "carbohydrate": 50.8,
-          "sugar": 11.9,
-          "sodium": 463.0
-        }
-      },
-      "image": {
-        "imageUrl": "https://foodsafety.family.com.tw/product_img/003004.1502725.jpg",
-        "sourcePageUrl": "https://foodsafety.family.com.tw/Web_FFD_2022/product/1502725",
-        "sourceKind": "official_retailer",
         "rotate": 0
       },
       "vegetarian": null
