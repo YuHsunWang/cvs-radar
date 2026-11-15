@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-14T08:56:05+08:00",
+  "generated_at": "2026-11-15T08:49:40+08:00",
   "reports": [
     {
       "brand": "全家",
@@ -65397,7 +65397,7 @@
       "product_key": "7-11:星級饗宴jr東日本壽喜燒牛肉炊飯",
       "score_mean": 0.4345,
       "price": 129,
-      "category": "其他",
+      "category": "便當",
       "competitor_mention_count": 0,
       "competitor_preference_count": 0,
       "competitor_own_preference_count": 0,
@@ -93322,6 +93322,50 @@
       ]
     },
     {
+      "brand": "萊爾富",
+      "product_name": "芋泥同行三明治",
+      "fair_score": 66.0,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "n_eff": 1.0,
+      "score_std": 0.0,
+      "n_posts": 1,
+      "n_comments": 2,
+      "n_eligible_comments": 0,
+      "n_unique_commenters": 0,
+      "score_weight_sum": 1.0,
+      "score_weighted_sum": 0.82,
+      "score_weight_square_sum": 1.0,
+      "positive_weight": 1.0,
+      "neutral_weight": 0,
+      "negative_weight": 0,
+      "contributors": [],
+      "rep_positive": [
+        "奶素者食用方便",
+        "看得到芋頭",
+        "甜度不高"
+      ],
+      "rep_negative": [
+        "起司沒有提味感"
+      ],
+      "product_key": "萊爾富:芋泥同行三明治",
+      "score_mean": 0.82,
+      "price": 49,
+      "category": "麵包",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-11-14T12:43:24+08:00",
+      "review_excerpt": "芋泥吃得到芋頭且有顆粒感，不會甜",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794631408.A.1FE.html"
+      ]
+    },
+    {
       "brand": "全家",
       "product_name": "迷你可頌餅乾",
       "fair_score": 65.9,
@@ -101473,6 +101517,47 @@
       "review_provisional": false,
       "post_urls": [
         "https://www.ptt.cc/bbs/CVS/M.1720854354.A.8A9.html"
+      ]
+    },
+    {
+      "brand": "7-11",
+      "product_name": "波隆那風肉醬焗烤麵",
+      "fair_score": 55.0,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "n_eff": 1.0,
+      "score_std": 0.0,
+      "n_posts": 1,
+      "n_comments": 0,
+      "n_eligible_comments": 0,
+      "n_unique_commenters": 0,
+      "score_weight_sum": 1.0,
+      "score_weighted_sum": 0.6,
+      "score_weight_square_sum": 1.0,
+      "positive_weight": 0,
+      "neutral_weight": 1.0,
+      "negative_weight": 0,
+      "contributors": [],
+      "rep_positive": [],
+      "rep_negative": [
+        "表面只有一層醬",
+        "吃起來滿空虛"
+      ],
+      "product_key": "7-11:波隆那風肉醬焗烤麵",
+      "score_mean": 0.6,
+      "price": 99,
+      "category": "便當",
+      "competitor_mention_count": 0,
+      "competitor_preference_count": 0,
+      "competitor_own_preference_count": 0,
+      "competitor_brands": [],
+      "shill_ratio": 0.0,
+      "shill_flag": false,
+      "latest_post_date": "2026-11-15T00:30:32+08:00",
+      "review_excerpt": "吃起來空虛，表面一層醬、底下偏乾",
+      "review_provisional": false,
+      "post_urls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794673835.A.6FE.html"
       ]
     },
     {

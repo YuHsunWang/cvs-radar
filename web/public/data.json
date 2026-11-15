@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T08:56:05+08:00",
+  "generatedAt": "2026-11-15T08:49:40+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -90186,6 +90186,45 @@
       "vegetarian": null
     },
     {
+      "id": "萊爾富::芋泥同行三明治",
+      "brand": "萊爾富",
+      "productName": "芋泥同行三明治",
+      "price": 49,
+      "category": "麵包",
+      "fairScore": 66,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 0,
+      "rawComments": 2,
+      "eligibleComments": 0,
+      "uniqueEligibleCommenters": 0,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "奶素者食用方便",
+        "看得到芋頭",
+        "甜度不高"
+      ],
+      "cautions": [
+        "起司沒有提味感"
+      ],
+      "excerpt": "芋泥吃得到芋頭且有顆粒感，不會甜",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794631408.A.1FE.html"
+      ],
+      "latestDate": "2026-11-14",
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
+      "vegetarian": null
+    },
+    {
       "id": "全家::迷你可頌餅乾",
       "brand": "全家",
       "productName": "迷你可頌餅乾",
@@ -97967,6 +98006,42 @@
       ],
       "latestDate": "2024-07-13",
       "kcal": null,
+      "nutrition": null,
+      "image": null,
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::波隆那風肉醬焗烤麵",
+      "brand": "7-11",
+      "productName": "波隆那風肉醬焗烤麵",
+      "price": 99,
+      "category": "便當",
+      "fairScore": 55,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 0,
+      "rawComments": 0,
+      "eligibleComments": 0,
+      "uniqueEligibleCommenters": 0,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [],
+      "cautions": [
+        "表面只有一層醬",
+        "吃起來滿空虛"
+      ],
+      "excerpt": "吃起來空虛，表面一層醬、底下偏乾",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794673835.A.6FE.html"
+      ],
+      "latestDate": "2026-11-15",
+      "kcal": 550,
       "nutrition": null,
       "image": null,
       "vegetarian": null
