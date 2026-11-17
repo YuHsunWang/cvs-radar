@@ -10,6 +10,7 @@ Already-saved photos are not fetched again.
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import os
@@ -65,6 +66,10 @@ def download(cmnos: set[str], delay: float = 1.0) -> None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--delay", type=float, default=1.0, help="seconds between photos")
+    args = parser.parse_args()
+
     products = json.loads((ROOT / "web" / "public" / "data.json").read_text(encoding="utf-8"))["products"]
     with (ROOT / "data" / "labels" / "product_images.csv").open(encoding="utf-8-sig", newline="") as f:
         decided = {row["product_id"] for row in csv.DictReader(f)}
@@ -79,7 +84,7 @@ def main() -> int:
     todo = {c for c in by_product.values() if not (IMAGE_DIR / f"{c}.jpg").exists()}
     print(f"[family-images] {len(by_product)} image-less products with a CMNO; fetching {len(todo)}")
     if todo:
-        download(todo)
+        download(todo, args.delay)
 
     CANDIDATES.parent.mkdir(parents=True, exist_ok=True)
     with CANDIDATES.open("w", encoding="utf-8-sig", newline="") as f:
