@@ -240,6 +240,11 @@ python3 scripts/fetch_official_nutrition.py 2>&1 | tail -2 \
 
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
+# Photo candidates for image-less products, written outside the repo for a
+# human review. Never edits product_images.csv; optional like the steps above.
+python3 scripts/collect_image_candidates.py 2>&1 | tail -1 \
+  || log "WARN: image candidate collection failed; publish unaffected"
+
 # --- 8. commit (+push): labels + recomputed, de-identified public data ---
 if [ "$DO_COMMIT" = "1" ]; then
   # Every label cache this run may have written has to be committed. Step 0 resets the
