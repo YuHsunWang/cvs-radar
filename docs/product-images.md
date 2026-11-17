@@ -40,6 +40,11 @@ must use HTTPS without credentials, control characters, or nonstandard ports.
 Unsupported sources or unsafe URLs fail closed. Reachability is not checked by
 the build. This workflow grants no image download or rehosting authorization.
 
+The local cron queues candidates for review without enabling anything:
+`scripts/collect_image_candidates.py` lists PTT article photos and
+`scripts/fetch_family_images.py` saves FamilyMart official photos, both under
+`~/.cache/cvs-radar/`. Codex reviews them with `docs/image-review-prompt.md`.
+
 To remove an image, set `enabled=0`, record `takedown_reason`, retain the row, and
 rebuild from the repo root:
 
