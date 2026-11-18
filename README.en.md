@@ -31,7 +31,9 @@ It covers about 2,400 products from nearly 2,800 review posts going back to June
 - The default sort is "recent recommendation": well-reviewed products that people discussed recently come first. Discussion volume and plain score are the other sorts.
 - Filter by category (meals, desserts, frozen treats, drinks, bread, snacks), brand and review date. On phones a quick-filter row sits above the list, so the common filters don't need the sheet.
 - "Vegetarian only" lists products whose package or ingredient list was checked by hand; unchecked products are never shown as vegetarian.
-- Search treats the two spellings of curry (咖喱 / 咖哩) as one word.
+- Search treats the two spellings of curry (咖喱 / 咖哩) and of cheese (起士 / 起司) as one word, and ignores spaces, punctuation and symbols ("let's cafe" finds LetsCafé). Typing 素食 (vegetarian) into the box lists products with a vegetarian mark.
+- The applied conditions, search text included, are listed on one line that ends with a 清除全部 (clear all) button.
+- First-time visitors get a short tour of search, filters, scores and product cards; the question-mark button replays it.
 - The URL keeps the search, filters, sort and the open product, so a copied link reopens the same view.
 
 **Reading a product**
