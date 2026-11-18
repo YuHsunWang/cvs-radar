@@ -4,8 +4,10 @@ Goal: review queued photo candidates and add the good ones to
 review; picks still go out as a PR the owner merges.
 
 Inputs (written daily by the local cron, outside the repo):
-- `~/.cache/cvs-radar/image-candidates.csv`: PTT article photos
-  (product_id, post_url, image_url, nearby_text).
+- `~/.cache/cvs-radar/image-candidates.csv`: every non-PTT link in the
+  product's PTT articles (product_id, post_url, image_url, nearby_text).
+  `image_url` may be a photo page (postimg.cc) or short link (myppt.cc):
+  open it, and store the direct image file URL it leads to, not the page.
 - `~/.cache/cvs-radar/familymart-image-candidates.csv`: FamilyMart official
   photos already saved locally (product_id, official_id, source_page_url,
   image_url, local_file). Open `local_file`; never fetch FamilyMart yourself
