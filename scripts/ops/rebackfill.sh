@@ -237,8 +237,17 @@ python3 scripts/fetch_official_kcal.py 2>&1 | tail -2 \
 # a minute each); cache the misses if that list grows.
 python3 scripts/fetch_official_nutrition.py 2>&1 | tail -2 \
   || log "WARN: official nutrition refresh failed; publishing with the cached labels"
+# Official photos of image-less FamilyMart products, saved outside the repo for
+# review. Never edits product_images.csv; same Chrome window rule as above.
+python3 scripts/fetch_family_images.py 2>&1 | tail -2 \
+  || log "WARN: FamilyMart photo fetch failed; publish unaffected"
 
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
+
+# Photo candidates for image-less products, written outside the repo for a
+# human review. Never edits product_images.csv; optional like the steps above.
+python3 scripts/collect_image_candidates.py 2>&1 | tail -1 \
+  || log "WARN: image candidate collection failed; publish unaffected"
 
 # --- 8. commit (+push): labels + recomputed, de-identified public data ---
 if [ "$DO_COMMIT" = "1" ]; then
