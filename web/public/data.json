@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T08:58:42+08:00",
+  "generatedAt": "2026-11-18T08:53:15+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -1733,6 +1733,44 @@
         "https://www.ptt.cc/bbs/CVS/M.1784903487.A.FE4.html"
       ],
       "latestDate": "2026-07-24",
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
+      "vegetarian": null
+    },
+    {
+      "id": "萊爾富::芋見愛情昏了頭布丁",
+      "brand": "萊爾富",
+      "productName": "芋見愛情昏了頭布丁",
+      "price": 45,
+      "category": "甜點",
+      "fairScore": 78,
+      "recommendationScore": null,
+      "consensus": "一致好評",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 3,
+      "rawComments": 4,
+      "eligibleComments": 3,
+      "uniqueEligibleCommenters": 3,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "芋頭味道很濃"
+      ],
+      "cautions": [
+        "甜度偏高",
+        "糖和脂肪偏高"
+      ],
+      "excerpt": "芋頭味濃郁綿密，均質無顆粒但很甜",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794450834.A.507.html"
+      ],
+      "latestDate": "2026-11-12",
       "kcal": null,
       "nutrition": null,
       "image": null,
@@ -37904,8 +37942,8 @@
       "uniqueEligibleCommenters": 4,
       "independentThreads": 1,
       "volumeLevel": "中等",
-      "positivePct": 40,
-      "neutralPct": 60,
+      "positivePct": 39,
+      "neutralPct": 61,
       "negativePct": 0,
       "likes": [
         "打開就有蜂蜜香氣"
@@ -44042,49 +44080,6 @@
       "vegetarian": null
     },
     {
-      "id": "全家::蒜滷財運大吉腿油飯",
-      "brand": "全家",
-      "productName": "蒜滷財運大吉腿油飯",
-      "price": 129,
-      "category": "便當",
-      "fairScore": 54,
-      "recommendationScore": 57,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 11,
-      "rawComments": 15,
-      "eligibleComments": 12,
-      "uniqueEligibleCommenters": 11,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 59,
-      "neutralPct": 8,
-      "negativePct": 33,
-      "likes": [
-        "特價不到100元，附大雞腿",
-        "雞腿很大"
-      ],
-      "cautions": [
-        "油飯份量看起來偏少"
-      ],
-      "excerpt": "油飯偏濕且份量薄，雞腿有蒜味不乾柴",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1770959967.A.F0E.html"
-      ],
-      "latestDate": "2026-02-13",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/x9o9nyk.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1770959967.A.F0E.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
       "id": "OK::光泉優質蛋白牛奶",
       "brand": "OK",
       "productName": "光泉優質蛋白牛奶",
@@ -44122,6 +44117,49 @@
       "image": {
         "imageUrl": "https://pimg.1px.tw/blog/dressingfrad/album/303510220/866605461942323242.jpg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1773904715.A.93F.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
+      "id": "全家::蒜滷財運大吉腿油飯",
+      "brand": "全家",
+      "productName": "蒜滷財運大吉腿油飯",
+      "price": 129,
+      "category": "便當",
+      "fairScore": 54,
+      "recommendationScore": 57,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 11,
+      "rawComments": 15,
+      "eligibleComments": 12,
+      "uniqueEligibleCommenters": 11,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 59,
+      "neutralPct": 8,
+      "negativePct": 33,
+      "likes": [
+        "特價不到100元，附大雞腿",
+        "雞腿很大"
+      ],
+      "cautions": [
+        "油飯份量看起來偏少"
+      ],
+      "excerpt": "油飯偏濕且份量薄，雞腿有蒜味不乾柴",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1770959967.A.F0E.html"
+      ],
+      "latestDate": "2026-02-13",
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/x9o9nyk.jpg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1770959967.A.F0E.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -44991,6 +45029,63 @@
       "vegetarian": null
     },
     {
+      "id": "全家::正男醬香烤飯糰",
+      "brand": "全家",
+      "productName": "正男醬香烤飯糰",
+      "price": 49,
+      "category": "便當",
+      "fairScore": 54,
+      "recommendationScore": 56,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 4,
+      "rawComments": 4,
+      "eligibleComments": 4,
+      "uniqueEligibleCommenters": 4,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 41,
+      "neutralPct": 19,
+      "negativePct": 40,
+      "likes": [
+        "外殼帶焦感且微黏",
+        "當小點心好吃"
+      ],
+      "cautions": [
+        "沒什麼料，吃完有點空虛"
+      ],
+      "excerpt": "外殼帶焦感與黏性，日式醬油甜味，不能直接微波",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1774531437.A.038.html"
+      ],
+      "latestDate": "2026-03-26",
+      "kcal": 340,
+      "nutrition": {
+        "servingSize": "84 公克",
+        "packageServings": 2.0,
+        "servings": 2,
+        "perServing": {
+          "kcal": 170.0,
+          "protein": 3.5,
+          "fat": 1.1,
+          "saturatedFat": 0.3,
+          "transFat": 0.0,
+          "carbohydrate": 36.5,
+          "sugar": 1.7,
+          "sodium": 142.0
+        }
+      },
+      "image": {
+        "imageUrl": "https://foodsafety.family.com.tw/product_img/003004.1172495.jpg",
+        "sourcePageUrl": "https://foodsafety.family.com.tw/Web_FFD_2022/product/1172495",
+        "sourceKind": "official_retailer",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "全家::鮮蝦旬彩炊飯飯糰",
       "brand": "全家",
       "productName": "鮮蝦旬彩炊飯飯糰",
@@ -45197,63 +45292,6 @@
         "imageUrl": "https://i.imgur.com/3ZpJis4.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1720071756.A.35C.html",
         "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::正男醬香烤飯糰",
-      "brand": "全家",
-      "productName": "正男醬香烤飯糰",
-      "price": 49,
-      "category": "便當",
-      "fairScore": 54,
-      "recommendationScore": 56,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 4,
-      "rawComments": 4,
-      "eligibleComments": 4,
-      "uniqueEligibleCommenters": 4,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 41,
-      "neutralPct": 19,
-      "negativePct": 40,
-      "likes": [
-        "外殼帶焦感且微黏",
-        "當小點心好吃"
-      ],
-      "cautions": [
-        "沒什麼料，吃完有點空虛"
-      ],
-      "excerpt": "外殼帶焦感與黏性，日式醬油甜味，不能直接微波",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1774531437.A.038.html"
-      ],
-      "latestDate": "2026-03-26",
-      "kcal": 340,
-      "nutrition": {
-        "servingSize": "84 公克",
-        "packageServings": 2.0,
-        "servings": 2,
-        "perServing": {
-          "kcal": 170.0,
-          "protein": 3.5,
-          "fat": 1.1,
-          "saturatedFat": 0.3,
-          "transFat": 0.0,
-          "carbohydrate": 36.5,
-          "sugar": 1.7,
-          "sodium": 142.0
-        }
-      },
-      "image": {
-        "imageUrl": "https://foodsafety.family.com.tw/product_img/003004.1172495.jpg",
-        "sourcePageUrl": "https://foodsafety.family.com.tw/Web_FFD_2022/product/1172495",
-        "sourceKind": "official_retailer",
         "rotate": 0
       },
       "vegetarian": null
@@ -59879,6 +59917,60 @@
       "vegetarian": null
     },
     {
+      "id": "全家::小黃瓜壽司卷",
+      "brand": "全家",
+      "productName": "小黃瓜壽司卷",
+      "price": 55,
+      "category": "便當",
+      "fairScore": 46,
+      "recommendationScore": 44,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 17,
+      "rawComments": 20,
+      "eligibleComments": 17,
+      "uniqueEligibleCommenters": 17,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 34,
+      "neutralPct": 5,
+      "negativePct": 61,
+      "likes": [
+        "清爽好吃",
+        "外觀和封面一樣"
+      ],
+      "cautions": [
+        "價格偏貴",
+        "味道太清淡，需加醬料",
+        "小黃瓜偏硬，不好入口"
+      ],
+      "excerpt": "小黃瓜清爽鮮脆帶淡鹹，無美乃滋且會回購",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794100016.A.53F.html"
+      ],
+      "latestDate": "2026-11-08",
+      "kcal": 171,
+      "nutrition": {
+        "servingSize": "164 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 171.0,
+          "protein": 3.8,
+          "fat": 0.8,
+          "saturatedFat": 0.2,
+          "transFat": 0.0,
+          "carbohydrate": 36.9,
+          "sugar": 6.6,
+          "sodium": 233.0
+        }
+      },
+      "image": null,
+      "vegetarian": null
+    },
+    {
       "id": "全家::港式鮮蝦雲吞撈麵",
       "brand": "全家",
       "productName": "港式鮮蝦雲吞撈麵",
@@ -60592,7 +60684,7 @@
       "confidence": "高",
       "nPosts": 3,
       "nComments": 19,
-      "rawComments": 24,
+      "rawComments": 25,
       "eligibleComments": 20,
       "uniqueEligibleCommenters": 19,
       "independentThreads": 3,
@@ -62307,45 +62399,6 @@
       "vegetarian": null
     },
     {
-      "id": "7-11::波隆那風肉醬焗烤麵",
-      "brand": "7-11",
-      "productName": "波隆那風肉醬焗烤麵",
-      "price": 99,
-      "category": "便當",
-      "fairScore": 45,
-      "recommendationScore": 41,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 8,
-      "rawComments": 10,
-      "eligibleComments": 8,
-      "uniqueEligibleCommenters": 8,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 23,
-      "neutralPct": 22,
-      "negativePct": 55,
-      "likes": [
-        "適合當宵夜，味道不錯"
-      ],
-      "cautions": [
-        "價錢令人不滿",
-        "份量真的很少",
-        "醬料不多"
-      ],
-      "excerpt": "吃起來空虛，表面一層醬、底下偏乾",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1794673835.A.6FE.html"
-      ],
-      "latestDate": "2026-11-15",
-      "kcal": 550,
-      "nutrition": null,
-      "image": null,
-      "vegetarian": null
-    },
-    {
       "id": "7-11::百吉孔雀餅乾雪糕",
       "brand": "7-11",
       "productName": "百吉孔雀餅乾雪糕",
@@ -62969,60 +63022,6 @@
         "sourceKind": "official_retailer",
         "rotate": 0
       },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::小黃瓜壽司卷",
-      "brand": "全家",
-      "productName": "小黃瓜壽司卷",
-      "price": 55,
-      "category": "便當",
-      "fairScore": 44,
-      "recommendationScore": 41,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 16,
-      "rawComments": 19,
-      "eligibleComments": 16,
-      "uniqueEligibleCommenters": 16,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 30,
-      "neutralPct": 6,
-      "negativePct": 64,
-      "likes": [
-        "清爽好吃",
-        "雖貴仍很愛吃"
-      ],
-      "cautions": [
-        "太貴",
-        "太淡，加醬更好吃",
-        "未打折時小黃瓜偏硬"
-      ],
-      "excerpt": "小黃瓜清爽鮮脆帶淡鹹，無美乃滋且會回購",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1794100016.A.53F.html"
-      ],
-      "latestDate": "2026-11-08",
-      "kcal": 171,
-      "nutrition": {
-        "servingSize": "164 公克",
-        "packageServings": 1.0,
-        "servings": 1,
-        "perServing": {
-          "kcal": 171.0,
-          "protein": 3.8,
-          "fat": 0.8,
-          "saturatedFat": 0.2,
-          "transFat": 0.0,
-          "carbohydrate": 36.9,
-          "sugar": 6.6,
-          "sodium": 233.0
-        }
-      },
-      "image": null,
       "vegetarian": null
     },
     {
@@ -66210,49 +66209,6 @@
       "vegetarian": null
     },
     {
-      "id": "7-11::乾杯炭火燒肉包",
-      "brand": "7-11",
-      "productName": "乾杯炭火燒肉包",
-      "price": 34,
-      "category": "鹹食",
-      "fairScore": 43,
-      "recommendationScore": 38,
-      "consensus": "評價兩極",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 6,
-      "rawComments": 18,
-      "eligibleComments": 6,
-      "uniqueEligibleCommenters": 6,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 28,
-      "neutralPct": 29,
-      "negativePct": 43,
-      "likes": [
-        "炭燒包很香也好吃"
-      ],
-      "cautions": [
-        "回購後炭燒香變淡",
-        "內餡越來越少"
-      ],
-      "excerpt": "包子皮Q不硬，肉餡炭香但偏甜",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1745499019.A.1C2.html"
-      ],
-      "latestDate": "2025-04-24",
-      "kcal": 263,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://www.7-11.com.tw/freshfoods/4_Snacks/images/Snacks_308.png",
-        "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/4_Snacks/index.aspx",
-        "sourceKind": "official_retailer",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
       "id": "7-11::酸辣烤魚打拋雞雙拼便當",
       "brand": "7-11",
       "productName": "酸辣烤魚打拋雞雙拼便當",
@@ -66516,6 +66472,49 @@
         "imageUrl": "https://i.imgur.com/If8Cx0W.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1739331681.A.ACD.html",
         "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::乾杯炭火燒肉包",
+      "brand": "7-11",
+      "productName": "乾杯炭火燒肉包",
+      "price": 34,
+      "category": "鹹食",
+      "fairScore": 42,
+      "recommendationScore": 38,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 6,
+      "rawComments": 18,
+      "eligibleComments": 6,
+      "uniqueEligibleCommenters": 6,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 28,
+      "neutralPct": 29,
+      "negativePct": 43,
+      "likes": [
+        "炭燒包很香也好吃"
+      ],
+      "cautions": [
+        "回購後炭燒香變淡",
+        "內餡越來越少"
+      ],
+      "excerpt": "包子皮Q不硬，肉餡炭香但偏甜",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1745499019.A.1C2.html"
+      ],
+      "latestDate": "2025-04-24",
+      "kcal": 263,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://www.7-11.com.tw/freshfoods/4_Snacks/images/Snacks_308.png",
+        "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/4_Snacks/index.aspx",
+        "sourceKind": "official_retailer",
         "rotate": 0
       },
       "vegetarian": null
@@ -67342,6 +67341,44 @@
         "sourceKind": "ptt",
         "rotate": 0
       },
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::波隆那風肉醬焗烤麵",
+      "brand": "7-11",
+      "productName": "波隆那風肉醬焗烤麵",
+      "price": 99,
+      "category": "便當",
+      "fairScore": 42,
+      "recommendationScore": 36,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 9,
+      "rawComments": 11,
+      "eligibleComments": 9,
+      "uniqueEligibleCommenters": 9,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 20,
+      "neutralPct": 20,
+      "negativePct": 60,
+      "likes": [
+        "適合當宵夜，味道不錯"
+      ],
+      "cautions": [
+        "醬料不多",
+        "份量真的超少"
+      ],
+      "excerpt": "吃起來空虛，表面一層醬、底下偏乾",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794673835.A.6FE.html"
+      ],
+      "latestDate": "2026-11-15",
+      "kcal": 550,
+      "nutrition": null,
+      "image": null,
       "vegetarian": null
     },
     {
@@ -70621,46 +70658,6 @@
       "vegetarian": null
     },
     {
-      "id": "7-11::可樂果濃厚臭豆腐",
-      "brand": "7-11",
-      "productName": "可樂果濃厚臭豆腐",
-      "price": 35,
-      "category": "零食",
-      "fairScore": 39,
-      "recommendationScore": 32,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 18,
-      "rawComments": 23,
-      "eligibleComments": 18,
-      "uniqueEligibleCommenters": 18,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 15,
-      "neutralPct": 16,
-      "negativePct": 69,
-      "likes": [],
-      "cautions": [
-        "臭豆腐味淡，偏辣且普通"
-      ],
-      "excerpt": "臭豆腐味淡，不嗆不臭，吃不出臭豆腐感",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1775476246.A.4C1.html"
-      ],
-      "latestDate": "2026-04-06",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://l.urusai.cc/rpSYH.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1775476246.A.4C1.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
       "id": "7-11::搖搖沙拉燻腸紅醬",
       "brand": "7-11",
       "productName": "搖搖沙拉燻腸紅醬",
@@ -70825,6 +70822,46 @@
       "image": {
         "imageUrl": "https://i.imgur.com/B3tqJJ6.jpg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1760590973.A.483.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::可樂果濃厚臭豆腐",
+      "brand": "7-11",
+      "productName": "可樂果濃厚臭豆腐",
+      "price": 35,
+      "category": "零食",
+      "fairScore": 39,
+      "recommendationScore": 31,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 18,
+      "rawComments": 23,
+      "eligibleComments": 18,
+      "uniqueEligibleCommenters": 18,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 15,
+      "neutralPct": 16,
+      "negativePct": 69,
+      "likes": [],
+      "cautions": [
+        "臭豆腐味淡，偏辣且普通"
+      ],
+      "excerpt": "臭豆腐味淡，不嗆不臭，吃不出臭豆腐感",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1775476246.A.4C1.html"
+      ],
+      "latestDate": "2026-04-06",
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://l.urusai.cc/rpSYH.jpg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1775476246.A.4C1.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -71162,52 +71199,6 @@
       "image": {
         "imageUrl": "https://www.7-11.com.tw/freshfoods/24_dessert/images/dessert_76.png",
         "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/24_dessert/index.aspx",
-        "sourceKind": "official_retailer",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "7-11::潮粵坊鴨肉捲餅",
-      "brand": "7-11",
-      "productName": "潮粵坊鴨肉捲餅",
-      "price": 79,
-      "category": "便當",
-      "fairScore": 39,
-      "recommendationScore": 31,
-      "consensus": "一致負評",
-      "confidence": "高",
-      "nPosts": 3,
-      "nComments": 19,
-      "rawComments": 25,
-      "eligibleComments": 20,
-      "uniqueEligibleCommenters": 19,
-      "independentThreads": 3,
-      "volumeLevel": "充足",
-      "positivePct": 18,
-      "neutralPct": 23,
-      "negativePct": 59,
-      "likes": [
-        "鴨肉至少比甜麵醬多"
-      ],
-      "cautions": [
-        "沒加熱、肉少，吃完空虛",
-        "醬太多且偏鹹",
-        "價格太貴，內容物太虛"
-      ],
-      "excerpt": "炸土司邊多，醬鹹僅給30分；內餡超少，吃了很空虛；鴨肉量足，吐司條酥脆但微波10秒仍冷",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1778711367.A.453.html",
-        "https://www.ptt.cc/bbs/CVS/M.1779628958.A.1CB.html",
-        "https://www.ptt.cc/bbs/CVS/M.1794850205.A.9B5.html"
-      ],
-      "latestDate": "2026-11-17",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://www.7-11.com.tw/freshfoods/19_star/images/star_352.png",
-        "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/19_star/index.aspx",
         "sourceKind": "official_retailer",
         "rotate": 0
       },
@@ -76146,6 +76137,41 @@
       "vegetarian": null
     },
     {
+      "id": "萊爾富::芋頭起司三明治",
+      "brand": "萊爾富",
+      "productName": "芋頭起司三明治",
+      "price": 55,
+      "category": "麵包",
+      "fairScore": 34,
+      "recommendationScore": null,
+      "consensus": "一致負評",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 3,
+      "rawComments": 4,
+      "eligibleComments": 3,
+      "uniqueEligibleCommenters": 3,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [],
+      "cautions": [
+        "冷藏後吐司會變乾"
+      ],
+      "excerpt": "芋泥薄且無芋頭味，料少又貴不推薦",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794529161.A.E2F.html"
+      ],
+      "latestDate": "2026-11-13",
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
+      "vegetarian": null
+    },
+    {
       "id": "7-11::吳一無二聖諾黑千層塔",
       "brand": "7-11",
       "productName": "吳一無二聖諾黑千層塔",
@@ -76189,38 +76215,50 @@
       "vegetarian": null
     },
     {
-      "id": "萊爾富::芋頭起司三明治",
-      "brand": "萊爾富",
-      "productName": "芋頭起司三明治",
-      "price": 55,
-      "category": "麵包",
+      "id": "7-11::潮粵坊鴨肉捲餅",
+      "brand": "7-11",
+      "productName": "潮粵坊鴨肉捲餅",
+      "price": 79,
+      "category": "便當",
       "fairScore": 34,
-      "recommendationScore": null,
+      "recommendationScore": 24,
       "consensus": "一致負評",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 3,
-      "rawComments": 4,
-      "eligibleComments": 3,
-      "uniqueEligibleCommenters": 3,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [],
-      "cautions": [
-        "冷藏後吐司會變乾"
+      "confidence": "高",
+      "nPosts": 3,
+      "nComments": 27,
+      "rawComments": 35,
+      "eligibleComments": 28,
+      "uniqueEligibleCommenters": 27,
+      "independentThreads": 3,
+      "volumeLevel": "充足",
+      "positivePct": 13,
+      "neutralPct": 24,
+      "negativePct": 63,
+      "likes": [
+        "鴨肉給得很大方",
+        "微波久一點會更好吃"
       ],
-      "excerpt": "芋泥薄且無芋頭味，料少又貴不推薦",
+      "cautions": [
+        "捲餅沒加熱，吃起來冷",
+        "醬料太多且偏鹹",
+        "價格太貴，內容物太虛"
+      ],
+      "excerpt": "炸土司邊多，醬鹹僅給30分；內餡超少，吃了很空虛；鴨肉量足，吐司條酥脆但微波10秒仍冷",
       "reviewProvisional": false,
       "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1794529161.A.E2F.html"
+        "https://www.ptt.cc/bbs/CVS/M.1778711367.A.453.html",
+        "https://www.ptt.cc/bbs/CVS/M.1779628958.A.1CB.html",
+        "https://www.ptt.cc/bbs/CVS/M.1794850205.A.9B5.html"
       ],
-      "latestDate": "2026-11-13",
+      "latestDate": "2026-11-17",
       "kcal": null,
       "nutrition": null,
-      "image": null,
+      "image": {
+        "imageUrl": "https://www.7-11.com.tw/freshfoods/19_star/images/star_352.png",
+        "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/19_star/index.aspx",
+        "sourceKind": "official_retailer",
+        "rotate": 0
+      },
       "vegetarian": null
     },
     {
@@ -79318,49 +79356,6 @@
       "vegetarian": null
     },
     {
-      "id": "7-11::新馬辣經典麻辣鍋",
-      "brand": "7-11",
-      "productName": "新馬辣經典麻辣鍋",
-      "price": 129,
-      "category": "便當",
-      "fairScore": 30,
-      "recommendationScore": 16,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 16,
-      "rawComments": 24,
-      "eligibleComments": 16,
-      "uniqueEligibleCommenters": 16,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 6,
-      "neutralPct": 6,
-      "negativePct": 88,
-      "likes": [
-        "麻而不辣，口味好吃"
-      ],
-      "cautions": [
-        "份量少，吃完不飽",
-        "價格偏貴"
-      ],
-      "excerpt": "量少湯鹹不辣，不太值得",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1732262329.A.3D8.html"
-      ],
-      "latestDate": "2024-11-22",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/6fFyKLh.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1732262329.A.3D8.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
       "id": "其他::多力多滋爆脆捲",
       "brand": "其他",
       "productName": "多力多滋爆脆捲",
@@ -79397,6 +79392,49 @@
       "kcal": null,
       "nutrition": null,
       "image": null,
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::新馬辣經典麻辣鍋",
+      "brand": "7-11",
+      "productName": "新馬辣經典麻辣鍋",
+      "price": 129,
+      "category": "便當",
+      "fairScore": 29,
+      "recommendationScore": 16,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 16,
+      "rawComments": 24,
+      "eligibleComments": 16,
+      "uniqueEligibleCommenters": 16,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 6,
+      "neutralPct": 6,
+      "negativePct": 88,
+      "likes": [
+        "麻而不辣，口味好吃"
+      ],
+      "cautions": [
+        "份量少，吃完不飽",
+        "價格偏貴"
+      ],
+      "excerpt": "量少湯鹹不辣，不太值得",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1732262329.A.3D8.html"
+      ],
+      "latestDate": "2024-11-22",
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/6fFyKLh.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1732262329.A.3D8.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
       "vegetarian": null
     },
     {
@@ -81834,55 +81872,12 @@
       "vegetarian": null
     },
     {
-      "id": "7-11::地中海風時蔬沙拉餐",
-      "brand": "7-11",
-      "productName": "地中海風時蔬沙拉餐",
-      "price": 64,
-      "category": "便當",
-      "fairScore": 23,
-      "recommendationScore": 6,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 15,
-      "rawComments": 17,
-      "eligibleComments": 15,
-      "uniqueEligibleCommenters": 15,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 0,
-      "neutralPct": 13,
-      "negativePct": 87,
-      "likes": [
-        "有蒜香，配料偏清淡"
-      ],
-      "cautions": [
-        "蔬菜量少，買小滷時蔬更實際",
-        "價格偏貴"
-      ],
-      "excerpt": "份量不多，調味清淡帶蒜香，主打健康",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1729613186.A.859.html"
-      ],
-      "latestDate": "2024-10-23",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/3w4wk3Y.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1729613186.A.859.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
       "id": "全家::卡波納拉義大利麵",
       "brand": "全家",
       "productName": "卡波納拉義大利麵",
       "price": 99,
       "category": "便當",
-      "fairScore": 23,
+      "fairScore": 24,
       "recommendationScore": 6,
       "consensus": "一致負評",
       "confidence": "中",
@@ -81930,6 +81925,49 @@
         "imageUrl": "https://foodsafety.family.com.tw/product_img/003004.1548674.jpg",
         "sourcePageUrl": "https://foodsafety.family.com.tw/Web_FFD_2022/product/1548674",
         "sourceKind": "official_retailer",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::地中海風時蔬沙拉餐",
+      "brand": "7-11",
+      "productName": "地中海風時蔬沙拉餐",
+      "price": 64,
+      "category": "便當",
+      "fairScore": 23,
+      "recommendationScore": 6,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 15,
+      "rawComments": 17,
+      "eligibleComments": 15,
+      "uniqueEligibleCommenters": 15,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 0,
+      "neutralPct": 13,
+      "negativePct": 87,
+      "likes": [
+        "有蒜香，配料偏清淡"
+      ],
+      "cautions": [
+        "蔬菜量少，買小滷時蔬更實際",
+        "價格偏貴"
+      ],
+      "excerpt": "份量不多，調味清淡帶蒜香，主打健康",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1729613186.A.859.html"
+      ],
+      "latestDate": "2024-10-23",
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/3w4wk3Y.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1729613186.A.859.html",
+        "sourceKind": "ptt",
         "rotate": 0
       },
       "vegetarian": null
@@ -82885,44 +82923,6 @@
         "sourceKind": "ptt",
         "rotate": 0
       },
-      "vegetarian": null
-    },
-    {
-      "id": "萊爾富::芋見愛情昏了頭布丁",
-      "brand": "萊爾富",
-      "productName": "芋見愛情昏了頭布丁",
-      "price": 45,
-      "category": "甜點",
-      "fairScore": 80,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 1,
-      "rawComments": 2,
-      "eligibleComments": 1,
-      "uniqueEligibleCommenters": 1,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "芋頭味很濃"
-      ],
-      "cautions": [
-        "甜度很高",
-        "糖和脂肪偏高"
-      ],
-      "excerpt": "芋頭味濃郁綿密，均質無顆粒但很甜",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1794450834.A.507.html"
-      ],
-      "latestDate": "2026-11-12",
-      "kcal": null,
-      "nutrition": null,
-      "image": null,
       "vegetarian": null
     },
     {
@@ -95312,45 +95312,6 @@
       "vegetarian": null
     },
     {
-      "id": "全家::芋頭水晶蛋糕",
-      "brand": "全家",
-      "productName": "芋頭水晶蛋糕",
-      "price": 34,
-      "category": "甜點",
-      "fairScore": 60,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 0,
-      "rawComments": 0,
-      "eligibleComments": 0,
-      "uniqueEligibleCommenters": 0,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "芋頭不是香精味"
-      ],
-      "cautions": [
-        "芋泥偏甜",
-        "咖啡凍與芋泥味道不搭",
-        "原價不會回購"
-      ],
-      "excerpt": "芋味自然，與咖啡凍不搭，原價不回購",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1794846826.A.B3A.html"
-      ],
-      "latestDate": "2026-11-17",
-      "kcal": 115,
-      "nutrition": null,
-      "image": null,
-      "vegetarian": null
-    },
-    {
       "id": "全家::開丼壹號醬炙烤牛蛋堡",
       "brand": "全家",
       "productName": "開丼壹號醬炙烤牛蛋堡",
@@ -96251,6 +96212,48 @@
       "vegetarian": null
     },
     {
+      "id": "全家::絲滑奶油麵包",
+      "brand": "全家",
+      "productName": "絲滑奶油麵包",
+      "price": 52,
+      "category": "麵包",
+      "fairScore": 58,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 2,
+      "rawComments": 3,
+      "eligibleComments": 2,
+      "uniqueEligibleCommenters": 2,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "內餡份量還可以"
+      ],
+      "cautions": [
+        "整體口味就是甜"
+      ],
+      "excerpt": "麵包鬆軟帶甜，內餡尚可但整體偏甜",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1730346274.A.6BF.html"
+      ],
+      "latestDate": "2024-10-31",
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/mtjepn9.jpg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1730346274.A.6BF.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "7-11::芒果情人果",
       "brand": "7-11",
       "productName": "芒果情人果",
@@ -96368,48 +96371,6 @@
       "kcal": null,
       "nutrition": null,
       "image": null,
-      "vegetarian": null
-    },
-    {
-      "id": "全家::絲滑奶油麵包",
-      "brand": "全家",
-      "productName": "絲滑奶油麵包",
-      "price": 52,
-      "category": "麵包",
-      "fairScore": 58,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 2,
-      "rawComments": 3,
-      "eligibleComments": 2,
-      "uniqueEligibleCommenters": 2,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "內餡份量還可以"
-      ],
-      "cautions": [
-        "整體口味就是甜"
-      ],
-      "excerpt": "麵包鬆軟帶甜，內餡尚可但整體偏甜",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1730346274.A.6BF.html"
-      ],
-      "latestDate": "2024-10-31",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/mtjepn9.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1730346274.A.6BF.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
       "vegetarian": null
     },
     {
@@ -100674,6 +100635,43 @@
         "sourceKind": "ptt",
         "rotate": 0
       },
+      "vegetarian": null
+    },
+    {
+      "id": "全家::芋頭水晶蛋糕",
+      "brand": "全家",
+      "productName": "芋頭水晶蛋糕",
+      "price": 34,
+      "category": "甜點",
+      "fairScore": 49,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 2,
+      "rawComments": 2,
+      "eligibleComments": 2,
+      "uniqueEligibleCommenters": 2,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "芋頭不是香精味"
+      ],
+      "cautions": [
+        "味道互不相容"
+      ],
+      "excerpt": "芋味自然，與咖啡凍不搭，原價不回購",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794846826.A.B3A.html"
+      ],
+      "latestDate": "2026-11-17",
+      "kcal": 115,
+      "nutrition": null,
+      "image": null,
       "vegetarian": null
     },
     {

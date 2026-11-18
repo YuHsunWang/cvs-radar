@@ -4099,6 +4099,7 @@
 161ecebdc187c86dfff37b6116cb2bffdd699401cf43c621ae65ae597877a8c6,-0.7,負向,true,codex,sentiment-v1
 1620e5b9030a38579c0a017d45105c1a6cf20e1d085dfe7ff50344948cf2aa0e,0.7,正向,true,codex,sentiment-v1
 162313d5548c41d646698feaecb9fec5ab3c9d14f111a3c074c4aeed6017c78a,,中性,false,codex,sentiment-v1
+162752a4ee203658ddc928ddcde5966d95027833606802dd744b35e5b687e19a,,中性,false,jev,sentiment-v1
 16290b9ee436f48a69709c1a8b5983059abb3794dd3ef0a9b21fa0d389f74e0f,0.0,中性,true,codex,sentiment-v1
 162b9a4769e40cc9e5efef13869fd99031d75d03b1ca9f11900f239cf03f6f55,0.0,中性,true,codex,sentiment-v1
 162c7d899848eeaa23a6420f20a0eab97ed1c3e83a9ec963ae4ead4c51c37a8f,0.0,中性,true,codex,sentiment-v1
@@ -4707,6 +4708,7 @@
 1986c08f3762a7301dc17d0b698f6eb7079cc59adec16c4717300d9486236184,0.6,正向,true,codex,sentiment-v1
 1986d30228927b9adde4781ecf4678bfc49f46dee4e5d855d263e756ed25bf3f,-0.6,負向,true,codex,sentiment-v1
 19885e608ecac69c9a166094c3c140898c1bfae93c7b08b15f592b7e70b4d6ec,0.195,正向,true,jev,sentiment-v1
+198bcbac42532cc52c213615d48aeb866a96cb381073bb618b5e4422b3e0afae,-0.755,負向,true,jev,sentiment-v1
 198deabb880e524639d888ec6b66074ebb53a0586721c5159e4304731c0d2f8c,-0.7,負向,true,codex,sentiment-v1
 1990fb0f0bfc63cfdbe046ef306602ff00da2a94b474d63959afcbab46ecb635,0.5,正向,true,codex,sentiment-v1
 1993f5f834439052b75cd268e6f0bc1de7d6463e7ea840dbeb6cab8cec171254,-0.4,負向,true,codex,sentiment-v1
@@ -6500,6 +6502,7 @@
 232bb35532f7c3e571b652d24c985390b7ec1e868c7c793e4d62f9c11e536930,,中性,false,codex,sentiment-v1
 232bf2f40debeb49434a60ac1e49538981101c1611587b2f888e55f116c7de57,0.1,中性,true,codex,sentiment-v1
 232ccb61912cbf1aafa6f9e0b73169ec1d7389182971f457304ec07c702f2bf4,0.0,中性,true,codex,sentiment-v1
+232d3e3e8d389c30a0a80789b3dcc0b2a6264d71d965791c20cf32eb5c99286a,-0.88,負向,true,jev,sentiment-v1
 2333f269b19b8ea71c56d94419112389bf6063791e4cb2d73d75d8ac14cdfc08,0.6,正向,true,codex,sentiment-v1
 233477f08e61b6bf3c69f3772cc469cef1bb930666947ef5b5cadd4149f2572e,-0.525,負向,true,jev,sentiment-v1
 2335bc3b6c52d8eadd547bd828e1a42978637c7863b1af931d316442cfa74d1b,-0.4,負向,true,codex,sentiment-v1
@@ -7282,6 +7285,7 @@
 274dd08cb2d7d704d3b003183fd6b9fe9afc8ece939d6110803432a0ac16ce35,0.8,正向,true,codex,sentiment-v1
 274e17fec6f71dfaa06f0e6a90af599b7bff3625a728efd605aa7e783d227aeb,0.5,正向,true,codex,sentiment-v1
 274f1a742d184636394348e6038780219678bd74ef990f32589d4cd8f18b2713,0.0,中性,true,codex,sentiment-v1
+275003215873b34320feadc3de8f2bcd0b8172654719ecfa1b616eaba4d75720,-0.19,負向,true,jev,sentiment-v1
 275200f25b22dec804ce9c9bec4d6bd8d9e1e30a757b2b6adf1f09da477b2a42,0.3,正向,true,codex,sentiment-v1
 2754247aa5a631b89deaaece1be4f6c544949d605eb6ba2c8e0add3bce4521b0,0.5,正向,true,codex,sentiment-v1
 27544ce26d04651fb306126bda4bffd6433e01f6e3b548a982d55be1881f78b4,,中性,false,codex,sentiment-v1
@@ -9675,6 +9679,7 @@
 3411173414775c8eba3f3659e2412172d7163f19df2edb0cce52cae46a173220,-0.45,負向,true,codex,sentiment-v1
 3411727847e71433639016719bc0ec1a7915dd541f28f97f38939475a4afb55e,0.2,正向,true,codex,sentiment-v1
 341214cfa82d98d1f08c8ed1241d2da53ab39d5be9c3acb53a1c7b41803f92c9,0.0,中性,true,codex,sentiment-v1
+341284b4e8d2147a46d63469c1a9bb5715eaa2c89ec69fa7ef5dd4f6d46c7b5e,-0.885,負向,true,jev,sentiment-v1
 3412da04111f13b8292d1fd6a4226c33d49a56b5f878cb0ac20c6dda45db8f17,0.5,正向,true,codex,sentiment-v1
 34135201f0a5190c8a58aa1de6b3d505ccf4770681aeda9f11457b78536ebac8,-0.7,負向,true,codex,sentiment-v1
 3414a403b4d1f0fb2d12d801b54ed17b4c4a451d8b6747ddc429c5097b9e8b57,-0.4,負向,true,codex,sentiment-v1
@@ -15633,6 +15638,7 @@
 5457c9e8a2e2ebfc6f4c466fc2bf137be8fa785239c127a3e98081ba8cbe9829,0.5,正向,true,codex,sentiment-v1
 545a7741ee729ed933a8adbb190826c74de3b53b959e15ebac753083cae8d664,-0.4,負向,true,codex,sentiment-v1
 545bb3c6ce02da926851e3a42c63aaa044fd7122d146815351f83d03ce77f023,,中性,false,codex,sentiment-v1
+545d3ce99fab48348e8b6038e3a78ae08ce66a958479882b56d33488e692ecbb,0.515,正向,true,jev,sentiment-v1
 54601a1aa4d9313866bdef3c5052e8a3d40f1836d860c77d0140ab0cc5954af2,0.6,正向,true,codex,sentiment-v1
 546508f7e382f01f741bb5e2b4fa6e7c61297e5e0245a953203d0b1d92c62b04,0.6,正向,true,codex,sentiment-v1
 5465699796b70fffd406aac7e5f781a24262bfee943e057cfbaeccfc7e300f77,,中性,false,codex,sentiment-v1
@@ -17496,6 +17502,7 @@
 5e2ead0da69449145d9d0850deca696c230eb0b8cb84e69ad9c4be6cff48300f,,中性,false,codex,sentiment-v1
 5e31224077b5ac9096bb5c24d11b9446e43ce30902b317008ef57d75c1a4c81c,,中性,false,codex,sentiment-v1
 5e329b785976587942f210b8dd509ef464f2d79cc724a5bb1a730ec29211eb4f,0.0,中性,true,codex,sentiment-v1
+5e35000ef01d31bc35a5fc12e9c7b5d8b104b65ecba45ef7e9842d20d8e9cc93,0.5,正向,true,jev,sentiment-v1
 5e351993f51d5d51b23a3441b476c094e93a789b1d20f4dfa35f6d10f29e0f60,-0.4,負向,true,codex,sentiment-v1
 5e39eb712a2e4e184d7844cd12505b976b66ade38b3531cc8e14b65d07cc85f3,,中性,false,codex,sentiment-v1
 5e3aaf3de5bd407528d1514ad0c21242dfeb76d88650be809d31bfdfef19550a,0.4,正向,true,codex,sentiment-v1
@@ -20084,6 +20091,7 @@
 6caa274582456db0b39ecbeb8adc85e19507188eeab2843514c6dfdec6876ee5,0.3,正向,true,codex,sentiment-v1
 6caa3544587ec8c21658d1788b1bf06b48b5260829cd7bbbd99cacf334da3d87,,中性,false,codex,sentiment-v1
 6cab7543739c21b1c0ee172eb88f585ebfabc00a4716a0a737626c4e128e80f1,0.6,正向,true,codex,sentiment-v1
+6caba7563c1122d4d1b95afdc8c211797276071b74290b192348f2e56a2f6df4,-0.33,負向,true,jev,sentiment-v1
 6cad0d3768b18828a6f937b5b85784ddeaffbbf97e48e533c9ae69ba0e261b06,-0.4,負向,true,codex,sentiment-v1
 6cada837142533647f7eb3a3427ed2cbc64989c4d24b72c97a97fac984d5f379,-0.4,負向,true,codex,sentiment-v1
 6caf59447e1c444887953a1e4d4a87018e475b44f560201018740a21ca124fd6,0.45,正向,true,codex,sentiment-v1
@@ -21922,6 +21930,7 @@
 76c69171dafee67aec57ecf2f3347bff3b3a7850166f5c4ae337b4f73e23d4ab,,中性,false,codex,sentiment-v1
 76c741b4fc864ce8734d91c6241af67b41cb270ec8c7e843bcb82fe97bff98aa,0.3,正向,true,codex,sentiment-v1
 76c773af208a0fd8ff0fba4b0b98e8bf08a323eab98e016bcd8f16548b6359b1,-0.8,負向,true,codex,sentiment-v1
+76ca79e853c14c04d2d9cfa3a32b50949fb4a3e15d39dcb490d4f4e9a3a02c3b,-0.485,負向,true,jev,sentiment-v1
 76ccdfe04b601c95a8fcb555caa022213da9e1cca080faeb98ed366c30fdc9de,0.9,正向,true,codex,sentiment-v1
 76cd84551527abe7093ed7a565420ae9b40fe5bbcd0c99755137cbbb72025113,,中性,false,codex,sentiment-v1
 76ce7c6a1190fc42da933684dd77aaa0055193555d8861dcf58f90cd6baf0f88,-0.3,負向,true,codex,sentiment-v1
@@ -25102,6 +25111,7 @@
 87ca95f9b941542e1c6b90a92606bbe03fb1459c809bd934b6e10dc6cd81e483,,中性,false,codex,sentiment-v1
 87cb43b67a6b098bfcc2824c480ef6d7a13e49cffdb937c669610295d13c7ed4,-0.4,負向,true,codex,sentiment-v1
 87cbb37bf648c24103ca3d26c2541bfc4b50a5ae37ec4a44e93c4e31f702175a,0.3,正向,true,codex,sentiment-v1
+87cbc5bd29ccdba827752110b43ff0450701426c4ca01f7f6328b470fa7705c8,-0.455,負向,true,jev,sentiment-v1
 87cc49b445aacd4cce160e14a3b6c015957bb4c5bbb20f294b92860848deebcb,,中性,false,codex,sentiment-v1
 87cf5096ae7dce70d359250cfcda17981565e7903d239489c74f8f4a666bc42f,0.3,正向,true,codex,sentiment-v1
 87d0d63df64b98eb6eefb807c9f34583dbea6004aaf08ef37e4d406af671699f,0.7,正向,true,codex,sentiment-v1
@@ -25345,6 +25355,7 @@
 891a5e37a76408410bcfcaf6cf55ebfe0ccc7551b718d3149849bbd0c75568f5,0.245,正向,true,jev,sentiment-v1
 891ecdf1e35150316813889683c27fed55fb8ac51cf24f266a871e0cbb0b959c,,中性,false,codex,sentiment-v1
 8920409cb8f0b1eea404d6bc192e6ac754a92cf5b0d6978f9dada8bdcbad083a,-0.6,負向,true,codex,sentiment-v1
+8920947d8a06f9b573959031498b24efd07e1f4e9d34dba7b22547fbea53b7a8,0.455,正向,true,jev,sentiment-v1
 89215d845619911db5394ae3e5afb952b36d01a127e8baf0795ad777ca04133c,0.35,正向,true,codex,sentiment-v1
 8923921e7486b0f28b17e6a6f9254815feaa01ed827ffda01cc8904362d0a6a3,-0.5,負向,true,codex,sentiment-v1
 8923c4e18709d5d79bc469b0bcf09788119fffc360858589f7a879b16e1c08e6,,中性,false,jev,sentiment-v1
@@ -33535,6 +33546,7 @@ b5eccc17776dc7e5c069251e1de04123179dd0420a83cfb833b31457534cd40f,-0.8,負向,tru
 b5ed63033b5062e65751fda7249d9836569a7bfabe1a6899b22e341a3d511d59,0.3,正向,true,codex,sentiment-v1
 b5ed665b3b242f00b5d55a69c68986bc1194ea1bd5c3405d76115cee96e54722,0.2,正向,true,codex,sentiment-v1
 b5eda54d54bfafddd74d4bb1a9e286cead12b2e3af9fa000e37aaba46ff7b3ee,-0.5,負向,true,codex,sentiment-v1
+b5ee419592369a0306ce263e2bda59d8fa8f1ce29edc7e10416390716a49e811,-0.19,負向,true,jev,sentiment-v1
 b5ee98a9abcd1d4a6df9555ad35102f384b0036c5753fd0b82c6075b850c6985,-0.9,負向,true,codex,sentiment-v1
 b5efa959e89d18311a0fe6ee832502b092d2f9059ee959ddecc5cc7dddc9cbba,0.1,中性,true,codex,sentiment-v1
 b5f1a624dd4f4d901f93cca05dfd91e01f50afafece0738f07f9a2963ed904cb,0.8,正向,true,codex,sentiment-v1
@@ -34814,6 +34826,7 @@ bce0314740a01cad4a70d02e0e715768e52689a04d6c62aaa03739a8d7ec537a,,中性,false,c
 bce0f51edc4a31ad18789e3ad4e103cf38a0e8f67249325b818c7bfb116ef3cb,0.7,正向,true,codex,sentiment-v1
 bce277cfbdd1991d24dbba79915314282639854be353c6a0b9d469f0dfb5162e,,中性,false,codex,sentiment-v1
 bce3a78597d697e3af7121afa4a1cfb08a8ed6368370ce8f501a6467b8369ec4,-0.7,負向,true,codex,sentiment-v1
+bce63abdce8c1cd85e0fbafe8892e3ab3e07fd31654b9319def95d530406b382,-0.54,負向,true,jev,sentiment-v1
 bce7424e14eccfe18f84e5ad64cbc0da15d017ceb9c4d24869622e051ffb5d74,0.2,正向,true,codex,sentiment-v1
 bce9aef2cf09d60a61ef1da015ce6dacb1d5ab26206965c357b28655b9ab793b,-0.4,負向,true,codex,sentiment-v1
 bcebf532ff2896c62403ae5370f3266f9d568f01bd09e01e601ce653f24039db,,中性,false,codex,sentiment-v1
@@ -37496,6 +37509,7 @@ cbb08fe5ceff66f71e61457f57551ac1574aa85cbeefea28372193d2a0204cb7,,中性,false,c
 cbb1fb4e0366c425647af1ca5e96ca7e99c4971839b2b7ede85ee296bb1f2ced,0.55,正向,true,codex,sentiment-v1
 cbb9e74d1d012daff3d2aceee75a83addf6bd8fecbe23a06b0f5f2ba8e049137,0.0,中性,true,codex,sentiment-v1
 cbba9752dbb2cbc7a9b41e117c6124e5221d6b6a1521b635685c219e539e5338,,中性,false,codex,sentiment-v1
+cbbbc12554a6d6e5f0680919bb3129baf16905ddd7ddf8010f81b0485ef7f14c,0.455,正向,true,jev,sentiment-v1
 cbbcc3aa645a80f6bc8f3365a548b6f2e8cde5a4b6359d2bed123b0942181aea,,中性,false,codex,sentiment-v1
 cbbf5970d279383aab079bc125ec05e5cff26865aa0c7df950d8454e2e91d44b,,中性,false,codex,sentiment-v1
 cbc0419fe42833510fc8a7c542490f928ce7d62d8b7d101b4bf4b204d041faba,0.3,正向,true,codex,sentiment-v1
@@ -37648,6 +37662,7 @@ cc96853858a1e707c9e4a7073aa4982396eba0e32a9247e3c20d7f2302431c2d,0.0,中性,true
 cc983025ec713064f2cc0354f64981a129da822615b5b005c04b688a377c0084,0.0,中性,true,codex,sentiment-v1
 cc987b378228e74ebc436dc997a739fd291748cc4fc6a05118df9d2d7883de7a,,中性,false,codex,sentiment-v1
 cc98a07d80878dccbcfd9af8cef483afb888531f127e3eedf8ef789bec2c5acb,,中性,false,codex,sentiment-v1
+cc99836efedcbd0bb838d66162e9dbb3140b3115719b972ba158f23a3f146fb2,-0.975,負向,true,jev,sentiment-v1
 cc9a05663d84726b60511efb71e1722da2bbbe711d14a39b8177b9ec12bbde1a,,中性,false,codex,sentiment-v1
 cc9a862ab873b661241fa0c4fbfffce18c0a616b63892ddf3d57e5ffbd20b53e,0.0,中性,true,codex,sentiment-v1
 cc9c7a4c570f4be37ba4db64e7b8c48aafcf6385ed902862bc768a221622ca26,-0.4,負向,true,codex,sentiment-v1
@@ -43798,6 +43813,7 @@ ee189ba2d4c366e4aadfd26a0c061eebdf3d42e7cdf5d74d43d43b251114adf5,0.6,正向,true
 ee18c89678b0e248c43a3851f1e6d5c68d0b12a6dc94ae89a708003d5941dd95,-0.5,負向,true,codex,sentiment-v1
 ee1991cc5e9712afa0f758faa5841e070d17bb668b03265902d163bcc393b30e,0.7,正向,true,codex,sentiment-v1
 ee1ac39d3f9c55ef3716998272a56dd14f63fce79c47307717512e2655368d2b,-0.45,負向,true,jev,sentiment-v1
+ee1cc7df755ab64f897b9278baa9afa4ce7dd3a4c7f2c8c7e4e76c62f41638d5,,中性,false,jev,sentiment-v1
 ee1cc89529d54eaa96a191749be2e54657112789867325d1716df009beeedd0d,-0.3,負向,true,codex,sentiment-v1
 ee1e1de8332dc99eeaab0fca09ae7df5539d69e1d4a50fd72ae5edb2e284b18e,,中性,false,codex,sentiment-v1
 ee1e9e408c5709849d2ad6076fe3269d5116634d47b68702726e7ec1561a824b,0.5,正向,true,codex,sentiment-v1
@@ -44442,6 +44458,7 @@ f166dbbef9b0b7065beb6dffb93dacda6dd005e997f6d83bfda07a71fc8ab6c5,,中性,false,c
 f167e0b0091815310db1b8890f92b11da605e2eb2f8766eea8363cf2fafdb289,-0.5,負向,true,codex,sentiment-v1
 f169db2aaada24d8fb4f1b3f98de646dca6f30046c6aef28e1069e653ee6d85a,0.7,正向,true,codex,sentiment-v1
 f16d74f5f4431f750ef2d4ba25d4bda9886822ce28656eb1373842508ea09458,,中性,false,codex,sentiment-v1
+f16e700e497b67106ed3f554d56258c6b0f2732b5ac762902af20f84f3fc5f7b,-0.86,負向,true,jev,sentiment-v1
 f16ed0ee99b43ac03e9a37875e7e57b528f6137fe3f2a3d21409b358087658bf,0.4,正向,true,codex,sentiment-v1
 f16f491fed28c720be91d37578b426009f2ff39b0c9044a54b0bb392f1d11ec3,0.3,正向,true,codex,sentiment-v1
 f171dea30708c2a9296dd41c325eefd4be6fa3d7e733e44baabd305ef764e2c9,-0.5,負向,true,codex,sentiment-v1
