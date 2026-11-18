@@ -20,9 +20,10 @@ for the same product. On top of it, reject a photo when:
 - the flavour or variant on the package does not match the product name;
 - the article covers several products and the photo cannot tell which one;
 - it shows something other than this product.
-A label is not required (owner decision 2026-11-18). Soft-serve, cup drinks
-and fresh food often have none. Accept an unlabelled item when the article is
-about this one product and the photo shows the item itself.
+Neither a label nor the package is required (owner decision 2026-11-18): a
+photo of the food or drink itself is fine. Soft-serve, cup drinks and fresh
+food often have no label. Accept an unlabelled item when the article is about
+this one product and the photo shows the item itself.
 When unsure, leave it out.
 </task>
 
