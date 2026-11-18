@@ -18,7 +18,11 @@ for the same product. On top of it, reject a photo when:
 - the product is not the main subject (small, in the background, cut off);
 - only the back, nutrition panel or barcode side shows;
 - the flavour or variant on the package does not match the product name;
-- it is a generic picture that does not show this exact item.
+- the article covers several products and the photo cannot tell which one;
+- it shows something other than this product.
+A label is not required (owner decision 2026-11-18). Soft-serve, cup drinks
+and fresh food often have none. Accept an unlabelled item when the article is
+about this one product and the photo shows the item itself.
 When unsure, leave it out.
 </task>
 
