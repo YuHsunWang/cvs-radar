@@ -15,7 +15,7 @@ Inputs (written daily by the local cron, outside the repo):
 
 Rules: `docs/product-images.md` is binding. Prefer an official photo over PTT
 for the same product. On top of it, reject a photo when:
-- the product is not the main subject (small, in the background, cut off);
+- the product is hard to see (tiny, in the background, mostly cut off);
 - only the back, nutrition panel or barcode side shows;
 - the flavour or variant on the package does not match the product name;
 - the article covers several products and the photo cannot tell which one;
@@ -24,6 +24,8 @@ Neither a label nor the package is required (owner decision 2026-11-18): a
 photo of the food or drink itself is fine. Soft-serve, cup drinks and fresh
 food often have no label. Accept an unlabelled item when the article is about
 this one product and the photo shows the item itself.
+Other flavours beside it, or an edge cut off, are fine as long as this
+product is clearly visible and can be told apart (owner decision 2026-11-18).
 When unsure, leave it out.
 </task>
 
