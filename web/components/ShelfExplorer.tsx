@@ -521,6 +521,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <button
           type="button"
           className={`sl-chip-btn${category === null ? ' sl-on' : ''}`}
+          aria-pressed={category === null}
           onClick={() => {
             setCategory(null)
             resetPage()
@@ -533,6 +534,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             key={key}
             type="button"
             className={`sl-chip-btn${category === key ? ' sl-on' : ''}`}
+            aria-pressed={category === key}
             onClick={() => toggleCategory(key)}
           >
             {key}
@@ -549,6 +551,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
         <button
           type="button"
           className={`sl-chip-btn${brand === null ? ' sl-on' : ''}`}
+          aria-pressed={brand === null}
           onClick={() => {
             setBrand(null)
             resetPage()
@@ -561,6 +564,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
               key={name}
               type="button"
               className={`sl-chip-btn${brand === name ? ' sl-on' : ''}`}
+              aria-pressed={brand === name}
               onClick={() => toggleBrand(name)}
             >
               {name}
@@ -579,6 +583,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             key={preset.key}
             type="button"
             className={`sl-datebtn${datePreset === preset.key ? ' sl-on' : ''}`}
+            aria-pressed={datePreset === preset.key}
             onClick={() => applyDatePreset(preset)}
           >
             {preset.label}
