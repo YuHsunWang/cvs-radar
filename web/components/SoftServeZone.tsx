@@ -122,6 +122,7 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
             <button
               type="button"
               className={`sl-chip-btn${brand === null ? ' sl-on' : ''}`}
+              aria-pressed={brand === null}
               onClick={() => setBrand(null)}
             >
               全部
@@ -131,6 +132,7 @@ export default function SoftServeZone({ initialPayload }: SoftServeZoneProps) {
                 key={name}
                 type="button"
                 className={`sl-chip-btn${brand === name ? ' sl-on' : ''}`}
+                aria-pressed={brand === name}
                 onClick={() => setBrand(brand === name ? null : name)}
               >
                 {name}

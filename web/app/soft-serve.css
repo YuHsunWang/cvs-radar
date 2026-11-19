@@ -16,7 +16,9 @@
   padding: 6px 10px;
   white-space: nowrap;
 }
-.ss-back:hover { background: rgba(246, 243, 234, 0.12); }
+@media (hover: hover) {
+  .ss-back:hover { background: rgba(246, 243, 234, 0.12); }
+}
 
 .ss-section { margin-top: 26px; }
 
@@ -54,7 +56,9 @@
   text-decoration: underline dotted;
   text-underline-offset: 3px;
 }
-.ss-r-jump:hover { color: var(--sl-ink); text-decoration-style: solid; }
+@media (hover: hover) {
+  .ss-r-jump:hover { color: var(--sl-ink); text-decoration-style: solid; }
+}
 
 .ss-g-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .ss-g-flavor { font-size: 16px; font-weight: 800; color: var(--sl-ink); min-width: 0; }

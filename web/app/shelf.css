@@ -181,7 +181,11 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   border-radius: 999px;
   white-space: nowrap;
 }
-.sl-zonelink:hover { background: var(--sl-pop); color: #17130e; }
+/* Hover rules sit in (hover: hover): a phone keeps :hover on whatever was last
+   tapped, which left buttons stuck grey after a tap. */
+@media (hover: hover) {
+  .sl-zonelink:hover { background: var(--sl-pop); color: #17130e; }
+}
 
 /* ---- controls ---- */
 .sl-controls { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
@@ -260,7 +264,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   font-weight: 700;
   cursor: pointer;
 }
-.sl-clear-all:hover { background: rgba(127, 127, 127, 0.14); }
+@media (hover: hover) {
+  .sl-clear-all:hover { background: rgba(127, 127, 127, 0.14); }
+}
 
 .sl-check {
   display: inline-flex;
@@ -497,7 +503,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   padding: 12px;
   cursor: pointer;
 }
-.sl-loadmore button:hover { background: var(--sl-surface-2); }
+@media (hover: hover) {
+  .sl-loadmore button:hover { background: var(--sl-surface-2); }
+}
 
 .sl-empty {
   grid-column: 1 / -1;
@@ -953,7 +961,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   );
   opacity: 0.75;
 }
-.sl-k-src a:hover { background: var(--sl-pop); color: #17130e; }
+@media (hover: hover) {
+  .sl-k-src a:hover { background: var(--sl-pop); color: #17130e; }
+}
 .sl-k-src a:focus-visible { outline: 3px solid #35e0a1; outline-offset: 2px; }
 
 @media (max-width: 640px) {
@@ -998,7 +1008,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   border-radius: 12px;
   color: var(--sl-accent);
 }
-.sl-page:not(.ss-page) .sl-loadmore button:hover { background: var(--sl-accent-soft); }
+@media (hover: hover) {
+  .sl-page:not(.ss-page) .sl-loadmore button:hover { background: var(--sl-accent-soft); }
+}
 .sl-page:not(.ss-page) .sl-empty { border-color: var(--sl-line); border-radius: 14px; }
 .sl-page:not(.ss-page) .sl-empty button { color: var(--sl-accent); }
 .sl-page:not(.ss-page) .sl-foot { border-color: var(--sl-line); }
@@ -1082,7 +1094,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
   color: inherit;
   cursor: pointer;
 }
-.sl-theme-toggle:hover { background: rgba(127, 127, 127, 0.18); }
+@media (hover: hover) {
+  .sl-theme-toggle:hover { background: rgba(127, 127, 127, 0.18); }
+}
 .ss-sign-actions { display: flex; flex: none; align-items: center; gap: 6px; }
 
 /* ---- hero line under the header ---- */

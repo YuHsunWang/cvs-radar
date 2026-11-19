@@ -60,11 +60,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           it is presented as though a model had labelled it. */}
       {takes.length > 0 || product.reviewProvisional ? (
         <section className="sl-kb sl-kb-say">
-          <h4 className="sl-kb-head">
+          <h3 className="sl-kb-head">
             <b>大家怎麼說</b>
             {takes.length > 0 ? <i>{takes.length} 篇整理</i> : null}
             {product.reviewProvisional ? <span className="sl-k-prov">暫定</span> : null}
-          </h4>
+          </h3>
           {takes.length > 0 ? (
             <ol className="sl-say-list">
               {takes.map((take, index) => (
@@ -208,7 +208,7 @@ function EvidenceBlock({ tone, items }: { tone: 'up' | 'dn'; items: string[] }) 
   const isUp = tone === 'up'
   return (
     <section className={`sl-kb sl-kb-${tone}`}>
-      <h4 className="sl-kb-head">
+      <h3 className="sl-kb-head">
         <b aria-hidden="true" className="sl-kb-icon">
           {isUp ? (
             <ThumbsUp size={13} strokeWidth={2.6} />
@@ -218,7 +218,7 @@ function EvidenceBlock({ tone, items }: { tone: 'up' | 'dn'; items: string[] }) 
         </b>
         <b>{isUp ? '推薦點' : '踩雷點'}</b>
         {items.length > 0 ? <i>{items.length}</i> : null}
-      </h4>
+      </h3>
       {items.length > 0 ? (
         <ul className="sl-kb-list">
           {items.map((item) => (

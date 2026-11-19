@@ -20,6 +20,9 @@ const config: Config = {
     },
   },
   plugins: [],
+  // hover: utilities only where a real pointer can hover, so a tapped button
+  // on a phone doesn't stay highlighted (matches the hover rules in shelf.css).
+  future: { hoverOnlyWhenSupported: true },
 }
 
 export default config

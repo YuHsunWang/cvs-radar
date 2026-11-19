@@ -330,6 +330,27 @@ describe('truthful shelf results', () => {
     expect(html).not.toContain('sl-mobile-sort')
   })
 
+  it('tells screen readers which filter chip is selected, not only by colour', () => {
+    // The selected chip is marked by the sl-on colour alone; without aria-pressed a
+    // screen reader hears every chip the same and cannot tell what is filtered.
+    for (const html of [
+      renderToStaticMarkup(React.createElement(ShelfExplorer, { initialPayload: {
+        products: [product()], generatedAt: '', siteBuiltAt: '',
+      } })),
+      renderToStaticMarkup(React.createElement(SoftServeZone, { initialPayload: {
+        products: [product({ productName: '香草霜淇淋', category: '冰品' })], generatedAt: '', siteBuiltAt: '',
+      } })),
+    ]) {
+      const chips = html.match(/<button[^>]*class="sl-(chip-btn|datebtn)[^"]*"[^>]*>/g) ?? []
+      expect(chips.length).toBeGreaterThan(0)
+      for (const chip of chips) {
+        expect(chip).toMatch(/aria-pressed="(true|false)"/)
+        // Colour and state must agree: the highlighted chip is the pressed one.
+        expect(chip.includes(' sl-on')).toBe(chip.includes('aria-pressed="true"'))
+      }
+    }
+  })
+
   it('gives each card a category tile so neighbouring cards differ', () => {
     // The tile follows the category group, and unknown categories fall back to 其他.
     for (const [raw, group] of [['便當', '正餐'], ['乳品', '飲料'], ['冰品', '冰品'], ['新品類', '其他']] as const) {
