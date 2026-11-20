@@ -151,7 +151,8 @@ export function isDataStale(generatedAt: string, now = Date.now()): boolean {
   return ageDays !== null && ageDays > DATA_STALE_DAYS
 }
 
-// Spelling pairs both in use (咖喱 / 咖哩, 起士 / 起司) are folded into one.
+// Spelling pairs both in use (咖喱 / 咖哩, 起士 / 起司, 吐司 / 土司,
+// 波蘿 / 菠蘿) are folded into one.
 // Spaces, punctuation, symbols and accents are dropped, so "let's cafe" finds
 // LetsCafé and an emoji doesn't sink a query.
 function searchText(value: string): string {
@@ -160,6 +161,8 @@ function searchText(value: string): string {
     .replace(/[\s\p{P}\p{S}\p{M}]/gu, '')
     .replaceAll('喱', '哩')
     .replaceAll('起士', '起司')
+    .replaceAll('吐司', '土司')
+    .replaceAll('波蘿', '菠蘿')
 }
 
 export function filterBySearch(products: Product[], query: string): Product[] {
