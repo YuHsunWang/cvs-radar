@@ -189,6 +189,19 @@ describe('filterBySearch', () => {
     expect(filterBySearch(products, '巴士').map(({ id }) => id)).toEqual(['bus'])
   })
 
+  // GA4 zero-result searches, 2026-11-01 to 11-20: the data spells these 土司 and 波蘿/菠蘿.
+  it('folds 吐司/土司 and 波蘿/菠蘿', () => {
+    const products = [
+      product({ id: 'toast', productName: '匠生土司' }),
+      product({ id: 'bolo', productName: '醇黑可可波蘿奶酥' }),
+      product({ id: 'spit', productName: '吐納草本茶' }),
+    ]
+    expect(filterBySearch(products, '吐司').map(({ id }) => id)).toEqual(['toast'])
+    expect(filterBySearch(products, '菠蘿奶酥').map(({ id }) => id)).toEqual(['bolo'])
+    // Only the pair folds; a lone 吐 still has to match itself.
+    expect(filterBySearch(products, '吐納').map(({ id }) => id)).toEqual(['spit'])
+  })
+
   it('ignores spaces, punctuation, emoji and accents', () => {
     const products = [product({ id: 'lets', productName: 'LetsCafé香蕉風味咖啡拿鐵' }), product({ id: 'tea', productName: '綠茶' })]
     expect(filterBySearch(products, "let's cafe").map(({ id }) => id)).toEqual(['lets'])
