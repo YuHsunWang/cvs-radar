@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-20T08:48:54+08:00",
+  "generatedAt": "2026-11-21T08:50:48+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -23751,8 +23751,8 @@
       "independentThreads": 3,
       "volumeLevel": "充足",
       "positivePct": 66,
-      "neutralPct": 7,
-      "negativePct": 27,
+      "neutralPct": 10,
+      "negativePct": 24,
       "likes": [
         "夏天吃很開胃",
         "白醋帶酸甜奶味，很好吃",
@@ -42143,6 +42143,48 @@
       "vegetarian": null
     },
     {
+      "id": "全家::芋頭水晶蛋糕",
+      "brand": "全家",
+      "productName": "芋頭水晶蛋糕",
+      "price": 34,
+      "category": "甜點",
+      "fairScore": 55,
+      "recommendationScore": 59,
+      "consensus": "評價兩極",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 5,
+      "rawComments": 6,
+      "eligibleComments": 5,
+      "uniqueEligibleCommenters": 5,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 49,
+      "neutralPct": 34,
+      "negativePct": 17,
+      "likes": [
+        "吃不到弘宇時，可暫時解饞"
+      ],
+      "cautions": [
+        "味道不相容，直接跳過"
+      ],
+      "excerpt": "芋味自然，與咖啡凍不搭，原價不回購",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1794846826.A.B3A.html"
+      ],
+      "latestDate": "2026-11-17",
+      "kcal": 115,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/i5RMZzu.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1794846826.A.B3A.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "全家::芭C檸檬綠",
       "brand": "全家",
       "productName": "芭C檸檬綠",
@@ -54523,48 +54565,6 @@
       "image": {
         "imageUrl": "https://i.imgur.com/cCdRcOp.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1746788486.A.186.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::芋頭水晶蛋糕",
-      "brand": "全家",
-      "productName": "芋頭水晶蛋糕",
-      "price": 34,
-      "category": "甜點",
-      "fairScore": 49,
-      "recommendationScore": 49,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 4,
-      "rawComments": 5,
-      "eligibleComments": 4,
-      "uniqueEligibleCommenters": 4,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 39,
-      "neutralPct": 41,
-      "negativePct": 20,
-      "likes": [
-        "芋頭沒有香精味"
-      ],
-      "cautions": [
-        "芋頭與咖啡凍味道不搭"
-      ],
-      "excerpt": "芋味自然，與咖啡凍不搭，原價不回購",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1794846826.A.B3A.html"
-      ],
-      "latestDate": "2026-11-17",
-      "kcal": 115,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/i5RMZzu.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1794846826.A.B3A.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -78761,23 +78761,22 @@
       "consensus": "一致負評",
       "confidence": "高",
       "nPosts": 3,
-      "nComments": 33,
-      "rawComments": 43,
-      "eligibleComments": 35,
-      "uniqueEligibleCommenters": 33,
+      "nComments": 38,
+      "rawComments": 48,
+      "eligibleComments": 40,
+      "uniqueEligibleCommenters": 38,
       "independentThreads": 3,
       "volumeLevel": "充足",
-      "positivePct": 11,
-      "neutralPct": 23,
+      "positivePct": 9,
+      "neutralPct": 25,
       "negativePct": 66,
       "likes": [
-        "鴨肉至少比甜麵醬多",
-        "吐司邊能維持脆度"
+        "捲餅好吃，吐司邊增加脆度"
       ],
       "cautions": [
-        "沒加熱，冷冷的又很空虛",
-        "醬太多，味道偏鹹",
-        "價格太貴，內容物太虛"
+        "蛋白質9.8g，肉量很少",
+        "醬料太多，吃起來偏鹹",
+        "價格太貴，內容物單薄"
       ],
       "excerpt": "炸土司邊多，醬鹹僅給30分；內餡超少，吃了很空虛；鴨肉量足，吐司條酥脆但微波10秒仍冷",
       "reviewProvisional": false,
