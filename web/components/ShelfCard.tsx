@@ -1,26 +1,8 @@
-import { CakeSlice, Cookie, Croissant, CupSoda, IceCreamCone, Package, Soup, type LucideIcon } from 'lucide-react'
+import { Package } from 'lucide-react'
 import { useId, useState } from 'react'
 import ProductDetail from '@/components/ProductDetail'
+import { CATEGORY_ICON, scoreTone } from '@/lib/shelf-label'
 import { Product, comprehensiveScore, displayBrand, displayCategory, vegetarianShort } from '@/lib/data'
-
-// One icon per category group so neighbouring cards differ at a glance.
-const CATEGORY_ICON: Record<string, LucideIcon> = {
-  正餐: Soup,
-  甜點: CakeSlice,
-  冰品: IceCreamCone,
-  飲料: CupSoda,
-  麵包: Croissant,
-  零食: Cookie,
-  其他: Package,
-}
-
-function scoreTone(score: number | null): string {
-  if (score === null) return 'sl-na'
-  if (score >= 85) return 'sl-great'
-  if (score >= 70) return 'sl-good'
-  if (score >= 50) return 'sl-mid'
-  return 'sl-low'
-}
 
 type ShelfCardProps = {
   product: Product
