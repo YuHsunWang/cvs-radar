@@ -24,6 +24,9 @@ export const metadata: Metadata = {
     type: 'website',
     images: [{ url: '/opengraph-image.png', width: 1200, height: 630, alt: 'CVS Radar | 超商商品評價雷達' }],
   },
+  // Google Search Console ownership. The GA method cannot work here: the gtag
+  // script is injected after hydration, so it is not in the served <head>.
+  verification: { google: 'D1Z_F5RHsAuPtnChiRuTyvzCq_bJHpboozGCKd1nwGU' },
   twitter: {
     card: 'summary_large_image',
     title: 'CVS Radar | 超商商品評價雷達',
