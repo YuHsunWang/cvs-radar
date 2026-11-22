@@ -22,6 +22,62 @@
 
 .ss-section { margin-top: 26px; }
 
+/* Product page (/p/…/): one label, then the way to the rest of the shelf. */
+.pp-intro {
+  margin: 14px 2px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.pp-rel {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+@media (min-width: 640px) {
+  .pp-rel { grid-template-columns: 1fr 1fr; }
+}
+
+.pp-rel-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 10px 8px 14px;
+  border-radius: 12px;
+  background: var(--sl-tag);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+@media (hover: hover) {
+  .pp-rel-link:hover { outline: 2px solid currentColor; outline-offset: -2px; }
+}
+
+.pp-rel-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.pp-rel-brand { font-size: 12px; opacity: 0.7; }
+.pp-rel-name { font-weight: 700; font-size: 15px; line-height: 1.35; }
+.pp-rel-score { flex: none; transform: scale(0.7); transform-origin: right center; }
+
+/* The main exit: a full-width button, not a text link, so it reads as the next step. */
+.pp-all {
+  display: block;
+  margin-bottom: 32px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--sl-ink);
+  color: var(--sl-tag);
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+}
+@media (hover: hover) {
+  .pp-all:hover { opacity: 0.88; }
+}
+
 .ss-h2 {
   font-size: 17px;
   font-weight: 800;
