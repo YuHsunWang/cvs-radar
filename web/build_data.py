@@ -422,6 +422,8 @@ def attach_youtube_reviews(
                 by_key[_id_key(product["id"])] = product
                 out.append(product)
             else:
+                if existing["nPosts"] == 0:  # two YouTube-only groups met: the date filter needs the newest video
+                    existing["latestDate"] = max(existing["latestDate"], product["latestDate"])
                 product = existing
         reviews = [*product.get("youtube", []), *(public_review(row) for row in group)]
         product["youtube"] = sorted(reviews, key=lambda review: review["date"], reverse=True)

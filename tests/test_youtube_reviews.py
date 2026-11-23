@@ -79,6 +79,16 @@ def test_a_youtube_only_product_obeys_product_overrides() -> None:
     assert [(p["id"], p["category"]) for p in products] == [("全家::冰心可可脆絲蛋糕", "冰品")]
 
 
+def test_an_override_merge_keeps_the_newest_video_date() -> None:
+    # The date filter reads latestDate; an older date would hide a card whose
+    # newest review falls inside the chosen range.
+    overrides = {"全家::舊名": {"productName": "冰心可可脆絲蛋糕"}}
+    rows = [row(), row(video_id="t2xVd60iicM", video_date="2026-11-18", product_name="舊名")]
+    products = build_data.attach_youtube_reviews([], rows, overrides)
+    assert len(products) == 1 and len(products[0]["youtube"]) == 2
+    assert products[0]["latestDate"] == "2026-11-18"
+
+
 @pytest.mark.parametrize(
     ("overrides", "problem"),
     [
