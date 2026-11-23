@@ -16,6 +16,7 @@ Env overrides: MODEL RUNNER YOUTUBE_ENV CACHE MAX_VIDEOS LOOKBACK_DAYS (a one-of
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -196,6 +197,7 @@ def review_rows(video: dict, work: Path, known_ids: set[str]) -> list[dict]:
 
 
 def main() -> int:
+    argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter).parse_args()
     key = api_key()
     reviews_path, videos_path = ROOT / REVIEWS_PATH, ROOT / VIDEOS_PATH
     seen = set(load_videos(videos_path))

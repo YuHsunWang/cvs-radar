@@ -62,6 +62,23 @@ def test_two_videos_on_one_new_product_make_one_card() -> None:
     assert products[0]["latestDate"] == "2026-10-18"
 
 
+def test_names_differing_only_in_case_keep_every_review_on_one_card() -> None:
+    # Each channel spells the brand its own way; dropping one creator's review
+    # would silently misreport what YouTubers said.
+    rows = [row(product_name="Homeal咖哩飯"), row(video_id="t2xVd60iicM", video_date="2026-10-18", product_name="HOMEAL咖哩飯")]
+    products = build_data.attach_youtube_reviews([], rows)
+    assert len(products) == 1 and len(products[0]["youtube"]) == 2
+    assert products[0]["latestDate"] == "2026-10-18"
+
+
+def test_a_youtube_only_product_obeys_product_overrides() -> None:
+    # product_overrides.csv is the documented way to fix a wrong category or hide
+    # a product; it must reach YouTube-only cards too, or the filters stay wrong.
+    overrides = {"全家::冰心可可脆絲蛋糕": {"category": "冰品"}, "全家::別的": {"exclude": "1"}}
+    products = build_data.attach_youtube_reviews([], [row(), row(product_name="別的")], overrides)
+    assert [(p["id"], p["category"]) for p in products] == [("全家::冰心可可脆絲蛋糕", "冰品")]
+
+
 @pytest.mark.parametrize(
     ("overrides", "problem"),
     [

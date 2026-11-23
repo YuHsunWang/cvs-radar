@@ -381,7 +381,7 @@ def youtube_only_product(product_id: str, rows: list[dict[str, str]]) -> dict[st
     brand, name = product_id.split("::", 1)
     return {
         "id": product_id, "brand": brand, "productName": name, "price": price,
-        "category": latest["category"], "fairScore": None, "recommendationScore": None,
+        "category": resolve_category(brand, name, fallback=latest["category"]), "fairScore": None, "recommendationScore": None,
         "consensus": YOUTUBE_ONLY_CONSENSUS, "confidence": "低",
         "nPosts": 0, "nComments": 0, "rawComments": 0, "eligibleComments": 0,
         "uniqueEligibleCommenters": 0, "independentThreads": 0, "volumeLevel": "不足",
@@ -391,28 +391,40 @@ def youtube_only_product(product_id: str, rows: list[dict[str, str]]) -> dict[st
     }
 
 
-def attach_youtube_reviews(products: list[dict[str, Any]], rows: list[dict[str, str]]) -> list[dict[str, Any]]:
+def attach_youtube_reviews(
+    products: list[dict[str, Any]],
+    rows: list[dict[str, str]],
+    overrides: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     """Give every product its `youtube` list; products only YouTube covers are added.
 
     A row lands on the product it was matched to (a PTT product, or a product an
-    earlier video already added), else on its own brand::name.
+    earlier video already added), else on its own brand::name. A YouTube-only
+    product takes the same category labels and product_overrides.csv
+    corrections as a PTT one.
     """
     by_key = {_id_key(product["id"]): product for product in products}
-    grouped: dict[str, list[dict[str, str]]] = {}
+    grouped: dict[str, tuple[str, list[dict[str, str]]]] = {}  # id key -> (first-seen id, rows)
     for row in rows:
         target = row["product_id"] or f"{row['brand']}::{row['product_name'].strip()}"
-        existing = by_key.get(_id_key(target))
-        grouped.setdefault(existing["id"] if existing else target, []).append(row)
+        grouped.setdefault(_id_key(target), (target, []))[1].append(row)
     for product in products:
         product["youtube"] = []
     out = list(products)
-    for product_id, group in grouped.items():
-        product = by_key.get(_id_key(product_id))
+    for key, (product_id, group) in grouped.items():
+        product = by_key.get(key)
         if product is None:
-            product = youtube_only_product(product_id, group)
-            by_key[_id_key(product_id)] = product
-            out.append(product)
-        product["youtube"] = sorted((public_review(row) for row in group), key=lambda review: review["date"], reverse=True)
+            product = apply_product_override(youtube_only_product(product_id, group), (overrides or {}).get(product_id))
+            if product is None:  # excluded by an override
+                continue
+            existing = by_key.get(_id_key(product["id"]))  # an override renamed it onto a listed product
+            if existing is None:
+                by_key[_id_key(product["id"])] = product
+                out.append(product)
+            else:
+                product = existing
+        reviews = [*product.get("youtube", []), *(public_review(row) for row in group)]
+        product["youtube"] = sorted(reviews, key=lambda review: review["date"], reverse=True)
     return out
 
 
@@ -672,7 +684,7 @@ def main(
         if corrected is not None:
             products.append(corrected)
     products = merge_products(products)
-    products = attach_youtube_reviews(products, load_youtube_reviews(ROOT / "data" / "labels" / "youtube_reviews.csv"))
+    products = attach_youtube_reviews(products, load_youtube_reviews(ROOT / "data" / "labels" / "youtube_reviews.csv"), product_overrides)
     assert_unique_product_ids(products)
     # After merge and overrides, so the match is on the name the site shows.
     kcal_lookup = load_kcal_lookup()
