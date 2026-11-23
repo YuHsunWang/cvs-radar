@@ -124,6 +124,10 @@ export function trackOutboundPttClick(productId: string) {
   trackEvent('outbound_ptt_click', { product_id: productId })
 }
 
+export function trackOutboundYoutubeClick(productId: string) {
+  trackEvent('outbound_youtube_click', { product_id: productId })
+}
+
 /** Measures whether shoppers read the label, to decide if more chains are worth scraping. */
 export function trackNutritionOpen(productId: string, brand: string, fullLabel: boolean) {
   trackEvent('nutrition_open', {

@@ -9,7 +9,7 @@ function product(overrides: Partial<Product>): Product {
     nPosts: 1, nComments: 5, rawComments: 5, eligibleComments: 5, uniqueEligibleCommenters: 5,
     independentThreads: 1, volumeLevel: '中等', positivePct: 80, neutralPct: 10, negativePct: 10,
     likes: [], cautions: [], excerpt: '', reviewProvisional: false, postUrls: [], latestDate: null,
-    kcal: null, nutrition: null, image: null, vegetarian: null,
+    kcal: null, nutrition: null, image: null, vegetarian: null, youtube: [],
     ...overrides,
   }
 }

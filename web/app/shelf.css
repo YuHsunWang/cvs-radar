@@ -406,6 +406,13 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-meta { color: var(--sl-soft); font-size: 12px; white-space: nowrap; }
 .sl-price { color: var(--sl-ink); font-size: 14px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .sl-veg { color: var(--sl-good); border: 1px solid currentColor; border-radius: 999px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
+.sl-yt { color: var(--sl-hot); border: 1px solid currentColor; border-radius: 999px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
+.sl-kb-yt { border-left-color: var(--sl-hot); }
+.sl-yt-row { display: grid; gap: 1px; }
+.sl-yt-who { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 12px; color: var(--sl-soft); }
+.sl-yt-who b { color: var(--sl-ink); font-weight: 800; }
+.sl-yt-who a { color: var(--sl-soft); text-decoration: underline; text-underline-offset: 2px; }
+.sl-yt-say { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.6; color: var(--sl-ink); overflow-wrap: anywhere; }
 /* One-line takeaway from reviewers; two lines at most so cards keep a steady rhythm. */
 .sl-summary {
   margin: 0;

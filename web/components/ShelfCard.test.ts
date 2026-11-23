@@ -57,7 +57,7 @@ function product(overrides: Partial<Product> = {}): Product {
     rawComments: 2, eligibleComments: 2, uniqueEligibleCommenters: 2,
     independentThreads: 1, volumeLevel: '中等', positivePct: 60,
     neutralPct: 20, negativePct: 20, likes: [], cautions: [], excerpt: '',
-    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null, nutrition: null, image: null, vegetarian: null,
+    reviewProvisional: false, postUrls: [], latestDate: '2026-06-15', kcal: null, nutrition: null, image: null, vegetarian: null, youtube: [],
     ...overrides,
   }
 }
@@ -117,6 +117,31 @@ describe('reviewed static product images (synthetic fixtures)', () => {
     expect(card(product({ vegetarian: '植物五辛素（含奶蛋）' }), true)).toContain('素食標示：植物五辛素（含奶蛋）')
     // Unreviewed products must never look vegetarian.
     expect(card(product({ vegetarian: null }), true)).not.toMatch(/sl-veg|素食標示/)
+  })
+
+  it('shows a YouTube-only product as a creator verdict, never as an empty PTT record or a score', () => {
+    const review = { channel: '那個女生 Kiki', summary: '巧克力味滿滿，脆絲加分', score: '9/10', url: 'https://www.youtube.com/watch?v=lLgH8aKjHys&t=812s', date: '2026-10-16' }
+    const only = product({
+      nPosts: 0, nComments: 0, rawComments: 0, eligibleComments: 0, uniqueEligibleCommenters: 0, independentThreads: 0,
+      fairScore: null, recommendationScore: null, consensus: 'YouTuber 開箱', confidence: '低', positivePct: null,
+      neutralPct: null, negativePct: null, youtube: [review],
+    })
+    const closed = card(only, false)
+    expect(closed).toContain('YouTuber 開箱')
+    expect(closed).toContain('巧克力味滿滿，脆絲加分')
+    expect(closed).not.toContain('0 篇心得')
+    // No PTT score means the score slot stays a dash, not a number the creator never gave the site.
+    expect(closed).toMatch(/sl-score[^>]*>—</)
+    const open = card(only, true)
+    expect(open).toContain('YouTuber 怎麼說')
+    expect(open).toContain('給 9/10')
+    expect(open).toContain('href="https://www.youtube.com/watch?v=lLgH8aKjHys&amp;t=812s"')
+    expect(open).not.toMatch(/原文連結暫缺|共識：|留言沒有集中的優缺點/)
+    // A PTT product keeps its PTT record and gains the creator block beside it.
+    const both = card(product({ youtube: [review] }), true)
+    expect(both).toContain('YouTuber 怎麼說')
+    expect(both).toContain('共識：一致好評')
+    expect(card(product({ youtube: [review] }), false)).toContain('1 篇心得')
   })
 
   it('makes no image request for absent imagery and keeps the category fallback', () => {

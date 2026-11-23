@@ -73,6 +73,38 @@ matches exactly, or that has a reviewed `same` verdict in
 - 萊爾富's site refuses scripts (403) and has no calorie source; photo reading
   was sampled and parked in Linear DEV-228.
 
+### YouTube creators' verdicts run before `build_data` (since 2026-11-23)
+
+`scripts/youtube_reviews.py` adds what taste-test YouTubers say about a product.
+Channels, the lookback window and a per-run video cap live under `YOUTUBE:` in
+`config.yaml`. Per new video:
+
+1. The official YouTube Data API lists uploads (key in `~/.config/youtube/env`,
+   about 10 quota units a day of a 10,000 free quota). Titles must name a
+   Taiwanese chain; Shorts under two minutes and streams over an hour are skipped.
+2. `yt-dlp` downloads the audio and faster-whisper `medium` transcribes it on the
+   CPU, roughly one minute per minute of video. Audio is deleted afterwards;
+   transcripts stay in `~/.cache/cvs-radar/youtube/` and never enter the repo.
+3. Codex (`scripts/prompts/youtube-extract.md`) writes one row per product with
+   our one-line summary of the creator's verdict, the second it is said and the
+   creator's own score when they state one. `review_errors` checks each row.
+4. A second Codex pass (`youtube-verify.md`) rereads the transcript and drops
+   any row whose summary the creator did not say, plus jokes and sponsor spots.
+5. Survivors are appended to `data/labels/youtube_reviews.csv`; every processed
+   video is recorded in `youtube_videos.csv` (`done`, `empty` or `failed`). A
+   `failed` video is not retried; delete its line to retry it.
+
+`build_data` attaches the rows to the matched product, or adds a product no PTT
+post covers. Those show the 🎬 YouTuber 開箱 badge and **no score**: a creator's
+"9/10" stays their words beside their name and never feeds the site's score.
+They get no product page, because `pageProducts` needs three PTT comments.
+
+The step is optional in `rebackfill.sh`: a failure logs a WARN and the PTT
+publish goes ahead. The API lists videos within YouTube's terms, but downloading
+the audio does not follow them; the site publishes only short summaries in our
+words with a link to the creator's own video. This was the repo owner's call on
+2026-11-23.
+
 ### Labeling runs in two passes (since 2026-08-13)
 
 `run_required_label_layers.sh` runs all three layers, then — if anything was held

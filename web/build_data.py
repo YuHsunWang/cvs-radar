@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import tempfile
+import unicodedata
 from datetime import datetime, timedelta, timezone
 from math import sqrt
 from pathlib import Path
@@ -26,6 +27,7 @@ from cvs_radar.scoring.compute import _classify, _confidence  # noqa: E402
 from cvs_radar.product_categories import resolve_category  # noqa: E402
 from cvs_radar.scoring._common import _FULL_URL_RE  # noqa: E402
 from cvs_radar.store import load_results  # noqa: E402
+from cvs_radar.youtube_reviews import load_reviews as load_youtube_reviews, public_review  # noqa: E402
 from web.product_images import PTT_POST, load_product_images, valid_image  # noqa: E402
 
 
@@ -363,6 +365,67 @@ def merge_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return merged_products
 
 
+YOUTUBE_ONLY_CONSENSUS = "YouTuber 開箱"
+YOUTUBE_REVIEW_KEYS = {"channel", "summary", "score", "url", "date"}
+
+
+def _id_key(product_id: str) -> str:
+    # data.json ids keep their case; compare case-folded (TRAPS.md #6).
+    return unicodedata.normalize("NFKC", product_id).lower()
+
+
+def youtube_only_product(product_id: str, rows: list[dict[str, str]]) -> dict[str, Any]:
+    """A product no PTT post covers: shown without a score, only the creators' words."""
+    latest = max(rows, key=lambda row: row["video_date"])
+    price = next((int(row["price"]) for row in sorted(rows, key=lambda r: r["video_date"], reverse=True) if row["price"]), None)
+    brand, name = product_id.split("::", 1)
+    return {
+        "id": product_id, "brand": brand, "productName": name, "price": price,
+        "category": latest["category"], "fairScore": None, "recommendationScore": None,
+        "consensus": YOUTUBE_ONLY_CONSENSUS, "confidence": "低",
+        "nPosts": 0, "nComments": 0, "rawComments": 0, "eligibleComments": 0,
+        "uniqueEligibleCommenters": 0, "independentThreads": 0, "volumeLevel": "不足",
+        "positivePct": None, "neutralPct": None, "negativePct": None,
+        "likes": [], "cautions": [], "excerpt": "", "reviewProvisional": False,
+        "postUrls": [], "latestDate": latest["video_date"],
+    }
+
+
+def attach_youtube_reviews(products: list[dict[str, Any]], rows: list[dict[str, str]]) -> list[dict[str, Any]]:
+    """Give every product its `youtube` list; products only YouTube covers are added.
+
+    A row lands on the product it was matched to (a PTT product, or a product an
+    earlier video already added), else on its own brand::name.
+    """
+    by_key = {_id_key(product["id"]): product for product in products}
+    grouped: dict[str, list[dict[str, str]]] = {}
+    for row in rows:
+        target = row["product_id"] or f"{row['brand']}::{row['product_name'].strip()}"
+        existing = by_key.get(_id_key(target))
+        grouped.setdefault(existing["id"] if existing else target, []).append(row)
+    for product in products:
+        product["youtube"] = []
+    out = list(products)
+    for product_id, group in grouped.items():
+        product = by_key.get(_id_key(product_id))
+        if product is None:
+            product = youtube_only_product(product_id, group)
+            by_key[_id_key(product_id)] = product
+            out.append(product)
+        product["youtube"] = sorted((public_review(row) for row in group), key=lambda review: review["date"], reverse=True)
+    return out
+
+
+def valid_youtube(reviews: Any) -> bool:
+    return isinstance(reviews, list) and all(
+        isinstance(review, dict) and set(review) == YOUTUBE_REVIEW_KEYS
+        and all(isinstance(review[key], str) and review[key] for key in ("channel", "summary", "url", "date"))
+        and (review["score"] is None or isinstance(review["score"], str))
+        and review["url"].startswith("https://www.youtube.com/watch?v=")
+        for review in reviews
+    )
+
+
 def assert_unique_product_ids(products: list[dict[str, Any]]) -> None:
     ids = [product["id"] for product in products]
     if len(ids) != len(set(ids)):
@@ -512,7 +575,7 @@ def validate_payload(payload: dict[str, Any]) -> None:
         "eligibleComments", "uniqueEligibleCommenters", "independentThreads",
         "volumeLevel", "positivePct",
         "neutralPct", "negativePct", "likes", "cautions", "excerpt", "reviewProvisional", "postUrls", "latestDate",
-        "kcal", "nutrition", "image", "vegetarian",
+        "kcal", "nutrition", "image", "vegetarian", "youtube",
     }
     for index, product in enumerate(payload["products"]):
         if not isinstance(product, dict) or set(product) != required_fields:
@@ -528,6 +591,8 @@ def validate_payload(payload: dict[str, Any]) -> None:
             raise ValueError(f"public payload product {index} has invalid image metadata")
         if product["vegetarian"] is not None and not (isinstance(product["vegetarian"], str) and product["vegetarian"]):
             raise ValueError(f"public payload product {index} has an invalid vegetarian label")
+        if not valid_youtube(product["youtube"]):
+            raise ValueError(f"public payload product {index} has invalid YouTube reviews")
         if not isinstance(product["reviewProvisional"], bool):
             raise ValueError(f"public payload product {index} has invalid excerpt provenance")
         count_fields = (
@@ -607,6 +672,7 @@ def main(
         if corrected is not None:
             products.append(corrected)
     products = merge_products(products)
+    products = attach_youtube_reviews(products, load_youtube_reviews(ROOT / "data" / "labels" / "youtube_reviews.csv"))
     assert_unique_product_ids(products)
     # After merge and overrides, so the match is on the name the site shows.
     kcal_lookup = load_kcal_lookup()

@@ -31,6 +31,24 @@ export type Product = {
   image: ProductImage | null
   // The package's own vegetarian mark as printed, or 素食 from the ingredient list.
   vegetarian: string | null
+  // Creators' spoken verdicts from taste-test videos, newest first; [] for most products.
+  youtube: YoutubeReview[]
+}
+
+export type YoutubeReview = {
+  channel: string
+  // Our one-line summary of what the creator said, not a quote.
+  summary: string
+  // As the creator stated it, e.g. "9/10"; null when they gave none.
+  score: string | null
+  // Opens the video at the second the product comes up.
+  url: string
+  date: string
+}
+
+/** No PTT post covers it; the site only has what YouTube creators said. */
+export function isYoutubeOnly(product: Product): boolean {
+  return product.nPosts === 0 && product.youtube.length > 0
 }
 
 // Card chip: the mark's main word, e.g. 植物五辛素（含奶蛋） → 植物五辛素.
