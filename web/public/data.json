@@ -25642,37 +25642,46 @@
       "productName": "花生巧克力熔岩蛋糕",
       "price": 45,
       "category": "甜點",
-      "fairScore": 63,
-      "recommendationScore": 71,
+      "fairScore": 62,
+      "recommendationScore": 70,
       "consensus": "褒貶不一",
       "confidence": "高",
-      "nPosts": 2,
+      "nPosts": 3,
       "nComments": 15,
-      "rawComments": 31,
-      "eligibleComments": 17,
+      "rawComments": 36,
+      "eligibleComments": 18,
       "uniqueEligibleCommenters": 15,
       "independentThreads": 2,
       "volumeLevel": "充足",
-      "positivePct": 64,
-      "neutralPct": 18,
-      "negativePct": 18,
+      "positivePct": 63,
+      "neutralPct": 16,
+      "negativePct": 21,
       "likes": [
         "微波後蛋糕鬆軟，口感特別",
-        "烤熱後花生醬、巧克力都融化"
+        "烤熱後花生醬、巧克力都融化",
+        "霜的味道很足"
       ],
       "cautions": [
         "士力架不是內餡，只在上方",
         "折價券黏包裝紙，不好處理",
         "奶油和顏色與圖片差很多"
       ],
-      "excerpt": "鮮奶油份量相對多，冷藏兩三天後變硬；蛋糕與奶油不太甜，頂層巧克力較甜，整體好吃",
+      "excerpt": "巧克力蛋糕加熱或不加熱都適合",
       "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1789740654.A.932.html",
-        "https://www.ptt.cc/bbs/CVS/M.1789945975.A.7AF.html"
+        "https://www.ptt.cc/bbs/CVS/M.1789945975.A.7AF.html",
+        "https://www.ptt.cc/bbs/CVS/M.1794117474.A.691.html"
       ],
-      "latestDate": "2026-09-21",
+      "latestDate": "2026-11-08",
       "youtube": [
+        {
+          "channel": "黃泱綾 Naomi",
+          "summary": "花生巧克力搭配不合，甜膩又乾，吃起來很卡",
+          "score": null,
+          "url": "https://www.youtube.com/watch?v=YYDGKYbxkGA&t=278s",
+          "date": "2026-11-18"
+        },
         {
           "channel": "厭世甜點店",
           "summary": "巧克力苦味最明顯，但加熱後濕彈難吞，花生感偏弱",
@@ -101577,55 +101586,6 @@
       "image": {
         "imageUrl": "https://i.imgur.com/n3SGJ8K.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1734423914.A.89A.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::snikers花生巧克力熔岩蛋糕",
-      "brand": "全家",
-      "productName": "snikers花生巧克力熔岩蛋糕",
-      "price": 27,
-      "category": "甜點",
-      "fairScore": 55,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 1,
-      "rawComments": 5,
-      "eligibleComments": 1,
-      "uniqueEligibleCommenters": 1,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "霜的味道很足"
-      ],
-      "cautions": [],
-      "excerpt": "巧克力蛋糕加熱或不加熱都適合",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1794117474.A.691.html"
-      ],
-      "latestDate": "2026-11-08",
-      "youtube": [
-        {
-          "channel": "黃泱綾 Naomi",
-          "summary": "花生巧克力搭配不合，甜膩又乾，吃起來很卡",
-          "score": null,
-          "url": "https://www.youtube.com/watch?v=YYDGKYbxkGA&t=278s",
-          "date": "2026-11-18"
-        }
-      ],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://pimg.1px.tw/blog/dressingfrad/album/303510220/954562643798803628.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1794117474.A.691.html",
         "sourceKind": "ptt",
         "rotate": 0
       },

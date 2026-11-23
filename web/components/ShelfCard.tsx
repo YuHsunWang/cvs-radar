@@ -44,9 +44,10 @@ export default function ShelfCard({ product, isExpanded, onToggle }: ShelfCardPr
               <span className="sl-channel"><span className="sl-channel-dot" data-brand={channel} aria-hidden="true" />{channel}</span>
               {product.price != null ? <span className="sl-price">${product.price}</span> : null}
               {product.vegetarian ? <span className="sl-veg">{vegetarianShort(product.vegetarian)}</span> : null}
-              {youtubeOnly
+              {youtubeOnly ? null : <span className="sl-meta">{product.nPosts} 篇心得</span>}
+              {product.youtube.length > 0
                 ? <span className="sl-yt"><span aria-hidden="true">🎬 </span>YouTuber 開箱</span>
-                : <span className="sl-meta">{product.nPosts} 篇心得</span>}
+                : null}
             </div>
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
             {/* Open, the same line leads the 大家怎麼說 list; showing it twice reads as a repeat. */}

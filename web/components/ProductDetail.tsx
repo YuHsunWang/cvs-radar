@@ -91,8 +91,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         </section>
       ) : null}
 
-      {product.youtube.length > 0 ? <YoutubeBlock product={product} /> : null}
-
       {hasEvidence ? (
         <div className="sl-k-split">
           <EvidenceBlock tone="up" items={product.likes} />
@@ -156,6 +154,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       ) : youtubeOnly ? null : (
         <p className="sl-k-none sl-k-none-wide">原文連結暫缺</p>
       )}
+
+      {/* Last: a separate source, kept apart from the PTT reviews above. */}
+      {product.youtube.length > 0 ? <YoutubeBlock product={product} /> : null}
     </div>
   )
 }

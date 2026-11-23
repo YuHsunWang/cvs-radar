@@ -138,10 +138,18 @@ describe('reviewed static product images (synthetic fixtures)', () => {
     expect(open).toContain('href="https://www.youtube.com/watch?v=lLgH8aKjHys&amp;t=812s"')
     expect(open).not.toMatch(/原文連結暫缺|共識：|留言沒有集中的優缺點/)
     // A PTT product keeps its PTT record and gains the creator block beside it.
-    const both = card(product({ youtube: [review] }), true)
+    const both = card(product({ youtube: [review], postUrls: ['https://www.ptt.cc/bbs/CVS/M.1.A.1.html'] }), true)
     expect(both).toContain('YouTuber 怎麼說')
     expect(both).toContain('共識：一致好評')
-    expect(card(product({ youtube: [review] }), false)).toContain('1 篇心得')
+    // The creator block closes the detail, after the PTT sources, so the two
+    // sources never read as one.
+    expect(both.indexOf('PTT 01')).toBeGreaterThan(-1)
+    expect(both.indexOf('YouTuber 怎麼說')).toBeGreaterThan(both.indexOf('PTT 01'))
+    // Closed, the card says both: its PTT count and that a YouTuber tried it.
+    const closedBoth = card(product({ youtube: [review] }), false)
+    expect(closedBoth).toContain('1 篇心得')
+    expect(closedBoth).toContain('YouTuber 開箱')
+    expect(card(product(), false)).not.toContain('YouTuber 開箱')
   })
 
   it('makes no image request for absent imagery and keeps the category fallback', () => {
