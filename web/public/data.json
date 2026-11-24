@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22T09:09:50+08:00",
+  "generatedAt": "2026-11-24T11:05:37+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -61904,17 +61904,14 @@
       "neutralPct": 18,
       "negativePct": 54,
       "likes": [
-        "滿好吃的",
-        "當宵夜蠻適合的!味道其實不錯",
-        "好吃"
+        "適合當宵夜，味道不錯"
       ],
       "cautions": [
-        "什麼鬼價錢",
-        "就說吃超商圖方便不都如此?嫌貴就等i珍食不然就別吃嚕!XD",
-        "這包裝份量都不裝的一看就超小 但有個蝴蝶麵的好多人推但都沒進"
+        "份量真的很少",
+        "醬料不多"
       ],
       "excerpt": "吃起來空虛，表面一層醬、底下偏乾",
-      "reviewProvisional": true,
+      "reviewProvisional": false,
       "postUrls": [
         "https://www.ptt.cc/bbs/CVS/M.1794673835.A.6FE.html"
       ],
@@ -78537,6 +78534,53 @@
       "vegetarian": null
     },
     {
+      "id": "7-11::潮粵坊鴨肉捲餅",
+      "brand": "7-11",
+      "productName": "潮粵坊鴨肉捲餅",
+      "price": 79,
+      "category": "便當",
+      "fairScore": 32,
+      "recommendationScore": 20,
+      "consensus": "一致負評",
+      "confidence": "高",
+      "nPosts": 3,
+      "nComments": 43,
+      "rawComments": 53,
+      "eligibleComments": 45,
+      "uniqueEligibleCommenters": 43,
+      "independentThreads": 3,
+      "volumeLevel": "充足",
+      "positivePct": 8,
+      "neutralPct": 27,
+      "negativePct": 65,
+      "likes": [
+        "醬味道不錯",
+        "吐司邊可保持脆度"
+      ],
+      "cautions": [
+        "捲餅冷且鴨肉少",
+        "醬太多，味道偏鹹",
+        "整體好吃，但價格不划算"
+      ],
+      "excerpt": "炸土司邊多，醬鹹僅給30分；內餡超少，吃了很空虛；鴨肉量足，吐司條酥脆但微波10秒仍冷",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1778711367.A.453.html",
+        "https://www.ptt.cc/bbs/CVS/M.1779628958.A.1CB.html",
+        "https://www.ptt.cc/bbs/CVS/M.1794850205.A.9B5.html"
+      ],
+      "latestDate": "2026-11-17",
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://www.7-11.com.tw/freshfoods/19_star/images/star_352.png",
+        "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/19_star/index.aspx",
+        "sourceKind": "official_retailer",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "全家::大滿足香辣涼麵",
       "brand": "全家",
       "productName": "大滿足香辣涼麵",
@@ -78671,53 +78715,6 @@
         "imageUrl": "https://i.imgur.com/G5CpAFF.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1760436956.A.A20.html",
         "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "7-11::潮粵坊鴨肉捲餅",
-      "brand": "7-11",
-      "productName": "潮粵坊鴨肉捲餅",
-      "price": 79,
-      "category": "便當",
-      "fairScore": 32,
-      "recommendationScore": 20,
-      "consensus": "一致負評",
-      "confidence": "高",
-      "nPosts": 3,
-      "nComments": 39,
-      "rawComments": 49,
-      "eligibleComments": 41,
-      "uniqueEligibleCommenters": 39,
-      "independentThreads": 3,
-      "volumeLevel": "充足",
-      "positivePct": 9,
-      "neutralPct": 24,
-      "negativePct": 67,
-      "likes": [
-        "醬料好吃",
-        "炸吐司邊增加脆度"
-      ],
-      "cautions": [
-        "捲餅沒加熱，鴨肉也少",
-        "醬料太多且偏鹹",
-        "整體好吃，但價格不划算"
-      ],
-      "excerpt": "炸土司邊多，醬鹹僅給30分；內餡超少，吃了很空虛；鴨肉量足，吐司條酥脆但微波10秒仍冷",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1778711367.A.453.html",
-        "https://www.ptt.cc/bbs/CVS/M.1779628958.A.1CB.html",
-        "https://www.ptt.cc/bbs/CVS/M.1794850205.A.9B5.html"
-      ],
-      "latestDate": "2026-11-17",
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://www.7-11.com.tw/freshfoods/19_star/images/star_352.png",
-        "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/19_star/index.aspx",
-        "sourceKind": "official_retailer",
         "rotate": 0
       },
       "vegetarian": null
