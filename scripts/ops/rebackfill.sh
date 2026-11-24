@@ -60,18 +60,21 @@ if git worktree list --porcelain | grep -q "worktree $WT"; then
   on_branch="$(git -C "$WT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
   [ "$on_branch" = "$BRANCH" ] || die \
     "worktree $WT is on '$on_branch', not '$BRANCH' (another worktree probably holds that branch)"
-  # A run whose push was rejected leaves its commit here, and the reset below would
-  # destroy it together with every label that run paid for. Park it on a branch first
-  # so the labels can still be recovered by hand.
-  if ! git -C "$WT" merge-base --is-ancestor HEAD "origin/$BRANCH" 2>/dev/null; then
-    keep="rebackfill-unpushed-$(date -u +%Y%m%dT%H%M%SZ)"
-    git -C "$WT" branch "$keep" HEAD && log "kept an unpushed commit as branch $keep"
-  fi
-  git -C "$WT" reset -q --hard "origin/$BRANCH"
 else
   rm -rf "$WT"
   git worktree add -f "$WT" "$BRANCH" >/dev/null 2>&1 || die "worktree add"
 fi
+# Both paths end here. A recreated worktree checks out the LOCAL branch, which lags
+# origin once other PRs merge; skipping the reset there made the 2026-11-23/24 runs
+# commit on a stale main and fail the push.
+# A run whose push was rejected leaves its commit here, and the reset below would
+# destroy it together with every label that run paid for. Park it on a branch first
+# so the labels can still be recovered by hand.
+if ! git -C "$WT" merge-base --is-ancestor HEAD "origin/$BRANCH" 2>/dev/null; then
+  keep="rebackfill-unpushed-$(date -u +%Y%m%dT%H%M%SZ)"
+  git -C "$WT" branch "$keep" HEAD && log "kept an unpushed commit as branch $keep"
+fi
+git -C "$WT" reset -q --hard "origin/$BRANCH"
 cd "$WT" || die "cd worktree"
 # keep the scratch working dir out of git without touching the repo .gitignore
 # (in a worktree .git is a file, so resolve the real info/exclude path)
