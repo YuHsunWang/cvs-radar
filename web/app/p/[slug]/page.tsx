@@ -56,7 +56,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!product) return {}
   const title = productPageTitle(product)
   const description = productPageDescription(product)
-  const image = product.image?.imageUrl
+  // Our copy resolves against metadataBase; the original only until it exists.
+  const image = product.image && (product.image.localSrc ? `/${product.image.localSrc}` : product.image.imageUrl)
   return {
     title,
     description,

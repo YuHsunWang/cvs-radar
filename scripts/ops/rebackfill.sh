@@ -244,6 +244,11 @@ python3 scripts/fetch_official_nutrition.py 2>&1 | tail -2 \
 # review. Never edits product_images.csv; same Chrome window rule as above.
 python3 scripts/fetch_family_images.py 2>&1 | tail -2 \
   || log "WARN: FamilyMart photo fetch failed; publish unaffected"
+# Our own copies of the reviewed photos, so a dead original cannot blank a card.
+# Before build_data, which links a copy only if it exists; a failed photo keeps
+# its original URL.
+python3 scripts/download_product_images.py 2>&1 | tail -1 \
+  || log "WARN: product photo download failed; publish unaffected"
 
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
@@ -268,6 +273,8 @@ if [ "$DO_COMMIT" = "1" ]; then
           data/labels/official_kcal.csv \
           data/labels/official_nutrition.csv \
           data/results.json web/public/data.json
+  # The folder, not a file list: this also stages copies deleted by a takedown.
+  [ -d web/public/images ] && git add web/public/images
   if git diff --cached --quiet; then
     log "no data change to commit"
   else

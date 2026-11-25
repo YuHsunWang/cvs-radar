@@ -71,6 +71,7 @@ function card(item: Product, expanded = false) {
 describe('reviewed static product images (synthetic fixtures)', () => {
   const image = {
     imageUrl: 'https://images.example/test-fixture.png',
+    localSrc: null,
     sourcePageUrl: 'https://retailer.example/product/0904302',
     sourceKind: 'official_retailer',
     rotate: 0,

@@ -15,6 +15,7 @@ import {
   filterVegetarian,
   formatDisplayDate,
   isDataStale,
+  imageSrc,
   isProductImage,
   parseDataPayload,
   normalizeDateRange,
@@ -27,6 +28,7 @@ import {
 // Synthetic URLs only; these are never added to the public snapshot.
 const fixtureImage = {
   imageUrl: 'https://images.example/test-fixture.png',
+  localSrc: null,
   sourcePageUrl: 'https://retailer.example/product/0904302',
   sourceKind: 'official_retailer',
   rotate: 0,
@@ -46,6 +48,9 @@ describe('public image metadata boundary', () => {
     { ...fixtureImage, sourceKind: 'ptt' },
     { ...fixtureImage, rotate: 45 },
     { ...fixtureImage, rotate: '90' },
+    // Our copy may only live in our own image folder.
+    { ...fixtureImage, localSrc: '../data.json' },
+    { ...fixtureImage, localSrc: 'https://evil.example/0123456789abcdef.webp' },
   ])('rejects untraceable or unexpected image metadata: %j', (image) => {
     expect(isProductImage(image)).toBe(false)
     expect(() => parseDataPayload(JSON.stringify({ products: [{ image }] }))).toThrow('Invalid public product image metadata')
@@ -61,6 +66,13 @@ describe('public image metadata boundary', () => {
   ])('rejects unsafe image and source URLs: %s', (url) => {
     expect(isProductImage({ ...fixtureImage, imageUrl: url })).toBe(false)
     expect(isProductImage({ ...fixtureImage, sourcePageUrl: url })).toBe(false)
+  })
+
+  it('serves our saved copy so a dead original cannot blank the card', () => {
+    const saved = { ...fixtureImage, localSrc: 'images/0123456789abcdef.webp' }
+    expect(isProductImage(saved)).toBe(true)
+    expect(imageSrc(saved)).toBe('/images/0123456789abcdef.webp')
+    expect(imageSrc(fixtureImage)).toBe(fixtureImage.imageUrl) // not downloaded yet
   })
 
   it('accepts a reviewed supplementary PTT post source without account metadata', () => {
