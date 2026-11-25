@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { isProductImage, type Product } from '@/lib/data'
+import { imageSrc, isProductImage, type Product } from '@/lib/data'
 
 type Props = {
   product: Product
@@ -18,7 +18,7 @@ export default function ProductImage({ product }: Props) {
   }
   const picture = (
     <img
-      src={image.imageUrl}
+      src={imageSrc(image)}
       alt={`${product.productName?.trim() || '商品'}的商品圖片`}
       width={320}
       height={240}

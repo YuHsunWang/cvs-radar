@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import re
 from pathlib import Path
 from typing import Any
@@ -17,6 +18,14 @@ IMAGE_FIELDS = (
 ROTATIONS = {"0", "90", "180", "270"}
 SOURCE_KINDS = {"official_retailer", "official_brand", "ptt"}
 PTT_POST = re.compile(r"https://www\.ptt\.cc/bbs/CVS/M\.\d+\.A\.[0-9A-F]+\.html")
+# Our own copy of each reviewed photo (scripts/download_product_images.py), so a
+# deleted or hotlink-blocked original cannot blank a card. Served from web/public.
+IMAGES_DIR = Path(__file__).resolve().parent / "public" / "images"
+LOCAL_SRC = re.compile(r"images/[0-9a-f]{16}\.webp")
+
+
+def local_image_name(image_url: str) -> str:
+    return hashlib.sha256(image_url.encode()).hexdigest()[:16] + ".webp"
 
 
 def safe_https_url(value: Any) -> bool:
@@ -46,10 +55,11 @@ def safe_https_url(value: Any) -> bool:
 def valid_image(image: Any) -> bool:
     if image is None:
         return True
-    if not isinstance(image, dict) or set(image) != {"imageUrl", "sourcePageUrl", "sourceKind", "rotate"}:
+    if not isinstance(image, dict) or set(image) != {"imageUrl", "localSrc", "sourcePageUrl", "sourceKind", "rotate"}:
         return False
     return (
         isinstance(image["sourceKind"], str) and image["sourceKind"] in SOURCE_KINDS
+        and (image["localSrc"] is None or (isinstance(image["localSrc"], str) and bool(LOCAL_SRC.fullmatch(image["localSrc"]))))
         and safe_https_url(image["imageUrl"])
         and safe_https_url(image["sourcePageUrl"])
         and (image["sourceKind"] != "ptt" or bool(PTT_POST.fullmatch(image["sourcePageUrl"])))
@@ -57,7 +67,7 @@ def valid_image(image: Any) -> bool:
     )
 
 
-def load_product_images(path: Path) -> dict[str, dict[str, str]]:
+def load_product_images(path: Path, images_dir: Path = IMAGES_DIR) -> dict[str, dict[str, Any]]:
     """One retained row per exact product ID, including disabled/removal rows.
 
     Duplicate IDs abort the build regardless of row order or source. Operators
@@ -88,8 +98,11 @@ def load_product_images(path: Path) -> dict[str, dict[str, str]]:
                 or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row["checked_at"])
             ):
                 continue
+            local = local_image_name(row["image_url"])
             image = {
                 "imageUrl": row["image_url"],
+                # Not downloaded yet (e.g. approved since the last cron run): the original serves.
+                "localSrc": f"images/{local}" if (images_dir / local).is_file() else None,
                 "sourcePageUrl": row["source_page_url"],
                 "sourceKind": row["source_kind"],
                 "rotate": int(row["rotate"]),

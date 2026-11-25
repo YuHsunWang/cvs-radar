@@ -39,7 +39,10 @@ export function vegetarianShort(label: string): string {
 }
 
 export type ProductImage = {
+  // The original; kept for provenance and served only until our copy exists.
   imageUrl: string
+  // Our own copy under web/public, e.g. images/0123456789abcdef.webp.
+  localSrc: string | null
   sourcePageUrl: string
   sourceKind: 'official_retailer' | 'official_brand' | 'ptt'
   // Clockwise degrees that turn the photo so its package text reads upright.
@@ -60,11 +63,17 @@ function safeImageHttpsUrl(value: unknown): value is string {
   }
 }
 
+// Our copy when we have one, so a dead original cannot blank the card.
+export function imageSrc(image: ProductImage): string {
+  return image.localSrc ? `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/${image.localSrc}` : image.imageUrl
+}
+
 export function isProductImage(value: unknown): value is ProductImage | null {
   if (value === null) return true
   if (typeof value !== 'object' || value === null) return false
   const image = value as Record<string, unknown>
-  return Object.keys(image).sort().join(',') === 'imageUrl,rotate,sourceKind,sourcePageUrl'
+  return Object.keys(image).sort().join(',') === 'imageUrl,localSrc,rotate,sourceKind,sourcePageUrl'
+    && (image.localSrc === null || (typeof image.localSrc === 'string' && /^images\/[0-9a-f]{16}\.webp$/.test(image.localSrc)))
     && [0, 90, 180, 270].includes(image.rotate as number)
     && ['official_retailer', 'official_brand', 'ptt'].includes(image.sourceKind as string)
     && safeImageHttpsUrl(image.imageUrl) && safeImageHttpsUrl(image.sourcePageUrl)

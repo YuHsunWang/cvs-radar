@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 import web.build_data as build_data
-from web.product_images import IMAGE_FIELDS, load_product_images, safe_https_url, valid_image
+from web.product_images import IMAGE_FIELDS, load_product_images, local_image_name, safe_https_url, valid_image
 
 
 def image_row(**changes: str) -> dict[str, str]:
@@ -68,11 +68,25 @@ def test_traceability_without_private_review_fields(tmp_path: Path, kind: str) -
     row = image_row(source_kind=kind, source_page_url=source)
     images = load_product_images(manifest(tmp_path, row))
     assert images[row["product_id"]] == {
-        "imageUrl": row["image_url"], "sourcePageUrl": source, "sourceKind": kind, "rotate": 0,
+        "imageUrl": row["image_url"], "localSrc": None, "sourcePageUrl": source, "sourceKind": kind, "rotate": 0,
     }
     assert valid_image(images[row["product_id"]])
     assert "official_id" not in json.dumps(images)
     assert "checked_at" not in json.dumps(images)
+
+
+def test_our_saved_copy_is_published_so_a_dead_original_cannot_blank_the_card(tmp_path: Path) -> None:
+    row = image_row()
+    saved = tmp_path / "images"
+    saved.mkdir()
+    (saved / local_image_name(row["image_url"])).write_bytes(b"webp")
+    image = load_product_images(manifest(tmp_path, row), saved)[row["product_id"]]
+    assert image["localSrc"] == f"images/{local_image_name(row['image_url'])}"
+    assert image["imageUrl"] == row["image_url"]  # provenance stays traceable
+    assert valid_image(image)
+    # Anything else in localSrc could point the page outside our image folder.
+    assert not valid_image({**image, "localSrc": "../data.json"})
+    assert not valid_image({**image, "localSrc": "https://evil.example/x.webp"})
 
 
 def test_ptt_must_trace_to_a_post_not_an_account(tmp_path: Path) -> None:

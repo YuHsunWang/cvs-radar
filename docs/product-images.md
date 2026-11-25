@@ -38,7 +38,16 @@ set `enabled` to `1`. Unknown/unreviewed rows stay `unknown` and `0`; `enabled`
 accepts exactly `0` or `1`, with malformed values aborting the build. Both URLs
 must use HTTPS without credentials, control characters, or nonstandard ports.
 Unsupported sources or unsafe URLs fail closed. Reachability is not checked by
-the build. This workflow grants no image download or rehosting authorization.
+the build.
+
+Since 2026-11-25 the repo owner has the site serve its own copy of each enabled
+image, so a deleted or hotlink-blocked original no longer blanks the card.
+`scripts/download_product_images.py` (run by the local cron before
+`build_data.py`; needs Pillow) saves each one once as a 640px WebP in
+`web/public/images/`, named by a hash of `image_url`, and deletes copies no
+enabled row points at. The build links a copy (`localSrc`) only when the file
+exists; until then, or if the download failed, the original URL is shown. The
+source link under the photo is unchanged.
 
 The local cron queues candidates for review without enabling anything:
 `scripts/collect_image_candidates.py` lists the links in PTT articles (each
@@ -46,10 +55,11 @@ article is opened once; its links are cached) and
 `scripts/fetch_family_images.py` saves FamilyMart official photos, both under
 `~/.cache/cvs-radar/`. Codex reviews them with `docs/image-review-prompt.md`.
 
-To remove an image, set `enabled=0`, record `takedown_reason`, retain the row, and
-rebuild from the repo root:
+To remove an image, set `enabled=0`, record `takedown_reason`, retain the row,
+delete our copy, and rebuild from the repo root:
 
 ```bash
+python3 scripts/download_product_images.py   # deletes copies no enabled row uses
 cd web
 npm run build:data
 npm test
@@ -61,7 +71,7 @@ Use a Python environment with the repository dependencies installed. Rebuilding
 updates `web/public/data.json` and the static output; a live removal takes effect
 only after the normal publishing process publishes that output.
 
-Only `image: null` or `{imageUrl, sourcePageUrl, sourceKind}` enters public product
+Only `image: null` or `{imageUrl, localSrc, sourcePageUrl, sourceKind, rotate}` enters public product
 data. Review dates, candidate IDs, permission records and removal reasons do not.
 Images load only when a card is opened; collapsed cards keep the category icon
 and request nothing. A missing image shows nothing in detail and a failed one
