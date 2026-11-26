@@ -385,6 +385,22 @@ _DISTINCTIVE_TERMS = {
     # Frozen and chilled versions of the same dish are different products
     # (7-11 青醬蛤蜊義大利麵: $45 frozen bag vs $89 microwave meal).
     "冷凍",
+    "qq雪糕",
+    "冰棒",
+    "凍凍",
+    "卡士達",
+    "巧酥",
+    "扁可頌",
+    "果漾",
+    "泰國娘娘",
+    "煉乳牛奶",
+    "熱飲",
+    "甘王",
+    "短筒襪",
+    "米糕飯糰",
+    "紅豆牛奶x莊園牛奶",
+    "肉燥",
+    "蛋白",
 }
 
 _GENERIC_CATEGORY_KEYWORDS = {
