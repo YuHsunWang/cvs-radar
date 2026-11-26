@@ -724,6 +724,86 @@ class ScoringTest(unittest.TestCase):
         # $45 frozen bag vs $89 microwave meal: same dish name, different products.
         self.assertFalse(_same_product("7-11", "青醬蛤蜊義大利麵冷凍", "青醬蛤蜊義大利麵"))
 
+    def test_product_grouping_keeps_ice_cream_bar_apart_from_soft_serve(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "杜老爺紅豆牛奶QQ雪糕", "紅豆牛奶霜淇淋")
+        )
+
+    def test_product_grouping_keeps_ice_pop_apart_from_soft_serve(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "春植水蜜桃風味冰棒", "梨山水蜜桃霜淇淋")
+        )
+
+    def test_product_grouping_keeps_jelly_milk_tea_apart(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "凍凍好喝奶茶", "好喝奶茶")
+        )
+
+    def test_product_grouping_keeps_custard_apart_from_basque(self) -> None:
+        self.assertFalse(
+            _same_product("7-11", "酷聖霜草莓卡士達霜淇淋", "草莓巴斯克霜淇淋")
+        )
+
+    def test_product_grouping_keeps_cookie_ice_cream_bar_apart(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "貘抖明星巧克力巧酥牛奶雪糕", "牧場直送4.0巧克力牛奶雪糕")
+        )
+
+    def test_product_grouping_keeps_flat_croissant_apart(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "巧克力扁可頌", "巧克力可頌")
+        )
+
+    def test_product_grouping_keeps_fruit_bun_apart_from_cream_bun(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "果漾草莓麵包", "生果粒草莓滿餡麵包")
+        )
+
+    def test_product_grouping_keeps_thai_curry_collaboration_apart(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "泰國娘娘泰式綠咖哩雞飯", "泰式綠咖哩雞飯")
+        )
+
+    def test_product_grouping_keeps_condensed_milk_swirl_apart(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "不二家草莓牛奶x煉乳牛奶霜淇淋", "不二家草莓牛奶霜淇淋")
+        )
+
+    def test_product_grouping_keeps_hot_cocoa_apart_from_iced(self) -> None:
+        self.assertFalse(
+            _same_product("7-11", "HERSHEYS好時經典可可熱飲", "HERSHEYS好時經典可可冰飲")
+        )
+
+    def test_product_grouping_keeps_amaou_custard_apart(self) -> None:
+        self.assertFalse(
+            _same_product("7-11", "甘王草莓卡士達霜淇淋", "酷聖霜草莓卡士達霜淇淋")
+        )
+
+    def test_product_grouping_keeps_ankle_socks_apart_from_crew_socks(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "ConvenienceWear短筒襪", "Conveniencewear黑中筒線襪")
+        )
+
+    def test_product_grouping_keeps_rice_ball_apart_from_rice_cake(self) -> None:
+        self.assertFalse(
+            _same_product("7-11", "府城肉燥米糕飯糰", "府城肉燥米糕")
+        )
+
+    def test_product_grouping_keeps_red_bean_milk_swirl_apart(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "紅豆牛奶x莊園牛奶霜淇淋", "紅豆牛奶霜淇淋")
+        )
+
+    def test_product_grouping_keeps_braised_pork_rice_ball_apart(self) -> None:
+        self.assertFalse(
+            _same_product("7-11", "爆蛋肉燥新極大飯糰", "爆蛋燒肉新極大御飯糰")
+        )
+
+    def test_product_grouping_keeps_protein_ice_cream_bar_apart(self) -> None:
+        self.assertFalse(
+            _same_product("全家", "SUPERX巧克力牛奶蛋白雪糕", "牧場直送4.0巧克力牛奶雪糕")
+        )
+
     def test_junk_product_name_falls_back_to_title_not_unknown(self) -> None:
         # The 商品名稱 field is promo junk that canonicalizes to "unknown"; the real
         # name lives in the title. Unrelated posts must not collapse under "unknown".
