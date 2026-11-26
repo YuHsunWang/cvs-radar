@@ -720,6 +720,10 @@ class ScoringTest(unittest.TestCase):
         self.assertTrue(_same_combo_flavor_product("麻辣起司飯糰", "起司麻辣飯糰"))
         self.assertTrue(_same_product("7-11", "麻辣起司飯糰", "起司麻辣飯糰"))
 
+    def test_product_grouping_keeps_frozen_version_apart(self) -> None:
+        # $45 frozen bag vs $89 microwave meal: same dish name, different products.
+        self.assertFalse(_same_product("7-11", "青醬蛤蜊義大利麵冷凍", "青醬蛤蜊義大利麵"))
+
     def test_junk_product_name_falls_back_to_title_not_unknown(self) -> None:
         # The 商品名稱 field is promo junk that canonicalizes to "unknown"; the real
         # name lives in the title. Unrelated posts must not collapse under "unknown".
