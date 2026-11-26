@@ -382,6 +382,9 @@ _DISTINCTIVE_TERMS = {
     "蒜",
     "蔥",
     "辣椒",
+    # Frozen and chilled versions of the same dish are different products
+    # (7-11 青醬蛤蜊義大利麵: $45 frozen bag vs $89 microwave meal).
+    "冷凍",
 }
 
 _GENERIC_CATEGORY_KEYWORDS = {
