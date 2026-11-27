@@ -124,6 +124,15 @@ export function trackOutboundPttClick(productId: string) {
   trackEvent('outbound_ptt_click', { product_id: productId })
 }
 
+/** The add-to-home-screen button: `android` = native prompt shown, else the how-to dialog. */
+export function trackInstallPrompt(platform: string) {
+  trackEvent('install_prompt', { platform })
+}
+
+export function trackInstallChoice(outcome: string) {
+  trackEvent('install_choice', { outcome })
+}
+
 export function trackOutboundYoutubeClick(productId: string) {
   trackEvent('outbound_youtube_click', { product_id: productId })
 }

@@ -570,7 +570,9 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
     padding: 14px 16px 12px;
   }
   .sl-page:not(.ss-page) .sl-sign-title { font-size: 22px; }
-  .sl-update-date { flex: 1; text-align: right; font-size: 12px; }
+  /* Title, date and three icon buttons share one row; the date gives way first. */
+  .sl-update-date { flex: 1; min-width: 0; text-align: right; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sl-page:not(.ss-page) .sl-sign .sl-theme-toggle { width: 40px; margin-left: -12px; }
   .sl-searchwrap { order: 2; width: 100%; }
   .sl-shelf { margin-top: 12px; }
   .sl-score { width: 60px; height: 52px; font-size: 26px; }
@@ -1148,3 +1150,38 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-tour .driver-popover-arrow-side-right { border-right-color: var(--sl-tour-bg); }
 .sl-tour .driver-popover-arrow-side-top { border-top-color: var(--sl-tour-bg); }
 .sl-tour .driver-popover-arrow-side-bottom { border-bottom-color: var(--sl-tour-bg); }
+
+/* ---- add to home screen: phones only (same 640px breakpoint) ---- */
+.sl-a2hs-btn { display: none; }
+@media (max-width: 640px) {
+  .sl-a2hs-btn { display: inline-flex; }
+}
+.sl-a2hs-dialog {
+  --sl-tour-bg: #ffffff;
+  --sl-tour-ink: #17130e;
+  width: min(360px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--sl-tour-bg);
+  color: var(--sl-tour-ink);
+  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
+:root[data-theme="dark"] .sl-a2hs-dialog { --sl-tour-bg: #1f2229; --sl-tour-ink: #eceef2; }
+.sl-a2hs-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.sl-a2hs-body { position: relative; padding: 18px 18px 16px; font-size: 15px; line-height: 1.6; }
+.sl-a2hs-body h2 { margin: 0 40px 8px 0; font-size: 17px; }
+.sl-a2hs-body ol { margin: 0 0 10px; padding-left: 22px; list-style: decimal; }
+.sl-a2hs-body p { margin: 0; color: var(--sl-muted); font-size: 14px; }
+.sl-a2hs-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+}
