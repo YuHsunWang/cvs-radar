@@ -23,14 +23,10 @@ import {
   DataPayload,
   Product,
   SortKey,
-  applyAdvanced,
   brands,
   categoryKeys,
-  filterByBrand,
-  filterByCategory,
-  filterHasScore,
   filterBySearch,
-  filterVegetarian,
+  filterShelf,
   formatDisplayDate,
   isDataStale,
   isoMonthsAgo,
@@ -296,34 +292,31 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
   }, [sheetOpen, sheetSection])
 
   const visibleProducts = useMemo(() => {
-    return sortProducts(
-      applyAdvanced(
-        filterVegetarian(
-          filterHasScore(
-            filterByCategory(filterByBrand(filterBySearch(products, query), brand), category),
-            hideNoScore,
-          ),
-          vegOnly,
-        ),
-        filters,
-      ),
-      sortKey,
-    )
+    return sortProducts(filterShelf(products, { query, brand, category, hideNoScore, vegOnly, filters }), sortKey)
   }, [brand, category, filters, hideNoScore, products, query, sortKey, vegOnly])
 
   // Static export: only the client sees the query string, so restore it after mount.
   useEffect(() => {
     const view = readViewParams(window.location.search)
-    setQuery(view.query)
-    setBrand(view.brand)
-    setCategory(view.category)
     setSortKey(view.sortKey)
-    setHideNoScore(view.hideNoScore)
-    setVegOnly(view.vegOnly)
-    const preset = DATE_PRESETS.find((item) => item.key === view.datePreset)
-    if (preset && preset.key !== 'all') {
-      setDatePreset(preset.key)
-      setFilters({ fromDate: preset.from(), toDate: '' })
+    const preset = DATE_PRESETS.find((item) => item.key === view.datePreset && item.key !== 'all')
+    const linkFilters = {
+      query: view.query, brand: view.brand, category: view.category, hideNoScore: view.hideNoScore,
+      vegOnly: view.vegOnly, filters: { fromDate: preset ? preset.from() : '', toDate: '' },
+    }
+    // A shared product link whose filters now hide that product (a search word that matches
+    // nothing, a 1-week window that has passed) would open on an empty shelf; drop the filters.
+    const hidesProduct = view.product !== null && !filterShelf(products, linkFilters).some((p) => p.id === view.product)
+    if (!hidesProduct) {
+      setQuery(view.query)
+      setBrand(view.brand)
+      setCategory(view.category)
+      setHideNoScore(view.hideNoScore)
+      setVegOnly(view.vegOnly)
+      if (preset) {
+        setDatePreset(preset.key)
+        setFilters(linkFilters.filters)
+      }
     }
     if (view.product) {
       // The URL keeps the open product while browsing, so a reload or back/forward
