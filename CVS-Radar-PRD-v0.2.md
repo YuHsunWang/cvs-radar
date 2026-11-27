@@ -346,7 +346,8 @@ ProductReport : brand, product_name, fair_score, consensus,
 
 ## 17. 資料來源範圍
 
-- 資料來源限定為 PTT `CVS` 板，不規劃第二來源或跨來源彙整。
+- 評分來源限定為 PTT `CVS` 板；分數只由 PTT 心得與推文產生。
+- 2026-11-23 起加入 YouTube 開箱影片作為**不計分**的第二來源：只取 YouTuber 本人在影片中講的評價，整理成一句摘要並附影片時間點連結，與 PTT 分數分開顯示；PTT 沒有的商品也可上架，但不顯示分數、不開商品獨立頁。不讀觀眾留言。流程見 `docs/ops-pipeline.md`。
 - 帳號不跨平台串接(非目標)。
 
 ---

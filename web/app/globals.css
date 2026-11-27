@@ -16,6 +16,7 @@
   --sl-on-accent: #ffffff;
   --sl-tint-up: #f4f9f5;
   --sl-tint-dn: #fdf5f3;
+  --sl-tint-yt: #f1f2fb;
 }
 
 /* Selected by the script in app/layout.tsx. The extra selector weight also beats
@@ -34,6 +35,7 @@
   --sl-on-accent: #14161b;
   --sl-tint-up: #1a2a20;
   --sl-tint-dn: #2f1e1c;
+  --sl-tint-yt: #1e2135;
 }
 :root[data-theme="dark"] .sl-page {
   --sl-aisle: #14161b;

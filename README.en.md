@@ -41,6 +41,7 @@ It covers about 2,400 products from nearly 2,800 review posts going back to June
 - A closed card shows only the chain, price, number of reviews, name, one takeaway and the score.
 - Opened, it shows a product photo, one takeaway per review, pros and cons, and a link to every PTT post.
 - More than 80% of products have a photo, from the chain's official site or a PTT review, each with its source.
+- Products a YouTuber has taste-tested get a "what YouTubers say" block: the channel, a one-line summary, and a link to the second they say it. Products no PTT post covers still appear, marked "YouTuber 開箱" and never scored.
 - Products with an official nutrition label can expand it; 7-Eleven and FamilyMart give calories, and some FamilyMart products give the full table.
 - Dark mode is supported.
 

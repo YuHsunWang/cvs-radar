@@ -1,8 +1,8 @@
 'use client'
 
 import { ExternalLink, ThumbsUp, TriangleAlert } from 'lucide-react'
-import { trackNutritionOpen, trackOutboundPttClick } from '@/lib/analytics'
-import { Nutrition, Product } from '@/lib/data'
+import { trackNutritionOpen, trackOutboundPttClick, trackOutboundYoutubeClick } from '@/lib/analytics'
+import { Nutrition, Product, isYoutubeOnly } from '@/lib/data'
 import ProductImage from '@/components/ProductImage'
 
 type ProductDetailProps = {
@@ -44,15 +44,24 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     .filter(Boolean)
 
   const hasEvidence = product.likes.length > 0 || product.cautions.length > 0
+  // No PTT post: the PTT-only blocks (consensus, polarity split, sources) would
+  // only announce that they are empty.
+  const youtubeOnly = isYoutubeOnly(product)
 
   return (
     <div className="sl-k">
       <ProductImage product={product} />
       <div className="sl-detail-meta">
-        <span>{product.latestDate ? `最新心得 ${product.latestDate.replaceAll('-', '/')}` : '心得日期不明'}</span>
-        <span>共識：{product.consensus}</span>
-        <span>討論量：{product.nPosts + product.nComments}</span>
-        {product.confidence === '低' ? <span>樣本少</span> : null}
+        {youtubeOnly ? (
+          <span>最新開箱 {product.youtube[0].date.replaceAll('-', '/')}</span>
+        ) : (
+          <>
+            <span>{product.latestDate ? `最新心得 ${product.latestDate.replaceAll('-', '/')}` : '心得日期不明'}</span>
+            <span>共識：{product.consensus}</span>
+            <span>討論量：{product.nPosts + product.nComments}</span>
+            {product.confidence === '低' ? <span>樣本少</span> : null}
+          </>
+        )}
         {product.vegetarian ? <span>素食標示：{product.vegetarian}</span> : null}
       </div>
       {/* Rendered when there is a summary OR the row is provisional: a provisional
@@ -87,7 +96,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           <EvidenceBlock tone="up" items={product.likes} />
           <EvidenceBlock tone="dn" items={product.cautions} />
         </div>
-      ) : (
+      ) : youtubeOnly ? null : (
         <p className="sl-k-none sl-k-none-wide">留言沒有集中的優缺點</p>
       )}
 
@@ -142,10 +151,49 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             ))}
           </div>
         </div>
-      ) : (
+      ) : youtubeOnly ? null : (
         <p className="sl-k-none sl-k-none-wide">原文連結暫缺</p>
       )}
+
+      {/* Last: a separate source, kept apart from the PTT reviews above. */}
+      {product.youtube.length > 0 ? <YoutubeBlock product={product} /> : null}
     </div>
+  )
+}
+
+/**
+ * What taste-test creators said. Each line is our summary, not a quote (speech
+ * recognition mishears too much to quote), so the creator's name links to the
+ * exact second they say it and the reader can hear it themselves.
+ */
+function YoutubeBlock({ product }: { product: Product }) {
+  return (
+    <section className="sl-kb sl-kb-yt">
+      <h3 className="sl-kb-head">
+        <b>YouTuber 怎麼說</b>
+        <i>{product.youtube.length}</i>
+      </h3>
+      <ol className="sl-say-list">
+        {product.youtube.map((review) => (
+          <li key={review.url} className="sl-yt-row">
+            <span className="sl-yt-who">
+              <b>{review.channel}</b>
+              {review.score ? <span>給 {review.score}</span> : null}
+              <a
+                href={review.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackOutboundYoutubeClick(product.id)}
+                aria-label={`看${review.channel}講${product.productName}的那一段，另開新分頁`}
+              >
+                ▶ 看這段
+              </a>
+            </span>
+            <p className="sl-yt-say">{review.summary}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
   )
 }
 

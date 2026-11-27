@@ -245,6 +245,12 @@ python3 scripts/fetch_official_nutrition.py 2>&1 | tail -2 \
 python3 scripts/fetch_family_images.py 2>&1 | tail -2 \
   || log "WARN: FamilyMart photo fetch failed; publish unaffected"
 
+# YouTube creators' verdicts (scripts/youtube_reviews.py). Optional like the
+# steps above: a quota, download or Codex failure must not cost the PTT publish,
+# and the script only appends rows it has checked, so a failure leaves the
+# committed CSVs as they were. Transcribing is local CPU work (~1x video length).
+python3 scripts/youtube_reviews.py 2>&1 | tail -8 \
+  || log "WARN: YouTube review step failed; publishing without new YouTube reviews"
 python3 web/build_data.py 2>&1 | tail -1 || die "build_data"
 
 # Photo candidates for image-less products, written outside the repo for a
@@ -268,6 +274,10 @@ if [ "$DO_COMMIT" = "1" ]; then
           data/labels/official_kcal.csv \
           data/labels/official_nutrition.csv \
           data/results.json web/public/data.json || die "git add"
+  # Created by the first YouTube run; `git add` of a missing path would abort the add.
+  for f in data/labels/youtube_reviews.csv data/labels/youtube_videos.csv; do
+    [ -f "$f" ] && git add "$f"
+  done
   if git diff --cached --quiet; then
     log "no data change to commit"
   else

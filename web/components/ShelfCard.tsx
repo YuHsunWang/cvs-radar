@@ -2,7 +2,7 @@ import { Package } from 'lucide-react'
 import { useId, useState } from 'react'
 import ProductDetail from '@/components/ProductDetail'
 import { CATEGORY_ICON, scoreTone } from '@/lib/shelf-label'
-import { Product, comprehensiveScore, displayBrand, displayCategory, vegetarianShort } from '@/lib/data'
+import { Product, comprehensiveScore, displayBrand, displayCategory, isYoutubeOnly, vegetarianShort } from '@/lib/data'
 
 type ShelfCardProps = {
   product: Product
@@ -19,8 +19,10 @@ export default function ShelfCard({ product, isExpanded, onToggle }: ShelfCardPr
   const channel = displayBrand(product.brand)
   const category = displayCategory(product.category)
   const CategoryIcon = CATEGORY_ICON[category] ?? Package
+  const youtubeOnly = isYoutubeOnly(product)
   // The excerpt joins one rewrite per post with 「；」; the card shows the first one.
-  const summary = (product.excerpt || '').split('；')[0].trim()
+  // A product only YouTube covers has no excerpt, so its newest creator verdict stands in.
+  const summary = youtubeOnly ? product.youtube[0].summary : (product.excerpt || '').split('；')[0].trim()
 
   return (
     <article className="sl-label" id={`p-${product.id}`}>
@@ -42,7 +44,10 @@ export default function ShelfCard({ product, isExpanded, onToggle }: ShelfCardPr
               <span className="sl-channel"><span className="sl-channel-dot" data-brand={channel} aria-hidden="true" />{channel}</span>
               {product.price != null ? <span className="sl-price">${product.price}</span> : null}
               {product.vegetarian ? <span className="sl-veg">{vegetarianShort(product.vegetarian)}</span> : null}
-              <span className="sl-meta">{product.nPosts} 篇心得</span>
+              {youtubeOnly ? null : <span className="sl-meta">{product.nPosts} 篇心得</span>}
+              {product.youtube.length > 0
+                ? <span className="sl-yt"><span aria-hidden="true">🎬 </span>YouTuber 開箱</span>
+                : null}
             </div>
             <h2 className="sl-pname">{product.productName?.trim() || '商品名稱待確認'}</h2>
             {/* Open, the same line leads the 大家怎麼說 list; showing it twice reads as a repeat. */}
