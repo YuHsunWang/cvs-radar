@@ -889,6 +889,18 @@ class ScoringTest(unittest.TestCase):
         # The unweighted mean these two comments used to produce:
         self.assertNotAlmostEqual(contributors[0].score, 0.5, places=2)
 
+    def test_alias_rows_from_one_article_are_one_independent_thread(self) -> None:
+        from web.build_data import to_product
+
+        rows = [
+            Post(id=f"article_{alias}", url="https://example.org/article",
+                 brand="7-11", product_name=alias, author="fan", author_score=80)
+            for alias in ("起司雞排", "起士雞排")
+        ]
+        report = score_product(rows, {})
+        self.assertEqual(to_product(report)["independentThreads"], 1)
+        self.assertEqual(report.score_weight_sum, score_product(rows[:1], {}).score_weight_sum)
+
     def test_one_author_posting_repeatedly_gets_one_vote(self) -> None:
         # per_user_cap is meant to stop one person outvoting a product, but it only
         # ever applied to commenters: ten reviews by one account carried ten full
