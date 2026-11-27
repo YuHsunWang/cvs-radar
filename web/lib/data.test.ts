@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   DATA_STALE_DAYS,
   Product,
@@ -15,6 +15,7 @@ import {
   filterVegetarian,
   formatDisplayDate,
   isDataStale,
+  isoMonthsAgo,
   isProductImage,
   parseDataPayload,
   normalizeDateRange,
@@ -394,4 +395,16 @@ describe('sortProducts', () => {
       'higher-recommendation',
     ])
   })
+})
+
+it('keeps the last February day in the one-month window on March 31', () => {
+  vi.useFakeTimers()
+  try {
+    vi.setSystemTime(new Date(2026, 2, 31, 12))
+    expect(isoMonthsAgo(1)).toBe('2026-02-28')
+    vi.setSystemTime(new Date(2024, 2, 31, 12))
+    expect(isoMonthsAgo(1)).toBe('2024-02-29')
+  } finally {
+    vi.useRealTimers()
+  }
 })
