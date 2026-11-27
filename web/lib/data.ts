@@ -246,6 +246,26 @@ export function applyAdvanced(products: Product[], filters: AdvancedFilters): Pr
   })
 }
 
+export type ShelfFilters = {
+  query: string
+  brand: string | null
+  category: CategoryKey | null
+  hideNoScore: boolean
+  vegOnly: boolean
+  filters: AdvancedFilters
+}
+
+/** Every narrowing the shelf applies, in one place so a shared link can test it before restoring. */
+export function filterShelf(products: Product[], f: ShelfFilters): Product[] {
+  return applyAdvanced(
+    filterVegetarian(
+      filterHasScore(filterByCategory(filterByBrand(filterBySearch(products, f.query), f.brand), f.category), f.hideNoScore),
+      f.vegOnly,
+    ),
+    f.filters,
+  )
+}
+
 export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
   return [...products].sort((a, b) => {
     let difference = 0

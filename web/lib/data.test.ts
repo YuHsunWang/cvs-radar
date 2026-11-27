@@ -11,6 +11,7 @@ import {
   displayCategory,
   filterByCategory,
   filterBySearch,
+  filterShelf,
   filterHasScore,
   filterVegetarian,
   formatDisplayDate,
@@ -407,4 +408,25 @@ it('keeps the last February day in the one-month window on March 31', () => {
   } finally {
     vi.useRealTimers()
   }
+})
+
+describe('filterShelf', () => {
+  // GA4 2026-11: shared links like ?q=菠蘿奶酥麵包&p=全家::聖多諾黑塔 and ?date=1w&p=… opened on an
+  // empty shelf, because the sharer's search word or time window hid the very product linked.
+  // ShelfExplorer drops a link's filters when filterShelf would hide its product, so this
+  // function must apply every narrowing the shelf does.
+  const tart = product({ id: '全家::聖多諾黑塔', brand: '全家', productName: '聖多諾黑塔', category: '甜點', latestDate: '2026-10-01' })
+  const none = { query: '', brand: null, category: null, hideNoScore: false, vegOnly: false, filters: { fromDate: '', toDate: '' } }
+
+  it('hides the linked product under a search word or an expired window', () => {
+    expect(filterShelf([tart], { ...none, query: '菠蘿奶酥麵包' })).toEqual([])
+    expect(filterShelf([tart], { ...none, filters: { fromDate: '2026-11-20', toDate: '' } })).toEqual([])
+    expect(filterShelf([tart], { ...none, brand: '7-11' })).toEqual([])
+    expect(filterShelf([tart], { ...none, category: '冰品' })).toEqual([])
+    expect(filterShelf([tart], { ...none, vegOnly: true })).toEqual([])
+  })
+
+  it('keeps it once the link filters are dropped', () => {
+    expect(filterShelf([tart], none)).toEqual([tart])
+  })
 })
