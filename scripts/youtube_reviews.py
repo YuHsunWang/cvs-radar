@@ -125,9 +125,11 @@ def vtt_lines(text: str) -> list[str]:
         if not stamp:
             continue
         seconds = int(stamp[1] or 0) * 3600 + int(stamp[2]) * 60 + int(stamp[3])
+        # Only the payload after the timing line: a numeric line before it is a cue id,
+        # one after it is a price or score said on screen.
+        payload = block[stamp.end():].split("\n", 1)[1] if "\n" in block[stamp.end():] else ""
         body = " ".join(
-            re.sub(r"<[^>]+>", "", line).strip() for line in block.splitlines()
-            if "-->" not in line and line.strip() and not line.strip().isdigit()
+            re.sub(r"<[^>]+>", "", line).strip() for line in payload.splitlines() if line.strip()
         ).strip()
         if body and not (lines and lines[-1].split(" ", 1)[1] == body):
             lines.append(f"{seconds // 60}:{seconds % 60:02d} {body}")
@@ -155,12 +157,16 @@ def captions(video: dict) -> list[str] | None:
     video_id = video["video_id"]
     with tempfile.TemporaryDirectory() as tmp:
         # --sleep-subtitles: subtitle requests in quick succession get HTTP 429 (yt-dlp #13831).
-        result = subprocess.run(
-            ["yt-dlp", "--no-update", "--skip-download", "--write-subs", "--sub-langs", ",".join(CAPTION_LANGS),
-             "--sub-format", "vtt", "--sleep-subtitles", "125", "-o", f"{tmp}/sub",
-             f"https://www.youtube.com/watch?v={video_id}"],
-            capture_output=True, text=True, timeout=600,
-        )
+        try:
+            result = subprocess.run(
+                ["yt-dlp", "--no-update", "--skip-download", "--write-subs", "--sub-langs", ",".join(CAPTION_LANGS),
+                 "--sub-format", "vtt", "--sleep-subtitles", "125", "-o", f"{tmp}/sub",
+                 f"https://www.youtube.com/watch?v={video_id}"],
+                capture_output=True, text=True, timeout=600,
+            )
+        except subprocess.TimeoutExpired:
+            log(f"{video_id}: caption download timed out, transcribing instead")
+            return None
         found = {path.suffixes[-2].lstrip("."): path for path in Path(tmp).glob("sub.*.vtt")}
         if result.returncode:
             log(f"{video_id}: caption download failed, transcribing instead: {result.stderr.strip()[-300:]}")

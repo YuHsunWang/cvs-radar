@@ -125,6 +125,27 @@ def test_captions_become_whisper_style_lines_without_tags_or_repeats() -> None:
     assert vtt_lines(text) == ["0:05 各位觀眾 大家好", "1:15 這個肉鬆麵包 我給八分"]
 
 
+def test_prices_on_their_own_caption_line_survive_but_cue_ids_do_not() -> None:
+    """Extraction reads prices and scores from the transcript; a bare `49` line is one of them."""
+    from scripts.youtube_reviews import vtt_lines
+
+    text = "WEBVTT\n\n7\n00:00:05.000 --> 00:00:06.000\n這個售價\n49\n\n8\n00:00:07.000 --> 00:00:08.000\n8\n"
+    assert vtt_lines(text) == ["0:05 這個售價 49", "0:07 8"]
+
+
+def test_a_stalled_caption_download_falls_back_to_whisper(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A timeout must not mark the video failed; the audio path should still run."""
+    import subprocess
+
+    import scripts.youtube_reviews as yt
+
+    def stall(cmd: list[str], **_kwargs):
+        raise subprocess.TimeoutExpired(cmd, 600)
+
+    monkeypatch.setattr(yt.subprocess, "run", stall)
+    assert yt.captions({"video_id": "x", "duration": 600}) is None
+
+
 @pytest.mark.parametrize(
     ("lines", "problem"),
     [
