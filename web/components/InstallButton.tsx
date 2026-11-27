@@ -60,11 +60,22 @@ export default function InstallButton() {
           </button>
           <h2 id="sl-a2hs-title">加到手機桌面</h2>
           {platform === 'ios' ? (
+            <>
+              {/* Recorded in iPhone Chrome; contacts and home screen left out. Loads only once the dialog opens. */}
+              <img
+                className="sl-a2hs-demo"
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/a2hs-ios.gif`}
+                alt="示範：點分享、點加入主畫面、點加入，桌面就多了超商雷達"
+                width={300}
+                height={652}
+                loading="lazy"
+              />
             <ol>
               <li>點瀏覽器的「分享」按鈕（方框加向上箭頭；Safari 在畫面下方，Chrome 在網址列右邊）</li>
               <li>往下滑，點「加入主畫面」</li>
               <li>按右上角「加入」</li>
             </ol>
+            </>
           ) : (
             <ol>
               <li>點瀏覽器右上角的「⋮」選單</li>

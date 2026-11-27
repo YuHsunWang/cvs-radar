@@ -1172,6 +1172,8 @@ body:has(.sl-page:not(.ss-page)) { overflow-x: clip; }
 .sl-a2hs-body { position: relative; padding: 18px 18px 16px; font-size: 15px; line-height: 1.6; }
 .sl-a2hs-body h2 { margin: 0 40px 8px 0; font-size: 17px; }
 .sl-a2hs-body ol { margin: 0 0 10px; padding-left: 22px; list-style: decimal; }
+.sl-a2hs-demo { display: block; width: auto; height: min(46vh, 360px); margin: 0 auto 12px; border-radius: 12px; }
+.sl-a2hs-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
 .sl-a2hs-body p { margin: 0; color: var(--sl-muted); font-size: 14px; }
 .sl-a2hs-close {
   position: absolute;
