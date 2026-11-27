@@ -210,6 +210,14 @@ function toUtcCalendarDay(value: string): number {
   return Date.UTC(year, month - 1, day)
 }
 
+export function isoMonthsAgo(months: number): string {
+  const d = new Date()
+  const day = d.getDate()
+  d.setMonth(d.getMonth() - months + 1, 0)
+  d.setDate(Math.min(day, d.getDate()))
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 export function dateToOffset(date: string, minDate: string): number {
   return Math.round((toUtcCalendarDay(date) - toUtcCalendarDay(minDate)) / millisecondsPerDay)
 }

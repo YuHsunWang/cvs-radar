@@ -339,7 +339,7 @@ def score_product(
         confidence=_confidence(n_eff),
         n_eff=round(n_eff, 2),
         score_std=round(std, 3),
-        n_posts=len(posts),
+        n_posts=len({post.url or post.id for post in posts}),
         n_comments=sum(len(post.comments) for post in posts),
         n_eligible_comments=len(eligible_comments),
         n_unique_commenters=len({comment.user for comment in eligible_comments}),

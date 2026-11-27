@@ -33,6 +33,7 @@ import {
   filterVegetarian,
   formatDisplayDate,
   isDataStale,
+  isoMonthsAgo,
   sortProducts,
 } from '@/lib/data'
 import { DEFAULT_SORT, readViewParams, viewSearch } from '@/lib/view-url'
@@ -42,11 +43,6 @@ const PAGE_SIZE = 30
 function isoDaysAgo(days: number): string {
   const d = new Date()
   d.setDate(d.getDate() - days)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-function isoMonthsAgo(months: number): string {
-  const d = new Date()
-  d.setMonth(d.getMonth() - months)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 const DATE_PRESETS = [

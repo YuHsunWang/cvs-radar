@@ -62,7 +62,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         <section className="sl-kb sl-kb-say">
           <h3 className="sl-kb-head">
             <b>大家怎麼說</b>
-            {takes.length > 0 ? <i>{takes.length} 篇整理</i> : null}
+            {takes.length > 0 ? <i>{product.independentThreads} 篇整理</i> : null}
             {product.reviewProvisional ? <span className="sl-k-prov">暫定</span> : null}
           </h3>
           {takes.length > 0 ? (

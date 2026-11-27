@@ -25,6 +25,22 @@ def _iso(days_ago: float) -> str:
     return (datetime.now(timezone.utc) - timedelta(days=days_ago)).isoformat()
 
 
+def test_staging_failure_cannot_report_no_data_change(tmp_path):
+    script = (ROOT / "scripts/ops/rebackfill.sh").read_text()
+    helpers = "\n".join(line for line in script.splitlines() if line.startswith(("log(){", "die(){")))
+    publish = script[script.index("# --- 8. commit"):]
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    (tmp_path / ".git/index.lock").touch()
+    run = subprocess.run(
+        ["bash", "-c", helpers + "\n" + publish], cwd=tmp_path,
+        env={**os.environ, "DO_COMMIT": "1", "PUSH": "0"},
+        capture_output=True, text=True,
+    )
+    assert run.returncode != 0
+    assert "FAILED: git add" in run.stderr
+    assert "no data change" not in run.stdout
+
+
 class DataAgeDaysTest(unittest.TestCase):
     def test_recent_timestamp_is_young(self) -> None:
         self.assertLess(data_age_days(_iso(0.5)), 1.0)

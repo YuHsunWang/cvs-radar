@@ -267,7 +267,7 @@ if [ "$DO_COMMIT" = "1" ]; then
           data/labels/grounding_verdicts.csv \
           data/labels/official_kcal.csv \
           data/labels/official_nutrition.csv \
-          data/results.json web/public/data.json
+          data/results.json web/public/data.json || die "git add"
   if git diff --cached --quiet; then
     log "no data change to commit"
   else
