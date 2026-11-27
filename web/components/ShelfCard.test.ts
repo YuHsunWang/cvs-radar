@@ -62,6 +62,11 @@ function product(overrides: Partial<Product> = {}): Product {
   }
 }
 
+it('counts one source article even when its summary contains a semicolon', () => {
+  const html = card(product({ excerpt: '起司很濃；外皮酥脆', independentThreads: 1 }), true)
+  expect(html).toContain('1 篇整理')
+})
+
 function card(item: Product, expanded = false) {
   return renderToStaticMarkup(
     React.createElement(ShelfCard, { product: item, isExpanded: expanded, onToggle: () => {} }),

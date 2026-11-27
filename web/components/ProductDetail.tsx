@@ -36,8 +36,6 @@ type ProductDetailProps = {
  * screen-reader label, so the split survives greyscale and colour-blind vision.
  */
 export default function ProductDetail({ product }: ProductDetailProps) {
-  // One rewrite per reviewing post, joined with 「；」 upstream. Splitting them
-  // back out is the honest reading: they are separate people, not one sentence.
   const takes = (product.excerpt || '')
     .split('；')
     .map((part) => part.trim())
@@ -62,15 +60,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         <section className="sl-kb sl-kb-say">
           <h3 className="sl-kb-head">
             <b>大家怎麼說</b>
-            {takes.length > 0 ? <i>{takes.length} 篇整理</i> : null}
+            {takes.length > 0 ? <i>{product.independentThreads} 篇整理</i> : null}
             {product.reviewProvisional ? <span className="sl-k-prov">暫定</span> : null}
           </h3>
           {takes.length > 0 ? (
             <ol className="sl-say-list">
               {takes.map((take, index) => (
                 <li key={take} className="sl-say-row">
-                  {/* Numbering only earns its place when there are several
-                      reviewers to tell apart. */}
                   {takes.length > 1 ? <span>{String(index + 1).padStart(2, '0')}</span> : null}
                   <p>{take}</p>
                 </li>
