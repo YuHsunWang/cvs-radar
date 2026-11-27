@@ -111,3 +111,53 @@ def test_a_malformed_committed_row_stops_the_build(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="brand"):
         load_reviews(path)
     assert load_reviews(tmp_path / "missing.csv") == []
+
+
+def vtt(cues: list[tuple[int, str]]) -> str:
+    blocks = [f"00:{s // 60:02d}:{s % 60:02d}.000 --> 00:{s // 60:02d}:{s % 60:02d}.900\n{text}" for s, text in cues]
+    return "WEBVTT\nKind: captions\nLanguage: zh-TW\n\n" + "\n\n".join(blocks) + "\n"
+
+
+def test_captions_become_whisper_style_lines_without_tags_or_repeats() -> None:
+    from scripts.youtube_reviews import vtt_lines
+
+    text = vtt([(5, "各位觀眾<c> 大家好</c>"), (6, "各位觀眾 大家好"), (75, "這個肉鬆麵包\n我給八分")])
+    assert vtt_lines(text) == ["0:05 各位觀眾 大家好", "1:15 這個肉鬆麵包 我給八分"]
+
+
+@pytest.mark.parametrize(
+    ("lines", "problem"),
+    [
+        ([f"{i // 60}:{i % 60:02d} 這個很好吃" for i in range(0, 600, 30)][:10], "only 10 lines"),
+        ([f"{i // 60}:{i % 60:02d} this one is really tasty" for i in range(0, 600, 20)], "Chinese"),
+        ([f"{i // 60}:{i % 60:02d} 這個很好吃" for i in range(0, 200, 5)], "stop at"),
+    ],
+)
+def test_captions_that_cannot_replace_a_transcript_are_rejected(lines: list[str], problem: str) -> None:
+    from scripts.youtube_reviews import caption_problem
+
+    assert problem in (caption_problem(lines, duration=600) or "")
+
+
+def test_full_chinese_captions_are_accepted() -> None:
+    from scripts.youtube_reviews import caption_problem
+
+    assert caption_problem([f"{i // 60}:{i % 60:02d} 這個很好吃 7-11 $45" for i in range(0, 600, 20)], duration=600) is None
+
+
+def test_english_or_missing_captions_fall_back_to_whisper(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A wrong-language track must never reach Codex as the transcript."""
+    import subprocess
+
+    import scripts.youtube_reviews as yt
+
+    def fake_run(cmd: list[str], **_kwargs):
+        out = Path(cmd[cmd.index("-o") + 1])
+        (out.parent / "sub.zh-TW.vtt").write_text(vtt([(s, "this one is tasty") for s in range(0, 600, 20)]), encoding="utf-8")
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    monkeypatch.setattr(yt.subprocess, "run", fake_run)
+    assert yt.captions({"video_id": "x", "duration": 600}) is None
+
+    monkeypatch.setattr(yt.subprocess, "run", lambda cmd, **_: subprocess.CompletedProcess(cmd, 0, "", ""))
+    assert yt.captions({"video_id": "x", "duration": 600}) is None
