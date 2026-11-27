@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-27T02:23:29+08:00",
+  "generatedAt": "2026-11-28T02:39:42+08:00",
   "siteBuiltAt": "2026-08-25T01:15:01.401105+00:00",
   "products": [
     {
@@ -4491,6 +4491,43 @@
         "sourceKind": "ptt",
         "rotate": 90
       },
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::雪樹伏特加",
+      "brand": "7-11",
+      "productName": "雪樹伏特加",
+      "price": 79,
+      "category": "飲料",
+      "fairScore": 74,
+      "recommendationScore": 91,
+      "consensus": "一致好評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 6,
+      "rawComments": 7,
+      "eligibleComments": 6,
+      "uniqueEligibleCommenters": 6,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 86,
+      "neutralPct": 14,
+      "negativePct": 0,
+      "likes": [
+        "雪樹凍飲評價極高，可搭柳澄汁或蔓越莓汁",
+        "雪樹是我最喜歡的酒之一"
+      ],
+      "cautions": [],
+      "excerpt": "瓶身很美，加冰塊配可樂好喝",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1795706926.A.541.html"
+      ],
+      "latestDate": "2026-11-26",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
       "vegetarian": null
     },
     {
@@ -24995,8 +25032,8 @@
       "independentThreads": 3,
       "volumeLevel": "充足",
       "positivePct": 66,
-      "neutralPct": 10,
-      "negativePct": 24,
+      "neutralPct": 7,
+      "negativePct": 27,
       "likes": [
         "夏天吃很開胃",
         "白醋帶酸甜奶味，很好吃",
@@ -29558,6 +29595,54 @@
       "vegetarian": null
     },
     {
+      "id": "全家::寒天甘蔗檸檬",
+      "brand": "全家",
+      "productName": "寒天甘蔗檸檬",
+      "price": 65,
+      "category": "飲料",
+      "fairScore": 61,
+      "recommendationScore": 69,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 11,
+      "rawComments": 16,
+      "eligibleComments": 11,
+      "uniqueEligibleCommenters": 11,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 69,
+      "neutralPct": 8,
+      "negativePct": 23,
+      "likes": [
+        "喝起來很有嚼勁",
+        "49元來說，價格便宜",
+        "層次豐富的飲品"
+      ],
+      "cautions": [
+        "甘蔗味存在感低",
+        "寒天很少，幾乎吃不到",
+        "甜度太高"
+      ],
+      "excerpt": "退冰似冰沙，加氣泡水並帶甘蔗甜味；甜度約半糖，寒天多且脆Q",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1718429921.A.17E.html",
+        "https://www.ptt.cc/bbs/CVS/M.1730445962.A.DC7.html"
+      ],
+      "latestDate": "2024-11-01",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/gQfAgbo.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1718429921.A.17E.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "全家::康貝特200PEX能量飲料",
       "brand": "全家",
       "productName": "康貝特200PEX能量飲料",
@@ -29737,54 +29822,6 @@
       "image": {
         "imageUrl": "https://i.imgur.com/yqSxtFC.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1725894450.A.9E5.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::寒天甘蔗檸檬",
-      "brand": "全家",
-      "productName": "寒天甘蔗檸檬",
-      "price": 65,
-      "category": "飲料",
-      "fairScore": 61,
-      "recommendationScore": 69,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 11,
-      "rawComments": 16,
-      "eligibleComments": 11,
-      "uniqueEligibleCommenters": 11,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 69,
-      "neutralPct": 8,
-      "negativePct": 23,
-      "likes": [
-        "喝起來很有嚼勁",
-        "49元來說，價格便宜",
-        "層次豐富的飲品"
-      ],
-      "cautions": [
-        "甘蔗味存在感低",
-        "寒天很少，幾乎吃不到",
-        "甜度太高"
-      ],
-      "excerpt": "退冰似冰沙，加氣泡水並帶甘蔗甜味；甜度約半糖，寒天多且脆Q",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1718429921.A.17E.html",
-        "https://www.ptt.cc/bbs/CVS/M.1730445962.A.DC7.html"
-      ],
-      "latestDate": "2024-11-01",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/gQfAgbo.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1718429921.A.17E.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -34737,6 +34774,52 @@
       "vegetarian": null
     },
     {
+      "id": "7-11::黑金雙醬辣雞刈包",
+      "brand": "7-11",
+      "productName": "黑金雙醬辣雞刈包",
+      "price": 57,
+      "category": "鹹食",
+      "fairScore": 59,
+      "recommendationScore": 65,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 24,
+      "rawComments": 33,
+      "eligibleComments": 27,
+      "uniqueEligibleCommenters": 24,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 57,
+      "neutralPct": 19,
+      "negativePct": 24,
+      "likes": [
+        "辣度輕微，酸黃瓜醬很搭",
+        "部分口感酥脆，醬料夠配"
+      ],
+      "cautions": [
+        "油耗味很重，吃起來難吃",
+        "一個就有667大卡"
+      ],
+      "excerpt": "重口味好吃，雞腿排厚微辣，價格偏貴；芥末香、起司濃，炸雞有份量但偏軟",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792243643.A.F54.html",
+        "https://www.ptt.cc/bbs/CVS/M.1795586619.A.449.html"
+      ],
+      "latestDate": "2026-11-25",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/XU1X8NE.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1792243643.A.F54.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "全家::五味五彩嫩雞餐盒",
       "brand": "全家",
       "productName": "五味五彩嫩雞餐盒",
@@ -35096,52 +35179,6 @@
       "image": {
         "imageUrl": "https://i.imgur.com/5MN0qNI.jpeg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1746795112.A.A42.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "7-11::黑金雙醬辣雞刈包",
-      "brand": "7-11",
-      "productName": "黑金雙醬辣雞刈包",
-      "price": 57,
-      "category": "鹹食",
-      "fairScore": 59,
-      "recommendationScore": 65,
-      "consensus": "評價兩極",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 22,
-      "rawComments": 30,
-      "eligibleComments": 24,
-      "uniqueEligibleCommenters": 22,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 58,
-      "neutralPct": 17,
-      "negativePct": 25,
-      "likes": [
-        "微辣，配酸黃瓜醬很搭",
-        "部分酥脆，醬料很夠"
-      ],
-      "cautions": [
-        "一個就有667卡，熱量很驚人",
-        "油耗味很重，吃起來難吃"
-      ],
-      "excerpt": "重口味好吃，雞腿排厚微辣，價格偏貴；芥末香、起司濃，炸雞有份量但偏軟",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792243643.A.F54.html",
-        "https://www.ptt.cc/bbs/CVS/M.1795586619.A.449.html"
-      ],
-      "latestDate": "2026-11-25",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/XU1X8NE.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1792243643.A.F54.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -54956,7 +54993,7 @@
       "price": 39,
       "category": "飲料",
       "fairScore": 50,
-      "recommendationScore": 51,
+      "recommendationScore": 50,
       "consensus": "評價兩極",
       "confidence": "中",
       "nPosts": 1,
@@ -60610,6 +60647,74 @@
       "vegetarian": null
     },
     {
+      "id": "7-11::港式叉燒油雞雙寶飯",
+      "brand": "7-11",
+      "productName": "港式叉燒油雞雙寶飯",
+      "price": 109,
+      "category": "便當",
+      "fairScore": 48,
+      "recommendationScore": 46,
+      "consensus": "褒貶不一",
+      "confidence": "高",
+      "nPosts": 2,
+      "nComments": 10,
+      "rawComments": 22,
+      "eligibleComments": 10,
+      "uniqueEligibleCommenters": 10,
+      "independentThreads": 2,
+      "volumeLevel": "充足",
+      "positivePct": 25,
+      "neutralPct": 34,
+      "negativePct": 41,
+      "likes": [
+        "味道不錯",
+        "i珍食價格可接受"
+      ],
+      "cautions": [
+        "肉量少，還有怪味",
+        "吃一次就夠了"
+      ],
+      "excerpt": "雞肉無骨好吃，叉燒軟爛沒口感，飯粒分明；叉燒不乾硬但肉量少，價格不太划算",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1778671651.A.13E.html",
+        "https://www.ptt.cc/bbs/CVS/M.1780835164.A.37F.html"
+      ],
+      "latestDate": "2026-06-07",
+      "youtube": [
+        {
+          "channel": "黃泱綾 Naomi",
+          "summary": "肉質嫩、入口即化，港式調味香甜有靈魂",
+          "score": null,
+          "url": "https://www.youtube.com/watch?v=N31mAxbB6AQ&t=96s",
+          "date": "2026-06-17"
+        },
+        {
+          "channel": "那個女生 Kiki",
+          "summary": "叉燒過甜且醬太多，油雞尚嫩，整體普通",
+          "score": "5/10",
+          "url": "https://www.youtube.com/watch?v=WpSJrKwy6sc&t=266s",
+          "date": "2026-06-03"
+        },
+        {
+          "channel": "prettyhappyfatty",
+          "summary": "油雞嫩、口味豐富，但肉量少且整體偏鹹，還算OK",
+          "score": "6.5/10",
+          "url": "https://www.youtube.com/watch?v=z89-qICeqUM&t=156s",
+          "date": "2026-05-16"
+        }
+      ],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/S5SLT4y.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1778671651.A.13E.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "全家::哈尼午茉綠霜淇淋",
       "brand": "全家",
       "productName": "哈尼午茉綠霜淇淋",
@@ -60801,74 +60906,6 @@
       "image": {
         "imageUrl": "https://pimg.1px.tw/blog/dressingfrad/album/303510220/941932867053439131.jpg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1794708288.A.F68.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "7-11::港式叉燒油雞雙寶飯",
-      "brand": "7-11",
-      "productName": "港式叉燒油雞雙寶飯",
-      "price": 109,
-      "category": "便當",
-      "fairScore": 48,
-      "recommendationScore": 46,
-      "consensus": "褒貶不一",
-      "confidence": "高",
-      "nPosts": 2,
-      "nComments": 10,
-      "rawComments": 22,
-      "eligibleComments": 10,
-      "uniqueEligibleCommenters": 10,
-      "independentThreads": 2,
-      "volumeLevel": "充足",
-      "positivePct": 25,
-      "neutralPct": 34,
-      "negativePct": 41,
-      "likes": [
-        "味道不錯",
-        "i珍食價格可接受"
-      ],
-      "cautions": [
-        "肉量少，還有怪味",
-        "吃一次就夠了"
-      ],
-      "excerpt": "雞肉無骨好吃，叉燒軟爛沒口感，飯粒分明；叉燒不乾硬但肉量少，價格不太划算",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1778671651.A.13E.html",
-        "https://www.ptt.cc/bbs/CVS/M.1780835164.A.37F.html"
-      ],
-      "latestDate": "2026-06-07",
-      "youtube": [
-        {
-          "channel": "黃泱綾 Naomi",
-          "summary": "肉質嫩、入口即化，港式調味香甜有靈魂",
-          "score": null,
-          "url": "https://www.youtube.com/watch?v=N31mAxbB6AQ&t=96s",
-          "date": "2026-06-17"
-        },
-        {
-          "channel": "那個女生 Kiki",
-          "summary": "叉燒過甜且醬太多，油雞尚嫩，整體普通",
-          "score": "5/10",
-          "url": "https://www.youtube.com/watch?v=WpSJrKwy6sc&t=266s",
-          "date": "2026-06-03"
-        },
-        {
-          "channel": "prettyhappyfatty",
-          "summary": "油雞嫩、口味豐富，但肉量少且整體偏鹹，還算OK",
-          "score": "6.5/10",
-          "url": "https://www.youtube.com/watch?v=z89-qICeqUM&t=156s",
-          "date": "2026-05-16"
-        }
-      ],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/S5SLT4y.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1778671651.A.13E.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -63895,9 +63932,9 @@
       "uniqueEligibleCommenters": 15,
       "independentThreads": 1,
       "volumeLevel": "中等",
-      "positivePct": 36,
+      "positivePct": 37,
       "neutralPct": 12,
-      "negativePct": 52,
+      "negativePct": 51,
       "likes": [
         "白醬不膩，紅白醬分開吃較好",
         "友善價願意多次回購"
@@ -71840,49 +71877,6 @@
       "vegetarian": null
     },
     {
-      "id": "全家::西湖牛肉羹",
-      "brand": "全家",
-      "productName": "西湖牛肉羹",
-      "price": 62,
-      "category": "便當",
-      "fairScore": 42,
-      "recommendationScore": 36,
-      "consensus": "褒貶不一",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 7,
-      "rawComments": 14,
-      "eligibleComments": 7,
-      "uniqueEligibleCommenters": 7,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 25,
-      "neutralPct": 25,
-      "negativePct": 50,
-      "likes": [
-        "味道不錯，加烏醋配飯"
-      ],
-      "cautions": [
-        "味道不錯，但價格太貴"
-      ],
-      "excerpt": "羹湯鹹度剛好不稀，牛肉是絞肉，特價才回購",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1744213265.A.AA1.html"
-      ],
-      "latestDate": "2025-04-09",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.ibb.co/8gnWfLYC/IMG-6546.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1744213265.A.AA1.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
       "id": "7-11::乖乖香濃巧克力雷仔捲",
       "brand": "7-11",
       "productName": "乖乖香濃巧克力雷仔捲",
@@ -71971,6 +71965,49 @@
       "kcal": null,
       "nutrition": null,
       "image": null,
+      "vegetarian": null
+    },
+    {
+      "id": "全家::西湖牛肉羹",
+      "brand": "全家",
+      "productName": "西湖牛肉羹",
+      "price": 62,
+      "category": "便當",
+      "fairScore": 42,
+      "recommendationScore": 36,
+      "consensus": "褒貶不一",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 7,
+      "rawComments": 14,
+      "eligibleComments": 7,
+      "uniqueEligibleCommenters": 7,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 25,
+      "neutralPct": 25,
+      "negativePct": 50,
+      "likes": [
+        "味道不錯，加烏醋配飯"
+      ],
+      "cautions": [
+        "味道不錯，但價格太貴"
+      ],
+      "excerpt": "羹湯鹹度剛好不稀，牛肉是絞肉，特價才回購",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1744213265.A.AA1.html"
+      ],
+      "latestDate": "2025-04-09",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.ibb.co/8gnWfLYC/IMG-6546.jpg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1744213265.A.AA1.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
       "vegetarian": null
     },
     {
@@ -74663,25 +74700,23 @@
       "price": 45,
       "category": "麵包",
       "fairScore": 40,
-      "recommendationScore": null,
-      "consensus": "評價兩極",
-      "confidence": "低",
+      "recommendationScore": 33,
+      "consensus": "一致負評",
+      "confidence": "中",
       "nPosts": 1,
-      "nComments": 3,
-      "rawComments": 4,
-      "eligibleComments": 3,
-      "uniqueEligibleCommenters": 3,
+      "nComments": 5,
+      "rawComments": 6,
+      "eligibleComments": 5,
+      "uniqueEligibleCommenters": 5,
       "independentThreads": 1,
       "volumeLevel": "中等",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "波蘿皮酥脆"
-      ],
+      "positivePct": 18,
+      "neutralPct": 17,
+      "negativePct": 65,
+      "likes": [],
       "cautions": [
         "內餡很少，不會回購",
-        "甜度過高",
+        "味道太甜",
         "熱量很高"
       ],
       "excerpt": "外表普通，加熱後沒爆漿",
@@ -75301,6 +75336,47 @@
       "vegetarian": null
     },
     {
+      "id": "7-11::可樂果濃厚臭豆腐",
+      "brand": "7-11",
+      "productName": "可樂果濃厚臭豆腐",
+      "price": 35,
+      "category": "零食",
+      "fairScore": 39,
+      "recommendationScore": 32,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 18,
+      "rawComments": 23,
+      "eligibleComments": 18,
+      "uniqueEligibleCommenters": 18,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 15,
+      "neutralPct": 16,
+      "negativePct": 69,
+      "likes": [],
+      "cautions": [
+        "臭豆腐味淡，偏辣且普通"
+      ],
+      "excerpt": "臭豆腐味淡，不嗆不臭，吃不出臭豆腐感",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1775476246.A.4C1.html"
+      ],
+      "latestDate": "2026-04-06",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://l.urusai.cc/rpSYH.jpg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1775476246.A.4C1.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "7-11::搖搖沙拉燻腸紅醬",
       "brand": "7-11",
       "productName": "搖搖沙拉燻腸紅醬",
@@ -75469,47 +75545,6 @@
       "image": {
         "imageUrl": "https://i.imgur.com/B3tqJJ6.jpg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1760590973.A.483.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "7-11::可樂果濃厚臭豆腐",
-      "brand": "7-11",
-      "productName": "可樂果濃厚臭豆腐",
-      "price": 35,
-      "category": "零食",
-      "fairScore": 39,
-      "recommendationScore": 31,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 18,
-      "rawComments": 23,
-      "eligibleComments": 18,
-      "uniqueEligibleCommenters": 18,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 15,
-      "neutralPct": 16,
-      "negativePct": 69,
-      "likes": [],
-      "cautions": [
-        "臭豆腐味淡，偏辣且普通"
-      ],
-      "excerpt": "臭豆腐味淡，不嗆不臭，吃不出臭豆腐感",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1775476246.A.4C1.html"
-      ],
-      "latestDate": "2026-04-06",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://l.urusai.cc/rpSYH.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1775476246.A.4C1.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -82501,6 +82536,51 @@
       "vegetarian": null
     },
     {
+      "id": "全家::花枝大阪燒",
+      "brand": "全家",
+      "productName": "花枝大阪燒",
+      "price": 119,
+      "category": "鹹食",
+      "fairScore": 33,
+      "recommendationScore": 21,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 10,
+      "rawComments": 14,
+      "eligibleComments": 10,
+      "uniqueEligibleCommenters": 10,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 18,
+      "neutralPct": 0,
+      "negativePct": 82,
+      "likes": [
+        "高麗菜脆，花枝有三塊"
+      ],
+      "cautions": [
+        "花枝偏少",
+        "台灣製麵糊，119元偏貴",
+        "店員忘拿醬包就微波"
+      ],
+      "excerpt": "本體偏軟但調味不鹹，整體好吃可解饞",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1732026205.A.065.html"
+      ],
+      "latestDate": "2024-11-19",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/dplOp8P.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1732026205.A.065.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "7-11::銀座篝雞白湯拉麵",
       "brand": "7-11",
       "productName": "銀座篝雞白湯拉麵",
@@ -82540,51 +82620,6 @@
       "image": {
         "imageUrl": "https://i.imgur.com/NHL9rkt.jpg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1734061684.A.E4C.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::花枝大阪燒",
-      "brand": "全家",
-      "productName": "花枝大阪燒",
-      "price": 119,
-      "category": "鹹食",
-      "fairScore": 32,
-      "recommendationScore": 21,
-      "consensus": "一致負評",
-      "confidence": "中",
-      "nPosts": 1,
-      "nComments": 10,
-      "rawComments": 14,
-      "eligibleComments": 10,
-      "uniqueEligibleCommenters": 10,
-      "independentThreads": 1,
-      "volumeLevel": "中等",
-      "positivePct": 18,
-      "neutralPct": 0,
-      "negativePct": 82,
-      "likes": [
-        "高麗菜脆，花枝有三塊"
-      ],
-      "cautions": [
-        "花枝偏少",
-        "台灣製麵糊，119元偏貴",
-        "店員忘拿醬包就微波"
-      ],
-      "excerpt": "本體偏軟但調味不鹹，整體好吃可解饞",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1732026205.A.065.html"
-      ],
-      "latestDate": "2024-11-19",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/dplOp8P.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1732026205.A.065.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -86142,6 +86177,43 @@
         "sourceKind": "ptt",
         "rotate": 0
       },
+      "vegetarian": null
+    },
+    {
+      "id": "7-11::21plus好食蛋白飯糰拌拌餐",
+      "brand": "7-11",
+      "productName": "21plus好食蛋白飯糰拌拌餐",
+      "price": 99,
+      "category": "便當",
+      "fairScore": 27,
+      "recommendationScore": 12,
+      "consensus": "一致負評",
+      "confidence": "中",
+      "nPosts": 1,
+      "nComments": 12,
+      "rawComments": 15,
+      "eligibleComments": 12,
+      "uniqueEligibleCommenters": 12,
+      "independentThreads": 1,
+      "volumeLevel": "中等",
+      "positivePct": 0,
+      "neutralPct": 8,
+      "negativePct": 92,
+      "likes": [],
+      "cautions": [
+        "份量少，價格高到打五折也不想買",
+        "連蔬菜都沒有"
+      ],
+      "excerpt": "份量少、飯糰偏硬，肉普通，99元太坑",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1795755840.A.DBA.html"
+      ],
+      "latestDate": "2026-11-27",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": null,
       "vegetarian": null
     },
     {
@@ -98245,6 +98317,50 @@
       "vegetarian": null
     },
     {
+      "id": "全家::金色三麥威士忌冬瓜調酒",
+      "brand": "全家",
+      "productName": "金色三麥威士忌冬瓜調酒",
+      "price": null,
+      "category": "飲料",
+      "fairScore": 65,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 0,
+      "rawComments": 0,
+      "eligibleComments": 0,
+      "uniqueEligibleCommenters": 0,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "威士忌冬瓜香味很足"
+      ],
+      "cautions": [
+        "味道太清爽，感覺不太搭",
+        "價格偏貴"
+      ],
+      "excerpt": "冬瓜香足帶紅茶感，但太清爽不太搭",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1746278659.A.745.html"
+      ],
+      "latestDate": "2025-05-03",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/C3w5l1p.jpg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1746278659.A.745.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "萊爾富::清原芋見雲朵",
       "brand": "萊爾富",
       "productName": "清原芋見雲朵",
@@ -98361,50 +98477,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1746802247.A.383.html"
       ],
       "latestDate": "2025-05-09",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/C3w5l1p.jpg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1746278659.A.745.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::金色三麥威士忌冬瓜調酒",
-      "brand": "全家",
-      "productName": "金色三麥威士忌冬瓜調酒",
-      "price": null,
-      "category": "飲料",
-      "fairScore": 65,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 0,
-      "rawComments": 0,
-      "eligibleComments": 0,
-      "uniqueEligibleCommenters": 0,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "威士忌冬瓜香味很足"
-      ],
-      "cautions": [
-        "味道太清爽，感覺不太搭",
-        "價格偏貴"
-      ],
-      "excerpt": "冬瓜香足帶紅茶感，但太清爽不太搭",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1746278659.A.745.html"
-      ],
-      "latestDate": "2025-05-03",
       "youtube": [],
       "kcal": null,
       "nutrition": null,
@@ -99236,43 +99308,6 @@
         "https://www.ptt.cc/bbs/CVS/M.1743823092.A.AF2.html"
       ],
       "latestDate": "2025-04-05",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": null,
-      "vegetarian": null
-    },
-    {
-      "id": "7-11::雪樹伏特加",
-      "brand": "7-11",
-      "productName": "雪樹伏特加",
-      "price": 79,
-      "category": "飲料",
-      "fairScore": 64,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 1,
-      "rawComments": 1,
-      "eligibleComments": 1,
-      "uniqueEligibleCommenters": 1,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "瓶身外觀漂亮",
-        "加冰配可樂好喝"
-      ],
-      "cautions": [],
-      "excerpt": "瓶身很美，加冰塊配可樂好喝",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1795706926.A.541.html"
-      ],
-      "latestDate": "2026-11-26",
       "youtube": [],
       "kcal": null,
       "nutrition": null,
@@ -101405,12 +101440,12 @@
       "recommendationScore": null,
       "consensus": "資料不足",
       "confidence": "低",
-      "nPosts": 2,
+      "nPosts": 1,
       "nComments": 1,
       "rawComments": 1,
       "eligibleComments": 1,
       "uniqueEligibleCommenters": 1,
-      "independentThreads": 2,
+      "independentThreads": 1,
       "volumeLevel": "不足",
       "positivePct": null,
       "neutralPct": null,
@@ -105004,6 +105039,48 @@
       "vegetarian": null
     },
     {
+      "id": "7-11::這不是芝麻球",
+      "brand": "7-11",
+      "productName": "這不是芝麻球",
+      "price": 39,
+      "category": "甜點",
+      "fairScore": 55,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 0,
+      "rawComments": 0,
+      "eligibleComments": 0,
+      "uniqueEligibleCommenters": 0,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [],
+      "cautions": [
+        "芝麻容易掉",
+        "不好吃又麻煩"
+      ],
+      "excerpt": "芝麻易掉，微波後像麻糬，不太好吃又麻煩",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1792242091.A.D66.html"
+      ],
+      "latestDate": "2026-10-17",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://www.7-11.com.tw/freshfoods/1_Ricerolls/images/ricerolls_630.png",
+        "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/1_Ricerolls/index.aspx",
+        "sourceKind": "official_retailer",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "7-11::韓國生乳風味甜甜圈",
       "brand": "7-11",
       "productName": "韓國生乳風味甜甜圈",
@@ -105450,48 +105527,6 @@
       "vegetarian": null
     },
     {
-      "id": "7-11::這不是芝麻球",
-      "brand": "7-11",
-      "productName": "這不是芝麻球",
-      "price": 39,
-      "category": "甜點",
-      "fairScore": 55,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 0,
-      "rawComments": 0,
-      "eligibleComments": 0,
-      "uniqueEligibleCommenters": 0,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [],
-      "cautions": [
-        "芝麻容易掉",
-        "不好吃又麻煩"
-      ],
-      "excerpt": "芝麻易掉，微波後像麻糬，不太好吃又麻煩",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1792242091.A.D66.html"
-      ],
-      "latestDate": "2026-10-17",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://www.7-11.com.tw/freshfoods/1_Ricerolls/images/ricerolls_630.png",
-        "sourcePageUrl": "https://www.7-11.com.tw/freshfoods/1_Ricerolls/index.aspx",
-        "sourceKind": "official_retailer",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
       "id": "7-11::DyDo白葡萄沙瓦風味氣泡飲",
       "brand": "7-11",
       "productName": "DyDo白葡萄沙瓦風味氣泡飲",
@@ -105620,6 +105655,49 @@
       "vegetarian": null
     },
     {
+      "id": "全家::鐵觀音曲奇禮盒",
+      "brand": "全家",
+      "productName": "鐵觀音曲奇禮盒",
+      "price": 367,
+      "category": "零食",
+      "fairScore": 54,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 1,
+      "rawComments": 1,
+      "eligibleComments": 1,
+      "uniqueEligibleCommenters": 1,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [
+        "曲奇酥脆，茶香味濃郁"
+      ],
+      "cautions": [
+        "曲奇口感偏乾"
+      ],
+      "excerpt": "曲奇酥脆、茶香濃郁，附提袋適合送人",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1725540363.A.D54.html"
+      ],
+      "latestDate": "2024-09-05",
+      "youtube": [],
+      "kcal": null,
+      "nutrition": null,
+      "image": {
+        "imageUrl": "https://i.imgur.com/R6gT9y4.jpeg",
+        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1725540363.A.D54.html",
+        "sourceKind": "ptt",
+        "rotate": 0
+      },
+      "vegetarian": null
+    },
+    {
       "id": "全家::SUPERX巧克力牛奶蛋白雪糕",
       "brand": "全家",
       "productName": "SUPERX巧克力牛奶蛋白雪糕",
@@ -105658,49 +105736,6 @@
       "image": {
         "imageUrl": "https://i.imgur.com/U2VhPB3.jpg",
         "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1725624133.A.00B.html",
-        "sourceKind": "ptt",
-        "rotate": 0
-      },
-      "vegetarian": null
-    },
-    {
-      "id": "全家::鐵觀音曲奇禮盒",
-      "brand": "全家",
-      "productName": "鐵觀音曲奇禮盒",
-      "price": 367,
-      "category": "零食",
-      "fairScore": 54,
-      "recommendationScore": null,
-      "consensus": "資料不足",
-      "confidence": "低",
-      "nPosts": 1,
-      "nComments": 1,
-      "rawComments": 1,
-      "eligibleComments": 1,
-      "uniqueEligibleCommenters": 1,
-      "independentThreads": 1,
-      "volumeLevel": "不足",
-      "positivePct": null,
-      "neutralPct": null,
-      "negativePct": null,
-      "likes": [
-        "曲奇酥脆，茶香味濃郁"
-      ],
-      "cautions": [
-        "曲奇口感偏乾"
-      ],
-      "excerpt": "曲奇酥脆、茶香濃郁，附提袋適合送人",
-      "reviewProvisional": false,
-      "postUrls": [
-        "https://www.ptt.cc/bbs/CVS/M.1725540363.A.D54.html"
-      ],
-      "latestDate": "2024-09-05",
-      "youtube": [],
-      "kcal": null,
-      "nutrition": null,
-      "image": {
-        "imageUrl": "https://i.imgur.com/R6gT9y4.jpeg",
-        "sourcePageUrl": "https://www.ptt.cc/bbs/CVS/M.1725540363.A.D54.html",
         "sourceKind": "ptt",
         "rotate": 0
       },
@@ -109186,6 +109221,43 @@
       "vegetarian": null
     },
     {
+      "id": "全家::士力架花生巧克力雪糕",
+      "brand": "全家",
+      "productName": "士力架花生巧克力雪糕",
+      "price": 49,
+      "category": "冰品",
+      "fairScore": 40,
+      "recommendationScore": null,
+      "consensus": "資料不足",
+      "confidence": "低",
+      "nPosts": 1,
+      "nComments": 0,
+      "rawComments": 0,
+      "eligibleComments": 0,
+      "uniqueEligibleCommenters": 0,
+      "independentThreads": 1,
+      "volumeLevel": "不足",
+      "positivePct": null,
+      "neutralPct": null,
+      "negativePct": null,
+      "likes": [],
+      "cautions": [
+        "味道不像士力架，實際只是雙色脆皮雪糕",
+        "花生味重像米漿，價格偏高且不如普通脆皮雪糕好吃"
+      ],
+      "excerpt": "雙色脆皮雪糕，花生味像米漿，價格偏高且不如普通款",
+      "reviewProvisional": false,
+      "postUrls": [
+        "https://www.ptt.cc/bbs/CVS/M.1795755064.A.78F.html"
+      ],
+      "latestDate": "2026-11-27",
+      "youtube": [],
+      "kcal": 193,
+      "nutrition": null,
+      "image": null,
+      "vegetarian": null
+    },
+    {
       "id": "全家::嵜本柚子胡椒雞肉棒",
       "brand": "全家",
       "productName": "嵜本柚子胡椒雞肉棒",
@@ -110535,7 +110607,21 @@
         }
       ],
       "kcal": 189,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "375 毫升",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 188.8,
+          "protein": 7.1,
+          "fat": 6.0,
+          "saturatedFat": 4.1,
+          "transFat": 0.0,
+          "carbohydrate": 26.6,
+          "sugar": 24.4,
+          "sodium": 120.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -111104,7 +111190,21 @@
         }
       ],
       "kcal": 638,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "382 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 638.0,
+          "protein": 24.4,
+          "fat": 20.6,
+          "saturatedFat": 8.8,
+          "transFat": 0.0,
+          "carbohydrate": 88.6,
+          "sugar": 5.7,
+          "sodium": 1070.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -111151,7 +111251,21 @@
         }
       ],
       "kcal": 307,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "100 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 307.0,
+          "protein": 8.2,
+          "fat": 15.8,
+          "saturatedFat": 6.5,
+          "transFat": 0.0,
+          "carbohydrate": 33.0,
+          "sugar": 7.6,
+          "sodium": 815.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -111285,7 +111399,21 @@
         }
       ],
       "kcal": 282,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "460 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 282.0,
+          "protein": 11.0,
+          "fat": 6.4,
+          "saturatedFat": 2.3,
+          "transFat": 0.0,
+          "carbohydrate": 45.1,
+          "sugar": 0.0,
+          "sodium": 1711.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -111983,7 +112111,21 @@
         }
       ],
       "kcal": 742,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "270 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 742.2,
+          "protein": 41.9,
+          "fat": 45.6,
+          "saturatedFat": 11.1,
+          "transFat": 0.0,
+          "carbohydrate": 41.0,
+          "sugar": 3.2,
+          "sodium": 702.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -112063,7 +112205,21 @@
         }
       ],
       "kcal": 234,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "100 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 234.0,
+          "protein": 7.7,
+          "fat": 5.2,
+          "saturatedFat": 2.1,
+          "transFat": 0.0,
+          "carbohydrate": 39.1,
+          "sugar": 7.9,
+          "sodium": 851.6
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -112383,7 +112539,21 @@
         }
       ],
       "kcal": 74,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "60 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 73.8,
+          "protein": 10.1,
+          "fat": 2.5,
+          "saturatedFat": 0.6,
+          "transFat": 0.0,
+          "carbohydrate": 2.7,
+          "sugar": 2.2,
+          "sodium": 467.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -112423,7 +112593,21 @@
         }
       ],
       "kcal": 228,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "75 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 227.5,
+          "protein": 5.7,
+          "fat": 12.5,
+          "saturatedFat": 3.0,
+          "transFat": 0.0,
+          "carbohydrate": 24.3,
+          "sugar": 10.9,
+          "sodium": 286.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -112470,7 +112654,21 @@
         }
       ],
       "kcal": 166,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "109 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 166.0,
+          "protein": 5.3,
+          "fat": 1.1,
+          "saturatedFat": 0.4,
+          "transFat": 0.0,
+          "carbohydrate": 33.7,
+          "sugar": 1.0,
+          "sodium": 421.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -112557,7 +112755,21 @@
         }
       ],
       "kcal": 339,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "50 公克",
+        "packageServings": 3.0,
+        "servings": 3,
+        "perServing": {
+          "kcal": 112.9,
+          "protein": 0.9,
+          "fat": 4.1,
+          "saturatedFat": 1.6,
+          "transFat": 0.0,
+          "carbohydrate": 18.2,
+          "sugar": 6.4,
+          "sodium": 152.3
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -113759,7 +113971,21 @@
         }
       ],
       "kcal": 360,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "85 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 360.0,
+          "protein": 6.2,
+          "fat": 18.5,
+          "saturatedFat": 9.4,
+          "transFat": 0.0,
+          "carbohydrate": 42.2,
+          "sugar": 19.9,
+          "sodium": 338.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -115445,7 +115671,21 @@
         }
       ],
       "kcal": 134,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "320 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 134.0,
+          "protein": 15.0,
+          "fat": 6.1,
+          "saturatedFat": 1.9,
+          "transFat": 0.0,
+          "carbohydrate": 4.8,
+          "sugar": 2.2,
+          "sodium": 870.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -119220,7 +119460,21 @@
         }
       ],
       "kcal": 259,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "105 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 259.0,
+          "protein": 12.9,
+          "fat": 12.9,
+          "saturatedFat": 5.1,
+          "transFat": 0.0,
+          "carbohydrate": 22.9,
+          "sugar": 8.4,
+          "sodium": 645.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -119260,7 +119514,21 @@
         }
       ],
       "kcal": 260,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "90 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 260.0,
+          "protein": 2.6,
+          "fat": 15.1,
+          "saturatedFat": 8.2,
+          "transFat": 0.0,
+          "carbohydrate": 28.4,
+          "sugar": 21.2,
+          "sodium": 40.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -120822,7 +121090,21 @@
         }
       ],
       "kcal": 724,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "436 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 724.0,
+          "protein": 24.9,
+          "fat": 24.4,
+          "saturatedFat": 7.8,
+          "transFat": 0.0,
+          "carbohydrate": 100.7,
+          "sugar": 7.4,
+          "sodium": 1216.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -120862,7 +121144,21 @@
         }
       ],
       "kcal": 330,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "191 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 330.0,
+          "protein": 10.1,
+          "fat": 5.3,
+          "saturatedFat": 1.1,
+          "transFat": 0.0,
+          "carbohydrate": 60.5,
+          "sugar": 7.3,
+          "sodium": 787.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -122198,7 +122494,21 @@
         }
       ],
       "kcal": 567,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "361 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 567.0,
+          "protein": 22.4,
+          "fat": 14.1,
+          "saturatedFat": 2.5,
+          "transFat": 0.0,
+          "carbohydrate": 87.4,
+          "sugar": 0.0,
+          "sodium": 1141.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -122506,7 +122816,21 @@
         }
       ],
       "kcal": 254,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "180 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 254.0,
+          "protein": 10.3,
+          "fat": 9.0,
+          "saturatedFat": 2.7,
+          "transFat": 0.0,
+          "carbohydrate": 32.9,
+          "sugar": 4.0,
+          "sodium": 578.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -122626,7 +122950,21 @@
         }
       ],
       "kcal": 206,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "55 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 205.6,
+          "protein": 8.3,
+          "fat": 15.1,
+          "saturatedFat": 5.3,
+          "transFat": 0.0,
+          "carbohydrate": 9.2,
+          "sugar": 6.7,
+          "sodium": 433.4
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -122746,7 +123084,21 @@
         }
       ],
       "kcal": 283,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "152 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 283.0,
+          "protein": 9.3,
+          "fat": 7.9,
+          "saturatedFat": 1.7,
+          "transFat": 0.0,
+          "carbohydrate": 43.6,
+          "sugar": 2.1,
+          "sodium": 578.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -124555,7 +124907,21 @@
         }
       ],
       "kcal": 466,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "160 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 466.0,
+          "protein": 13.9,
+          "fat": 11.5,
+          "saturatedFat": 7.2,
+          "transFat": 0.0,
+          "carbohydrate": 76.8,
+          "sugar": 20.2,
+          "sodium": 694.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -124595,7 +124961,21 @@
         }
       ],
       "kcal": 402,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "38 公克",
+        "packageServings": 3.0,
+        "servings": 3,
+        "perServing": {
+          "kcal": 134.0,
+          "protein": 3.1,
+          "fat": 5.0,
+          "saturatedFat": 2.3,
+          "transFat": 0.0,
+          "carbohydrate": 19.2,
+          "sugar": 4.5,
+          "sodium": 126.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -124635,7 +125015,21 @@
         }
       ],
       "kcal": 238,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "78 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 238.0,
+          "protein": 7.4,
+          "fat": 7.6,
+          "saturatedFat": 4.2,
+          "transFat": 0.0,
+          "carbohydrate": 34.9,
+          "sugar": 2.9,
+          "sodium": 450.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -124675,7 +125069,21 @@
         }
       ],
       "kcal": 529,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "125 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 529.0,
+          "protein": 10.4,
+          "fat": 23.6,
+          "saturatedFat": 9.5,
+          "transFat": 0.0,
+          "carbohydrate": 68.5,
+          "sugar": 19.0,
+          "sodium": 330.0
+        }
+      },
       "image": null,
       "vegetarian": null
     },
@@ -126169,7 +126577,21 @@
         }
       ],
       "kcal": 489,
-      "nutrition": null,
+      "nutrition": {
+        "servingSize": "0 公克",
+        "packageServings": 1.0,
+        "servings": 1,
+        "perServing": {
+          "kcal": 489.0,
+          "protein": 24.1,
+          "fat": 12.4,
+          "saturatedFat": 2.9,
+          "transFat": 0.0,
+          "carbohydrate": 70.4,
+          "sugar": 5.5,
+          "sodium": 1139.0
+        }
+      },
       "image": null,
       "vegetarian": null
     }
