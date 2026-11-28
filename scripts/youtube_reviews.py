@@ -2,7 +2,8 @@
 
 For each new video from the channels in config.yaml (YOUTUBE):
   1. list it with the official Data API (key in ~/.config/youtube/env),
-  2. download the audio with yt-dlp and transcribe it locally with faster-whisper,
+  2. use the creator's own Chinese captions when they pass a sanity check;
+     otherwise download the audio with yt-dlp and transcribe it locally with faster-whisper,
   3. let Codex extract one row per product, check the rows mechanically,
   4. let a second Codex pass check each row against the transcript,
   5. append the surviving rows; record the video in youtube_videos.csv.
@@ -44,6 +45,11 @@ PROMPTS = ROOT / "scripts" / "prompts"
 CVS_TITLE = re.compile(r"超商|便利商店|7-?11|小七|711|全家|萊爾富|OK超商|FamilyMart|7-Eleven", re.I)
 FOREIGN_TITLE = re.compile(r"日本|韓國|Lawson|羅森|泰國|香港")
 WHISPER_PROMPT = "以下是繁體中文的超商新品開箱影片，提到7-11、全家、萊爾富的商品、價格和好不好吃。"
+# Creator-uploaded tracks only, in preference order. YouTube's automatic tracks
+# are no use here: on these channels the "-orig" track is English and the
+# Chinese automatic track is a translation of it.
+CAPTION_LANGS = ["zh-TW", "zh-Hant", "zh-HK", "zh"]
+CJK = re.compile(r"[㐀-鿿]")
 
 
 def log(message: str) -> None:
@@ -111,11 +117,82 @@ def new_videos(key: str, seen: set[str], lookback_days: int) -> list[dict]:
     return sorted(found, key=lambda video: video["published"])
 
 
+def vtt_lines(text: str) -> list[str]:
+    """WebVTT cues -> `m:ss text` lines (the whisper transcript format), repeats dropped."""
+    lines: list[str] = []
+    for block in re.split(r"\n\s*\n", text.replace("\r", "")):
+        stamp = re.search(r"(?:(\d+):)?(\d{2}):(\d{2})\.\d+\s+-->", block)
+        if not stamp:
+            continue
+        seconds = int(stamp[1] or 0) * 3600 + int(stamp[2]) * 60 + int(stamp[3])
+        # Only the payload after the timing line: a numeric line before it is a cue id,
+        # one after it is a price or score said on screen.
+        payload = block[stamp.end():].split("\n", 1)[1] if "\n" in block[stamp.end():] else ""
+        body = " ".join(
+            re.sub(r"<[^>]+>", "", line).strip() for line in payload.splitlines() if line.strip()
+        ).strip()
+        if body and not (lines and lines[-1].split(" ", 1)[1] == body):
+            lines.append(f"{seconds // 60}:{seconds % 60:02d} {body}")
+    return lines
+
+
+def caption_problem(lines: list[str], duration: int) -> str | None:
+    """Why these captions can't stand in for a transcript, or None if they can."""
+    if len(lines) < 20:
+        return f"only {len(lines)} lines"
+    text = "".join(line.split(" ", 1)[1] for line in lines)
+    letters = [c for c in text if c.isalpha()]
+    cjk = sum(bool(CJK.match(c)) for c in letters) / max(len(letters), 1)
+    if cjk < 0.6:
+        return f"only {cjk:.0%} Chinese characters"
+    minutes, seconds = lines[-1].split(" ", 1)[0].split(":")
+    covered = (int(minutes) * 60 + int(seconds)) / max(duration, 1)
+    if covered < 0.6:
+        return f"captions stop at {covered:.0%} of the video"
+    return None
+
+
+def captions(video: dict) -> list[str] | None:
+    """The creator's own Chinese captions as transcript lines, or None to fall back to whisper."""
+    video_id = video["video_id"]
+    with tempfile.TemporaryDirectory() as tmp:
+        # --sleep-subtitles: subtitle requests in quick succession get HTTP 429 (yt-dlp #13831).
+        try:
+            result = subprocess.run(
+                ["yt-dlp", "--no-update", "--skip-download", "--write-subs", "--sub-langs", ",".join(CAPTION_LANGS),
+                 "--sub-format", "vtt", "--sleep-subtitles", "125", "-o", f"{tmp}/sub",
+                 f"https://www.youtube.com/watch?v={video_id}"],
+                capture_output=True, text=True, timeout=600,
+            )
+        except subprocess.TimeoutExpired:
+            log(f"{video_id}: caption download timed out, transcribing instead")
+            return None
+        found = {path.suffixes[-2].lstrip("."): path for path in Path(tmp).glob("sub.*.vtt")}
+        if result.returncode:
+            log(f"{video_id}: caption download failed, transcribing instead: {result.stderr.strip()[-300:]}")
+            return None
+        lang = next((lang for lang in CAPTION_LANGS if lang in found), None)
+        if lang is None:
+            log(f"{video_id}: no creator Chinese captions, transcribing")
+            return None
+        lines = vtt_lines(found[lang].read_text(encoding="utf-8"))
+    if problem := caption_problem(lines, int(video.get("duration") or 0)):
+        log(f"{video_id}: {lang} captions rejected ({problem}), transcribing instead")
+        return None
+    log(f"{video_id}: using creator {lang} captions ({len(lines)} lines)")
+    return lines
+
+
 def transcript(video: dict) -> Path:
-    """Cached `m:ss text` transcript; the audio is deleted once it is written."""
+    """Cached `m:ss text` transcript: creator captions if usable, else whisper (audio deleted after)."""
     CACHE.mkdir(parents=True, exist_ok=True)
     out = CACHE / f"{video['video_id']}.txt"
     if out.exists() and out.stat().st_size:
+        return out
+    if lines := captions(video):
+        tmp = out.with_suffix(".tmp")
+        tmp.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        tmp.replace(out)
         return out
     audio = CACHE / f"{video['video_id']}.m4a"
     subprocess.run(
