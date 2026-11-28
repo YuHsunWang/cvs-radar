@@ -5,6 +5,14 @@ import { CircleHelp } from 'lucide-react'
 
 export const TOUR_DONE_KEY = 'cvs-radar-tour-done'
 
+// Say what the button really does here: only browsers that captured an install
+// prompt can add the site in one tap; elsewhere it opens step-by-step help.
+function installHint(): string {
+  return window.__installPrompt
+    ? '點這個按鈕，手機會問你要不要把超商雷達加到桌面。加了之後，下次像 App 一樣一點就開。'
+    : '點這個按鈕，會告訴你怎麼把超商雷達加到手機桌面。加了之後，下次像 App 一樣一點就開。'
+}
+
 // Phones hide the inline filter bar and use the quick row + floating button
 // instead (same 640px breakpoint as shelf.css), so the tour points at those.
 function tourSteps(): DriveStep[] {
@@ -21,6 +29,10 @@ function tourSteps(): DriveStep[] {
     { element: '.sl-label .sl-score', popover: { title: '分數', description: '0–100 分，越高代表越多人推。「—」是心得太少，先不給分。' } },
     { element: '.sl-label .sl-rowbtn', popover: { title: '點開看心得', description: '點卡片可以看網友怎麼說，還有 PTT 原文連結。' } },
     { element: '.sl-tour-btn', popover: { title: '想再看一次？', description: '隨時點這個問號，就能重看導覽。' } },
+    // Phones only (shelf.css hides the button wider); InstallButton renders nothing once added.
+    ...(phone
+      ? [{ element: '.sl-a2hs-btn', popover: { title: '加到手機桌面', description: installHint() } }]
+      : []),
   ]
   // An empty search result has no card to point at; skip what isn't on the page.
   return steps.filter((step) => typeof step.element === 'string' && document.querySelector(step.element))

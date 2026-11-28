@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import { SlidersHorizontal, X } from 'lucide-react'
 import SearchBar from '@/components/SearchBar'
 import ShelfCard from '@/components/ShelfCard'
+import InstallButton from '@/components/InstallButton'
 import TourButton, { startTour, tourSeen } from '@/components/SiteTour'
 import ThemeToggle from '@/components/ThemeToggle'
 import {
@@ -643,6 +644,7 @@ export default function ShelfExplorer({ initialPayload }: ShelfExplorerProps) {
             }}
           />
         </div>
+        <InstallButton />
         <TourButton />
         <ThemeToggle />
       </header>

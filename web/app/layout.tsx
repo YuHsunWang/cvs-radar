@@ -3,6 +3,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import { GA_ID } from '@/lib/analytics'
 import { getSiteUrl } from '@/lib/site-url'
 import { themeInitScript } from '@/lib/theme'
+import { installPromptScript } from '@/lib/install'
 import './globals.css'
 
 const siteUrl = getSiteUrl()
@@ -27,6 +28,8 @@ export const metadata: Metadata = {
   // Google Search Console ownership. The GA method cannot work here: the gtag
   // script is injected after hydration, so it is not in the served <head>.
   verification: { google: 'D1Z_F5RHsAuPtnChiRuTyvzCq_bJHpboozGCKd1nwGU' },
+  // Home-screen name and full-screen launch on iPhone (Android reads manifest.ts).
+  appleWebApp: { capable: true, title: '超商雷達', statusBarStyle: 'default' },
   twitter: {
     card: 'summary_large_image',
     title: 'CVS Radar | 超商商品評價雷達',
@@ -44,6 +47,7 @@ export default function RootLayout({
     <html lang="zh-Hant-TW" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: installPromptScript }} />
       </head>
       <body>{children}</body>
       {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
